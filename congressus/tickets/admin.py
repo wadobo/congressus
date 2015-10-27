@@ -10,9 +10,8 @@ class EventAdmin(admin.ModelAdmin):
 
 
 class TicketAdmin(admin.ModelAdmin):
-    list_display = ('order', 'event', 'confirmed', 'name', 'surname',
-                    'email')
-    list_filter = ('confirmed',)
+    list_display = ('order', 'event', 'confirmed', 'name', 'email', 'type', 'food')
+    list_filter = ('confirmed', 'food', 'type')
     date_hierarchy = 'created'
 
 
