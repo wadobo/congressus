@@ -1,3 +1,44 @@
-from django.shortcuts import render
+from django.conf import settings
+from django.utils import timezone
+from django.views.generic.edit import CreateView
+from django.views.generic.edit import ModelFormMixin
+from django.views.generic import TemplateView
+from django.views.generic import View
 
-# Create your views here.
+from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
+from django.core.urlresolvers import reverse
+
+from .models import Ticket
+from .models import Event
+
+
+class Register(CreateView):
+    model = Ticket
+    fields = Ticket.form_fields
+
+    def form_valid(self, form):
+        evid = self.kwargs['evid']
+        ev = get_object_or_404(Event, id=evid)
+        self.object = form.save(commit=False)
+        self.object.event = ev
+        self.object.order = timezone.now().strftime('%y%m%d%H%M%S')
+        self.object.save()
+        return super(ModelFormMixin, self).form_valid(form)
+
+    def get_success_url(self):
+        '''
+        Redirecting to TPV payment
+        '''
+        return reverse('payment', kwargs={'tkid': self.object.id})
+register = Register.as_view()
+
+
+class Payment(TemplateView):
+    template_name = 'tickets/payment.html'
+
+    def get_context_data(self, *args, **kwargs):
+        ctx = super(Payment, self).get_context_data(*args, **kwargs)
+        ctx['ticket'] = get_object_or_404(Ticket, id=kwargs['tkid'])
+        return ctx
+payment = Payment.as_view()
