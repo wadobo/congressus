@@ -1,2 +1,7 @@
-{{ ticket.name }} - {{ ticket.surname }}
-{{ ticket.order }}
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+    {{ ticket.name }} - {{ ticket.surname }}
+    {{ ticket.order }}
+{% endblock %}
