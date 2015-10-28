@@ -3,10 +3,16 @@
 {% load bootstrap %}
 
 {% block content %}
+    <div class="page-header">
+        <h1>
+            {{ ev }}
+            <small>{% trans "Fill the form and continue to complete the payment" %}</small>
+        </h1>
+    </div>
+
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
             <form role="form" action="" method="post" enctype="multipart/form-data">
-                <legend>{{ ev }}</legend>
                 {% csrf_token %}
                 {{ form|bootstrap }}
                 <div class="form-group">
