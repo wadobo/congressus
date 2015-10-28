@@ -23,6 +23,7 @@ class Event(models.Model):
     price_student = models.IntegerField(_('student price'), default=25)
     info = models.TextField(blank=True, null=True)
     active = models.BooleanField(default=False)
+    admin = models.EmailField(_('admin email'), blank=True, null=True)
 
     class Meta:
         ordering = ['-start']
