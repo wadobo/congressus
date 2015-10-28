@@ -1,0 +1,51 @@
+{% load i18n %}
+
+<table class="table table-striped table-bordered" role="table">
+    <tr>
+        <th class="bg-info" colspan="2">{% trans "Ticket info" %}</th>
+    </tr>
+    <tr>
+        <th>{% trans "Event" %}</th>
+        <td>{{ ticket.event }}</td>
+    </tr>
+    <tr>
+        <th>{% trans "ticket number" %}</th>
+        <td>{{ ticket.order }}</td>
+    </tr>
+    <tr>
+        <th>{% trans "ticket price" %}</th>
+        <td>{{ ticket.get_price|floatformat:2 }} €</td>
+    </tr>
+    <tr>
+        <th>{% trans "ticket confirmed" %}</th>
+        <td>{{ ticket.confirmed|yesno }}</td>
+    </tr>
+    <tr>
+        <th class="bg-info" colspan="2">{% trans "Personal info" %}</th>
+    </tr>
+    {% for f in ticket.get_personal_info %}
+        <tr>
+            <th>{{ f.name }}</th>
+            <td>
+                {% if f.f == 'photo' %}
+                    {% if f.value %}
+                        <img width="200px" class="img-thumbnail" src="{{ MEDIA_URL }}{{ f.value }}" alt="{% trans "photo" %}"/>
+                    {% else %}
+                        {% trans "No photo" %}
+                    {% endif %}
+                {% else %}
+                    {{ f.value }}
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    <tr>
+        <th class="bg-info" colspan="2">{% trans "Registration info" %}</th>
+    </tr>
+    {% for f in ticket.get_reg_info %}
+        <tr>
+            <th>{{ f.name }}</th>
+            <td>{{ f.value }}</td>
+        </tr>
+    {% endfor %}
+</table>

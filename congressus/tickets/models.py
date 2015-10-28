@@ -55,8 +55,35 @@ class Ticket(models.Model):
     arrival = models.DateField(_('Arrival date'), help_text='dd/mm/YYYY')
     departure = models.DateField(_('Departure date'), help_text='dd/mm/YYYY')
 
-    form_fields = ['email', 'name', 'address', 'org', 'photo',
-                   'type', 'food', 'comments', 'arrival', 'departure']
+    personal_info = ['email', 'name', 'address', 'org', 'photo']
+    reg_info = ['type', 'food', 'comments', 'arrival', 'departure']
+    form_fields = personal_info + reg_info
+
+    def get_personal_info(self):
+        pinfo = []
+        for f in self.personal_info:
+            field = getattr(self, f)
+            name = Ticket._meta.get_field_by_name(f)[0].verbose_name
+            pinfo.append({'value': field, 'name': name, 'f': f})
+        return pinfo
+
+    def get_reg_info(self):
+        pinfo = []
+        for f in self.reg_info:
+            field = getattr(self, f)
+            name = Ticket._meta.get_field_by_name(f)[0].verbose_name
+            pinfo.append({'value': field, 'name': name})
+        return pinfo
+
+    def get_price(self):
+        price = self.event.price
+        if self.type == 'speaker':
+            price = self.event.price_speaker
+        elif self.type == 'sponsor':
+            price = self.event.price_sponsor
+        elif self.type == 'student':
+            price = self.event.price_student
+        return price
 
     class Meta:
         ordering = ['-created']

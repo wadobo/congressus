@@ -50,3 +50,13 @@ class Payment(TemplateView):
         ctx['ticket'] = get_object_or_404(Ticket, order=kwargs['order'])
         return ctx
 payment = Payment.as_view()
+
+
+class Thanks(TemplateView):
+    template_name = 'tickets/thanks.html'
+
+    def get_context_data(self, *args, **kwargs):
+        ctx = super(Thanks, self).get_context_data(*args, **kwargs)
+        ctx['ticket'] = get_object_or_404(Ticket, order=kwargs['order'])
+        return ctx
+thanks = Thanks.as_view()
