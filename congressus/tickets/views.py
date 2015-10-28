@@ -38,6 +38,12 @@ class Register(CreateView):
         '''
         Redirecting to TPV payment
         '''
+
+        if not self.object.get_price():
+            # TODO: notify to the admin
+            # manual confirm?
+            return reverse('thanks', kwargs={'order': self.object.order})
+
         return reverse('payment', kwargs={'order': self.object.order})
 register = Register.as_view()
 
