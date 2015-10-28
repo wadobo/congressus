@@ -18,6 +18,13 @@ class Register(CreateView):
     model = Ticket
     fields = Ticket.form_fields
 
+    def get_context_data(self, *args, **kwargs):
+        ctx = super(Register, self).get_context_data(*args, **kwargs)
+        evid = self.kwargs['evid']
+        ev = get_object_or_404(Event, id=evid)
+        ctx['ev'] = ev
+        return ctx
+
     def form_valid(self, form):
         evid = self.kwargs['evid']
         ev = get_object_or_404(Event, id=evid)

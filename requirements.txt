@@ -2,3 +2,4 @@ django
 pytz
 ipdb
 pillow
+django-bootstrap-form
