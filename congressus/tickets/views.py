@@ -1,3 +1,4 @@
+import uuid
 from django.conf import settings
 from django.utils import timezone
 from django.views.generic.edit import CreateView
@@ -22,7 +23,7 @@ class Register(CreateView):
         ev = get_object_or_404(Event, id=evid)
         self.object = form.save(commit=False)
         self.object.event = ev
-        self.object.order = timezone.now().strftime('%y%m%d%H%M%S')
+        self.object.order = str(uuid.uuid4())
         self.object.save()
         return super(ModelFormMixin, self).form_valid(form)
 
@@ -30,7 +31,7 @@ class Register(CreateView):
         '''
         Redirecting to TPV payment
         '''
-        return reverse('payment', kwargs={'tkid': self.object.id})
+        return reverse('payment', kwargs={'order': self.object.order})
 register = Register.as_view()
 
 
@@ -39,6 +40,6 @@ class Payment(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         ctx = super(Payment, self).get_context_data(*args, **kwargs)
-        ctx['ticket'] = get_object_or_404(Ticket, id=kwargs['tkid'])
+        ctx['ticket'] = get_object_or_404(Ticket, order=kwargs['order'])
         return ctx
 payment = Payment.as_view()
