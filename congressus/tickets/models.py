@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 
 
 REG_TYPES = (
+    ('speaker', _('Speaker')),
     ('sponsor', _('Sponsor')),
     ('regular', _('Regular')),
     ('student', _('Student'))
@@ -21,6 +22,7 @@ class Event(models.Model):
     price = models.IntegerField(_('ticket price'), default=25)
     price_sponsor = models.IntegerField(_('sponsor price'), default=25)
     price_student = models.IntegerField(_('student price'), default=25)
+    price_speaker = models.IntegerField(_('speaker price'), default=0)
     info = models.TextField(blank=True, null=True)
     active = models.BooleanField(default=False)
     admin = models.EmailField(_('admin email'), blank=True, null=True)
