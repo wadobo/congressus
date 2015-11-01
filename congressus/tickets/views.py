@@ -1,4 +1,5 @@
 import uuid
+from hashlib import sha1
 from django.conf import settings
 from django.utils import timezone
 from django.views.generic.edit import CreateView
@@ -31,6 +32,7 @@ class Register(CreateView):
         self.object = form.save(commit=False)
         self.object.event = ev
         self.object.order = str(uuid.uuid4())
+        self.object.gen_order_tpv()
         self.object.save()
         return super(ModelFormMixin, self).form_valid(form)
 
@@ -53,7 +55,31 @@ class Payment(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         ctx = super(Payment, self).get_context_data(*args, **kwargs)
-        ctx['ticket'] = get_object_or_404(Ticket, order=kwargs['order'])
+        tk = get_object_or_404(Ticket, order=kwargs['order'])
+        ctx['ticket'] = tk
+
+        if not tk.order_tpv:
+            tk.gen_order_tpv()
+
+        amount = str(tk.get_price() * 100)
+        order = tk.order_tpv
+        merchant = settings.TPV_MERCHANT
+        currency = '978'
+        key = settings.TPV_KEY
+
+        msg = amount + order + merchant + currency + key
+        sig = sha1(msg.encode()).hexdigest().upper()
+
+        ctx.update({
+            'amount': amount,
+            'currency': currency,
+            'order': order,
+            'merchant': merchant,
+            'terminal': settings.TPV_TERMINAL,
+            'type': '0',
+            'sig': sig,
+        })
+
         return ctx
 payment = Payment.as_view()
 

@@ -119,3 +119,9 @@ STATICFILES_DIRS = (
 
 TPV_TERMINAL = 1
 TPV_MERCHANT = 'XXXXXX'
+TPV_KEY = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+
+try:
+    from local_settings import *
+except:
+    print("NO LOCAL SETTINGS")

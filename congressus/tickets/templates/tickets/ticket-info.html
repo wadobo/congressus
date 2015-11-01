@@ -13,6 +13,10 @@
         <td>{{ ticket.order }}</td>
     </tr>
     <tr>
+        <th>{% trans "payment number" %}</th>
+        <td>{{ ticket.order_tpv }}</td>
+    </tr>
+    <tr>
         <th>{% trans "ticket price" %}</th>
         <td>{{ ticket.get_price|floatformat:2 }} €</td>
     </tr>

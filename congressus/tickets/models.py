@@ -1,5 +1,9 @@
+import random
+from django.utils import timezone
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+
+from django.core.urlresolvers import reverse
 
 
 REG_TYPES = (
@@ -33,10 +37,14 @@ class Event(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse('register', kwargs={'id': self.id})
+
 
 class Ticket(models.Model):
     event = models.ForeignKey(Event, related_name='tickets')
     order = models.CharField(_('order'), max_length=200, unique=True)
+    order_tpv = models.CharField(_('order TPV'), max_length=12, blank=True, null=True)
     created = models.DateTimeField(_('created at'), auto_now_add=True)
 
     confirmed_date = models.DateTimeField(_('confirmed at'), blank=True, null=True)
@@ -58,6 +66,15 @@ class Ticket(models.Model):
     personal_info = ['email', 'name', 'address', 'org', 'photo']
     reg_info = ['type', 'food', 'comments', 'arrival', 'departure']
     form_fields = personal_info + reg_info
+
+    def get_absolute_url(self):
+        return reverse('payment', kwargs={'order': self.order})
+
+    def gen_order_tpv(self):
+        chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        self.order_tpv = timezone.now().strftime('%y%m%d')
+        self.order_tpv += ''.join(random.choice(chars) for _ in range(6))
+        self.save()
 
     def get_personal_info(self):
         pinfo = []
