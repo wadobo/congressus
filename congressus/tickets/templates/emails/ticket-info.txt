@@ -1,0 +1,18 @@
+{% load i18n %}
+{% trans "Ticket info" %}
+-----
+{% trans "Event" %}: {{ ticket.event }}
+{% trans "ticket number" %}: {{ ticket.order }}
+{% trans "payment number" %}: {{ ticket.order_tpv }}
+{% trans "ticket price" %}: {{ ticket.get_price|floatformat:2 }} €
+{% trans "ticket confirmed" %}: {{ ticket.confirmed|yesno }}
+
+{% trans "Personal info" %}
+-----
+{% for f in ticket.get_personal_info %}{{ f.name }}: {{ f.value }}
+{% endfor %}
+
+{% trans "Registration info" %}
+-----
+{% for f in ticket.get_reg_info %}{{ f.name }}: {{ f.value }}
+{% endfor %}

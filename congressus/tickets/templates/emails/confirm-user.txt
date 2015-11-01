@@ -1,0 +1,7 @@
+{% load i18n %}
+{% trans "Your ticket have been confirmed:" %}
+
+{% include "emails/ticket-info.txt" %}
+
+{% trans "Thank you" %}
+

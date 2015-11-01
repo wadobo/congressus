@@ -120,6 +120,7 @@ STATICFILES_DIRS = (
 TPV_TERMINAL = 1
 TPV_MERCHANT = 'XXXXXX'
 TPV_KEY = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+FROM_EMAIL = 'congressus@us.es'
 
 try:
     from local_settings import *

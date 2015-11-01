@@ -2,6 +2,13 @@ import random
 from django.utils import timezone
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.core.mail import EmailMessage
+from django.conf import settings
+from django.template.loader import get_template
+from django.template import Context
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from django.core.urlresolvers import reverse
 
@@ -49,6 +56,7 @@ class Ticket(models.Model):
 
     confirmed_date = models.DateTimeField(_('confirmed at'), blank=True, null=True)
     confirmed = models.BooleanField(default=False)
+    confirm_sent = models.BooleanField(default=False)
 
     # Form Fields
     email = models.EmailField(_('email'))
@@ -102,8 +110,42 @@ class Ticket(models.Model):
             price = self.event.price_student
         return price
 
+    def send_reg_email(self):
+        tmpl = get_template('emails/reg.txt')
+        d = Context({'ticket': self})
+        body = tmpl.render(d)
+        email = EmailMessage(_('New Register / %s') % self.event.name,
+                             body, settings.FROM_EMAIL, [self.event.admin])
+        email.send(fail_silently=False)
+
+    def send_confirm_email(self):
+        # email to admin
+        d = Context({'ticket': self})
+        tmpl = get_template('emails/confirm.txt')
+        body = tmpl.render(d)
+        email = EmailMessage(_('Confirmed / %s') % self.event.name,
+                             body, settings.FROM_EMAIL, [self.event.admin])
+        email.send(fail_silently=False)
+
+        # email to user
+        tmpl = get_template('emails/confirm-user.txt')
+        body = tmpl.render(d)
+        email = EmailMessage(_('Ticket Confirmed / %s') % self.event.name,
+                             body, settings.FROM_EMAIL, [self.email])
+        # TODO add attachments
+        email.send(fail_silently=False)
+
+        self.confirm_sent = True
+        self.save()
+
     class Meta:
         ordering = ['-created']
 
     def __str__(self):
         return self.order
+
+
+@receiver(post_save, sender=Ticket)
+def confirm_email(sender, instance, created, raw, using, update_fields, **kwargs):
+    if not instance.confirm_sent and instance.confirmed:
+        instance.send_confirm_email()

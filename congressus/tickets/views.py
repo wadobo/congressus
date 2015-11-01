@@ -11,6 +11,10 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 
+from django.views.decorators.csrf import csrf_exempt
+
+from django.utils.translation import ugettext as _
+
 from .models import Ticket
 from .models import Event
 
@@ -34,6 +38,10 @@ class Register(CreateView):
         self.object.order = str(uuid.uuid4())
         self.object.gen_order_tpv()
         self.object.save()
+
+        # Email to the event admin
+        self.object.send_reg_email()
+
         return super(ModelFormMixin, self).form_valid(form)
 
     def get_success_url(self):
@@ -42,8 +50,6 @@ class Register(CreateView):
         '''
 
         if not self.object.get_price():
-            # TODO: notify to the admin
-            # manual confirm?
             return reverse('thanks', kwargs={'order': self.object.order})
 
         return reverse('payment', kwargs={'order': self.object.order})
@@ -92,3 +98,13 @@ class Thanks(TemplateView):
         ctx['ticket'] = get_object_or_404(Ticket, order=kwargs['order'])
         return ctx
 thanks = Thanks.as_view()
+
+
+class Confirm(View):
+    def post(self, request):
+        order_tpv = request.POST.get('order_tpv', '????')
+        tk = get_object_or_404(Ticket, order_tpv=order_tpv)
+        tk.confirmed = True
+        tk.confirmed_date = timezone.now()
+        tk.save()
+confirm = csrf_exempt(Confirm.as_view())
