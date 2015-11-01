@@ -14,6 +14,7 @@ from django.core.urlresolvers import reverse
 
 
 REG_TYPES = (
+    ('invited', _('Invited')),
     ('speaker', _('Speaker')),
     ('sponsor', _('Sponsor')),
     ('regular', _('Regular')),
@@ -108,6 +109,8 @@ class Ticket(models.Model):
             price = self.event.price_sponsor
         elif self.type == 'student':
             price = self.event.price_student
+        elif self.type == 'invited':
+            price = 0
         return price
 
     def send_reg_email(self):
