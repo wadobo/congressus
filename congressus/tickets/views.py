@@ -55,7 +55,7 @@ class Register(CreateView):
 register = Register.as_view()
 
 
-def tpv_sig_data(mdata, order, key, alt='+/'):
+def tpv_sig_data(mdata, order, key, alt=b'+/'):
     k = b64decode(key.encode(), alt)
     x = triple_des(k, CBC, b"\0\0\0\0\0\0\0\0", pad='\0')
     okey = x.encrypt(order.encode())
