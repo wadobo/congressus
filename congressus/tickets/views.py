@@ -90,7 +90,7 @@ class Payment(TemplateView):
             #"DS_MERCHANT_URLOK": urlok,
             #"DS_MERCHANT_URLKO": urlko
         }
-        jsdata = json.dumps(data)
+        jsdata = json.dumps(data).replace(' ', '')
         mdata = b64encode(jsdata.encode()).decode()
 
         from pyDes import PAD_PKCS5, triple_des
