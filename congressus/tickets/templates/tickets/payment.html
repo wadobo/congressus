@@ -14,14 +14,10 @@
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
             <!-- TODO: Add the TPV form data -->
-            <form method="POST" target="tpv" name="ticket" action="https://sis-t.sermepa.es:25443/sis/realizarPago">
-                <input type=hidden name=Ds_Merchant_Amount value="{{ amount }}"/>
-                <input type=hidden name=Ds_Merchant_Currency value="{{ currency }}"/>
-                <input type=hidden name=Ds_Merchant_Order  value="{{ order }}"/>
-                <input type=hidden name=Ds_Merchant_MerchantCode value="{{ merchant }}"/>
-                <input type=hidden name=Ds_Merchant_Terminal value="{{ terminal }}"/>
-                <input type=hidden name=Ds_Merchant_TransactionType value="{{ type }}"/>
-                <input type=hidden name=Ds_Merchant_MerchantSignature value="{{ sig }}"/>
+            <form method="POST" target="tpv" name="ticket" action="{{ tpv_url }}">
+                <input type="hidden" name="Ds_SignatureVersion" value="HMAC_SHA256_V1"/>
+                <input type="hidden" name="Ds_MerchantParameters" value="{{ params }}"/>
+                <input type="hidden" name="Ds_Signature" value="{{ sig }}"/>
 
                 <button class="btn btn-success btn-block">{% trans "make payment" %}</button>
             </form>

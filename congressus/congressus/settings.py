@@ -119,6 +119,9 @@ STATICFILES_DIRS = (
 
 TPV_TERMINAL = 1
 TPV_MERCHANT = 'XXXXXX'
+TPV_MERCHANT_URL = 'http://us.es'
+TPV_URL = "https://sis-t.redsys.es:25443/sis/realizarPago"
+#TPV_URL = "https://sis.redsys.es/sis/realizarPago"
 TPV_KEY = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 FROM_EMAIL = 'congressus@us.es'
 

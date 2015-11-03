@@ -1,5 +1,7 @@
+from base64 import b64encode
+import json
 import uuid
-from hashlib import sha1
+from hashlib import sha256
 from django.conf import settings
 from django.utils import timezone
 from django.views.generic.edit import CreateView
@@ -72,18 +74,37 @@ class Payment(TemplateView):
         merchant = settings.TPV_MERCHANT
         currency = '978'
         key = settings.TPV_KEY
+        ttype = '0'
+        url = settings.TPV_MERCHANT_URL
+        tpv_url = settings.TPV_URL
+        terminal = settings.TPV_TERMINAL
 
-        msg = amount + order + merchant + currency + key
-        sig = sha1(msg.encode()).hexdigest().upper()
+        data = {
+            "DS_MERCHANT_AMOUNT": amount,
+            "DS_MERCHANT_ORDER": order,
+            "DS_MERCHANT_MERCHANTCODE": merchant,
+            "DS_MERCHANT_CURRENCY": currency,
+            "DS_MERCHANT_TRANSACTIONTYPE": ttype,
+            "DS_MERCHANT_TERMINAL": terminal,
+            #"DS_MERCHANT_MERCHANTURL": notifurl,
+            #"DS_MERCHANT_URLOK": urlok,
+            #"DS_MERCHANT_URLKO": urlko
+        }
+        jsdata = json.dumps(data)
+        mdata = b64encode(jsdata.encode()).decode()
+
+        from pyDes import PAD_PKCS5, triple_des
+        x = triple_des(b64encode(key.encode()), padmode=PAD_PKCS5)
+        okey = x.encode(order).decode()
+
+        msg = mdata + okey
+        sig = sha256(msg.encode()).hexdigest().upper()
+        sigb = b64encode(sig.encode()).decode()
+
 
         ctx.update({
-            'amount': amount,
-            'currency': currency,
-            'order': order,
-            'merchant': merchant,
-            'terminal': settings.TPV_TERMINAL,
-            'type': '0',
-            'sig': sig,
+            'mdata': mdata,
+            'sig': sigb,
         })
 
         return ctx
