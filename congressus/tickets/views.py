@@ -83,7 +83,7 @@ class Payment(TemplateView):
         data["DS_MERCHANT_TRANSACTIONTYPE"] = ttype
         data["DS_MERCHANT_TERMINAL"] = terminal
         data["DS_MERCHANT_MERCHANTURL"] = url
-        data["DS_MERCHANT_URLOK"] = ''
+        data["DS_MERCHANT_URLOK"] = settings.SITE_URL + '/ticket/%s/thanks/' % tk.order
         data["DS_MERCHANT_URLKO"] = ''
 
         jsdata = json.dumps(data).replace(' ', '')

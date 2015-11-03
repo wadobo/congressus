@@ -119,11 +119,12 @@ STATICFILES_DIRS = (
 
 TPV_TERMINAL = 1
 TPV_MERCHANT = 'XXXXXX'
-TPV_MERCHANT_URL = 'http://us.es'
 TPV_URL = "https://sis-t.redsys.es:25443/sis/realizarPago"
 #TPV_URL = "https://sis.redsys.es/sis/realizarPago"
 TPV_KEY = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 FROM_EMAIL = 'congressus@us.es'
+SITE_URL = "http://localhost:8000"
+TPV_MERCHANT_URL = SITE_URL + '/tickets/confirm/'
 
 try:
     from local_settings import *
