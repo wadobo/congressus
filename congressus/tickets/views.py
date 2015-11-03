@@ -1,6 +1,7 @@
 import hmac
 import json
 import uuid
+from django.http import Http404, HttpResponse
 from django.conf import settings
 from django.utils import timezone
 from django.views.generic.edit import CreateView
@@ -54,6 +55,15 @@ class Register(CreateView):
 register = Register.as_view()
 
 
+def tpv_sig_data(mdata, order, key):
+    k = b64decode(key.encode(), b"-_")
+    x = triple_des(k, CBC, b"\0\0\0\0\0\0\0\0", pad='\0')
+    okey = x.encrypt(order.encode())
+    sig = hmac.new(okey, mdata.encode(), sha256).digest()
+    sigb = b64encode(sig, b"-_").decode()
+    return sigb
+
+
 class Payment(TemplateView):
     template_name = 'tickets/payment.html'
 
@@ -87,19 +97,14 @@ class Payment(TemplateView):
         data["DS_MERCHANT_URLKO"] = ''
 
         jsdata = json.dumps(data).replace(' ', '')
-        mdata = b64encode(jsdata.encode()).decode()
+        mdata = b64encode(jsdata.encode(), b"-_").decode()
 
-        k = b64decode(key.encode())
-        x = triple_des(k, CBC, b"\0\0\0\0\0\0\0\0", pad='\0')
-        okey = x.encrypt(order.encode())
-
-        sig = hmac.new(okey, mdata.encode(), sha256).digest()
-        sigb = b64encode(sig).decode()
+        sig = tpv_sig_data(mdata, order, key)
 
         ctx.update({
             'tpv_url': tpv_url,
             'mdata': mdata,
-            'sig': sigb,
+            'sig': sig,
         })
 
         return ctx
@@ -118,9 +123,25 @@ thanks = Thanks.as_view()
 
 class Confirm(View):
     def post(self, request):
-        order_tpv = request.POST.get('order_tpv', '????')
+        mdata = request.POST.get('Ds_MerchantParameters', '')
+        sig = request.POST.get('Ds_Signature', '')
+
+        if not mdata or not sig:
+            raise Http404
+
+        jsdata = b64decode(mdata.encode(), b"-_").decode()
+        data = json.loads(jsdata)
+        order_tpv = data.get('Ds_Order', '')
+        if not order_tpv:
+            raise Http404
+
+        sig2 = tpv_sig_data(mdata, order_tpv, settings.TPV_KEY)
+        if sig != sig2:
+            raise Http404
+
         tk = get_object_or_404(Ticket, order_tpv=order_tpv)
         tk.confirmed = True
         tk.confirmed_date = timezone.now()
         tk.save()
+        return HttpResponse("")
 confirm = csrf_exempt(Confirm.as_view())
