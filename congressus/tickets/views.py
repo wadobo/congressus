@@ -1,5 +1,6 @@
+import hmac
+import json
 import uuid
-from hashlib import sha1
 from django.conf import settings
 from django.utils import timezone
 from django.views.generic.edit import CreateView
@@ -18,6 +19,11 @@ from django.utils.translation import ugettext as _
 from .models import Ticket
 from .models import Event
 from .forms import RegisterForm
+
+from base64 import b64encode, b64decode
+from pyDes import triple_des, CBC
+from collections import OrderedDict
+from hashlib import sha256
 
 
 class Register(CreateView):
@@ -64,18 +70,36 @@ class Payment(TemplateView):
         merchant = settings.TPV_MERCHANT
         currency = '978'
         key = settings.TPV_KEY
+        ttype = '0'
+        url = settings.TPV_MERCHANT_URL
+        tpv_url = settings.TPV_URL
+        terminal = settings.TPV_TERMINAL
 
-        msg = amount + order + merchant + currency + key
-        sig = sha1(msg.encode()).hexdigest().upper()
+        data = OrderedDict()
+        data["DS_MERCHANT_AMOUNT"] = amount
+        data["DS_MERCHANT_ORDER"] = order
+        data["DS_MERCHANT_MERCHANTCODE"] = merchant
+        data["DS_MERCHANT_CURRENCY"] = currency
+        data["DS_MERCHANT_TRANSACTIONTYPE"] = ttype
+        data["DS_MERCHANT_TERMINAL"] = terminal
+        data["DS_MERCHANT_MERCHANTURL"] = url
+        data["DS_MERCHANT_URLOK"] = ''
+        data["DS_MERCHANT_URLKO"] = ''
+
+        jsdata = json.dumps(data).replace(' ', '')
+        mdata = b64encode(jsdata.encode()).decode()
+
+        k = b64decode(key.encode())
+        x = triple_des(k, CBC, b"\0\0\0\0\0\0\0\0", pad='\0')
+        okey = x.encrypt(order.encode())
+
+        sig = hmac.new(okey, mdata.encode(), sha256).digest()
+        sigb = b64encode(sig).decode()
 
         ctx.update({
-            'amount': amount,
-            'currency': currency,
-            'order': order,
-            'merchant': merchant,
-            'terminal': settings.TPV_TERMINAL,
-            'type': '0',
-            'sig': sig,
+            'tpv_url': tpv_url,
+            'mdata': mdata,
+            'sig': sigb,
         })
 
         return ctx
