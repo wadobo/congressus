@@ -55,12 +55,12 @@ class Register(CreateView):
 register = Register.as_view()
 
 
-def tpv_sig_data(mdata, order, key):
-    k = b64decode(key.encode(), b"-_")
+def tpv_sig_data(mdata, order, key, alt='+/'):
+    k = b64decode(key.encode(), alt)
     x = triple_des(k, CBC, b"\0\0\0\0\0\0\0\0", pad='\0')
     okey = x.encrypt(order.encode())
     sig = hmac.new(okey, mdata.encode(), sha256).digest()
-    sigb = b64encode(sig, b"-_").decode()
+    sigb = b64encode(sig, alt).decode()
     return sigb
 
 
@@ -97,7 +97,7 @@ class Payment(TemplateView):
         data["DS_MERCHANT_URLKO"] = ''
 
         jsdata = json.dumps(data).replace(' ', '')
-        mdata = b64encode(jsdata.encode(), b"-_").decode()
+        mdata = b64encode(jsdata.encode()).decode()
 
         sig = tpv_sig_data(mdata, order, key)
 
@@ -129,13 +129,13 @@ class Confirm(View):
         if not mdata or not sig:
             raise Http404
 
-        jsdata = b64decode(mdata.encode(), b"-_").decode()
+        jsdata = b64decode(mdata.encode(), b'-_').decode()
         data = json.loads(jsdata)
         order_tpv = data.get('Ds_Order', '')
         if not order_tpv:
             raise Http404
 
-        sig2 = tpv_sig_data(mdata, order_tpv, settings.TPV_KEY)
+        sig2 = tpv_sig_data(mdata, order_tpv, settings.TPV_KEY, b'-_')
         if sig != sig2:
             raise Http404
 
