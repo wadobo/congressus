@@ -17,11 +17,12 @@ from django.utils.translation import ugettext as _
 
 from .models import Ticket
 from .models import Event
+from .forms import RegisterForm
 
 
 class Register(CreateView):
     model = Ticket
-    fields = Ticket.form_fields
+    form_class = RegisterForm
 
     def get_context_data(self, *args, **kwargs):
         ctx = super(Register, self).get_context_data(*args, **kwargs)
@@ -30,19 +31,10 @@ class Register(CreateView):
         ctx['ev'] = ev
         return ctx
 
-    def form_valid(self, form):
-        evid = self.kwargs['evid']
-        ev = get_object_or_404(Event, id=evid)
-        self.object = form.save(commit=False)
-        self.object.event = ev
-        self.object.order = str(uuid.uuid4())
-        self.object.gen_order_tpv()
-        self.object.save()
-
-        # Email to the event admin
-        self.object.send_reg_email()
-
-        return super(ModelFormMixin, self).form_valid(form)
+    def get_form_kwargs(self):
+        kwargs = super(Register, self).get_form_kwargs()
+        kwargs['evid'] = self.kwargs['evid']
+        return kwargs
 
     def get_success_url(self):
         '''

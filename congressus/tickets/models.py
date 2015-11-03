@@ -49,8 +49,19 @@ class Event(models.Model):
         return reverse('register', kwargs={'id': self.id})
 
 
+class InvCode(models.Model):
+    event = models.ForeignKey(Event, related_name='codes')
+    code = models.CharField(_('code'), max_length=10, blank=True, null=True)
+    person = models.CharField(_('for person'), max_length=100, blank=True, null=True)
+    used = models.BooleanField(_('used'), default=False)
+
+    def __str__(self):
+        return self.code
+
+
 class Ticket(models.Model):
     event = models.ForeignKey(Event, related_name='tickets')
+    inv = models.OneToOneField(InvCode, blank=True, null=True)
     order = models.CharField(_('order'), max_length=200, unique=True)
     order_tpv = models.CharField(_('order TPV'), max_length=12, blank=True, null=True)
     created = models.DateTimeField(_('created at'), auto_now_add=True)
@@ -152,3 +163,11 @@ class Ticket(models.Model):
 def confirm_email(sender, instance, created, raw, using, update_fields, **kwargs):
     if not instance.confirm_sent and instance.confirmed:
         instance.send_confirm_email()
+
+
+@receiver(post_save, sender=InvCode)
+def gencode(sender, instance, created, raw, using, update_fields, **kwargs):
+    if not instance.code:
+        chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        instance.code = ''.join(random.choice(chars) for _ in range(10))
+        instance.save()
