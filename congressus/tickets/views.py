@@ -1,7 +1,6 @@
-from base64 import b64encode
+import hmac
 import json
 import uuid
-from hashlib import sha256
 from django.conf import settings
 from django.utils import timezone
 from django.views.generic.edit import CreateView
@@ -19,6 +18,11 @@ from django.utils.translation import ugettext as _
 
 from .models import Ticket
 from .models import Event
+
+from base64 import b64encode, b64decode
+from pyDes import triple_des, CBC
+from collections import OrderedDict
+from hashlib import sha256
 
 
 class Register(CreateView):
@@ -79,30 +83,29 @@ class Payment(TemplateView):
         tpv_url = settings.TPV_URL
         terminal = settings.TPV_TERMINAL
 
-        data = {
-            "DS_MERCHANT_AMOUNT": amount,
-            "DS_MERCHANT_ORDER": order,
-            "DS_MERCHANT_MERCHANTCODE": merchant,
-            "DS_MERCHANT_CURRENCY": currency,
-            "DS_MERCHANT_TRANSACTIONTYPE": ttype,
-            "DS_MERCHANT_TERMINAL": terminal,
-            #"DS_MERCHANT_MERCHANTURL": notifurl,
-            #"DS_MERCHANT_URLOK": urlok,
-            #"DS_MERCHANT_URLKO": urlko
-        }
+        data = OrderedDict()
+        data["DS_MERCHANT_AMOUNT"] = amount
+        data["DS_MERCHANT_ORDER"] = order
+        data["DS_MERCHANT_MERCHANTCODE"] = merchant
+        data["DS_MERCHANT_CURRENCY"] = currency
+        data["DS_MERCHANT_TRANSACTIONTYPE"] = ttype
+        data["DS_MERCHANT_TERMINAL"] = terminal
+        data["DS_MERCHANT_MERCHANTURL"] = url
+        data["DS_MERCHANT_URLOK"] = ''
+        data["DS_MERCHANT_URLKO"] = ''
+
         jsdata = json.dumps(data).replace(' ', '')
         mdata = b64encode(jsdata.encode()).decode()
 
-        from pyDes import PAD_PKCS5, triple_des
-        x = triple_des(b64encode(key.encode()), padmode=PAD_PKCS5)
-        okey = x.encode(order).decode()
+        k = b64decode(key.encode())
+        x = triple_des(k, CBC, b"\0\0\0\0\0\0\0\0", pad='\0')
+        okey = x.encrypt(order.encode())
 
-        msg = mdata + okey
-        sig = sha256(msg.encode()).hexdigest().upper()
-        sigb = b64encode(sig.encode()).decode()
-
+        sig = hmac.new(okey, mdata.encode(), sha256).digest()
+        sigb = b64encode(sig).decode()
 
         ctx.update({
+            'tpv_url': tpv_url,
             'mdata': mdata,
             'sig': sigb,
         })
