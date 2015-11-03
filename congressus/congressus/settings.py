@@ -124,7 +124,7 @@ TPV_URL = "https://sis-t.redsys.es:25443/sis/realizarPago"
 TPV_KEY = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 FROM_EMAIL = 'congressus@us.es'
 SITE_URL = "http://localhost:8000"
-TPV_MERCHANT_URL = SITE_URL + '/tickets/confirm/'
+TPV_MERCHANT_URL = SITE_URL + '/ticket/confirm/'
 
 try:
     from local_settings import *
