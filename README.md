@@ -22,3 +22,9 @@ Servidor de pruebas:
 ```
 python manage.py runserver
 ```
+
+## Generar traducciones
+
+Al ser una aplicación django, podemos ver toda la información de traducciones en el siguiente enlace:
+
+ https://docs.djangoproject.com/en/1.8/topics/i18n/translation/
