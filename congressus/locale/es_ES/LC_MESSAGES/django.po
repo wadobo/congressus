@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-04 09:52+0100\n"
+"POT-Creation-Date: 2015-11-04 09:59+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -82,6 +82,7 @@ msgid "end date"
 msgstr "fecha salida"
 
 #: tickets/models.py:34 tickets/templates/emails/ticket-info.txt:7
+#: tickets/templates/tickets/ticket-info.html:20
 msgid "ticket price"
 msgstr "precio de entrada"
 
@@ -145,7 +146,7 @@ msgstr "dirección"
 msgid "organization"
 msgstr "organización"
 
-#: tickets/models.py:78
+#: tickets/models.py:78 tickets/templates/tickets/ticket-info.html:36
 msgid "photo"
 msgstr "foto"
 
@@ -184,11 +185,18 @@ msgstr "Confirmado / %s"
 msgid "Ticket Confirmed / %s"
 msgstr "Entrada Confirmada / %s"
 
+#: tickets/templates/base.html:10
+#: tickets/templates/tickets/ticket_form.html:19
+msgid "Register"
+msgstr "Registrarse"
+
 #: tickets/templates/emails/confirm-user.txt:2
 msgid "Your ticket have been confirmed:"
 msgstr "Tu entrada ha sido confirmada:"
 
 #: tickets/templates/emails/confirm-user.txt:6
+#: tickets/templates/tickets/thanks.html:4
+#: tickets/templates/tickets/thanks.html:9
 msgid "Thank you"
 msgstr "Muchas gracias"
 
@@ -201,53 +209,64 @@ msgid "A new user has registered in the platform:"
 msgstr "Un usuario nuevo se ha registrado en la plataforma:"
 
 #: tickets/templates/emails/ticket-info.txt:2
+#: tickets/templates/tickets/ticket-info.html:5
 msgid "Ticket info"
 msgstr "Información de entrada"
 
 #: tickets/templates/emails/ticket-info.txt:4
+#: tickets/templates/tickets/ticket-info.html:8
 msgid "Event"
 msgstr "Evento"
 
 #: tickets/templates/emails/ticket-info.txt:5
+#: tickets/templates/tickets/ticket-info.html:12
 msgid "ticket number"
 msgstr "Número de entrada"
 
 #: tickets/templates/emails/ticket-info.txt:6
+#: tickets/templates/tickets/ticket-info.html:16
 msgid "payment number"
 msgstr "Número de pago"
 
 #: tickets/templates/emails/ticket-info.txt:8
+#: tickets/templates/tickets/ticket-info.html:24
 msgid "ticket confirmed"
 msgstr "Entrada confirmada"
 
 #: tickets/templates/emails/ticket-info.txt:10
+#: tickets/templates/tickets/ticket-info.html:28
 msgid "Personal info"
 msgstr "Información personal"
 
 #: tickets/templates/emails/ticket-info.txt:15
+#: tickets/templates/tickets/ticket-info.html:47
 msgid "Registration info"
 msgstr "Información de registro"
 
-#~ msgid "Register"
-#~ msgstr "Registrarse"
+#: tickets/templates/tickets/payment.html:4
+msgid "Confirm"
+msgstr "Confirmar"
 
-#~ msgid "Confirm"
-#~ msgstr "Confirmar"
+#: tickets/templates/tickets/payment.html:9
+msgid "Ticket payment"
+msgstr "Pago de entrada"
 
-#~ msgid "Ticket payment"
-#~ msgstr "Pago de entrada"
+#: tickets/templates/tickets/payment.html:10
+msgid "Verify the data and make the payment"
+msgstr "Verificar datos y realizar el pago"
 
-#~ msgid "Verify the data and make the payment"
-#~ msgstr "Verificar datos y realizar el pago"
+#: tickets/templates/tickets/payment.html:22
+msgid "make payment"
+msgstr "Realizar pago"
 
-#~ msgid "make payment"
-#~ msgstr "Realizar pago"
+#: tickets/templates/tickets/thanks.html:10
+msgid "Here you can view your ticket information"
+msgstr "Aquí puede ver la información de su entrada"
 
-#~ msgid "Here you can view your ticket information"
-#~ msgstr "Aquí puede ver la información de su entrada"
+#: tickets/templates/tickets/ticket-info.html:38
+msgid "No photo"
+msgstr "No foto"
 
-#~ msgid "No photo"
-#~ msgstr "No foto"
-
-#~ msgid "Fill the form and continue to complete the payment"
-#~ msgstr "Rellenar el formulario y continuar para completar el pago"
+#: tickets/templates/tickets/ticket_form.html:9
+msgid "Fill the form and continue to complete the payment"
+msgstr "Rellenar el formulario y continuar para completar el pago"
