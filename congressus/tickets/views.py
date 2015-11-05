@@ -71,6 +71,7 @@ class Payment(TemplateView):
         ctx = super(Payment, self).get_context_data(*args, **kwargs)
         tk = get_object_or_404(Ticket, order=kwargs['order'])
         ctx['ticket'] = tk
+        ctx['error'] = self.request.GET.get('error', '')
 
         if not tk.order_tpv:
             tk.gen_order_tpv()
@@ -94,7 +95,7 @@ class Payment(TemplateView):
         data["DS_MERCHANT_TERMINAL"] = terminal
         data["DS_MERCHANT_MERCHANTURL"] = url
         data["DS_MERCHANT_URLOK"] = settings.SITE_URL + '/ticket/%s/thanks/' % tk.order
-        data["DS_MERCHANT_URLKO"] = ''
+        data["DS_MERCHANT_URLKO"] = settings.SITE_URL + '/ticket/%s/payment/?error=1' % tk.order
 
         jsdata = json.dumps(data).replace(' ', '')
         mdata = b64encode(jsdata.encode()).decode()
@@ -132,7 +133,13 @@ class Confirm(View):
         jsdata = b64decode(mdata.encode(), b'-_').decode()
         data = json.loads(jsdata)
         order_tpv = data.get('Ds_Order', '')
+        resp = data.get('Ds_Response', '')
+        error = data.get('Ds_ErrorCode', '')
         if not order_tpv:
+            raise Http404
+
+        if error or resp != '0000':
+            # payment error
             raise Http404
 
         sig2 = tpv_sig_data(mdata, order_tpv, settings.TPV_KEY, b'-_')
