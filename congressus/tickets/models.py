@@ -49,6 +49,12 @@ class Event(models.Model):
     def get_absolute_url(self):
         return reverse('register', kwargs={'id': self.id})
 
+    def get_email(self):
+        try:
+            return self.email
+        except:
+            return None
+
 
 class InvCode(models.Model):
     event = models.ForeignKey(Event, related_name='codes')
@@ -58,6 +64,20 @@ class InvCode(models.Model):
 
     def __str__(self):
         return self.code
+
+
+class ConfirmEmail(models.Model):
+    event = models.OneToOneField(Event, related_name='email')
+    subject = models.CharField(_('subject'), max_length=300)
+    body = models.TextField(_('body'))
+
+    def __str__(self):
+        return "ConfirmEmail - %s" % self.event
+
+
+class EmailAttachment(models.Model):
+    email = models.ForeignKey(ConfirmEmail, related_name='attachs')
+    attach = models.FileField(_('attach'), upload_to='attachments')
 
 
 class Ticket(models.Model):
@@ -143,11 +163,21 @@ class Ticket(models.Model):
         email.send(fail_silently=False)
 
         # email to user
-        tmpl = get_template('emails/confirm-user.txt')
-        body = tmpl.render(d)
-        email = EmailMessage(_('Ticket Confirmed / %s') % self.event.name,
-                             body, settings.FROM_EMAIL, [self.email])
-        # TODO add attachments
+        e = self.event.get_email()
+        if e:
+            subject = e.subject
+            body = e.body
+        else:
+            tmpl = get_template('emails/confirm-user.txt')
+            subject = _('Ticket Confirmed / %s') % self.event.name
+            body = tmpl.render(d)
+        email = EmailMessage(subject, body, settings.FROM_EMAIL, [self.email])
+
+        if e:
+            # adding attachments
+            for att in e.attachs.all():
+                email.attach_file(att.attach.path)
+
         email.send(fail_silently=False)
 
         self.confirm_sent = True

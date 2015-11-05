@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from .models import Event, Ticket, InvCode
+from .models import ConfirmEmail, EmailAttachment
 
 
 class InvCodeInline(admin.TabularInline):
@@ -26,6 +27,18 @@ class TicketAdmin(admin.ModelAdmin):
     date_hierarchy = 'created'
 
 
+class Attachments(admin.TabularInline):
+    model = EmailAttachment
+
+
+class ConfirmEmailAdmin(admin.ModelAdmin):
+    inlines = [Attachments]
+    list_display = ('event', 'subject')
+    list_filter = ('event',)
+    search_fields = ('event', 'subject', 'body')
+
+
 admin.site.register(Event, EventAdmin)
 admin.site.register(InvCode, InvCodeAdmin)
 admin.site.register(Ticket, TicketAdmin)
+admin.site.register(ConfirmEmail, ConfirmEmailAdmin)
