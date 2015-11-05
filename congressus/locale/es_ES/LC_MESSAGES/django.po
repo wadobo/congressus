@@ -1,21 +1,22 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Congressus translations.
+# Copyright (C) 2015
+# This file is distributed under the same license as the congressus package.
+# Daniel García <danigm@wadobo.com>, 2015.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-04 09:59+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2015-11-05 11:28+0100\n"
+"PO-Revision-Date: 2015-11-05 11:32+0100\n"
+"Last-Translator: Daniel García <danigm@wadobo.com>\n"
+"Language-Team: Español; Castellano <>\n"
+"Language: ES\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+"X-Generator: Gtranslator 2.91.7\n"
 
 #: tickets/forms.py:20
 msgid "Invitation code"
@@ -98,95 +99,111 @@ msgstr "precio estudiante"
 msgid "speaker price"
 msgstr "precio orador"
 
-#: tickets/models.py:40
+#: tickets/models.py:38
+#| msgid "ticket price"
+msgid "invited price"
+msgstr "precio de invitado"
+
+#: tickets/models.py:41
 msgid "admin email"
 msgstr "correo de administrador"
 
-#: tickets/models.py:54
+#: tickets/models.py:61
 msgid "code"
 msgstr "código"
 
-#: tickets/models.py:55
+#: tickets/models.py:62
 msgid "for person"
 msgstr "para persona"
 
-#: tickets/models.py:56
+#: tickets/models.py:63
 msgid "used"
 msgstr "usado"
 
-#: tickets/models.py:65
+#: tickets/models.py:71
+msgid "subject"
+msgstr "asunto"
+
+#: tickets/models.py:72
+msgid "body"
+msgstr "cuerpo"
+
+#: tickets/models.py:80
+msgid "attach"
+msgstr "adjunto"
+
+#: tickets/models.py:86
 msgid "order"
 msgstr "pedido"
 
-#: tickets/models.py:66
+#: tickets/models.py:87
 msgid "order TPV"
 msgstr "pedido TPV"
 
-#: tickets/models.py:67
+#: tickets/models.py:88
 msgid "created at"
 msgstr "creado el"
 
-#: tickets/models.py:69
+#: tickets/models.py:90
 msgid "confirmed at"
 msgstr "confirmado el"
 
-#: tickets/models.py:74
+#: tickets/models.py:95
 msgid "email"
 msgstr "correo"
 
-#: tickets/models.py:75
+#: tickets/models.py:96
 msgid "full name"
 msgstr "nombre completo"
 
-#: tickets/models.py:76
+#: tickets/models.py:97
 msgid "address"
 msgstr "dirección"
 
-#: tickets/models.py:77
+#: tickets/models.py:98
 msgid "organization"
 msgstr "organización"
 
-#: tickets/models.py:78 tickets/templates/tickets/ticket-info.html:36
+#: tickets/models.py:99 tickets/templates/tickets/ticket-info.html:36
 msgid "photo"
 msgstr "foto"
 
-#: tickets/models.py:80
+#: tickets/models.py:101
 msgid "type"
 msgstr "tipo"
 
-#: tickets/models.py:81
+#: tickets/models.py:102
 msgid "food preferences"
 msgstr "preferencias de comida"
 
-#: tickets/models.py:82
+#: tickets/models.py:103
 msgid "Especial needs"
 msgstr "Necesidades especiales"
 
-#: tickets/models.py:83
+#: tickets/models.py:104
 msgid "Arrival date"
 msgstr "Fecha de llegada"
 
-#: tickets/models.py:84
+#: tickets/models.py:105
 msgid "Departure date"
 msgstr "Fecha de salida"
 
-#: tickets/models.py:131
+#: tickets/models.py:152
 #, python-format
 msgid "New Register / %s"
 msgstr "Nuevo Registro / %s"
 
-#: tickets/models.py:140
+#: tickets/models.py:161
 #, python-format
 msgid "Confirmed / %s"
 msgstr "Confirmado / %s"
 
-#: tickets/models.py:147
+#: tickets/models.py:172
 #, python-format
 msgid "Ticket Confirmed / %s"
 msgstr "Entrada Confirmada / %s"
 
-#: tickets/templates/base.html:10
-#: tickets/templates/tickets/ticket_form.html:19
+#: tickets/templates/base.html:10 tickets/templates/tickets/ticket_form.html:19
 msgid "Register"
 msgstr "Registrarse"
 
@@ -255,7 +272,16 @@ msgstr "Pago de entrada"
 msgid "Verify the data and make the payment"
 msgstr "Verificar datos y realizar el pago"
 
-#: tickets/templates/tickets/payment.html:22
+#: tickets/templates/tickets/payment.html:18
+#, python-format
+msgid ""
+"There was an error in the payment. Try again and if the problem continue, "
+"contact with the admin: %(admin)s"
+msgstr ""
+"Ha ocurrido un error en el pago. Prueba otra vez y si el problema continua, "
+"contacta con el administrador: %(admin)s"
+
+#: tickets/templates/tickets/payment.html:26
 msgid "make payment"
 msgstr "Realizar pago"
 
