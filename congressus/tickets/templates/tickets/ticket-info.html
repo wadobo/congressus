@@ -30,17 +30,7 @@
     {% for f in ticket.get_personal_info %}
         <tr>
             <th>{{ f.name }}</th>
-            <td>
-                {% if f.f == 'photo' %}
-                    {% if f.value %}
-                        <img width="200px" class="img-thumbnail" src="{{ MEDIA_URL }}{{ f.value }}" alt="{% trans "photo" %}"/>
-                    {% else %}
-                        {% trans "No photo" %}
-                    {% endif %}
-                {% else %}
-                    {{ f.value }}
-                {% endif %}
-            </td>
+            <td>{{ f.value }}</td>
         </tr>
     {% endfor %}
     <tr>

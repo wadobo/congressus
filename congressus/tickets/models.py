@@ -94,9 +94,7 @@ class Ticket(models.Model):
     # Form Fields
     email = models.EmailField(_('email'))
     name = models.CharField(_('full name'), max_length=200)
-    address = models.TextField(_('address'))
     org = models.CharField(_('organization'), max_length=200)
-    photo = models.ImageField(_('photo'), upload_to='photos', blank=True, null=True)
 
     type = models.CharField(_('type'), max_length=20, choices=REG_TYPES, default='regular')
     food = models.CharField(_('food preferences'), max_length=20, choices=FOOD, default='all')
@@ -104,7 +102,7 @@ class Ticket(models.Model):
     arrival = models.DateField(_('Arrival date'), help_text='dd/mm/YYYY')
     departure = models.DateField(_('Departure date'), help_text='dd/mm/YYYY')
 
-    personal_info = ['email', 'name', 'address', 'org', 'photo']
+    personal_info = ['email', 'name', 'org']
     reg_info = ['type', 'food', 'comments', 'arrival', 'departure']
     form_fields = personal_info + reg_info
 

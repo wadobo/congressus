@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-05 11:28+0100\n"
+"POT-Creation-Date: 2015-11-06 12:25+0100\n"
 "PO-Revision-Date: 2015-11-05 11:32+0100\n"
 "Last-Translator: Daniel García <danigm@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
@@ -100,7 +100,6 @@ msgid "speaker price"
 msgstr "precio orador"
 
 #: tickets/models.py:38
-#| msgid "ticket price"
 msgid "invited price"
 msgstr "precio de invitado"
 
@@ -157,48 +156,40 @@ msgid "full name"
 msgstr "nombre completo"
 
 #: tickets/models.py:97
-msgid "address"
-msgstr "dirección"
-
-#: tickets/models.py:98
 msgid "organization"
 msgstr "organización"
 
-#: tickets/models.py:99 tickets/templates/tickets/ticket-info.html:36
-msgid "photo"
-msgstr "foto"
-
-#: tickets/models.py:101
+#: tickets/models.py:99
 msgid "type"
 msgstr "tipo"
 
-#: tickets/models.py:102
+#: tickets/models.py:100
 msgid "food preferences"
 msgstr "preferencias de comida"
 
-#: tickets/models.py:103
+#: tickets/models.py:101
 msgid "Especial needs"
 msgstr "Necesidades especiales"
 
-#: tickets/models.py:104
+#: tickets/models.py:102
 msgid "Arrival date"
 msgstr "Fecha de llegada"
 
-#: tickets/models.py:105
+#: tickets/models.py:103
 msgid "Departure date"
 msgstr "Fecha de salida"
 
-#: tickets/models.py:152
+#: tickets/models.py:150
 #, python-format
 msgid "New Register / %s"
 msgstr "Nuevo Registro / %s"
 
-#: tickets/models.py:161
+#: tickets/models.py:159
 #, python-format
 msgid "Confirmed / %s"
 msgstr "Confirmado / %s"
 
-#: tickets/models.py:172
+#: tickets/models.py:170
 #, python-format
 msgid "Ticket Confirmed / %s"
 msgstr "Entrada Confirmada / %s"
@@ -256,7 +247,7 @@ msgid "Personal info"
 msgstr "Información personal"
 
 #: tickets/templates/emails/ticket-info.txt:15
-#: tickets/templates/tickets/ticket-info.html:47
+#: tickets/templates/tickets/ticket-info.html:37
 msgid "Registration info"
 msgstr "Información de registro"
 
@@ -289,10 +280,15 @@ msgstr "Realizar pago"
 msgid "Here you can view your ticket information"
 msgstr "Aquí puede ver la información de su entrada"
 
-#: tickets/templates/tickets/ticket-info.html:38
-msgid "No photo"
-msgstr "No foto"
-
 #: tickets/templates/tickets/ticket_form.html:9
 msgid "Fill the form and continue to complete the payment"
 msgstr "Rellenar el formulario y continuar para completar el pago"
+
+#~ msgid "address"
+#~ msgstr "dirección"
+
+#~ msgid "photo"
+#~ msgstr "foto"
+
+#~ msgid "No photo"
+#~ msgstr "No foto"
