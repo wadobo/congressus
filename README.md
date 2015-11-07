@@ -46,7 +46,7 @@ Al ser una aplicación django, podemos ver toda la información de traducciones 
 ~ $ cd congressus
 congressus $ virtualenv3 env
 congressus $ ./env/bin/activate
-(env)congressus $ pip install -r requierements.txt
+(env)congressus $ pip install -r requirements.txt
 (env)congressus $ pip install psycopg2
 (env)congressus $ pip install uwsgi
 ```
@@ -67,7 +67,7 @@ postgres $ createdb congressus -O congressus
 # su - congressus
 ~ $ cd congressus/congressus
 congressus $ cat > local_settings.py
-DEBUG = FALSE
+DEBUG = False
 
 # tpv config
 TPV_MERCHANT = 'XXXXXXX'
@@ -94,7 +94,7 @@ DATABASES = {
         'NAME': 'congressus',
         'USER': 'congressus',
         'PASSWORD': 'congressus',
-        'HOST': '127.0.0.1',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }
@@ -121,7 +121,6 @@ pidfile=/tmp/congressus-master.pid
 vacuum=True
 max-requests=5000
 http-socket=:8080
-daemonize=/var/log/uwsgi/congressus.log
 ```
 
 Para lanzarlo:
