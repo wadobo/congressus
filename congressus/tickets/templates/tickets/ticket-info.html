@@ -9,19 +9,19 @@
         <td>{{ ticket.event }}</td>
     </tr>
     <tr>
-        <th>{% trans "ticket number" %}</th>
+        <th>{% trans "Ticket number" %}</th>
         <td>{{ ticket.order }}</td>
     </tr>
     <tr>
-        <th>{% trans "payment number" %}</th>
+        <th>{% trans "Payment number" %}</th>
         <td>{{ ticket.order_tpv }}</td>
     </tr>
     <tr>
-        <th>{% trans "ticket price" %}</th>
+        <th>{% trans "Ticket price" %}</th>
         <td>{{ ticket.get_price|floatformat:2 }} €</td>
     </tr>
     <tr>
-        <th>{% trans "ticket confirmed" %}</th>
+        <th>{% trans "Ticket confirmed" %}</th>
         <td>{{ ticket.confirmed|yesno }}</td>
     </tr>
     <tr>

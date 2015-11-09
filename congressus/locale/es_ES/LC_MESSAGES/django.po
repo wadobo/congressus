@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-06 12:25+0100\n"
-"PO-Revision-Date: 2015-11-05 11:32+0100\n"
+"POT-Creation-Date: 2015-11-09 11:27+0100\n"
+"PO-Revision-Date: 2015-11-09 11:29+0100\n"
 "Last-Translator: Daniel García <danigm@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
 "Language: ES\n"
@@ -18,23 +18,23 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
 "X-Generator: Gtranslator 2.91.7\n"
 
-#: tickets/forms.py:20
+#: tickets/forms.py:21
 msgid "Invitation code"
 msgstr "Código de invitación"
 
-#: tickets/forms.py:23
+#: tickets/forms.py:24
 msgid "Add your invitation code, if you've one"
 msgstr "Añade tu código de invitación si tienes uno"
 
-#: tickets/forms.py:31
+#: tickets/forms.py:32
 msgid "Invitation code is required for speaker or invited"
 msgstr "Código de invitación requerido para orador o invitado"
 
-#: tickets/forms.py:36
+#: tickets/forms.py:37
 msgid "Invitation code is only for speaker or invited"
 msgstr "Código de invitación válido unicamente para orador o invitado"
 
-#: tickets/forms.py:41
+#: tickets/forms.py:42
 msgid "Invitation code invalid"
 msgstr "Código de invitación inválido"
 
@@ -83,7 +83,6 @@ msgid "end date"
 msgstr "fecha salida"
 
 #: tickets/models.py:34 tickets/templates/emails/ticket-info.txt:7
-#: tickets/templates/tickets/ticket-info.html:20
 msgid "ticket price"
 msgstr "precio de entrada"
 
@@ -132,43 +131,52 @@ msgid "attach"
 msgstr "adjunto"
 
 #: tickets/models.py:86
-msgid "order"
-msgstr "pedido"
+#| msgid "order"
+msgid "Order"
+msgstr "Pedido"
 
 #: tickets/models.py:87
-msgid "order TPV"
-msgstr "pedido TPV"
+#| msgid "order TPV"
+msgid "Order TPV"
+msgstr "Pedido TPV"
 
 #: tickets/models.py:88
-msgid "created at"
-msgstr "creado el"
+#| msgid "created at"
+msgid "Created at"
+msgstr "Creado el"
 
 #: tickets/models.py:90
-msgid "confirmed at"
-msgstr "confirmado el"
+#| msgid "confirmed at"
+msgid "Confirmed at"
+msgstr "Confirmado el"
 
 #: tickets/models.py:95
-msgid "email"
-msgstr "correo"
+#| msgid "email"
+msgid "Email"
+msgstr "Correo"
 
 #: tickets/models.py:96
-msgid "full name"
-msgstr "nombre completo"
+#| msgid "full name"
+msgid "Full name"
+msgstr "Nombre completo"
 
 #: tickets/models.py:97
-msgid "organization"
-msgstr "organización"
+#| msgid "organization"
+msgid "Organization"
+msgstr "Organización"
 
 #: tickets/models.py:99
-msgid "type"
-msgstr "tipo"
+msgid "Type"
+msgstr "Tipo"
 
 #: tickets/models.py:100
-msgid "food preferences"
-msgstr "preferencias de comida"
+#| msgid "food preferences"
+msgid "Food preferences"
+msgstr "Preferencias de comida"
 
 #: tickets/models.py:101
-msgid "Especial needs"
+#| msgid "Especial needs"
+msgid "Special needs"
 msgstr "Necesidades especiales"
 
 #: tickets/models.py:102
@@ -227,17 +235,14 @@ msgid "Event"
 msgstr "Evento"
 
 #: tickets/templates/emails/ticket-info.txt:5
-#: tickets/templates/tickets/ticket-info.html:12
 msgid "ticket number"
 msgstr "Número de entrada"
 
 #: tickets/templates/emails/ticket-info.txt:6
-#: tickets/templates/tickets/ticket-info.html:16
 msgid "payment number"
 msgstr "Número de pago"
 
 #: tickets/templates/emails/ticket-info.txt:8
-#: tickets/templates/tickets/ticket-info.html:24
 msgid "ticket confirmed"
 msgstr "Entrada confirmada"
 
@@ -273,16 +278,40 @@ msgstr ""
 "contacta con el administrador: %(admin)s"
 
 #: tickets/templates/tickets/payment.html:26
-msgid "make payment"
+#| msgid "make payment"
+msgid "Make payment"
 msgstr "Realizar pago"
 
 #: tickets/templates/tickets/thanks.html:10
 msgid "Here you can view your ticket information"
 msgstr "Aquí puede ver la información de su entrada"
 
+#: tickets/templates/tickets/ticket-info.html:12
+#| msgid "ticket number"
+msgid "Ticket number"
+msgstr "Número de entrada"
+
+#: tickets/templates/tickets/ticket-info.html:16
+#| msgid "payment number"
+msgid "Payment number"
+msgstr "Número de pago"
+
+#: tickets/templates/tickets/ticket-info.html:20
+#| msgid "ticket price"
+msgid "Ticket price"
+msgstr "Precio de entrada"
+
+#: tickets/templates/tickets/ticket-info.html:24
+#| msgid "ticket confirmed"
+msgid "Ticket confirmed"
+msgstr "Entrada confirmada"
+
 #: tickets/templates/tickets/ticket_form.html:9
 msgid "Fill the form and continue to complete the payment"
 msgstr "Rellenar el formulario y continuar para completar el pago"
+
+#~ msgid "type"
+#~ msgstr "tipo"
 
 #~ msgid "address"
 #~ msgstr "dirección"

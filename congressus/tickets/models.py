@@ -83,22 +83,22 @@ class EmailAttachment(models.Model):
 class Ticket(models.Model):
     event = models.ForeignKey(Event, related_name='tickets')
     inv = models.OneToOneField(InvCode, blank=True, null=True)
-    order = models.CharField(_('order'), max_length=200, unique=True)
-    order_tpv = models.CharField(_('order TPV'), max_length=12, blank=True, null=True)
-    created = models.DateTimeField(_('created at'), auto_now_add=True)
+    order = models.CharField(_('Order'), max_length=200, unique=True)
+    order_tpv = models.CharField(_('Order TPV'), max_length=12, blank=True, null=True)
+    created = models.DateTimeField(_('Created at'), auto_now_add=True)
 
-    confirmed_date = models.DateTimeField(_('confirmed at'), blank=True, null=True)
+    confirmed_date = models.DateTimeField(_('Confirmed at'), blank=True, null=True)
     confirmed = models.BooleanField(default=False)
     confirm_sent = models.BooleanField(default=False)
 
     # Form Fields
-    email = models.EmailField(_('email'))
-    name = models.CharField(_('full name'), max_length=200)
-    org = models.CharField(_('organization'), max_length=200)
+    email = models.EmailField(_('Email'))
+    name = models.CharField(_('Full name'), max_length=200)
+    org = models.CharField(_('Organization'), max_length=200)
 
-    type = models.CharField(_('type'), max_length=20, choices=REG_TYPES, default='regular')
-    food = models.CharField(_('food preferences'), max_length=20, choices=FOOD, default='all')
-    comments = models.TextField(_('Especial needs'), blank=True, null=True)
+    type = models.CharField(_('Type'), max_length=20, choices=REG_TYPES, default='regular')
+    food = models.CharField(_('Food preferences'), max_length=20, choices=FOOD, default='all')
+    comments = models.TextField(_('Special needs'), blank=True, null=True)
     arrival = models.DateField(_('Arrival date'), help_text='dd/mm/YYYY')
     departure = models.DateField(_('Departure date'), help_text='dd/mm/YYYY')
 
