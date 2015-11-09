@@ -16,7 +16,6 @@ from django.core.urlresolvers import reverse
 REG_TYPES = (
     ('invited', _('Invited')),
     ('speaker', _('Speaker')),
-    ('sponsor', _('Sponsor')),
     ('regular', _('Regular')),
     ('student', _('Student'))
 )
@@ -32,7 +31,6 @@ class Event(models.Model):
     start = models.DateTimeField(_('start date'))
     end = models.DateTimeField(_('end date'))
     price = models.IntegerField(_('ticket price'), default=25)
-    price_sponsor = models.IntegerField(_('sponsor price'), default=25)
     price_student = models.IntegerField(_('student price'), default=25)
     price_speaker = models.IntegerField(_('speaker price'), default=0)
     price_invited = models.IntegerField(_('invited price'), default=0)
@@ -135,8 +133,6 @@ class Ticket(models.Model):
         price = self.event.price
         if self.type == 'speaker':
             price = self.event.price_speaker
-        elif self.type == 'sponsor':
-            price = self.event.price_sponsor
         elif self.type == 'student':
             price = self.event.price_student
         elif self.type == 'invited':
