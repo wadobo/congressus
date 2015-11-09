@@ -52,7 +52,8 @@ class RegisterForm(forms.ModelForm):
             self.inv_code.used = True
             self.inv_code.save()
             obj.inv = self.inv_code
-
+            obj.confirmed = True
+            obj.confirmed_date = timezone.now()
         obj.save()
 
         obj.send_reg_email()
