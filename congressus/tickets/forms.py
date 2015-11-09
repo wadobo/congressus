@@ -15,7 +15,7 @@ class RegisterForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.evid = kwargs.pop('evid')
         self.ev = Event.objects.get(id=self.evid)
-        self.inv_code = None
+        self.inv = None
         super(RegisterForm, self).__init__(*args, **kwargs)
 
     inv_code = forms.CharField(required=False, label=_("Invitation code"),
@@ -37,7 +37,7 @@ class RegisterForm(forms.ModelForm):
                 raise forms.ValidationError(_("Invitation code is only for speaker or invited"))
 
             try:
-                self.inv_code = InvCode.objects.get(event=self.ev, code=inv_code, used=False)
+                self.inv = InvCode.objects.get(event=self.ev, code=inv_code, used=False)
             except:
                 raise forms.ValidationError(_("Invitation code invalid"))
 
@@ -49,10 +49,10 @@ class RegisterForm(forms.ModelForm):
         obj.order = str(uuid.uuid4())
         obj.gen_order_tpv()
 
-        if self.inv_code:
-            self.inv_code.used = True
-            self.inv_code.save()
-            obj.inv = self.inv_code
+        if self.inv:
+            self.inv.used = True
+            self.inv.save()
+            obj.inv = self.inv
             obj.confirmed = True
             obj.confirmed_date = timezone.now()
         obj.save()
