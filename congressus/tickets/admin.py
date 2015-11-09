@@ -24,6 +24,7 @@ class InvCodeAdmin(admin.ModelAdmin):
 class TicketAdmin(admin.ModelAdmin):
     list_display = ('order', 'order_tpv', 'event', 'confirmed', 'name', 'email', 'type', 'food')
     list_filter = ('confirmed', 'food', 'type')
+    search_fields = ('order', 'order_tpv', 'email')
     date_hierarchy = 'created'
 
 

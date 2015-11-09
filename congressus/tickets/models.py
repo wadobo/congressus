@@ -165,6 +165,9 @@ class Ticket(models.Model):
             tmpl = get_template('emails/confirm-user.txt')
             subject = _('Ticket Confirmed / %s') % self.event.name
             body = tmpl.render(d)
+
+        body = body.replace('TICKETID', self.order)
+
         email = EmailMessage(subject, body, settings.FROM_EMAIL, [self.email])
 
         if e:
