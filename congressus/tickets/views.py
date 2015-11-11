@@ -102,7 +102,7 @@ class Payment(TemplateView):
         ctx['ticket'] = tk
         ctx['error'] = self.request.GET.get('error', '')
 
-        if not tk.order_tpv:
+        if not tk.confirmed and (not tk.order_tpv or ctx['error']):
             tk.gen_order_tpv()
 
         amount = str(tk.get_price() * 100)
