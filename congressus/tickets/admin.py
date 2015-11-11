@@ -16,8 +16,8 @@ class EventAdmin(admin.ModelAdmin):
 
 
 class InvCodeAdmin(admin.ModelAdmin):
-    list_display = ('event', 'person', 'code', 'used')
-    list_filter = ('event', 'used')
+    list_display = ('event', 'person', 'code', 'type', 'used')
+    list_filter = ('event', 'used', 'type')
     search_fields = ('event', 'person', 'code')
 
 

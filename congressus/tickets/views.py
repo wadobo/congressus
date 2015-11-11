@@ -1,6 +1,8 @@
 import hmac
 import json
 import uuid
+import random
+import operator
 from django.http import Http404, HttpResponse
 from django.conf import settings
 from django.utils import timezone
@@ -31,6 +33,27 @@ class Register(CreateView):
     model = Ticket
     form_class = RegisterForm
 
+    def gen_captcha(self):
+        numbers = {
+            '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9,
+            _('one'): 1,
+            _('two'): 2,
+            _('three'): 3,
+            _('four'): 4,
+            _('five'): 5,
+            _('six'): 6,
+            _('seven'): 7,
+            _('eight'): 8,
+            _('nine'): 9,
+        }
+        ops = { '+': operator.add, '-': operator.sub, }
+        first = random.choice(list(numbers.keys()))
+        second = random.choice(list(numbers.keys()))
+        op = random.choice(list(ops.keys()))
+        captcha_solution = ops[op](numbers[first], numbers[second])
+        c = "%s %s %s" % (first, op, second)
+        return c, captcha_solution
+
     def get_context_data(self, *args, **kwargs):
         ctx = super(Register, self).get_context_data(*args, **kwargs)
         evid = self.kwargs['evid']
@@ -41,6 +64,12 @@ class Register(CreateView):
     def get_form_kwargs(self):
         kwargs = super(Register, self).get_form_kwargs()
         kwargs['evid'] = self.kwargs['evid']
+        if self.request.method == 'GET':
+            c, cs = self.gen_captcha()
+            self.request.session['c'] = c
+            self.request.session['cs'] = cs
+        kwargs['captcha'] = self.request.session['c']
+        kwargs['captcha_solution'] = self.request.session['cs']
         return kwargs
 
     def get_success_url(self):

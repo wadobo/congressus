@@ -20,6 +20,12 @@ REG_TYPES = (
     ('student', _('Student'))
 )
 
+INV_TYPES = (
+    ('invited', _('Invited')),
+    ('speaker', _('Speaker')),
+    ('student', _('Student'))
+)
+
 FOOD = (
     ('all', _('All')),
     ('vegetarian', _('Vegetarian')),
@@ -53,15 +59,32 @@ class Event(models.Model):
         except:
             return None
 
+    def get_type(self, t):
+        from django.utils.translation import ugettext as _
+        if t == 'invited':
+            if not self.price_invited:
+                return _('Invited (FREE, you need an invitation code)')
+            return _('Invited (EUR %s, you need an invitation code)') % self.price_invited
+        elif t == 'speaker':
+            if not self.price_speaker:
+                return _('Speaker (FREE, you need an invitation code)')
+            return _('Speaker (EUR %s, you need an invitation code)') % self.price_speaker
+        elif t == 'student':
+            if not self.price_student:
+                return _('Student (FREE, you need an invitation code)')
+            return _('Student (EUR %s, you need an invitation code)') % self.price_student
+        return _('Regular (EUR %s)') % self.price
+
 
 class InvCode(models.Model):
     event = models.ForeignKey(Event, related_name='codes')
     code = models.CharField(_('code'), max_length=10, blank=True, null=True)
     person = models.CharField(_('for person'), max_length=100, blank=True, null=True)
     used = models.BooleanField(_('used'), default=False)
+    type = models.CharField(_('type'), choices=INV_TYPES, default='invited', max_length=15)
 
     def __str__(self):
-        return self.code
+        return "%s - %s" % (self.code, self.type)
 
 
 class ConfirmEmail(models.Model):

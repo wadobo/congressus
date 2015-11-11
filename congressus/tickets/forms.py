@@ -16,28 +16,52 @@ class RegisterForm(forms.ModelForm):
         self.evid = kwargs.pop('evid')
         self.ev = Event.objects.get(id=self.evid)
         self.inv = None
+
+        c = kwargs.pop('captcha')
+        cs = kwargs.pop('captcha_solution')
         super(RegisterForm, self).__init__(*args, **kwargs)
+
+        choices = self.fields['type'].widget.choices
+        for i in range(len(choices)):
+            current = choices[i]
+            choices[i] = (current[0], self.ev.get_type(current[0]))
+
+        cp = self.fields['captcha']
+        cp.help_text = c
+        self.captcha_solution = cs
 
     inv_code = forms.CharField(required=False, label=_("Invitation code"),
         widget=forms.TextInput(
         attrs={'placeholder':
-               _("Add your invitation code, if you've one")}))
+               _("Only for Student, Invited and Speaker")}))
+    captcha = forms.CharField(required=True, label=_("Captcha"), help_text="3+2")
+
+    def clean_captcha(self):
+        c = self.cleaned_data['captcha']
+        try:
+            c = int(c)
+        except:
+            raise forms.ValidationError(_("Captcha is incorrect"))
+
+        if not c == self.captcha_solution:
+            raise forms.ValidationError(_("Captcha is incorrect"))
+        return c
 
     def clean(self):
         data = super(RegisterForm, self).clean()
         inv_code = data.get('inv_code', '')
         type = data.get('type', '')
         if not inv_code:
-            if type in ['speaker', 'invited']:
-                raise forms.ValidationError(_("Invitation code is required for speaker or invited"))
+            if type in ['student', 'speaker', 'invited']:
+                raise forms.ValidationError(_("Invitation code is required for student, speaker or invited"))
             return data
         else:
             # checking invitation code
-            if type not in ['speaker', 'invited']:
-                raise forms.ValidationError(_("Invitation code is only for speaker or invited"))
+            if type not in ['student', 'speaker', 'invited']:
+                raise forms.ValidationError(_("Invitation code is only for student, speaker or invited"))
 
             try:
-                self.inv = InvCode.objects.get(event=self.ev, code=inv_code, used=False)
+                self.inv = InvCode.objects.get(event=self.ev, code=inv_code, type=type, used=False)
             except:
                 raise forms.ValidationError(_("Invitation code invalid"))
 
