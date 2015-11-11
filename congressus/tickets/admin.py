@@ -10,9 +10,12 @@ class InvCodeInline(admin.TabularInline):
 
 class EventAdmin(admin.ModelAdmin):
     inlines = [InvCodeInline]
-    list_display = ('name', 'start', 'end', 'active', 'price')
+    list_display = ('name', 'start', 'end', 'active', 'price', 'max', 'sold')
     list_filter = ('active',)
     date_hierarchy = 'start'
+
+    def sold(self, obj):
+        return obj.sold()
 
 
 class InvCodeAdmin(admin.ModelAdmin):

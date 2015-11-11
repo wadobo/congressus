@@ -51,6 +51,10 @@ class RegisterForm(forms.ModelForm):
         data = super(RegisterForm, self).clean()
         inv_code = data.get('inv_code', '')
         type = data.get('type', '')
+
+        if self.ev.sold() >= self.ev.max:
+            raise forms.ValidationError(_("Sorry, there's no more places for this event"))
+
         if not inv_code:
             if type in ['student', 'speaker', 'invited']:
                 raise forms.ValidationError(_("Invitation code is required for student, speaker or invited"))

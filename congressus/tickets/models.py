@@ -43,6 +43,7 @@ class Event(models.Model):
     info = models.TextField(blank=True, null=True)
     active = models.BooleanField(default=False)
     admin = models.EmailField(_('admin email'), blank=True, null=True)
+    max = models.IntegerField(_('max tickets'), default=300)
 
     class Meta:
         ordering = ['-start']
@@ -58,6 +59,10 @@ class Event(models.Model):
             return self.email
         except:
             return None
+
+    def sold(self):
+        sold = self.tickets.filter(confirmed=True).count()
+        return sold
 
     def get_type(self, t):
         from django.utils.translation import ugettext as _
