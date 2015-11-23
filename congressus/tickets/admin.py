@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from .models import Event, Ticket, InvCode
 from .models import ConfirmEmail, EmailAttachment
+from admin_csv import CSVMixin
 
 
 class InvCodeInline(admin.TabularInline):
@@ -24,11 +25,39 @@ class InvCodeAdmin(admin.ModelAdmin):
     search_fields = ('event', 'person', 'code')
 
 
-class TicketAdmin(admin.ModelAdmin):
+class TicketAdmin(CSVMixin, admin.ModelAdmin):
     list_display = ('order', 'order_tpv', 'event', 'confirmed', 'name', 'email', 'type', 'food')
     list_filter = ('confirmed', 'food', 'type')
     search_fields = ('order', 'order_tpv', 'email')
     date_hierarchy = 'created'
+    csv_fields = [
+        'email',
+        'name',
+        'org',
+        'confirmed',
+
+        'invcode',
+        'order',
+        'order_tpv',
+
+        'type',
+        'food',
+        'comments',
+        'arrival',
+        'departure',
+
+        'confirmed_date',
+        'confirm_sent',
+
+        'eventname',
+        'created',
+    ]
+
+    def eventname(self, obj):
+        return obj.event.name
+
+    def invcode(self, obj):
+        return obj.inv.code if obj.inv else ''
 
 
 class Attachments(admin.TabularInline):
