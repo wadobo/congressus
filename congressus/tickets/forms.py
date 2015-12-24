@@ -34,7 +34,11 @@ class RegisterForm(forms.ModelForm):
         widget=forms.TextInput(
         attrs={'placeholder':
                _("Only for Student, Invited and Speaker")}))
-    captcha = forms.CharField(required=True, label=_("Captcha"), help_text="3+2")
+    captcha = forms.CharField(required=True, label=_("Captcha"),
+        help_text="3+2",
+        widget=forms.TextInput(
+        attrs={'placeholder':
+               _('Result, for example for "3 - 2" write "1"')}))
 
     def clean_captcha(self):
         c = self.cleaned_data['captcha']
