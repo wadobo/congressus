@@ -3,6 +3,8 @@ from django import forms
 from .models import Ticket
 from .models import InvCode
 from .models import Event
+from .models import SHIRT_TYPES
+from .models import TShirt
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
@@ -30,6 +32,9 @@ class RegisterForm(forms.ModelForm):
         cp.help_text = c
         self.captcha_solution = cs
 
+    tshirt = forms.CharField(required=True, label=_("T-Shirt size"),
+        widget=forms.Select(choices=SHIRT_TYPES))
+
     inv_code = forms.CharField(required=False, label=_("Invitation code"),
         widget=forms.TextInput(
         attrs={'placeholder':
@@ -39,6 +44,10 @@ class RegisterForm(forms.ModelForm):
         widget=forms.TextInput(
         attrs={'placeholder':
                _('Result, for example for "3 - 2" write "1"')}))
+
+    idx = Ticket.form_fields.index('comments') + 1
+    field_order = (Ticket.form_fields[0:idx] + ['tshirt'] +
+                   Ticket.form_fields[idx:] + ['inv_code', 'captcha'])
 
     def clean_captcha(self):
         c = self.cleaned_data['captcha']
@@ -90,5 +99,9 @@ class RegisterForm(forms.ModelForm):
         obj.save()
 
         obj.send_reg_email()
+
+        tshirt = self.cleaned_data['tshirt']
+        tshirt = TShirt(ticket=obj, size=tshirt)
+        tshirt.save()
 
         return obj

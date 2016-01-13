@@ -21,6 +21,10 @@
         <td>{{ ticket.get_price|floatformat:2 }} €</td>
     </tr>
     <tr>
+        <th>{% trans "T-Shirt size" %}</th>
+        <td>{{ ticket.tshirt_size }}</td>
+    </tr>
+    <tr>
         <th>{% trans "Ticket confirmed" %}</th>
         <td>{{ ticket.confirmed|yesno }}</td>
     </tr>

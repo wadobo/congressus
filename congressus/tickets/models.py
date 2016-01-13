@@ -32,6 +32,14 @@ FOOD = (
     ('vegan', _('Vegan'))
 )
 
+SHIRT_TYPES = (
+    ('xs', 'XS'),
+    ('s', 'S'),
+    ('m', 'M'),
+    ('l', 'L'),
+    ('xl', 'XL'),
+)
+
 class Event(models.Model):
     name = models.CharField(_('name'), max_length=200, unique=True)
     start = models.DateTimeField(_('start date'))
@@ -44,6 +52,8 @@ class Event(models.Model):
     active = models.BooleanField(default=False)
     admin = models.EmailField(_('admin email'), blank=True, null=True)
     max = models.IntegerField(_('max tickets'), default=300)
+    tshirt_img = models.ImageField(_('t-shirt img'), upload_to='tshirts',
+                                   blank=True, null=True)
 
     class Meta:
         ordering = ['-start']
@@ -208,11 +218,25 @@ class Ticket(models.Model):
         self.confirm_sent = True
         self.save()
 
+    def tshirt_size(self):
+        try:
+            return self.tshirt.get_size_display()
+        except:
+            return 'NOTSET'
+
     class Meta:
         ordering = ['-created']
 
     def __str__(self):
         return self.order
+
+
+class TShirt(models.Model):
+    ticket = models.OneToOneField(Ticket, related_name='tshirt')
+    size = models.CharField(_('size'), choices=SHIRT_TYPES, default='M', max_length=3)
+
+    def __str__(self):
+        return "%s - %s" % (self.ticket, self.size)
 
 
 @receiver(post_save, sender=Ticket)

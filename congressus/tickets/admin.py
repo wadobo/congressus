@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from .models import Event, Ticket, InvCode
 from .models import ConfirmEmail, EmailAttachment
+from .models import TShirt
 from admin_csv import CSVMixin
 
 
@@ -25,9 +26,15 @@ class InvCodeAdmin(admin.ModelAdmin):
     search_fields = ('event', 'person', 'code')
 
 
+class TShirts(admin.TabularInline):
+    model = TShirt
+
+
 class TicketAdmin(CSVMixin, admin.ModelAdmin):
-    list_display = ('order', 'order_tpv', 'event', 'confirmed', 'name', 'email', 'type', 'food')
-    list_filter = ('confirmed', 'food', 'type')
+    inlines = [TShirts]
+    list_display = ('order', 'order_tpv', 'event', 'confirmed', 'name',
+                    'email', 'type', 'food', 'tshirts')
+    list_filter = ('tshirt__size', 'confirmed', 'food', 'type')
     search_fields = ('order', 'order_tpv', 'email')
     date_hierarchy = 'created'
     csv_fields = [
@@ -35,6 +42,7 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
         'name',
         'org',
         'confirmed',
+        'tshirts',
 
         'invcode',
         'order',
@@ -52,6 +60,9 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
         'eventname',
         'created',
     ]
+
+    def tshirts(self, obj):
+        return obj.tshirt_size()
 
     def eventname(self, obj):
         return obj.event.name
@@ -71,7 +82,23 @@ class ConfirmEmailAdmin(admin.ModelAdmin):
     search_fields = ('event', 'subject', 'body')
 
 
+class TShirtAdmin(admin.ModelAdmin):
+    list_display = ('event', 'ticket', 'size', 'email', 'name')
+    list_filter = ('size', )
+    search_fields = ('ticket', 'size')
+
+    def event(self, obj):
+        return obj.ticket.event
+
+    def email(self, obj):
+        return obj.ticket.email
+
+    def name(self, obj):
+        return obj.ticket.name
+
+
 admin.site.register(Event, EventAdmin)
 admin.site.register(InvCode, InvCodeAdmin)
 admin.site.register(Ticket, TicketAdmin)
 admin.site.register(ConfirmEmail, ConfirmEmailAdmin)
+admin.site.register(TShirt, TShirtAdmin)

@@ -5,6 +5,7 @@
 {% trans "ticket number" %}: {{ ticket.order }}
 {% trans "payment number" %}: {{ ticket.order_tpv }}
 {% trans "ticket price" %}: {{ ticket.get_price|floatformat:2 }} €
+{% trans "t-shirt size" %}: {{ ticket.tshirt_size }}
 {% trans "ticket confirmed" %}: {{ ticket.confirmed|yesno }}
 
 {% trans "Personal info" %}
