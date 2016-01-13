@@ -15,7 +15,9 @@
                 {% csrf_token %}
 
                 {% if ev.tshirt_img %}
+                    <div class="text-center">
                     <img src="{{ ev.tshirt_img.url }}" alt="tshirt photo" class="img-responsive img-thumbnail"/>
+                    </div>
                 {% endif %}
 
                 {{ form|bootstrap }}
