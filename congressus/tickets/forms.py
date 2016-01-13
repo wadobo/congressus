@@ -105,3 +105,21 @@ class RegisterForm(forms.ModelForm):
         tshirt.save()
 
         return obj
+
+
+class TShirtForm(forms.ModelForm):
+    class Meta:
+        model = TShirt
+        fields = ['size']
+
+    def __init__(self, *args, **kwargs):
+        self.order = kwargs.pop('order')
+        self.ticket = Ticket.objects.get(order=self.order)
+
+        super(TShirtForm, self).__init__(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        ts, created = TShirt.objects.get_or_create(ticket=self.ticket)
+        ts.size = self.cleaned_data['size']
+        ts.save()
+        return ts

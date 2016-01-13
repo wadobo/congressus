@@ -6,6 +6,7 @@ urlpatterns = [
     url(r'^event/(?P<evid>\d+)/register/', views.register, name='register'),
     url(r'^ticket/(?P<order>[\w-]+)/payment/', views.payment, name='payment'),
     url(r'^ticket/(?P<order>[\w-]+)/thanks/', views.thanks, name='thanks'),
+    url(r'^ticket/(?P<order>[\w-]+)/tshirt/', views.tshirt, name='tshirt'),
     url(r'^ticket/confirm/', views.confirm, name='confirm'),
 ]
 

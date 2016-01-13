@@ -19,9 +19,11 @@ from django.views.decorators.csrf import csrf_exempt
 
 from django.utils.translation import ugettext as _
 
+from .models import TShirt
 from .models import Ticket
 from .models import Event
 from .forms import RegisterForm
+from .forms import TShirtForm
 
 from base64 import b64encode, b64decode
 from pyDes import triple_des, CBC
@@ -182,3 +184,23 @@ class Confirm(View):
         tk.save()
         return HttpResponse("")
 confirm = csrf_exempt(Confirm.as_view())
+
+
+class ChangeTShirt(CreateView):
+    model = TShirt
+    form_class = TShirtForm
+
+    def get_form_kwargs(self):
+        kwargs = super(ChangeTShirt, self).get_form_kwargs()
+        kwargs['order'] = self.kwargs['order']
+        return kwargs
+
+    def get_context_data(self, *args, **kwargs):
+        ctx = super(ChangeTShirt, self).get_context_data(*args, **kwargs)
+        ticket = Ticket.objects.get(order=self.kwargs['order'])
+        ctx['ev'] = ticket.event
+        return ctx
+
+    def get_success_url(self):
+        return reverse('thanks', kwargs={'order': self.object.ticket.order})
+tshirt = ChangeTShirt.as_view()
