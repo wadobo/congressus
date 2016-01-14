@@ -83,9 +83,13 @@ class ConfirmEmailAdmin(admin.ModelAdmin):
 
 
 class TShirtAdmin(admin.ModelAdmin):
-    list_display = ('event', 'ticket', 'size', 'email', 'name')
-    list_filter = ('size', )
+    list_display = ('event', 'ticket', 'size', 'email', 'name', 'confirmed')
+    list_filter = ('size', 'ticket__confirmed')
     search_fields = ('ticket', 'size')
+
+    def confirmed(self, obj):
+        return obj.ticket.confirmed
+    confirmed.boolean = True
 
     def event(self, obj):
         return obj.ticket.event
