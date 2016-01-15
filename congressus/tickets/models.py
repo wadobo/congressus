@@ -33,11 +33,18 @@ FOOD = (
 )
 
 SHIRT_TYPES = (
+    ('xxs', 'XXS'),
     ('xs', 'XS'),
     ('s', 'S'),
     ('m', 'M'),
     ('l', 'L'),
     ('xl', 'XL'),
+    ('xxl', 'XXL'),
+)
+
+SHIRT_GENDER_TYPES = (
+    ('m', _('Male')),
+    ('f', _('Female')),
 )
 
 class Event(models.Model):
@@ -220,7 +227,8 @@ class Ticket(models.Model):
 
     def tshirt_size(self):
         try:
-            return self.tshirt.get_size_display()
+            return "%s (%s)" % (self.tshirt.get_size_display(),
+                                self.tshirt.get_type_display())
         except:
             return 'NOTSET'
 
@@ -233,7 +241,8 @@ class Ticket(models.Model):
 
 class TShirt(models.Model):
     ticket = models.OneToOneField(Ticket, related_name='tshirt')
-    size = models.CharField(_('size'), choices=SHIRT_TYPES, default='M', max_length=3)
+    type = models.CharField(_('type'), choices=SHIRT_GENDER_TYPES, default='m', max_length=3)
+    size = models.CharField(_('size'), choices=SHIRT_TYPES, default='m', max_length=3)
 
     def __str__(self):
         return "%s - %s" % (self.ticket, self.size)

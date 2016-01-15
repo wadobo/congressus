@@ -3,7 +3,7 @@ from django import forms
 from .models import Ticket
 from .models import InvCode
 from .models import Event
-from .models import SHIRT_TYPES
+from .models import SHIRT_TYPES, SHIRT_GENDER_TYPES
 from .models import TShirt
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -34,6 +34,8 @@ class RegisterForm(forms.ModelForm):
 
     tshirt = forms.CharField(required=True, label=_("T-Shirt size"),
         widget=forms.Select(choices=SHIRT_TYPES))
+    tstype = forms.CharField(required=True, label=_("T-Shirt type"),
+        widget=forms.Select(choices=SHIRT_GENDER_TYPES))
 
     inv_code = forms.CharField(required=False, label=_("Invitation code"),
         widget=forms.TextInput(
@@ -46,7 +48,7 @@ class RegisterForm(forms.ModelForm):
                _('Result, for example for "3 - 2" write "1"')}))
 
     idx = Ticket.form_fields.index('comments') + 1
-    field_order = (Ticket.form_fields[0:idx] + ['tshirt'] +
+    field_order = (Ticket.form_fields[0:idx] + ['tshirt', 'tstype'] +
                    Ticket.form_fields[idx:] + ['inv_code', 'captcha'])
 
     def clean_captcha(self):
@@ -101,7 +103,8 @@ class RegisterForm(forms.ModelForm):
         obj.send_reg_email()
 
         tshirt = self.cleaned_data['tshirt']
-        tshirt = TShirt(ticket=obj, size=tshirt)
+        tstype = self.cleaned_data['tstype']
+        tshirt = TShirt(ticket=obj, size=tshirt, type=tstype)
         tshirt.save()
 
         return obj
@@ -110,7 +113,7 @@ class RegisterForm(forms.ModelForm):
 class TShirtForm(forms.ModelForm):
     class Meta:
         model = TShirt
-        fields = ['size']
+        fields = ['size', 'type']
 
     def __init__(self, *args, **kwargs):
         self.order = kwargs.pop('order')
@@ -121,5 +124,6 @@ class TShirtForm(forms.ModelForm):
     def save(self, *args, **kwargs):
         ts, created = TShirt.objects.get_or_create(ticket=self.ticket)
         ts.size = self.cleaned_data['size']
+        ts.type = self.cleaned_data['type']
         ts.save()
         return ts
