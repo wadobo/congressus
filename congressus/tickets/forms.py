@@ -96,8 +96,9 @@ class RegisterForm(forms.ModelForm):
             self.inv.used = True
             self.inv.save()
             obj.inv = self.inv
-            obj.confirmed = True
-            obj.confirmed_date = timezone.now()
+            if not obj.get_price():
+                obj.confirmed = True
+                obj.confirmed_date = timezone.now()
         obj.save()
 
         obj.send_reg_email()
