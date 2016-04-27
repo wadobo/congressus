@@ -44,6 +44,7 @@ INSTALLED_APPS = (
 
     # custom apps
     'tickets',
+    'events',
 )
 
 MIDDLEWARE_CLASSES = (

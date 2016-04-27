@@ -1,10 +1,11 @@
 import uuid
 from django import forms
 from .models import Ticket
-from .models import InvCode
-from .models import Event
 from .models import SHIRT_TYPES, SHIRT_GENDER_TYPES
 from .models import TShirt
+
+from events.models import Event, InvCode
+
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 

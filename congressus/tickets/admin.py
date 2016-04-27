@@ -1,29 +1,8 @@
 from django.contrib import admin
 
-from .models import Event, Ticket, InvCode
-from .models import ConfirmEmail, EmailAttachment
+from .models import Ticket
 from .models import TShirt
 from admin_csv import CSVMixin
-
-
-class InvCodeInline(admin.TabularInline):
-    model = InvCode
-
-
-class EventAdmin(admin.ModelAdmin):
-    inlines = [InvCodeInline]
-    list_display = ('name', 'start', 'end', 'active', 'price', 'max', 'sold')
-    list_filter = ('active',)
-    date_hierarchy = 'start'
-
-    def sold(self, obj):
-        return obj.sold()
-
-
-class InvCodeAdmin(admin.ModelAdmin):
-    list_display = ('event', 'person', 'code', 'type', 'used')
-    list_filter = ('event', 'used', 'type')
-    search_fields = ('event', 'person', 'code')
 
 
 class TShirts(admin.TabularInline):
@@ -71,17 +50,6 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
         return obj.inv.code if obj.inv else ''
 
 
-class Attachments(admin.TabularInline):
-    model = EmailAttachment
-
-
-class ConfirmEmailAdmin(admin.ModelAdmin):
-    inlines = [Attachments]
-    list_display = ('event', 'subject')
-    list_filter = ('event',)
-    search_fields = ('event', 'subject', 'body')
-
-
 class TShirtAdmin(admin.ModelAdmin):
     list_display = ('event', 'ticket', 'size', 'type', 'email', 'name', 'confirmed')
     list_filter = ('size', 'type', 'ticket__confirmed')
@@ -101,8 +69,5 @@ class TShirtAdmin(admin.ModelAdmin):
         return obj.ticket.name
 
 
-admin.site.register(Event, EventAdmin)
-admin.site.register(InvCode, InvCodeAdmin)
 admin.site.register(Ticket, TicketAdmin)
-admin.site.register(ConfirmEmail, ConfirmEmailAdmin)
 admin.site.register(TShirt, TShirtAdmin)

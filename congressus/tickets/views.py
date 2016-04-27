@@ -21,7 +21,8 @@ from django.utils.translation import ugettext as _
 
 from .models import TShirt
 from .models import Ticket
-from .models import Event
+from events.models import Event
+
 from .forms import RegisterForm
 from .forms import TShirtForm
 
