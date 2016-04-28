@@ -64,6 +64,16 @@ class Event(models.Model):
         return _('Regular (EUR %s)') % self.price
 
 
+class Space(models.Model):
+    event = models.ForeignKey(Event, related_name='spaces')
+    name = models.CharField(_('name'), max_length=300)
+    capacity = models.IntegerField(_('capacity'), default=100)
+    numbered = models.BooleanField(_('numbered'), default=False)
+    layout = models.TextField(_('seats layout'),
+                              help_text=_('the layout to select the numbered seat'),
+                              blank=True, null=True)
+
+
 class ConfirmEmail(models.Model):
     event = models.OneToOneField(Event, related_name='email')
     subject = models.CharField(_('subject'), max_length=300)
