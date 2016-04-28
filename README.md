@@ -1,4 +1,7 @@
-# Aplicación para registro en congresos
+# Aplicación para venta de entradas y registro en congresos
+
+Esta aplicación ofrece una forma sencilla para montar un formulario de
+venta de entradas para eventos y congresos, con cobro a través de un TPV.
 
 ## Despliegue
 
