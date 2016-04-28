@@ -3,6 +3,7 @@ from django.contrib import admin
 from .models import Event, InvCode
 from .models import ConfirmEmail, EmailAttachment
 from .models import Space
+from .models import Session
 
 
 class InvCodeInline(admin.TabularInline):
@@ -22,14 +23,13 @@ class SpaceInline(admin.TabularInline):
 class SpaceAdmin(admin.ModelAdmin):
     list_display = ('event', 'name', 'capacity', 'numbered')
     list_filter = ('event', 'capacity', 'numbered')
-    search_fields = ('event', 'name')
+    search_fields = ('event__name', 'name')
 
 
 class EventAdmin(admin.ModelAdmin):
     inlines = [SpaceInline, InvCodeInline]
-    list_display = ('name', 'start', 'end', 'active', 'price', 'max', 'sold')
+    list_display = ('name', 'active', 'sold')
     list_filter = ('active',)
-    date_hierarchy = 'start'
 
     def sold(self, obj):
         return obj.sold()
@@ -46,7 +46,16 @@ class ConfirmEmailAdmin(admin.ModelAdmin):
     search_fields = ('event', 'subject', 'body')
 
 
+class SessionAdmin(admin.ModelAdmin):
+    list_display = ('space', 'name', 'start', 'end', 'price')
+    list_filter = ('space', )
+    search_fields = ('space__name', 'name', 'space__event__name')
+
+    date_hierarchy = 'start'
+
+
 admin.site.register(Event, EventAdmin)
 admin.site.register(InvCode, InvCodeAdmin)
-admin.site.register(Space, SpaceAdmin)
 admin.site.register(ConfirmEmail, ConfirmEmailAdmin)
+admin.site.register(Space, SpaceAdmin)
+admin.site.register(Session, SessionAdmin)

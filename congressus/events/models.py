@@ -15,21 +15,16 @@ INV_TYPES = (
 
 class Event(models.Model):
     name = models.CharField(_('name'), max_length=200, unique=True)
-    start = models.DateTimeField(_('start date'))
-    end = models.DateTimeField(_('end date'))
-    price = models.IntegerField(_('ticket price'), default=25)
+
     price_student = models.IntegerField(_('student price'), default=25)
     price_speaker = models.IntegerField(_('speaker price'), default=0)
     price_invited = models.IntegerField(_('invited price'), default=0)
     info = models.TextField(blank=True, null=True)
     active = models.BooleanField(default=False)
     admin = models.EmailField(_('admin email'), blank=True, null=True)
-    max = models.IntegerField(_('max tickets'), default=300)
+
     tshirt_img = models.ImageField(_('t-shirt img'), upload_to='tshirts',
                                    blank=True, null=True)
-
-    class Meta:
-        ordering = ['-start']
 
     def __str__(self):
         return self.name
@@ -63,6 +58,12 @@ class Event(models.Model):
             return _('Student (EUR %s, you need an invitation code)') % self.price_student
         return _('Regular (EUR %s)') % self.price
 
+    def get_sessions(self):
+        sessions = []
+        for space in self.spaces.all():
+            sessions += list(space.sessions.all())
+        return sessions
+
 
 class Space(models.Model):
     event = models.ForeignKey(Event, related_name='spaces')
@@ -74,7 +75,23 @@ class Space(models.Model):
                               blank=True, null=True)
 
     def __str__(self):
-        return self.name
+        return '%s - %s' % (self.name, self.event)
+
+
+class Session(models.Model):
+    space = models.ForeignKey(Space, related_name='sessions')
+    name = models.CharField(_('name'), max_length=300)
+
+    start = models.DateTimeField(_('start date'))
+    end = models.DateTimeField(_('end date'))
+
+    price = models.IntegerField(_('ticket price'), default=10)
+
+    class Meta:
+        ordering = ['-start']
+
+    def __str__(self):
+        return '%s - %s' % (self.name, self.space)
 
 
 class ConfirmEmail(models.Model):
