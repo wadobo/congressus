@@ -73,6 +73,9 @@ class Space(models.Model):
                               help_text=_('the layout to select the numbered seat'),
                               blank=True, null=True)
 
+    def __str__(self):
+        return self.name
+
 
 class ConfirmEmail(models.Model):
     event = models.OneToOneField(Event, related_name='email')
