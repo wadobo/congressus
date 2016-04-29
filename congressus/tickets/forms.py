@@ -19,7 +19,8 @@ class RegisterForm(forms.ModelForm):
 
         super(RegisterForm, self).__init__(*args, **kwargs)
 
-        # TODO add custom fields
+        for field in self.session.event().fields.all():
+            self.fields[field.label] = field.form_type()
 
     def clean(self):
         data = super(RegisterForm, self).clean()
@@ -34,6 +35,11 @@ class RegisterForm(forms.ModelForm):
         obj.session = self.session
         obj.order = str(uuid.uuid4())
         obj.gen_order_tpv()
+
+        data = self.cleaned_data
+        for field in self.session.event().fields.all():
+            value = data.get(field.label, '')
+            obj.set_extra_data(field.label, value)
 
         if not obj.get_price():
             obj.confirmed = True

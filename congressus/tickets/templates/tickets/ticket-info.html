@@ -27,5 +27,19 @@
     <tr>
         <th class="bg-info" colspan="2">{% trans "Personal info" %}</th>
     </tr>
+    <tr>
+        <th>{% trans "Email" %}</th>
+        <td>{{ ticket.email }}</td>
+    </tr>
     <!-- todo add custom fields -->
+    {% for d in ticket.get_extras %}
+    <tr>
+        <th>{{ d.field.label }}</th>
+        {% if d.field.type == 'check' %}
+            <td>{{ d.value|yesno }}</td>
+        {% else %}
+            <td>{{ d.value }}</td>
+        {% endif %}
+    </tr>
+    {% endfor %}
 </table>

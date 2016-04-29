@@ -82,7 +82,7 @@ class Space(models.Model):
                               blank=True, null=True)
 
     def __str__(self):
-        return '%s - %s' % (self.name, self.event)
+        return '%s - %s' % (self.event, self.name)
 
 
 class Session(models.Model):
@@ -94,6 +94,9 @@ class Session(models.Model):
     end = models.DateTimeField(_('end date'))
 
     price = models.IntegerField(_('ticket price'), default=10)
+
+    def event(self):
+        return self.space.event
 
     def sold(self):
         sold = self.tickets.filter(confirmed=True).count()
@@ -107,7 +110,7 @@ class Session(models.Model):
         ordering = ['-start']
 
     def __str__(self):
-        return '%s - %s' % (self.name, self.space)
+        return '%s - %s' % (self.space, self.name)
 
 
 class ConfirmEmail(models.Model):
@@ -137,12 +140,31 @@ class InvCode(models.Model):
 
 class TicketField(models.Model):
     event = models.ForeignKey(Event, related_name='fields')
+    order = models.IntegerField(default=0)
     type = models.CharField(max_length=100, choices=FIELD_TYPES, default='text')
     label = models.CharField(_('label'), max_length=100)
     help_text = models.CharField(_('help text'), max_length=200, blank=True, null=True)
+    required = models.BooleanField(default=False)
     options = models.CharField(max_length=500,
                                help_text='comma separated values, only for select type',
                                blank=True, null=True)
+
+    class Meta:
+        ordering = ['order']
+
+    def form_type(self):
+        from django import forms
+
+        choices = ((i, i) for i in map(str.strip, self.options.split(',')))
+
+        types = {
+            'text': forms.CharField(help_text=self.help_text, required=self.required),
+            'textarea': forms.CharField(help_text=self.help_text, widget=forms.Textarea, required=self.required),
+            'check': forms.BooleanField(help_text=self.help_text, required=self.required),
+            'select': forms.ChoiceField(help_text=self.help_text, choices=choices, required=self.required),
+        }
+
+        return types[self.type]
 
 
 @receiver(post_save, sender=InvCode)

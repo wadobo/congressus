@@ -52,9 +52,18 @@ class Ticket(models.Model):
         return data.get(key, None)
 
     def set_extra_data(self, key, value):
-        data = self.extra_data or {}
+        data = json.loads(self.extra_data or '{}')
         data[key] = value
         self.extra_data = json.dumps(data)
+
+    def get_extras(self):
+        extras = []
+        for field in self.session.event().fields.all():
+            extras.append({
+                'field': field,
+                'value': self.get_extra_data(field.label)
+            })
+        return extras
 
     def space(self):
         return self.session.space

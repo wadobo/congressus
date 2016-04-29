@@ -5,8 +5,8 @@
 {% block content %}
     <div class="page-header">
         <h1>
-            {{ session }}
-            <small>{% trans "Fill the form and continue to complete the payment" %}</small>
+            {{ session.name }}
+            <small>{{ session.space }}</small>
         </h1>
     </div>
 

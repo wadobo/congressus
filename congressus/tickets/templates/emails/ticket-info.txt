@@ -9,4 +9,6 @@
 
 {% trans "Personal info" %}
 -----
-TODO: add custom fields
+{% trans "Email" %}: {{ ticket.email }}
+{% for d in ticket.get_extras %}{{ d.field.label }}: {% if d.field.type == 'check' %}{{ d.value|yesno }}{% else %}{{ d.value }}{% endif %}
+{% endfor %}
