@@ -12,8 +12,8 @@ def generate_pdf(ticket, logo='img/logo.png'):
     """ Generate ticket in pdf with the get ticket. """
 
     data = {
-        'title': ticket.seesion.name,
-        'date': ticket.seesion.start.isoformat(),
+        'title': ticket.session.name,
+        'date': ticket.session.start.date.isoformat(),
         'code': ticket.order.upper(),
     }
 
