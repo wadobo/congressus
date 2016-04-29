@@ -4,6 +4,7 @@ from .models import Event, InvCode
 from .models import ConfirmEmail, EmailAttachment
 from .models import Space
 from .models import Session
+from .models import TicketField
 
 
 class InvCodeInline(admin.TabularInline):
@@ -26,8 +27,12 @@ class SpaceAdmin(admin.ModelAdmin):
     search_fields = ('event__name', 'name')
 
 
+class TicketFieldInline(admin.TabularInline):
+    model = TicketField
+
+
 class EventAdmin(admin.ModelAdmin):
-    inlines = [SpaceInline, InvCodeInline]
+    inlines = [SpaceInline, TicketFieldInline, InvCodeInline]
     list_display = ('name', 'active', 'sold')
     list_filter = ('active',)
 

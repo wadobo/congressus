@@ -1,4 +1,5 @@
 import random
+import json
 from django.utils import timezone
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -13,6 +14,7 @@ from django.dispatch import receiver
 from django.core.urlresolvers import reverse
 
 from events.models import Event, InvCode
+from events.models import Session
 
 
 REG_TYPES = (
@@ -44,30 +46,41 @@ SHIRT_GENDER_TYPES = (
 )
 
 class Ticket(models.Model):
-    event = models.ForeignKey(Event, related_name='tickets')
+    session = models.ForeignKey(Event, related_name='tickets')
+
     inv = models.OneToOneField(InvCode, blank=True, null=True)
+
     order = models.CharField(_('Order'), max_length=200, unique=True)
     order_tpv = models.CharField(_('Order TPV'), max_length=12, blank=True, null=True)
-    created = models.DateTimeField(_('Created at'), auto_now_add=True)
 
+    created = models.DateTimeField(_('Created at'), auto_now_add=True)
     confirmed_date = models.DateTimeField(_('Confirmed at'), blank=True, null=True)
     confirmed = models.BooleanField(default=False)
     confirm_sent = models.BooleanField(default=False)
 
     # Form Fields
     email = models.EmailField(_('Email'))
-    name = models.CharField(_('Full name'), max_length=200)
-    org = models.CharField(_('Organization'), max_length=200)
 
-    type = models.CharField(_('Type'), max_length=20, choices=REG_TYPES, default='regular')
-    food = models.CharField(_('Food preferences'), max_length=20, choices=FOOD, default='all')
-    comments = models.TextField(_('Special needs'), blank=True, null=True)
-    arrival = models.DateField(_('Arrival date'), help_text='dd/mm/YYYY')
-    departure = models.DateField(_('Departure date'), help_text='dd/mm/YYYY')
+    extra_data = models.TextField(blank=True, null=True)
 
-    personal_info = ['email', 'name', 'org']
-    reg_info = ['type', 'food', 'comments', 'arrival', 'departure']
-    form_fields = personal_info + reg_info
+    def get_extra_data(self, key):
+        data = {}
+        if not self.extra_data:
+            return None
+        else:
+            data = json.loads(self.extra_data)
+        return data.get(key, None)
+
+    def set_extra_data(self, key, value):
+        data = self.extra_data or {}
+        data[key] = value
+        self.extra_data = json.dumps(data)
+
+    def space(self):
+        return self.session.space
+
+    def event(self):
+        return self.space().event
 
     def get_absolute_url(self):
         return reverse('payment', kwargs={'order': self.order})
@@ -78,38 +91,16 @@ class Ticket(models.Model):
         self.order_tpv += ''.join(random.choice(chars) for _ in range(6))
         self.save()
 
-    def get_personal_info(self):
-        pinfo = []
-        for f in self.personal_info:
-            field = getattr(self, f)
-            name = Ticket._meta.get_field_by_name(f)[0].verbose_name
-            pinfo.append({'value': field, 'name': name, 'f': f})
-        return pinfo
-
-    def get_reg_info(self):
-        pinfo = []
-        for f in self.reg_info:
-            field = getattr(self, f)
-            name = Ticket._meta.get_field_by_name(f)[0].verbose_name
-            pinfo.append({'value': field, 'name': name})
-        return pinfo
-
     def get_price(self):
-        price = self.event.price
-        if self.type == 'speaker':
-            price = self.event.price_speaker
-        elif self.type == 'student':
-            price = self.event.price_student
-        elif self.type == 'invited':
-            price = self.event.price_invited
-        return price
+        # TODO manage ticket type
+        return self.session.price
 
     def send_reg_email(self):
         tmpl = get_template('emails/reg.txt')
         d = Context({'ticket': self})
         body = tmpl.render(d)
-        email = EmailMessage(_('New Register / %s') % self.event.name,
-                             body, settings.FROM_EMAIL, [self.event.admin])
+        email = EmailMessage(_('New Register / %s') % self.session,
+                             body, settings.FROM_EMAIL, [self.event().admin])
         email.send(fail_silently=False)
 
     def send_confirm_email(self):
@@ -117,18 +108,18 @@ class Ticket(models.Model):
         d = Context({'ticket': self})
         tmpl = get_template('emails/confirm.txt')
         body = tmpl.render(d)
-        email = EmailMessage(_('Confirmed / %s') % self.event.name,
-                             body, settings.FROM_EMAIL, [self.event.admin])
+        email = EmailMessage(_('Confirmed / %s') % self.session,
+                             body, settings.FROM_EMAIL, [self.event().admin])
         email.send(fail_silently=False)
 
         # email to user
-        e = self.event.get_email()
+        e = self.event().get_email()
         if e:
             subject = e.subject
             body = e.body
         else:
             tmpl = get_template('emails/confirm-user.txt')
-            subject = _('Ticket Confirmed / %s') % self.event.name
+            subject = _('Ticket Confirmed / %s') % self.session
             body = tmpl.render(d)
 
         body = body.replace('TICKETID', self.order)

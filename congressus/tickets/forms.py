@@ -13,7 +13,7 @@ from django.utils import timezone
 class RegisterForm(forms.ModelForm):
     class Meta:
         model = Ticket
-        fields = Ticket.form_fields
+        fields = ['email']
 
     def __init__(self, *args, **kwargs):
         self.evid = kwargs.pop('evid')
@@ -47,10 +47,6 @@ class RegisterForm(forms.ModelForm):
         widget=forms.TextInput(
         attrs={'placeholder':
                _('Result, for example for "3 - 2" write "1"')}))
-
-    idx = Ticket.form_fields.index('comments') + 1
-    field_order = (Ticket.form_fields[0:idx] + ['tshirt', 'tstype'] +
-                   Ticket.form_fields[idx:] + ['inv_code', 'captcha'])
 
     def clean_captcha(self):
         c = self.cleaned_data['captcha']

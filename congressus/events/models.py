@@ -9,16 +9,20 @@ from django.dispatch import receiver
 INV_TYPES = (
     ('invited', _('Invited')),
     ('speaker', _('Speaker')),
-    ('student', _('Student'))
+    ('student', _('Student')),
+)
+
+FIELD_TYPES = (
+    ('text', _('Text')),
+    ('textarea', _('TextArea')),
+    ('check', _('CheckBox')),
+    ('select', _('Select')),
 )
 
 
 class Event(models.Model):
     name = models.CharField(_('name'), max_length=200, unique=True)
 
-    price_student = models.IntegerField(_('student price'), default=25)
-    price_speaker = models.IntegerField(_('speaker price'), default=0)
-    price_invited = models.IntegerField(_('invited price'), default=0)
     info = models.TextField(blank=True, null=True)
     active = models.BooleanField(default=False)
     admin = models.EmailField(_('admin email'), blank=True, null=True)
@@ -117,6 +121,16 @@ class InvCode(models.Model):
 
     def __str__(self):
         return "%s - %s" % (self.code, self.type)
+
+
+class TicketField(models.Model):
+    event = models.ForeignKey(Event, related_name='fields')
+    type = models.CharField(max_length=100, choices=FIELD_TYPES, default='text')
+    label = models.CharField(_('label'), max_length=100)
+    help_text = models.CharField(_('help text'), max_length=200, blank=True, null=True)
+    options = models.CharField(max_length=500,
+                               help_text='comma separated values, only for select type',
+                               blank=True, null=True)
 
 
 @receiver(post_save, sender=InvCode)

@@ -11,32 +11,23 @@ class TShirts(admin.TabularInline):
 
 class TicketAdmin(CSVMixin, admin.ModelAdmin):
     inlines = [TShirts]
-    list_display = ('order', 'order_tpv', 'event', 'confirmed', 'name',
-                    'email', 'type', 'food', 'tshirts')
-    list_filter = ('tshirt__size', 'confirmed', 'food', 'type')
+    list_display = ('order', 'order_tpv', 'event', 'confirmed', 'email')
+    list_filter = ('confirmed',)
     search_fields = ('order', 'order_tpv', 'email')
     date_hierarchy = 'created'
     csv_fields = [
         'email',
-        'name',
-        'org',
-        'confirmed',
-        'tshirts',
 
         'invcode',
         'order',
         'order_tpv',
 
-        'type',
-        'food',
-        'comments',
-        'arrival',
-        'departure',
-
         'confirmed_date',
         'confirm_sent',
 
         'eventname',
+        'spacename',
+        'sessionname',
         'created',
     ]
 
@@ -44,7 +35,13 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
         return obj.tshirt_size()
 
     def eventname(self, obj):
-        return obj.event.name
+        return obj.event().name
+
+    def spacename(self, obj):
+        return obj.space().name
+
+    def sessionname(self, obj):
+        return obj.session.name
 
     def invcode(self, obj):
         return obj.inv.code if obj.inv else ''
