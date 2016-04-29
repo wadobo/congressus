@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ ev }}{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h1> {{ ev }} </h1>
+    </div>
+
+    <p> {{ ev.info }} </p>
+
+    <div class="row">
+    {% for space in ev.spaces.all %}
+        <div class="col-sm-6">
+            <div class="panel panel-info">
+                <div class="panel panel-heading">
+                    {{ space.name }}
+                </div>
+                <div class="panel panel-body">
+                {% for session in space.sessions.all %}
+                    <a class="btn btn-default {% if not session.have_places %}disabled{% endif %}"
+                       href="{% url 'register' ev.slug space.slug session.slug %}">
+                        {{ session.name }} - {{ session.price }}
+                    </a>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+
+{% endblock %}

@@ -5,6 +5,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from autoslug import AutoSlugField
+
 
 INV_TYPES = (
     ('invited', _('Invited')),
@@ -22,13 +24,11 @@ FIELD_TYPES = (
 
 class Event(models.Model):
     name = models.CharField(_('name'), max_length=200, unique=True)
+    slug = AutoSlugField(populate_from='name')
 
     info = models.TextField(blank=True, null=True)
     active = models.BooleanField(default=False)
     admin = models.EmailField(_('admin email'), blank=True, null=True)
-
-    tshirt_img = models.ImageField(_('t-shirt img'), upload_to='tshirts',
-                                   blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -41,10 +41,6 @@ class Event(models.Model):
             return self.email
         except:
             return None
-
-    def sold(self):
-        sold = self.tickets.filter(confirmed=True).count()
-        return sold
 
     def get_type(self, t):
         from django.utils.translation import ugettext as _
@@ -68,10 +64,17 @@ class Event(models.Model):
             sessions += list(space.sessions.all())
         return sessions
 
+    def sold(self):
+        return sum(i.sold() for i in self.get_sessions())
+
+
+
 
 class Space(models.Model):
     event = models.ForeignKey(Event, related_name='spaces')
     name = models.CharField(_('name'), max_length=300)
+    slug = AutoSlugField(populate_from='name')
+
     capacity = models.IntegerField(_('capacity'), default=100)
     numbered = models.BooleanField(_('numbered'), default=False)
     layout = models.TextField(_('seats layout'),
@@ -85,11 +88,20 @@ class Space(models.Model):
 class Session(models.Model):
     space = models.ForeignKey(Space, related_name='sessions')
     name = models.CharField(_('name'), max_length=300)
+    slug = AutoSlugField(populate_from='name')
 
     start = models.DateTimeField(_('start date'))
     end = models.DateTimeField(_('end date'))
 
     price = models.IntegerField(_('ticket price'), default=10)
+
+    def sold(self):
+        sold = self.tickets.filter(confirmed=True).count()
+        return sold
+
+    def have_places(self):
+        s = self.sold()
+        return s <= self.space.capacity
 
     class Meta:
         ordering = ['-start']

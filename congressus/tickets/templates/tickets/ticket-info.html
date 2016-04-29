@@ -21,29 +21,11 @@
         <td>{{ ticket.get_price|floatformat:2 }} €</td>
     </tr>
     <tr>
-        <th>{% trans "T-Shirt size" %}</th>
-        <td>{{ ticket.tshirt_size }}</td>
-    </tr>
-    <tr>
         <th>{% trans "Ticket confirmed" %}</th>
         <td>{{ ticket.confirmed|yesno }}</td>
     </tr>
     <tr>
         <th class="bg-info" colspan="2">{% trans "Personal info" %}</th>
     </tr>
-    {% for f in ticket.get_personal_info %}
-        <tr>
-            <th>{{ f.name }}</th>
-            <td>{{ f.value }}</td>
-        </tr>
-    {% endfor %}
-    <tr>
-        <th class="bg-info" colspan="2">{% trans "Registration info" %}</th>
-    </tr>
-    {% for f in ticket.get_reg_info %}
-        <tr>
-            <th>{{ f.name }}</th>
-            <td>{{ f.value }}</td>
-        </tr>
-    {% endfor %}
+    <!-- todo add custom fields -->
 </table>

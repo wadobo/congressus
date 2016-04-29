@@ -19,12 +19,12 @@ from django.views.decorators.csrf import csrf_exempt
 
 from django.utils.translation import ugettext as _
 
-from .models import TShirt
 from .models import Ticket
+from events.models import Session
 from events.models import Event
+from events.models import Space
 
 from .forms import RegisterForm
-from .forms import TShirtForm
 
 from base64 import b64encode, b64decode
 from pyDes import triple_des, CBC
@@ -32,47 +32,45 @@ from collections import OrderedDict
 from hashlib import sha256
 
 
+class EventView(TemplateView):
+    template_name = 'tickets/event.html'
+
+    def get_context_data(self, *args, **kwargs):
+        ev = get_object_or_404(Event, slug=self.kwargs['ev'])
+        ctx = super(EventView, self).get_context_data(*args, **kwargs)
+        ctx['ev'] = ev
+        return ctx
+event = EventView.as_view()
+
+
 class Register(CreateView):
     model = Ticket
     form_class = RegisterForm
 
-    def gen_captcha(self):
-        numbers = {
-            '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9,
-            _('one'): 1,
-            _('two'): 2,
-            _('three'): 3,
-            _('four'): 4,
-            _('five'): 5,
-            _('six'): 6,
-            _('seven'): 7,
-            _('eight'): 8,
-            _('nine'): 9,
-        }
-        ops = { '+': operator.add, '-': operator.sub, }
-        first = random.choice(list(numbers.keys()))
-        second = random.choice(list(numbers.keys()))
-        op = random.choice(list(ops.keys()))
-        captcha_solution = ops[op](numbers[first], numbers[second])
-        c = "%s %s %s" % (first, op, second)
-        return c, captcha_solution
-
     def get_context_data(self, *args, **kwargs):
         ctx = super(Register, self).get_context_data(*args, **kwargs)
-        evid = self.kwargs['evid']
-        ev = get_object_or_404(Event, id=evid)
-        ctx['ev'] = ev
+        ev = self.kwargs['ev']
+        sp = self.kwargs['space']
+        se = self.kwargs['session']
+
+        session = get_object_or_404(Session, slug=se,
+                                    space__slug=sp,
+                                    space__event__slug=ev)
+        ctx['session'] = session
         return ctx
 
     def get_form_kwargs(self):
         kwargs = super(Register, self).get_form_kwargs()
-        kwargs['evid'] = self.kwargs['evid']
-        if self.request.method == 'GET':
-            c, cs = self.gen_captcha()
-            self.request.session['c'] = c
-            self.request.session['cs'] = cs
-        kwargs['captcha'] = self.request.session['c']
-        kwargs['captcha_solution'] = self.request.session['cs']
+
+        ev = self.kwargs['ev']
+        sp = self.kwargs['space']
+        se = self.kwargs['session']
+
+        session = get_object_or_404(Session, slug=se,
+                                    space__slug=sp,
+                                    space__event__slug=ev)
+
+        kwargs['session'] = session
         return kwargs
 
     def get_success_url(self):
@@ -185,23 +183,3 @@ class Confirm(View):
         tk.save()
         return HttpResponse("")
 confirm = csrf_exempt(Confirm.as_view())
-
-
-class ChangeTShirt(CreateView):
-    model = TShirt
-    form_class = TShirtForm
-
-    def get_form_kwargs(self):
-        kwargs = super(ChangeTShirt, self).get_form_kwargs()
-        kwargs['order'] = self.kwargs['order']
-        return kwargs
-
-    def get_context_data(self, *args, **kwargs):
-        ctx = super(ChangeTShirt, self).get_context_data(*args, **kwargs)
-        ticket = Ticket.objects.get(order=self.kwargs['order'])
-        ctx['ev'] = ticket.event
-        return ctx
-
-    def get_success_url(self):
-        return reverse('thanks', kwargs={'order': self.object.ticket.order})
-tshirt = ChangeTShirt.as_view()

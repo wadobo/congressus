@@ -24,29 +24,9 @@ REG_TYPES = (
     ('student', _('Student'))
 )
 
-FOOD = (
-    ('all', _('All')),
-    ('vegetarian', _('Vegetarian')),
-    ('vegan', _('Vegan'))
-)
-
-SHIRT_TYPES = (
-    ('xxs', 'XXS'),
-    ('xs', 'XS'),
-    ('s', 'S'),
-    ('m', 'M'),
-    ('l', 'L'),
-    ('xl', 'XL'),
-    ('xxl', 'XXL'),
-)
-
-SHIRT_GENDER_TYPES = (
-    ('m', _('Male')),
-    ('f', _('Female')),
-)
 
 class Ticket(models.Model):
-    session = models.ForeignKey(Event, related_name='tickets')
+    session = models.ForeignKey(Session, related_name='tickets')
 
     inv = models.OneToOneField(InvCode, blank=True, null=True)
 
@@ -136,27 +116,11 @@ class Ticket(models.Model):
         self.confirm_sent = True
         self.save()
 
-    def tshirt_size(self):
-        try:
-            return "%s (%s)" % (self.tshirt.get_size_display(),
-                                self.tshirt.get_type_display())
-        except:
-            return 'NOTSET'
-
     class Meta:
         ordering = ['-created']
 
     def __str__(self):
         return self.order
-
-
-class TShirt(models.Model):
-    ticket = models.OneToOneField(Ticket, related_name='tshirt')
-    type = models.CharField(_('type'), choices=SHIRT_GENDER_TYPES, default='m', max_length=3)
-    size = models.CharField(_('size'), choices=SHIRT_TYPES, default='m', max_length=3)
-
-    def __str__(self):
-        return "%s - %s" % (self.ticket, self.size)
 
 
 @receiver(post_save, sender=Ticket)

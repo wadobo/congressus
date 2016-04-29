@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     # 3rd party
     'bootstrapform',
     'admin_csv',
+    'autoslug',
 
     # custom apps
     'tickets',
