@@ -5,3 +5,4 @@ pillow
 django-bootstrap-form
 django-admin-csv
 pybarcode
+reportlab
