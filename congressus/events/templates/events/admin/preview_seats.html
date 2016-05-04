@@ -1,0 +1,6 @@
+{% extends "admin/change_form.html" %}
+
+{% block after_related_objects %}
+    <a class="btn-default" onclick='preview();'>Preview seats</a>
+    <div id='preview' class="seatCharts-container"></div>
+{% endblock %}
