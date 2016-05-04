@@ -3,6 +3,9 @@ import json
 import uuid
 import random
 import operator
+
+from django.core.exceptions import ObjectDoesNotExist
+
 from django.http import Http404, HttpResponse
 from django.conf import settings
 from django.utils import timezone
@@ -12,7 +15,7 @@ from django.views.generic import TemplateView
 from django.views.generic import View
 
 from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.core.urlresolvers import reverse
 
 from django.views.decorators.csrf import csrf_exempt
@@ -20,11 +23,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.translation import ugettext as _
 
 from .models import Ticket
+from .models import MultiPurchase
 from events.models import Session
 from events.models import Event
 from events.models import Space
 
 from .forms import RegisterForm
+from .forms import MPRegisterForm
 
 from base64 import b64encode, b64decode
 from pyDes import triple_des, CBC
@@ -41,6 +46,54 @@ class EventView(TemplateView):
         ctx['ev'] = ev
         return ctx
 event = EventView.as_view()
+
+
+class MultiPurchaseView(TemplateView):
+    template_name = 'tickets/multipurchase.html'
+
+    def get_context_data(self, *args, **kwargs):
+        ev = get_object_or_404(Event, slug=self.kwargs['ev'])
+        ctx = super(MultiPurchaseView, self).get_context_data(*args, **kwargs)
+        ctx['ev'] = ev
+        ctx['form'] = MPRegisterForm(event=ev)
+        return ctx
+
+    def post(self, request, ev=None):
+        ev = get_object_or_404(Event, slug=ev)
+
+        ids = [(i[len('number_'):], request.POST[i]) for i in request.POST if i.startswith('number_')]
+
+        form = MPRegisterForm(request.POST, event=ev, ids=ids)
+        if form.is_valid():
+            mp = form.save()
+
+            # TODO add the seat number for numbered sessions
+            for sid, number in ids:
+                session = Session.objects.get(space__event=ev, id=sid)
+                n = int(number)
+                for i in range(n):
+                    # confirm_sent should be true to avoid multiple emails for
+                    # the same purchase
+                    order = str(uuid.uuid4())
+                    t = Ticket(session=session, mp=mp, email=mp.email,
+                               confirm_sent=True, order=order)
+                    t.save()
+
+            if not mp.get_price():
+                mp.confirm()
+
+            mp.save()
+            mp.send_reg_email()
+
+            if not mp.get_price():
+                return redirect('thanks', order=mp.order)
+            return redirect('payment', order=mp.order)
+
+        ctx = self.get_context_data()
+        ctx['form'] = form
+
+        return render(request, self.template_name, ctx)
+multipurchase = MultiPurchaseView.as_view()
 
 
 class Register(CreateView):
@@ -94,12 +147,23 @@ def tpv_sig_data(mdata, order, key, alt=b'+/'):
     return sigb
 
 
+def get_ticket_or_404(**kwargs):
+    try:
+        tk = Ticket.objects.get(**kwargs)
+    except ObjectDoesNotExist:
+        try:
+            tk = MultiPurchase.objects.get(**kwargs)
+        except ObjectDoesNotExist:
+            raise Http404
+    return tk
+
+
 class Payment(TemplateView):
     template_name = 'tickets/payment.html'
 
     def get_context_data(self, *args, **kwargs):
         ctx = super(Payment, self).get_context_data(*args, **kwargs)
-        tk = get_object_or_404(Ticket, order=kwargs['order'])
+        tk = get_ticket_or_404(order=kwargs['order'])
         ctx['ticket'] = tk
         ctx['error'] = self.request.GET.get('error', '')
 
@@ -148,7 +212,7 @@ class Thanks(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         ctx = super(Thanks, self).get_context_data(*args, **kwargs)
-        ctx['ticket'] = get_object_or_404(Ticket, order=kwargs['order'])
+        ctx['ticket'] = get_ticket_or_404(order=kwargs['order'])
         return ctx
 thanks = Thanks.as_view()
 
@@ -177,9 +241,7 @@ class Confirm(View):
         if sig != sig2:
             raise Http404
 
-        tk = get_object_or_404(Ticket, order_tpv=order_tpv)
-        tk.confirmed = True
-        tk.confirmed_date = timezone.now()
-        tk.save()
+        tk = get_ticket_or_404(order_tpv=order_tpv)
+        tk.confirm()
         return HttpResponse("")
 confirm = csrf_exempt(Confirm.as_view())

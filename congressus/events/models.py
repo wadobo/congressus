@@ -102,9 +102,9 @@ class Session(models.Model):
         sold = self.tickets.filter(confirmed=True).count()
         return sold
 
-    def have_places(self):
+    def have_places(self, number=1):
         s = self.sold()
-        return s <= self.space.capacity
+        return (s + number) < self.space.capacity
 
     class Meta:
         ordering = ['-start']

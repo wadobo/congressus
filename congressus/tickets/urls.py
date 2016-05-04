@@ -9,5 +9,7 @@ urlpatterns = [
     url(r'^ticket/(?P<order>[\w-]+)/payment/', views.payment, name='payment'),
     url(r'^ticket/(?P<order>[\w-]+)/thanks/', views.thanks, name='thanks'),
     url(r'^ticket/confirm/', views.confirm, name='confirm'),
+
+    url(r'^(?P<ev>\w+)/$', views.multipurchase, name='multipurchase'),
 ]
 

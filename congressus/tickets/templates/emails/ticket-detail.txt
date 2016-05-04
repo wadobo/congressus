@@ -1,0 +1,6 @@
+{% load i18n %}
+{% trans "ticket" %}: {{ ticket.order }}
+-----
+{% trans "Space" %}: {{ ticket.space.name }}
+{% trans "Session" %}: {{ ticket.session.name }}
+{% trans "Price" %}: {{ ticket.get_price|floatformat:2 }} €

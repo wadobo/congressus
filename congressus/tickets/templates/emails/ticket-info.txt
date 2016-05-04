@@ -12,3 +12,13 @@
 {% trans "Email" %}: {{ ticket.email }}
 {% for d in ticket.get_extras %}{{ d.field.label }}: {% if d.field.type == 'check' %}{{ d.value|yesno }}{% else %}{{ d.value }}{% endif %}
 {% endfor %}
+
+{% trans "Tickets" %}
+-----
+
+{% if ticket.is_mp %}
+{% for t in ticket.tickets.all %}{% include "emails/ticket-detail.txt" with ticket=t %}
+{% endfor %}
+{% else %}
+{% include "emails/ticket-detail.txt" %}
+{% endif %}

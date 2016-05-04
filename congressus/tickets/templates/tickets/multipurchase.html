@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load bootstrap %}
+
+{% block title %}{{ ev }}{% endblock %}
+
+{% block extrahead %}
+<style>
+    .table > tbody > tr > th,
+    .table > tbody > tr > td {
+             vertical-align: middle;
+    }
+    @-moz-document url-prefix() {
+      fieldset { display: table-cell; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h1> {{ ev }} </h1>
+    </div>
+
+    <p> {{ ev.info }} </p>
+
+    <form method="POST" action="">
+
+    {% csrf_token %}
+    <div class="row">
+    {% for space in ev.spaces.all %}
+        <div class="col-sm-6">
+            <div class="panel panel-info">
+                <div class="panel panel-heading">
+                    {{ space.name }}
+                </div>
+                <div class="panel panel-body">
+                    <table class="table table-striped">
+                        {% for session in space.sessions.all %}
+                            <tr>
+                                <th width="60%"><label for="{{ session.id }}" class="control-label">{{ session.name }}</label></th>
+                                <td>
+                                    <div class="input-group">
+                                        <input id="{{ session.id }}" class="form-control" type="number" name="number_{{ session.id }}" value="0"/>
+                                        <span class="input-group-addon" id="basic-addon2">{{ session.price }} €</span>
+                                    </div>
+                                </td>
+
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+
+    <fieldset>
+        <legend>{% trans "Personal info" %}:</legend>
+        <div class="reg-form">
+            {{ form|bootstrap }}
+        </div>
+    </fieldset>
+
+    <button class="btn btn-primary btn-block btn-lg">{% trans "Continue" %}</button>
+
+    </form
+
+{% endblock %}
