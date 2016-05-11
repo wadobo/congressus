@@ -170,16 +170,33 @@ class Ticket(models.Model, BaseTicketMixing):
 
     # Form Fields
     email = models.EmailField(_('Email'))
-
     extra_data = models.TextField(blank=True, null=True)
 
     mp = models.ForeignKey(MultiPurchase, related_name='tickets', null=True, blank=True)
+
+    # duplicated data to optimize queries
+    session_name = models.CharField(max_length=200, null=True, blank=True)
+    space_name = models.CharField(max_length=200, null=True, blank=True)
+    event_name = models.CharField(max_length=200, null=True, blank=True)
+    price = models.IntegerField(null=True)
+    tax = models.IntegerField(null=True)
+    start = models.DateTimeField(_('start date'), null=True)
+    end = models.DateTimeField(_('end date'), null=True)
 
     class Meta:
         ordering = ['-created']
 
     def __str__(self):
         return self.order
+
+    def fill_duplicated_data(self):
+        self.session_name = self.session.name
+        self.space_name = self.space().name
+        self.event_name = self.event().name
+        self.price = self.session.price
+        self.tax = self.session.tax
+        self.start = self.session.start
+        self.end = self.session.end
 
 
 def confirm_email(sender, instance, created, raw, using, update_fields, **kwargs):

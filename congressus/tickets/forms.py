@@ -45,6 +45,7 @@ class RegisterForm(forms.ModelForm):
         if not obj.get_price():
             obj.confirmed = True
             obj.confirmed_date = timezone.now()
+        obj.fill_duplicated_data()
         obj.save()
 
         obj.send_reg_email()
@@ -90,6 +91,7 @@ class MPRegisterForm(forms.ModelForm):
                 # the same purchase
                 t = Ticket(session=session, mp=mp, email=mp.email,
                            confirm_sent=True, order=order)
+                t.fill_duplicated_data()
                 t.save()
         return mp
 
