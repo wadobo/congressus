@@ -17,15 +17,6 @@ from events.models import Event, InvCode
 from events.models import Session
 
 
-REG_TYPES = (
-    ('invited', _('Invited')),
-    ('speaker', _('Speaker')),
-    ('regular', _('Regular')),
-    ('student', _('Student'))
-)
-
-
-
 class BaseTicketMixing:
     '''
     Common base class for ticket and MultiPurchase to avoid django model

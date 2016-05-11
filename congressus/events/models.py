@@ -42,22 +42,6 @@ class Event(models.Model):
         except:
             return None
 
-    def get_type(self, t):
-        from django.utils.translation import ugettext as _
-        if t == 'invited':
-            if not self.price_invited:
-                return _('Invited (FREE, you need an invitation code)')
-            return _('Invited (EUR %s, you need an invitation code)') % self.price_invited
-        elif t == 'speaker':
-            if not self.price_speaker:
-                return _('Speaker (FREE, you need an invitation code)')
-            return _('Speaker (EUR %s, you need an invitation code)') % self.price_speaker
-        elif t == 'student':
-            if not self.price_student:
-                return _('Student (FREE, you need an invitation code)')
-            return _('Student (EUR %s, you need an invitation code)') % self.price_student
-        return _('Regular (EUR %s)') % self.price
-
     def get_sessions(self):
         sessions = []
         for space in self.spaces.all():

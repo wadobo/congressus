@@ -79,6 +79,20 @@ class MPRegisterForm(forms.ModelForm):
 
         return data
 
+    def save_single_tickets(self, mp):
+        # TODO add the seat number for numbered sessions
+        for sid, number in self.ids:
+            session = Session.objects.get(space__event=self.event, id=sid)
+            n = int(number)
+            for i in range(n):
+                order = str(uuid.uuid4())
+                # confirm_sent should be true to avoid multiple emails for
+                # the same purchase
+                t = Ticket(session=session, mp=mp, email=mp.email,
+                           confirm_sent=True, order=order)
+                t.save()
+        return mp
+
     def save(self, *args, **kwargs):
         obj = super(MPRegisterForm, self).save(commit=False)
         obj.ev = self.event
@@ -90,5 +104,7 @@ class MPRegisterForm(forms.ModelForm):
             value = data.get(field.label, '')
             obj.set_extra_data(field.label, value)
         obj.save()
+
+        obj = self.save_single_tickets(obj)
 
         return obj

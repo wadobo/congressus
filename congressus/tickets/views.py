@@ -66,26 +66,10 @@ class MultiPurchaseView(TemplateView):
         form = MPRegisterForm(request.POST, event=ev, ids=ids)
         if form.is_valid():
             mp = form.save()
-
-            # TODO add the seat number for numbered sessions
-            for sid, number in ids:
-                session = Session.objects.get(space__event=ev, id=sid)
-                n = int(number)
-                for i in range(n):
-                    # confirm_sent should be true to avoid multiple emails for
-                    # the same purchase
-                    order = str(uuid.uuid4())
-                    t = Ticket(session=session, mp=mp, email=mp.email,
-                               confirm_sent=True, order=order)
-                    t.save()
-
-            if not mp.get_price():
-                mp.confirm()
-
-            mp.save()
             mp.send_reg_email()
 
             if not mp.get_price():
+                mp.confirm()
                 return redirect('thanks', order=mp.order)
             return redirect('payment', order=mp.order)
 
