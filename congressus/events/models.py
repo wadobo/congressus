@@ -78,6 +78,10 @@ class Session(models.Model):
     end = models.DateTimeField(_('end date'))
 
     price = models.IntegerField(_('ticket price'), default=10)
+    tax = models.IntegerField(_('ticket tax percentage'), default=21)
+
+    def price_without_tax(self):
+        return self.price * (self.tax / 100)
 
     def event(self):
         return self.space.event

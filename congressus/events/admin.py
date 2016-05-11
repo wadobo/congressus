@@ -63,7 +63,7 @@ class ConfirmEmailAdmin(admin.ModelAdmin):
 
 
 class SessionAdmin(admin.ModelAdmin):
-    list_display = ('space', 'name', 'start', 'end', 'price')
+    list_display = ('space', 'name', 'start', 'end', 'price', 'tax')
     list_filter = ('space', )
     search_fields = ('space__name', 'name', 'space__event__name')
 
