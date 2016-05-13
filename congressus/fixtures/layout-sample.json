@@ -4,7 +4,11 @@
     "pk": 1,
     "fields": {
         "name": "Sample",
-        "img": ""
+        "img": "",
+        "scene_top": 1,
+        "scene_bottom": 2,
+        "scene_left": 1,
+        "scene_right": 2
     }
 },
 {
