@@ -1,0 +1,70 @@
+[
+{
+    "model": "events.seatmap",
+    "pk": 1,
+    "fields": {
+        "name": "Sample",
+        "img": ""
+    }
+},
+{
+    "model": "events.seatlayout",
+    "pk": 1,
+    "fields": {
+        "map": 1,
+        "name": "2",
+        "top": 0,
+        "left": 1,
+        "direction": "d",
+        "layout": "LLLLLLLLLLLLLLLLLLL\r\nLLLLLLLLLLLLLLLLLLL\r\nLLLLLLLLLLLLLLLLLLL\r\nLLLLLLLLLLLLLLLLLLL\r\nLLLLL_______LLLLLLL\r\nLLLLL_______LLLLLLL\r\nRRRRR_______RRRRRRR"
+    }
+},
+{
+    "model": "events.seatlayout",
+    "pk": 2,
+    "fields": {
+        "map": 1,
+        "name": "5",
+        "top": 3,
+        "left": 1,
+        "direction": "u",
+        "layout": "LLLLL_______LLLLLLL\r\nLLLLL_______LLLLLLL\r\nRRRRR_______RRRRRRR\r\nLLLLLLLLLLLLLLLLLLL\r\nLLLLLLLLLLLLLLLLLLL\r\nLLLLLLLLLLLLLLLLLLL\r\nLLLLLLLLLLLLLLLLLLL"
+    }
+},
+{
+    "model": "events.seatlayout",
+    "pk": 3,
+    "fields": {
+        "map": 1,
+        "name": "1",
+        "top": 0,
+        "left": 2,
+        "direction": "d",
+        "layout": "LLLLLLLLLLLLLLLLLLL\r\nLLLLLLLLLLLLLLLLLLL\r\nLLLLLLLLLLLLLLLLLLL\r\nLLLLLLLLLLLLLLLLLLL"
+    }
+},
+{
+    "model": "events.seatlayout",
+    "pk": 4,
+    "fields": {
+        "map": 1,
+        "name": "3",
+        "top": 1,
+        "left": 0,
+        "direction": "r",
+        "layout": "LLLLLLLLLLLLLLLLLRR\r\nLLLLLLLLLLLLLLLLLRR\r\nLLLLLLLLLLLLLLLLLRR\r\nLLLLLLLLLLLLLLLLLRR"
+    }
+},
+{
+    "model": "events.seatlayout",
+    "pk": 5,
+    "fields": {
+        "map": 1,
+        "name": "4",
+        "top": 2,
+        "left": 0,
+        "direction": "r",
+        "layout": "LLLLLLLLLLLLLLLLLRR\r\nLLLLLLLLLLLLLLLLLRR\r\nLLLLLLLLLLLLLLLLLRR\r\nLLLLLLLLLLLLLLLLLRR"
+    }
+}
+]
