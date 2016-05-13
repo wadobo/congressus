@@ -11,5 +11,7 @@ urlpatterns = [
     url(r'^ticket/confirm/', views.confirm, name='confirm'),
 
     url(r'^(?P<ev>\w+)/$', views.multipurchase, name='multipurchase'),
+
+    url(r'^seats/view/(?P<map>\d+)/$', views.seats, name='seats'),
 ]
 

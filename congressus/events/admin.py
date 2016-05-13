@@ -5,6 +5,7 @@ from .models import ConfirmEmail, EmailAttachment
 from .models import Space
 from .models import Session
 from .models import TicketField
+from .models import SeatMap, SeatLayout
 
 
 class InvCodeInline(admin.TabularInline):
@@ -70,8 +71,23 @@ class SessionAdmin(admin.ModelAdmin):
     date_hierarchy = 'start'
 
 
+class SeatMapAdmin(admin.ModelAdmin):
+    list_display = ('name', )
+    list_filter = ('name', )
+    search_fields = ('name', )
+
+
+class SeatLayoutAdmin(admin.ModelAdmin):
+    list_display = ('name', 'map', 'top', 'left', 'direction')
+    list_filter = ('map', )
+    search_fields = ('map__name', 'name')
+
+
 admin.site.register(Event, EventAdmin)
 admin.site.register(InvCode, InvCodeAdmin)
 admin.site.register(ConfirmEmail, ConfirmEmailAdmin)
 admin.site.register(Space, SpaceAdmin)
 admin.site.register(Session, SessionAdmin)
+
+admin.site.register(SeatMap, SeatMapAdmin)
+admin.site.register(SeatLayout, SeatLayoutAdmin)

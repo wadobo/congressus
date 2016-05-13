@@ -21,6 +21,13 @@ FIELD_TYPES = (
     ('select', _('Select')),
 )
 
+DIRECTIONS = (
+    ('u', _('Up')),
+    ('l', _('Left')),
+    ('r', _('Right')),
+    ('d', _('Down')),
+)
+
 
 class Event(models.Model):
     name = models.CharField(_('name'), max_length=200, unique=True)
@@ -52,6 +59,50 @@ class Event(models.Model):
         return sum(i.sold() for i in self.get_sessions())
 
 
+class SeatMap(models.Model):
+    name = models.CharField(_('name'), max_length=300)
+    img = models.ImageField(_('map image'), upload_to='maps',
+                            blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+    def get_table(self):
+        layouts = list(self.layouts.all())
+        indexes = {(i.top, i.left): i  for i in layouts}
+        max_vertical = max(i.top for i in layouts)
+        max_horizontal = max(i.left for i in layouts)
+        table = []
+        for r in range(0, max_vertical + 1):
+            row = []
+            for c in range(0, max_horizontal + 1):
+                index = (r, c)
+                row.append(indexes.get(index, ''))
+            table.append(row)
+        return table
+
+
+class SeatLayout(models.Model):
+    map = models.ForeignKey(SeatMap, related_name='layouts')
+    name = models.CharField(_('name'), max_length=300)
+    top = models.IntegerField(default=0)
+    left = models.IntegerField(default=0)
+    direction = models.CharField(max_length=2, choices=DIRECTIONS, default='d')
+    layout = models.TextField(_('seats layout'),
+                              help_text=_('the layout to select the numbered seat'))
+
+    def __str__(self):
+        return self.name
+
+    def glyph(self):
+        g = {
+            'u': 'glyphicon-arrow-up',
+            'l': 'glyphicon-arrow-left',
+            'r': 'glyphicon-arrow-right',
+            'd': 'glyphicon-arrow-down',
+        }
+
+        return g[self.direction]
 
 
 class Space(models.Model):
@@ -61,9 +112,7 @@ class Space(models.Model):
 
     capacity = models.IntegerField(_('capacity'), default=100)
     numbered = models.BooleanField(_('numbered'), default=False)
-    layout = models.TextField(_('seats layout'),
-                              help_text=_('the layout to select the numbered seat'),
-                              blank=True, null=True)
+    seat_map = models.ForeignKey(SeatMap, related_name='spaces', null=True)
 
     def __str__(self):
         return '%s - %s' % (self.event, self.name)

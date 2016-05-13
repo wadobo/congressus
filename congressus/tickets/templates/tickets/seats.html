@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block title %}{{ map }}{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h1> {{ map }} </h1>
+    </div>
+
+    <div id="map">
+        <table class="table-bordered table">
+            {% for r in map.get_table %}
+                <tr>
+                {% for c in r %}
+                    {% if c %}
+                        <td class="layout" data-id="{{ c.id }}"
+                        data-name="{{ c.name }}" data-layout="{{ c.layout }}"
+                        data-dir="{{ c.direction }}"
+                        data-glyph="{{ c.glyph }}">
+                            {{ c }}
+                            <span class="glyphicon {{ c.glyph }}" aria-hidden="true"></span>
+                        </td>
+                    {% else %}
+                        <td class="empty">{{ c }}</td>
+                    {% endif %}
+                {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div id="display">
+        <h2 id="layout"></h2>
+    </div>
+{% endblock %}
+
+{% block extrahead %}
+    <link href="{% static "css/jquery.seat-charts.css" %}" rel="stylesheet"/>
+    <link href="{% static "css/map.css" %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block extrabody %}
+    <script src="{% static "js/jquery-1.12.3.min.js" %}"></script>
+    <script src="{% static "js/jquery.seat-charts.min.js" %}"></script>
+    <script src="{% static "js/map.js" %}"></script>
+{% endblock %}

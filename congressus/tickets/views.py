@@ -27,6 +27,7 @@ from .models import MultiPurchase
 from events.models import Session
 from events.models import Event
 from events.models import Space
+from events.models import SeatMap
 
 from .forms import RegisterForm
 from .forms import MPRegisterForm
@@ -229,3 +230,13 @@ class Confirm(View):
         tk.confirm()
         return HttpResponse("")
 confirm = csrf_exempt(Confirm.as_view())
+
+
+class SeatView(TemplateView):
+    template_name = 'tickets/seats.html'
+
+    def get_context_data(self, *args, **kwargs):
+        ctx = super(SeatView, self).get_context_data(*args, **kwargs)
+        ctx['map'] = get_object_or_404(SeatMap, id=kwargs['map'])
+        return ctx
+seats = SeatView.as_view()
