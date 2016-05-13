@@ -104,6 +104,9 @@ class SeatLayout(models.Model):
 
         return g[self.direction]
 
+    def free(self):
+        return self.layout.count('L')
+
 
 class Space(models.Model):
     event = models.ForeignKey(Event, related_name='spaces')
@@ -142,6 +145,9 @@ class Session(models.Model):
     def have_places(self, number=1):
         s = self.sold()
         return (s + number) < self.space.capacity
+
+    def places(self):
+        self.space.capacity
 
     class Meta:
         ordering = ['-start']

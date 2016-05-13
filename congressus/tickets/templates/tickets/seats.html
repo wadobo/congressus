@@ -19,7 +19,7 @@
                         data-name="{{ c.name }}" data-layout="{{ c.layout }}"
                         data-dir="{{ c.direction }}"
                         data-glyph="{{ c.glyph }}">
-                            {{ c }}
+                            {{ c }} / {% trans "free" %}: {{ c.free }}
                             <span class="glyphicon {{ c.glyph }}" aria-hidden="true"></span>
                         </td>
                     {% else %}
