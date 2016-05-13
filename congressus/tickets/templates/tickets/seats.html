@@ -14,7 +14,11 @@
             {% for r in map.get_table %}
                 <tr>
                 {% for c in r %}
-                    {% if c %}
+                    {% if c == 'scene' %}
+                        <td class="scene">
+                            {% trans "scene" %}
+                        </td>
+                    {% elif c %}
                         <td class="layout" data-id="{{ c.id }}"
                         data-name="{{ c.name }}" data-layout="{{ c.layout }}"
                         data-dir="{{ c.direction }}"

@@ -64,6 +64,11 @@ class SeatMap(models.Model):
     img = models.ImageField(_('map image'), upload_to='maps',
                             blank=True, null=True)
 
+    scene_top = models.IntegerField(default=0)
+    scene_bottom = models.IntegerField(default=0)
+    scene_left = models.IntegerField(default=0)
+    scene_right = models.IntegerField(default=0)
+
     def __str__(self):
         return self.name
 
@@ -72,6 +77,11 @@ class SeatMap(models.Model):
         indexes = {(i.top, i.left): i  for i in layouts}
         max_vertical = max(i.top for i in layouts)
         max_horizontal = max(i.left for i in layouts)
+
+        for r in range(self.scene_top, self.scene_bottom + 1):
+            for c in range(self.scene_left, self.scene_right + 1):
+                indexes[(r, c)] = 'scene'
+
         table = []
         for r in range(0, max_vertical + 1):
             row = []

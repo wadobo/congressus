@@ -6,3 +6,11 @@
 
 #display {
 }
+
+.scene {
+    background-color: white;
+    text-align: center;
+    text-color: #eee;
+    font-weight: bold;
+    text-transform: uppercase;
+}
