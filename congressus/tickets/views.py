@@ -63,8 +63,9 @@ class MultiPurchaseView(TemplateView):
         ev = get_object_or_404(Event, slug=ev)
 
         ids = [(i[len('number_'):], request.POST[i]) for i in request.POST if i.startswith('number_')]
+        seats = [(i[len('seats_'):], request.POST[i].split(',')) for i in request.POST if i.startswith('seats_')]
 
-        form = MPRegisterForm(request.POST, event=ev, ids=ids)
+        form = MPRegisterForm(request.POST, event=ev, ids=ids, seats=seats)
         if form.is_valid():
             mp = form.save()
             mp.send_reg_email()

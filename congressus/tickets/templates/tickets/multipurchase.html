@@ -45,11 +45,19 @@
                                 <td>
                                     {% include "tickets/seat_select.html" %}
                                     <input id="seats-{{ session.id }}" class="hidden" type="text" name="seats_{{ session.id }}" value=""/>
+                                    {% for sr in session.seats_reserved %}
+                                        <div class="hidden seat-reserved"
+                                            data-session="{{ session.id }}"
+                                            data-layout="{{ sr.seat_layout.id }}"
+                                            data-seat="{{ sr.seat }}"></div>
+                                    {% endfor %}
                                 </td>
                                 {% endif %}
                                 <td>
                                     <div class="input-group">
-                                        <input id="{{ session.id }}" class="sessioninput form-control" type="number" name="number_{{ session.id }}" value="0"/>
+                                        <input id="{{ session.id }}" class="sessioninput form-control" type="number"
+                                            {% if not session.space.numbered %}name="number_{{ session.id }}"{% endif %}
+                                            value="0"/>
                                         <span class="input-group-addon" id="basic-addon2">{{ session.price }} €</span>
                                     </div>
                                 </td>

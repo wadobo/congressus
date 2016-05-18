@@ -92,13 +92,23 @@ $(document).ready(function() {
         // TODO remove this
         // example to show how to mark a seat as occupied to sync between
         // clients with socket.io
-        setTimeout(function() {
-            var layout = '1';
-            var position = '2_2';
-            var selector = ".display-"+session+'-'+layout + ' .preview';
-            console.log(selector);
-            $(selector).seatCharts().status(position, "unavailable");
-        }, 5000);
+
+        //setTimeout(function() {
+        //    var layout = '1';
+        //    var position = '2_2';
+        //    var selector = ".display-"+session+'-'+layout + ' .preview';
+        //    console.log(selector);
+        //    $(selector).seatCharts().status(position, "unavailable");
+        //}, 5000);
     });
     SeatMap.cbs.add(seatCB);
+
+    // removing reserved seats
+    $(".seat-reserved").each(function() {
+        var session = $(this).data('session');
+        var layout = $(this).data('layout');
+        var seat = $(this).data('seat').replace(/-/g, '_');
+        var selector = '.display-'+session+'-'+layout+' .preview';
+        $(selector).seatCharts().status(seat, "unavailable");
+    });
 });

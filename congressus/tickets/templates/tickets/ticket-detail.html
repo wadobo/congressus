@@ -12,6 +12,16 @@
         <th>{% trans "Session" %}</th>
         <td>{{ ticket.session.name }}</td>
     </tr>
+    {% if ticket.space.numbered %}
+    <tr>
+        <th>{% trans "Seat" %}</th>
+        <td>
+        {% blocktrans with layout=ticket.seat_layout row=ticket.seat_row column=ticket.seat_column %}
+            Section: {{ layout }}, Row: {{ row }}, Seat: {{ column }}
+        {% endblocktrans %}
+        </td>
+    </tr>
+    {% endif %}
     <tr>
         <th>{% trans "Ticket price" %}</th>
         <td>{{ ticket.get_price|floatformat:2 }} €</td>

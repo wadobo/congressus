@@ -15,6 +15,7 @@ from django.core.urlresolvers import reverse
 
 from events.models import Event, InvCode
 from events.models import Session
+from events.models import SeatLayout
 
 
 WARNING_TYPES = (
@@ -173,6 +174,9 @@ class Ticket(models.Model, BaseTicketMixing):
     confirmed = models.BooleanField(default=False)
     confirm_sent = models.BooleanField(default=False)
 
+    seat = models.CharField(max_length=20, null=True, blank=True)
+    seat_layout = models.ForeignKey(SeatLayout, null=True)
+
     # Form Fields
     email = models.EmailField(_('Email'))
     extra_data = models.TextField(blank=True, null=True)
@@ -187,12 +191,31 @@ class Ticket(models.Model, BaseTicketMixing):
     tax = models.IntegerField(null=True)
     start = models.DateTimeField(_('start date'), null=True)
     end = models.DateTimeField(_('end date'), null=True)
+    seat_layout_name = models.CharField(max_length=200, null=True, blank=True)
 
     class Meta:
         ordering = ['-created']
 
     def __str__(self):
         return self.order
+
+    def cseat(self):
+        if not self.seat:
+            return None
+        row, column = self.seat.split('-')
+        return _('L%s-R%s-C%s') % (self.seat_layout.name, row, column)
+
+    def seat_row(self):
+        if not self.seat:
+            return None
+        row, column = self.seat.split('-')
+        return row
+
+    def seat_column(self):
+        if not self.seat:
+            return None
+        row, column = self.seat.split('-')
+        return column
 
     def fill_duplicated_data(self):
         self.session_name = self.session.name
@@ -202,6 +225,8 @@ class Ticket(models.Model, BaseTicketMixing):
         self.tax = self.session.tax
         self.start = self.session.start
         self.end = self.session.end
+        if self.seat_layout:
+            self.seat_layout_name = self.seat_layout.name
 
 
 class TicketWarning(models.Model):

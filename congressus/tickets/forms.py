@@ -61,6 +61,7 @@ class MPRegisterForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         self.ids = kwargs.pop('ids', [])
+        self.seats = kwargs.pop('seats', [])
 
         super(MPRegisterForm, self).__init__(*args, **kwargs)
 
@@ -78,10 +79,35 @@ class MPRegisterForm(forms.ModelForm):
             if not session.have_places(n):
                 raise forms.ValidationError(_("There's no %s places for %s") % (n, session))
 
+        for sid, seats in self.seats:
+            session = Session.objects.get(space__event=self.event, id=sid)
+            for seat in seats:
+                layout, row, column = seat.split('_')
+                layout = session.space.seat_map.layouts.get(pk=layout)
+                if not session.is_seat_available(layout, row, column):
+                    s = row + '-' + column
+                    raise forms.ValidationError(_("The seat %s is not available for %s") % (s, session))
+
         return data
 
-    def save_single_tickets(self, mp):
-        # TODO add the seat number for numbered sessions
+    def save_seat_tickets(self, mp):
+        # tickets with seat
+        for sid, seats in self.seats:
+            session = Session.objects.get(space__event=self.event, id=sid)
+            for seat in seats:
+                layout, row, column = seat.split('_')
+                layout = session.space.seat_map.layouts.get(pk=layout)
+                order = str(uuid.uuid4())
+                # confirm_sent should be true to avoid multiple emails for
+                # the same purchase
+                t = Ticket(session=session, mp=mp, email=mp.email,
+                           seat_layout=layout, seat=row + '-' + column,
+                           confirm_sent=True, order=order)
+                t.fill_duplicated_data()
+                t.save()
+
+    def save_normal_tickets(self, mp):
+        # tickets without seat
         for sid, number in self.ids:
             session = Session.objects.get(space__event=self.event, id=sid)
             n = int(number)
@@ -93,6 +119,10 @@ class MPRegisterForm(forms.ModelForm):
                            confirm_sent=True, order=order)
                 t.fill_duplicated_data()
                 t.save()
+
+    def save_single_tickets(self, mp):
+        self.save_normal_tickets(mp)
+        self.save_seat_tickets(mp)
         return mp
 
     def save(self, *args, **kwargs):

@@ -7,7 +7,7 @@ from admin_csv import CSVMixin
 
 
 class TicketAdmin(CSVMixin, admin.ModelAdmin):
-    list_display = ('order', 'order_tpv', 'event', 'confirmed', 'email', 'session', 'price', 'mp')
+    list_display = ('order', 'order_tpv', 'event', 'confirmed', 'email', 'session', 'price', 'cseat', 'mp')
     list_filter = ('confirmed',)
     search_fields = ('order', 'order_tpv', 'email')
     date_hierarchy = 'created'

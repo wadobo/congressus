@@ -3,4 +3,6 @@
 -----
 {% trans "Space" %}: {{ ticket.space.name }}
 {% trans "Session" %}: {{ ticket.session.name }}
+{% if ticket.space.numbered %}{% trans "Seat" %}:{% blocktrans with layout=ticket.seat_layout row=ticket.seat_row column=ticket.seat_column %} Section: {{ layout }}, Row: {{ row }}, Seat: {{ column }} {% endblocktrans %}
+{% endif %}
 {% trans "Price" %}: {{ ticket.get_price|floatformat:2 }} €

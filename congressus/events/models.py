@@ -156,6 +156,18 @@ class Session(models.Model):
         s = self.sold()
         return (s + number) < self.space.capacity
 
+    def is_seat_available(self, layout, row, column):
+        # TODO check here reserved seats
+        n = self.tickets.filter(confirmed=True,
+                                seat_layout=layout,
+                                seat=row + '-' + column).count()
+        return n == 0
+
+    def seats_reserved(self):
+        n = self.tickets.filter(confirmed=True,
+                                seat__isnull=False)
+        return n
+
     def places(self):
         self.space.capacity
 
