@@ -80,6 +80,7 @@ class MPRegisterForm(forms.ModelForm):
                 raise forms.ValidationError(_("There's no %s places for %s") % (n, session))
 
         for sid, seats in self.seats:
+            seats = list(filter(None, seats))
             session = Session.objects.get(space__event=self.event, id=sid)
             for seat in seats:
                 layout, row, column = seat.split('_')
@@ -93,6 +94,7 @@ class MPRegisterForm(forms.ModelForm):
     def save_seat_tickets(self, mp):
         # tickets with seat
         for sid, seats in self.seats:
+            seats = list(filter(None, seats))
             session = Session.objects.get(space__event=self.event, id=sid)
             for seat in seats:
                 layout, row, column = seat.split('_')
