@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load bootstrap %}
+{% load staticfiles %}
 
 {% block title %}{{ ev }}{% endblock %}
 
@@ -40,7 +41,7 @@
                                 <th width="60%"><label for="{{ session.id }}" class="control-label">{{ session.name }}</label></th>
                                 <td>
                                     <div class="input-group">
-                                        <input id="{{ session.id }}" class="form-control" type="number" name="number_{{ session.id }}" value="0"/>
+                                        <input id="{{ session.id }}" class="sessioninput form-control" type="number" name="number_{{ session.id }}" value="0"/>
                                         <span class="input-group-addon" id="basic-addon2">{{ session.price }} €</span>
                                     </div>
                                 </td>
@@ -63,6 +64,20 @@
 
     <button class="btn btn-primary btn-block btn-lg">{% trans "Continue" %}</button>
 
-    </form
+    </form>
 
+    <div id="restrictions" class="hidden">
+        {% for w in ev.warnings.all %}
+            <div class="warning"
+                data-name="{{ w.name }}"
+                data-sessions1="{{ w.sessions1_ids }}"
+                data-sessions2="{{ w.sessions2_ids }}"
+                data-type="{{ w.type }}"
+                data-message="{{ w.message }}"></div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block extrabody %}
+    <script src="{% static 'js/multipurchase.js' %}"></script>
 {% endblock %}

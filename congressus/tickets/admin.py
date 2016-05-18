@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from .models import Ticket
 from .models import MultiPurchase
+from .models import TicketWarning
 from admin_csv import CSVMixin
 
 
@@ -71,5 +72,18 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
         return obj.inv.code if obj.inv else ''
 
 
+class TicketWarningAdmin(admin.ModelAdmin):
+    list_display = ('name', 'ev',  'csessions1', 'csessions2', 'message')
+    list_filter = ('name',)
+    filter_horizontal = ('sessions1', 'sessions2')
+
+    def csessions1(self, obj):
+        return ', '.join(str(s) for s in obj.sessions1.all())
+
+    def csessions2(self, obj):
+        return ', '.join(str(s) for s in obj.sessions2.all())
+
+
 admin.site.register(Ticket, TicketAdmin)
+admin.site.register(TicketWarning, TicketWarningAdmin)
 admin.site.register(MultiPurchase, MPAdmin)

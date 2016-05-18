@@ -17,6 +17,11 @@ from events.models import Event, InvCode
 from events.models import Session
 
 
+WARNING_TYPES = (
+    ('req', _('Required')),
+)
+
+
 class BaseTicketMixing:
     '''
     Common base class for ticket and MultiPurchase to avoid django model
@@ -197,6 +202,25 @@ class Ticket(models.Model, BaseTicketMixing):
         self.tax = self.session.tax
         self.start = self.session.start
         self.end = self.session.end
+
+
+class TicketWarning(models.Model):
+    name = models.CharField(max_length=50)
+
+    ev = models.ForeignKey(Event, related_name='warnings')
+    sessions1 = models.ManyToManyField(Session, related_name='warnings1')
+    sessions2 = models.ManyToManyField(Session, related_name='warnings2')
+    message = models.TextField()
+    type = models.CharField(max_length=10, choices=WARNING_TYPES, default="req")
+
+    def sessions1_ids(self):
+        return ','.join(str(s.id) for s in self.sessions1.all())
+
+    def sessions2_ids(self):
+        return ','.join(str(s.id) for s in self.sessions2.all())
+
+    def __str__(self):
+        return self.name
 
 
 def confirm_email(sender, instance, created, raw, using, update_fields, **kwargs):
