@@ -25,6 +25,32 @@ function check_warning(w, sessions) {
     }
 }
 
+function seatCB(ev, seat) {
+    var id = seat.settings.id;
+    var session = seat.settings.data.session;
+    var layout = seat.settings.data.layout;
+
+    var current = [];
+    var currentval = $("#seats-"+session).val();
+    if (currentval) {
+        current = currentval.split(",");
+    }
+
+    var str = layout + '_' + id;
+
+    if (ev == 'select') {
+        current.push(str);
+    } else if (ev == 'unselect') {
+        var idx = current.indexOf(str);
+        if (idx >= 0) {
+            current.splice(idx, 1);
+        }
+    }
+
+    $("#seats-"+session).val(current.join(","));
+    $("#"+session).val(current.length);
+}
+
 $(document).ready(function() {
     $("form").submit(function() {
         var warnings = [];
@@ -57,4 +83,10 @@ $(document).ready(function() {
 
         return true;
     });
+
+    $(".seatmap").each(function() {
+        var obj = $("#modal-"+$(this).data('session'));
+        SeatMap.bindLayout(obj);
+    });
+    SeatMap.cbs.add(seatCB);
 });

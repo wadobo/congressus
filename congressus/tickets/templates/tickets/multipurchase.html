@@ -6,15 +6,17 @@
 {% block title %}{{ ev }}{% endblock %}
 
 {% block extrahead %}
-<style>
-    .table > tbody > tr > th,
-    .table > tbody > tr > td {
-             vertical-align: middle;
-    }
-    @-moz-document url-prefix() {
-      fieldset { display: table-cell; }
-    }
-</style>
+    <style>
+        .table > tbody > tr > th,
+        .table > tbody > tr > td {
+                 vertical-align: middle;
+        }
+        @-moz-document url-prefix() {
+          fieldset { display: table-cell; }
+        }
+    </style>
+    <link href="{% static "css/jquery.seat-charts.css" %}" rel="stylesheet"/>
+    <link href="{% static "css/map.css" %}" rel="stylesheet"/>
 {% endblock %}
 
 {% block content %}
@@ -39,6 +41,12 @@
                         {% for session in space.sessions.all %}
                             <tr>
                                 <th width="60%"><label for="{{ session.id }}" class="control-label">{{ session.name }}</label></th>
+                                {% if session.space.numbered %}
+                                <td>
+                                    {% include "tickets/seat_select.html" %}
+                                    <input id="seats-{{ session.id }}" class="hidden" type="text" name="seats_{{ session.id }}" value=""/>
+                                </td>
+                                {% endif %}
                                 <td>
                                     <div class="input-group">
                                         <input id="{{ session.id }}" class="sessioninput form-control" type="number" name="number_{{ session.id }}" value="0"/>
@@ -79,5 +87,9 @@
 {% endblock %}
 
 {% block extrabody %}
+    <script src="{% static "js/jquery-1.12.3.min.js" %}"></script>
+    <script src="{% static "js/jquery.seat-charts.min.js" %}"></script>
+    <script src="{% static "js/map.js" %}"></script>
+
     <script src="{% static 'js/multipurchase.js' %}"></script>
 {% endblock %}

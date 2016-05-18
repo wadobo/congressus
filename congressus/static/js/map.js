@@ -1,43 +1,65 @@
-function show_layout(obj) {
-    var layout = obj.data('layout');
-    var dir = ' <span class="glyphicon '+obj.data('glyph')+'" aria-hidden="true"></span>';
-    $('#layout').html(obj.data('name') + dir);
-    $('#preview').remove();
-    $('#display').append('<div id="preview"></div>');
-    var sc = $('#preview').seatCharts({
-        map: layout.split("\n"),
-        seats: {
-            L: {
-                price   : 50,
-                classes : 'front-seat'
-            },
-            O: {
-                classes : 'unavailable'
-            },
-            R: {
-                classes : 'unavailable'
-            }
+(function() {
+    var map = window.SeatMap = {};
+    map.cbs = $.Callbacks();
 
-        },
-        click: function () {
-            if (this.status() == 'available') {
-                //do some stuff, i.e. add to the cart
-                return 'selected';
-            } else if (this.status() == 'selected') {
-                //seat has been vacated
-                return 'available';
-            } else if (this.status() == 'unavailable') {
-                //seat has been already booked
-                return 'unavailable';
-            } else {
-                return this.style();
-            }
-        }
-    });
-}
+    map.showLayout = function(parentObj, obj) {
+        var layout = obj.data('layout');
+        var session = obj.data('session');
+        var layoutid = obj.data('id');
+        var dir = ' <span class="glyphicon '+obj.data('glyph')+'" aria-hidden="true"></span>';
+        var display = '.display-' + session + '-' + layoutid;
+        $(display + ' .layout-name').html(obj.data('name') + dir);
+        var sc = $(display + ' .preview').seatCharts({
+            map: layout.split("\n"),
+            seats: {
+                L: {
+                    layout: layoutid,
+                    session: session,
+                    classes: 'front-seat'
+                },
+                O: {
+                    layout: layoutid,
+                    session: session,
+                    classes : 'unavailable'
+                },
+                R: {
+                    layout: layoutid,
+                    session: session,
+                    classes : 'unavailable'
+                }
 
-$(document).ready(function() {
-    $(".layout").click(function() {
-        show_layout($(this));
-    });
-});
+            },
+            click: function () {
+                if (this.status() == 'available') {
+                    map.cbs.fire("select", this);
+                    return 'selected';
+                } else if (this.status() == 'selected') {
+                    //seat has been vacated
+                    map.cbs.fire("unselect", this);
+                    return 'available';
+                } else if (this.status() == 'unavailable') {
+                    //seat has been already booked
+                    return 'unavailable';
+                } else {
+                    return this.style();
+                }
+            }
+        });
+    },
+
+    map.bindLayout = function(obj) {
+        obj.find(".layout").each(function() {
+            map.showLayout(obj, $(this));
+        });
+
+        obj.find(".layout").click(function() {
+            var layoutid = $(this).data('id');
+            var session = $(this).data('session');
+            var display = '.display-' + session + '-' + layoutid;
+            obj.find('.display').hide();
+            obj.find(display).show();
+        });
+
+        obj.find('.display').hide();
+    }
+}).call(this);
