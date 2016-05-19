@@ -48,6 +48,10 @@ INSTALLED_APPS = (
     'events',
 )
 
+if os.path.exists(os.path.join(BASE_DIR, 'theme')):
+    print("Custom theme found... Using it")
+    INSTALLED_APPS = ('theme', ) + INSTALLED_APPS
+
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
