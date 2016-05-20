@@ -57,6 +57,7 @@ class MultiPurchaseView(TemplateView):
         ctx = super(MultiPurchaseView, self).get_context_data(*args, **kwargs)
         ctx['ev'] = ev
         ctx['form'] = MPRegisterForm(event=ev)
+        ctx['ws_server'] = 'localhost:9007'
         return ctx
 
     def post(self, request, ev=None):

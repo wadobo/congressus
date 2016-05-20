@@ -46,6 +46,7 @@ INSTALLED_APPS = (
     # custom apps
     'tickets',
     'events',
+    'websocket',
 )
 
 if os.path.exists(os.path.join(BASE_DIR, 'theme')):

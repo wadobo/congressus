@@ -6,3 +6,4 @@ django-bootstrap-form
 django-admin-csv
 reportlab
 django-autoslug
+websocket-server

@@ -100,4 +100,21 @@
     <script src="{% static "js/map.js" %}"></script>
 
     <script src="{% static 'js/multipurchase.js' %}"></script>
+    <script src="{% static "js/websocket.js" %}"></script>
+
+    <script>
+        // websocket example
+        function f(ev, msg) {
+            if (ev == 'msg') {
+                data = JSON.parse(msg.data);
+                console.log(data);
+            }
+            if (ev == 'open') {
+                ws.send("get_events");
+            }
+        }
+        ws.cbs.add(f);
+        ws.init("{{ ws_server }}");
+        //ws.cbs.remove(f);
+    </script>
 {% endblock %}
