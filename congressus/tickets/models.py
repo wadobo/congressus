@@ -6,7 +6,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.mail import EmailMessage
 from django.conf import settings
 from django.template.loader import get_template
-from django.template import Context
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -69,17 +68,15 @@ class BaseTicketMixing:
 
     def send_reg_email(self):
         tmpl = get_template('emails/reg.txt')
-        d = Context({'ticket': self})
-        body = tmpl.render(d)
+        body = tmpl.render({'ticket': self})
         email = EmailMessage(_('New Register / %s') % self.event(),
                              body, settings.FROM_EMAIL, [self.event().admin])
         email.send(fail_silently=False)
 
     def send_confirm_email(self):
         # email to admin
-        d = Context({'ticket': self})
         tmpl = get_template('emails/confirm.txt')
-        body = tmpl.render(d)
+        body = tmpl.render({'ticket': self})
         email = EmailMessage(_('Confirmed / %s') % self.event(),
                              body, settings.FROM_EMAIL, [self.event().admin])
         email.send(fail_silently=False)
@@ -92,7 +89,7 @@ class BaseTicketMixing:
         else:
             tmpl = get_template('emails/confirm-user.txt')
             subject = _('Ticket Confirmed / %s') % self.event()
-            body = tmpl.render(d)
+            body = tmpl.render({'ticket': self})
 
         body = body.replace('TICKETID', self.order)
 
