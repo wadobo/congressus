@@ -1,12 +1,39 @@
 import os
 from django.conf import settings
 from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.graphics.shapes import Drawing
+from reportlab.graphics import renderPDF
+from reportlab.graphics.barcode import code128
+from reportlab.graphics.barcode.qr import QrCodeWidget
 from reportlab.platypus import *
 from reportlab.pdfgen import canvas
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.units import inch
-from reportlab.graphics.barcode import code128
 from io import BytesIO
+
+
+class QRFlowable(Flowable):
+    def __init__(self, qr_value):
+        # init and store rendering value
+        Flowable.__init__(self)
+        self.qr_value = qr_value
+
+    def wrap(self, availWidth, availHeight):
+        # optionnal, here I ask for the biggest square available
+        self.width = self.height = min(availWidth, availHeight)
+        return self.width, self.height
+
+    def draw(self):
+        # here standard and documented QrCodeWidget usage on
+        # Flowable canva
+        qr_code = QrCodeWidget(self.qr_value)
+        bounds = qr_code.getBounds()
+        qr_width = (bounds[2] - bounds[0])*2
+        qr_height = (bounds[3] - bounds[1])*2
+        w = float(self.width)
+        d = Drawing(w, w, transform=[w/qr_width, 0, 0, w/qr_height, 0, 0])
+        d.add(qr_code)
+        renderPDF.draw(d, self.canv, 90, 230)
 
 
 def generate_pdf(ticket, logo='img/logo.png'):
@@ -43,8 +70,11 @@ def generate_pdf(ticket, logo='img/logo.png'):
         Story.append(Spacer(1 * inch, .25 * inch))
         Story.append(Paragraph("Code: %s" % (data.get('code')), styleN))
         Story.append(Spacer(1 * inch, .5 * inch))
-        barcode=code128.Code128(data.get('code'), barWidth= 0.01 * inch, barHeight= .5 * inch)
-        Story.append(barcode)
+        if settings.QRCODE:
+            code = QRFlowable(data.get('code'))
+        else:
+            code = code128.Code128(data.get('code'), barWidth= 0.01 * inch, barHeight= .5 * inch)
+        Story.append(code)
         doc.build(Story, onFirstPage=ticketPage, onLaterPages=ticketPage)
         pdf = buffer.getvalue()
         buffer.close()

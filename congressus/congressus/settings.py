@@ -138,6 +138,8 @@ FROM_EMAIL = 'congressus@us.es'
 SITE_URL = "http://localhost:8000"
 TPV_MERCHANT_URL = SITE_URL + '/ticket/confirm/'
 
+QRCODE = True
+
 try:
     from local_settings import *
 except:
