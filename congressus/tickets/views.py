@@ -197,6 +197,15 @@ payment = Payment.as_view()
 class Thanks(TemplateView):
     template_name = 'tickets/thanks.html'
 
+    def post(self, request, order):
+        from reportlab.pdfgen import canvas
+        ticket = Ticket.objects.get(order=request.POST.get('ticket'))
+        pdf = ticket.gen_pdf()
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="tickets.pdf"'
+        response.write(pdf)
+        return response
+
     def get_context_data(self, *args, **kwargs):
         ctx = super(Thanks, self).get_context_data(*args, **kwargs)
         ctx['ticket'] = get_ticket_or_404(order=kwargs['order'])
