@@ -15,6 +15,7 @@ from django.core.urlresolvers import reverse
 from events.models import Event, InvCode
 from events.models import Session
 from events.models import SeatLayout
+from tickets.utils import generate_pdf
 
 
 WARNING_TYPES = (
@@ -99,6 +100,10 @@ class BaseTicketMixing:
             # adding attachments
             for att in e.attachs.all():
                 email.attach_file(att.attach.path)
+
+        for ticket in self.tickets.all():
+            filename = 'ticket_%d.pdf' % (list(self.tickets.all()).index(ticket) + 1)
+            email.attach(filename, ticket.gen_pdf(), 'application/pdf')
 
         email.send(fail_silently=False)
 
@@ -224,6 +229,9 @@ class Ticket(models.Model, BaseTicketMixing):
         self.end = self.session.end
         if self.seat_layout:
             self.seat_layout_name = self.seat_layout.name
+
+    def gen_pdf(self):
+        return generate_pdf(self)
 
 
 class TicketWarning(models.Model):

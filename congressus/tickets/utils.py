@@ -6,6 +6,7 @@ from reportlab.pdfgen import canvas
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.units import inch
 from reportlab.graphics.barcode import code128
+from io import BytesIO
 
 
 def generate_pdf(ticket, logo='img/logo.png'):
@@ -13,7 +14,7 @@ def generate_pdf(ticket, logo='img/logo.png'):
 
     data = {
         'title': ticket.session.name,
-        'date': ticket.session.start.date.isoformat(),
+        'date': ticket.session.start.date().isoformat(),
         'code': ticket.order.upper(),
     }
 
@@ -30,8 +31,9 @@ def generate_pdf(ticket, logo='img/logo.png'):
                     PAGE_HEIGHT - (1.75 * inch), width = W, height = H)
             canvas.restoreState()
 
-    def gen_ticket(filename):
-        doc = SimpleDocTemplate(filename)
+    def gen_ticket():
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer)
         Story = []
         styleN = styles["Normal"]
         styleH = styles['Heading1']
@@ -44,8 +46,8 @@ def generate_pdf(ticket, logo='img/logo.png'):
         barcode=code128.Code128(data.get('code'), barWidth= 0.01 * inch, barHeight= .5 * inch)
         Story.append(barcode)
         doc.build(Story, onFirstPage=ticketPage, onLaterPages=ticketPage)
-        return
+        pdf = buffer.getvalue()
+        buffer.close()
+        return pdf
 
-    fname =  data.get('code') + ".pdf"
-    f = os.path.join(settings.MEDIA_ROOT, 'tickets', fname)
-    gen_ticket(f)
+    return gen_ticket()
