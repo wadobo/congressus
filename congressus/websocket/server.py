@@ -7,7 +7,7 @@ from events.models import Event
 class WSServer:
     def __init__(self, port=9007):
         self.port = port
-        self.server = WebsocketServer(self.port)
+        self.server = WebsocketServer(self.port, host='0.0.0.0')
         self.server.set_fn_new_client(self.on_connect)
         self.server.set_fn_message_received(self.on_msg)
         self.server.set_fn_client_left(self.on_disconnect)
