@@ -125,7 +125,7 @@ class Space(models.Model):
 
     capacity = models.IntegerField(_('capacity'), default=100)
     numbered = models.BooleanField(_('numbered'), default=False)
-    seat_map = models.ForeignKey(SeatMap, related_name='spaces', null=True)
+    seat_map = models.ForeignKey(SeatMap, related_name='spaces', null=True, blank=True)
 
     def __str__(self):
         return '%s - %s' % (self.event, self.name)
