@@ -151,6 +151,7 @@ class MultiPurchase(models.Model, BaseTicketMixing):
         for t in self.tickets.all():
             t.confirmed = True
             t.confirmed_date = timezone.now()
+            t.save()
         self.save()
 
     def is_mp(self):
