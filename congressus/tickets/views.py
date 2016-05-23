@@ -199,7 +199,7 @@ class Thanks(TemplateView):
 
     def post(self, request, order):
         from reportlab.pdfgen import canvas
-        ticket = Ticket.objects.get(order=request.POST.get('ticket'))
+        ticket = Ticket.objects.get(order=request.POST.get('ticket'), confirmed=True)
         pdf = ticket.gen_pdf()
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="tickets.pdf"'
@@ -208,7 +208,7 @@ class Thanks(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         ctx = super(Thanks, self).get_context_data(*args, **kwargs)
-        ctx['ticket'] = get_ticket_or_404(order=kwargs['order'])
+        ctx['ticket'] = get_ticket_or_404(order=kwargs['order'], confirmed=True)
         return ctx
 thanks = Thanks.as_view()
 

@@ -28,8 +28,10 @@
     </tr>
 </table>
 
-<form id="download-{{ ticket.order }}" method="post" action="{{ thanks }}">
+{% if ticket.confirmed %}
+<form id="download-{{ ticket.order }}" method="post" action="{% url 'thanks' ticket.order %}">
     {% csrf_token %}
     <input type="hidden" name="ticket" value="{{ ticket.order }}"/>
-    <a target="_blank" class="btn btn-lg btn-block btn-warning" onclick="document.getElementById('download-{{ ticket.order }}').submit();">DESCARGAR TICKET</a><br>
+    <button class="btn btn-lg btn-block btn-warning">{% trans "DOWNLOAD TICKET" %}</button>
 </form>
+{% endif %}
