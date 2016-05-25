@@ -1,0 +1,62 @@
+{% load i18n %}
+<div class="biglayout table-responsive {{ classes }}">
+    <h2 class="layout-name">
+        {{ layout.name }}
+        <span class="glyphicon {{ layout.glyph }}" aria-hidden="true"></span>
+    </h2>
+    <table class="text-center layout-parent">
+        {% if layout.direction == 'u' %}
+        <tr> <td class="bigscene">{% trans "Scene" %}</td> </tr>
+        {% endif %}
+        <tr>
+            {% if layout.direction == 'l' %}
+            <td>
+                <div class="bigscene vertical">
+                {% trans "Scene" %}
+                </div>
+            </td>
+            {% endif %}
+            <td>
+
+            <!-- layout -->
+            <table class="seat-layout table">
+                <tr>
+                    <th></th>
+                    {% for c in layout.cols %}
+                        <th>{{ forloop.counter }}</th>
+                    {% endfor %}
+                </tr>
+                {% for row in layout.rows %}
+                <tr>
+                    <th>{{ forloop.counter }}</th>
+                    {% for seat in row %}
+                    <td class="seat-{{ seat }}"
+                        id="{{ session.id }}_{{ c.id }}_{{ forloop.parentloop.counter }}_{{ forloop.counter }}"
+                        data-session="{{ session.id }}"
+                        data-layout="{{ c.id }}"
+                        data-row="{{ forloop.parentloop.counter }}"
+                        data-col="{{ forloop.counter }}">
+                        {% if seat != '_' %}
+                        {% if forloop.counter < 10 %}0{% endif %}{{ forloop.counter }}
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+
+            </td>
+            {% if layout.direction == 'r' %}
+            <td>
+                <div class="bigscene vertical">
+                {% trans "Scene" %}
+                </div>
+            </td>
+            {% endif %}
+        </tr>
+        {% if layout.direction == 'd' %}
+        <tr> <td class="bigscene">{% trans "Scene" %}</td> </tr>
+        {% endif %}
+    </table>
+</div>
+

@@ -114,6 +114,12 @@ class SeatLayout(models.Model):
 
         return g[self.direction]
 
+    def rows(self):
+        return self.layout.split()
+
+    def cols(self):
+        return self.layout.split()[0]
+
     def free(self):
         return self.layout.count('L')
 

@@ -15,7 +15,6 @@
           fieldset { display: table-cell; }
         }
     </style>
-    <link href="{% static "css/jquery.seat-charts.css" %}" rel="stylesheet"/>
     <link href="{% static "css/map.css" %}" rel="stylesheet"/>
 {% endblock %}
 
@@ -49,7 +48,7 @@
                                 {% if session.space.numbered %}
                                 <td>
                                     {% include "tickets/seat_select.html" %}
-                                    <input id="seats-{{ session.id }}" class="hidden" type="text" name="seats_{{ session.id }}" value=""/>
+                                    <input id="seats-{{ session.id }}" class="hidden seats-input" data-session="{{ session.id }}" type="text" name="seats_{{ session.id }}" value=""/>
                                     {% for sr in session.seats_reserved %}
                                         <div class="hidden seat-reserved"
                                             data-session="{{ session.id }}"
@@ -101,7 +100,6 @@
 
 {% block extrabody %}
     <script src="{% static "js/jquery-1.12.3.min.js" %}"></script>
-    <script src="{% static "js/jquery.seat-charts.min.js" %}"></script>
     <script src="{% static "js/map.js" %}"></script>
 
     <script src="{% static 'js/multipurchase.js' %}"></script>
@@ -119,7 +117,11 @@
             }
         }
         ws.cbs.add(f);
-        ws.init("{{ ws_server }}");
+        try {
+            ws.init("{{ ws_server }}");
+        } catch (e) {
+            console.log("NO WS");
+        }
         //ws.cbs.remove(f);
     </script>
 {% endblock %}

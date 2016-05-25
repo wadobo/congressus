@@ -26,9 +26,10 @@ function check_warning(w, sessions) {
 }
 
 function seatCB(ev, seat) {
-    var id = seat.settings.id;
-    var session = seat.settings.data.session;
-    var layout = seat.settings.data.layout;
+    var row = seat.data("row");
+    var col = seat.data("col");
+    var session = seat.data("session");
+    var layout = seat.data("layout");
 
     var current = [];
     var currentval = $("#seats-"+session).val();
@@ -36,7 +37,7 @@ function seatCB(ev, seat) {
         current = currentval.split(",");
     }
 
-    var str = layout + '_' + id;
+    var str = layout + '_' + row + '_' + col;
 
     if (ev == 'select') {
         current.push(str);
@@ -108,7 +109,22 @@ $(document).ready(function() {
         var session = $(this).data('session');
         var layout = $(this).data('layout');
         var seat = $(this).data('seat').replace(/-/g, '_');
-        var selector = '.display-'+session+'-'+layout+' .preview';
-        $(selector).seatCharts().status(seat, "unavailable");
+        var selector = '#' + session + '_' + layout + '_' + seat;
+        $(selector).addClass("seat-R");
+        $(selector).removeClass("seat-L");
+    });
+
+    $(".seats-input").each(function() {
+        var session = $(this).data('session');
+        var v = $(this).val();
+        if (v) {
+            var current = [];
+            current = v.split(",");
+            current.forEach(function(c) {
+                var selector = '#' + session + '_' + c;
+                $(selector).addClass("seat-selected");
+            });
+            $("#"+session).val(current.length);
+        }
     });
 });

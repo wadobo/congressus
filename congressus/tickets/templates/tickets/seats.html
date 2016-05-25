@@ -9,22 +9,24 @@
         <h1> {{ map }} </h1>
     </div>
 
-    <div id="sample-map">
+    <div id="sample-map" class="map">
         {% include "tickets/map.html" %}
     </div>
 {% endblock %}
 
 {% block extrahead %}
-    <link href="{% static "css/jquery.seat-charts.css" %}" rel="stylesheet"/>
     <link href="{% static "css/map.css" %}" rel="stylesheet"/>
 {% endblock %}
 
 {% block extrabody %}
     <script src="{% static "js/jquery-1.12.3.min.js" %}"></script>
-    <script src="{% static "js/jquery.seat-charts.min.js" %}"></script>
     <script src="{% static "js/map.js" %}"></script>
 
     <script>
         SeatMap.bindLayout($("#sample-map"));
+
+        {% if q %}
+        SeatMap.showLayoutById(1);
+        {% endif %}
     </script>
 {% endblock %}

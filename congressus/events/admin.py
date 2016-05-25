@@ -23,20 +23,9 @@ class SpaceInline(admin.TabularInline):
 
 
 class SpaceAdmin(admin.ModelAdmin):
-    change_form_template = "events/admin/preview_seats.html"
     list_display = ('event', 'name', 'capacity', 'numbered')
     list_filter = ('event', 'capacity', 'numbered')
     search_fields = ('event__name', 'name')
-
-    class Media:
-        css = {
-                'all': ("css/jquery.seat-charts.css",)
-        }
-        js = (
-                "js/jquery-1.12.3.min.js",
-                "js/jquery.seat-charts.min.js",
-                "js/space-seats.js",
-        )
 
 
 class TicketFieldInline(admin.TabularInline):

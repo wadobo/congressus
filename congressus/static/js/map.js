@@ -3,63 +3,35 @@
     map.cbs = $.Callbacks();
 
     map.showLayout = function(parentObj, obj) {
-        var layout = obj.data('layout');
-        var session = obj.data('session');
         var layoutid = obj.data('id');
-        var dir = ' <span class="glyphicon '+obj.data('glyph')+'" aria-hidden="true"></span>';
+        var session = obj.data('session');
         var display = '.display-' + session + '-' + layoutid;
-        $(display + ' .layout-name').html(obj.data('name') + dir);
-        var sc = $(display + ' .preview').seatCharts({
-            map: layout.split("\n"),
-            seats: {
-                L: {
-                    layout: layoutid,
-                    session: session,
-                    classes: 'front-seat'
-                },
-                O: {
-                    layout: layoutid,
-                    session: session,
-                    classes : 'unavailable'
-                },
-                R: {
-                    layout: layoutid,
-                    session: session,
-                    classes : 'unavailable'
-                }
-
-            },
-            click: function () {
-                if (this.status() == 'available') {
-                    map.cbs.fire("select", this);
-                    return 'selected';
-                } else if (this.status() == 'selected') {
-                    //seat has been vacated
-                    map.cbs.fire("unselect", this);
-                    return 'available';
-                } else if (this.status() == 'unavailable') {
-                    //seat has been already booked
-                    return 'unavailable';
-                } else {
-                    return this.style();
-                }
-            }
-        });
+        parentObj.find('.display').hide();
+        parentObj.find(display).show();
     },
 
     map.bindLayout = function(obj) {
-        obj.find(".layout").each(function() {
-            map.showLayout(obj, $(this));
+        obj.find(".seat-L").click(function() {
+            var isSelected = $(this).hasClass("seat-selected");
+            var seat = $(this);
+            if (isSelected) {
+                map.cbs.fire("unselect", seat);
+                $(this).removeClass("seat-selected");
+            } else {
+                map.cbs.fire("select", seat);
+                $(this).addClass("seat-selected");
+            }
+
         });
 
         obj.find(".layout").click(function() {
-            var layoutid = $(this).data('id');
-            var session = $(this).data('session');
-            var display = '.display-' + session + '-' + layoutid;
-            obj.find('.display').hide();
-            obj.find(display).show();
+            map.showLayout(obj, $(this));
         });
 
         obj.find('.display').hide();
+    },
+
+    map.showLayoutById = function(parentObj, id) {
+        map.showLayout($("#" + id));
     }
 }).call(this);

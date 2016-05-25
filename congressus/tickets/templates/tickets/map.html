@@ -9,7 +9,8 @@
                         {% trans "scene" %}
                     </td>
                 {% elif c %}
-                    <td class="layout" data-session="{{ session.id }}" data-id="{{ c.id }}"
+                    <td class="layout"
+                    data-session="{{ session.id }}" data-id="{{ c.id }}"
                     data-name="{{ c.name }}" data-layout="{{ c.layout }}"
                     data-dir="{{ c.direction }}"
                     data-glyph="{{ c.glyph }}">
@@ -29,8 +30,7 @@
     {% for c in r %}
         {% if c and c != 'scene' %}
             <div class="display display-{{ session.id }}-{{ c.id }}">
-                <h2 class="layout-name"></h2>
-                <div class="preview"></div>
+            {% include "tickets/layout.html" with layout=c session=session classes="" %}
             </div>
         {% endif %}
     {% endfor %}
