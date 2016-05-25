@@ -40,7 +40,12 @@
                     <table class="table table-striped">
                         {% for session in space.sessions.all %}
                             <tr>
-                                <th width="60%"><label for="{{ session.id }}" class="control-label">{{ session.name }}</label></th>
+                                <th width="30%">
+                                    {{ session.name }}
+                                </th>
+                                <td class="hidden-xs">
+                                    <span class="text-muted">{{ session.start|date:"d/m/Y" }}</span>
+                                </td>
                                 {% if session.space.numbered %}
                                 <td>
                                     {% include "tickets/seat_select.html" %}

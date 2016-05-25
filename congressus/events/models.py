@@ -172,7 +172,7 @@ class Session(models.Model):
         self.space.capacity
 
     class Meta:
-        ordering = ['-start']
+        ordering = ['start']
 
     def __str__(self):
         return '%s - %s' % (self.space, self.name)
