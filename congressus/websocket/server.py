@@ -1,7 +1,11 @@
+import json
 from django.core import serializers
 
 from websocket_server import WebsocketServer
 from events.models import Event
+from events.models import Session
+from events.models import SeatLayout
+from tickets.models import TicketSeatHold
 
 
 class WSServer:
@@ -29,12 +33,30 @@ class WSServer:
             if hasattr(self, internal):
                 getattr(self, internal)(client, *args)
             else:
-                self.server.send_message(client, 'Command not found')
+                data = {'action': 'cmd', 'msg': 'not found'}
+                self.server.send_message(client, json.dumps(data))
         except Exception as e:
             print("Error: ", e)
 
     def run(self):
         self.server.run_forever()
+
+    def drop_seat(self, hold):
+        row, col = hold.seat.split('-')
+        data = {
+            'action': 'drop',
+            'session': hold.session.id,
+            'layout': hold.layout.id,
+            'row': row,
+            'col': col,
+        }
+
+        confirmed = not hold.session.is_seat_available(hold.layout, row, col)
+        if confirmed:
+            data['action'] = 'confirm'
+
+        hold.delete()
+        self.server.send_message_to_all(json.dumps(data))
 
     # Protocol definitions
 
@@ -52,3 +74,46 @@ class WSServer:
         space = event.spaces.get(slug=space)
         sessions = serializers.serialize("json", space.sessions.all())
         self.server.send_message(client, sessions)
+
+    def internal_ws_hold_seat(self, client, session, layout, row, col, user):
+        session = Session.objects.get(id=session)
+        layout = SeatLayout.objects.get(id=layout)
+        data = {
+            'action': 'hold',
+            'session': session.id,
+            'layout': layout.id,
+            'row': row,
+            'col': col,
+        }
+
+        if not session.is_seat_holded(layout, row, col):
+            seat = row + '-' + col
+            sh = TicketSeatHold(client=user, layout=layout, seat=seat,
+                                session=session)
+            sh.save()
+            self.server.send_message_to_all(json.dumps(data))
+        else:
+            data['action'] = 'holded'
+            self.server.send_message(client, json.dumps(data))
+
+    def internal_ws_drop_seat(self, client, session, layout, row, col, user):
+        session = Session.objects.get(id=session)
+        layout = SeatLayout.objects.get(id=layout)
+        data = {
+            'action': 'drop',
+            'session': session.id,
+            'layout': layout.id,
+            'row': row,
+            'col': col,
+        }
+
+        try:
+            seat = row + '-' + col
+            sh = TicketSeatHold.objects.get(client=user,
+                                            layout=layout,
+                                            seat=seat,
+                                            session=session)
+            sh.delete()
+            self.server.send_message_to_all(json.dumps(data))
+        except:
+            pass

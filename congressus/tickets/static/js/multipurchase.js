@@ -25,6 +25,48 @@ function check_warning(w, sessions) {
     }
 }
 
+function seat_droped(session, layout, seat) {
+    var selector = '#' + session + '_' + layout + '_' + seat;
+    $(selector).addClass("seat-L");
+    $(selector).removeClass("seat-H");
+    $(selector).unbind("click").click(function() {
+        SeatMap.clickSeat($(this));
+    });
+}
+
+function seat_holded(session, layout, seat) {
+    var selector = '#' + session + '_' + layout + '_' + seat;
+
+    if ($(selector).hasClass("seat-selected")) {
+        return;
+    }
+
+    $(selector).addClass("seat-H");
+    $(selector).removeClass("seat-L");
+    $(selector).unbind("click");
+}
+
+function seat_reserved(session, layout, seat) {
+    var selector = '#' + session + '_' + layout + '_' + seat;
+    $(selector).addClass("seat-R");
+    $(selector).removeClass("seat-L");
+    $(selector).removeClass("seat-H");
+    $(selector).unbind("click");
+}
+
+function websocketCB(ev, data) {
+    if (ev == 'hold') {
+        var seat = data.row + '_' + data.col;
+        seat_holded(data.session, data.layout, seat);
+    } else if (ev == 'drop') {
+        var seat = data.row + '_' + data.col;
+        seat_droped(data.session, data.layout, seat);
+    } else if (ev == 'confirm') {
+        var seat = data.row + '_' + data.col;
+        seat_reserved(data.session, data.layout, seat);
+    }
+}
+
 function seatCB(ev, seat) {
     var row = seat.data("row");
     var col = seat.data("col");
@@ -39,13 +81,21 @@ function seatCB(ev, seat) {
 
     var str = layout + '_' + row + '_' + col;
 
+    args = session;
+    args += ' ' + layout;
+    args += ' ' + row;
+    args += ' ' + col;
+    args += ' ' + client;
+
     if (ev == 'select') {
         current.push(str);
+        ws.send('hold_seat ' + args);
     } else if (ev == 'unselect') {
         var idx = current.indexOf(str);
         if (idx >= 0) {
             current.splice(idx, 1);
         }
+        ws.send('drop_seat ' + args);
     }
 
     $("#seats-"+session).val(current.join(","));
@@ -89,29 +139,26 @@ $(document).ready(function() {
         var session = $(this).data('session');
         var obj = $("#modal-" + session);
         SeatMap.bindLayout(obj);
-
-        // TODO remove this
-        // example to show how to mark a seat as occupied to sync between
-        // clients with socket.io
-
-        //setTimeout(function() {
-        //    var layout = '1';
-        //    var position = '2_2';
-        //    var selector = ".display-"+session+'-'+layout + ' .preview';
-        //    console.log(selector);
-        //    $(selector).seatCharts().status(position, "unavailable");
-        //}, 5000);
     });
+
     SeatMap.cbs.add(seatCB);
+    ws.cbs.add(websocketCB);
+
+    // removing holds seats
+    $(".seat-holded").each(function() {
+        var session = $(this).data('session');
+        var layout = $(this).data('layout');
+        var seat = $(this).data('seat').replace(/-/g, '_');
+        var selector = '#' + session + '_' + layout + '_' + seat;
+        seat_holded(session, layout, seat);
+    });
 
     // removing reserved seats
     $(".seat-reserved").each(function() {
         var session = $(this).data('session');
         var layout = $(this).data('layout');
         var seat = $(this).data('seat').replace(/-/g, '_');
-        var selector = '#' + session + '_' + layout + '_' + seat;
-        $(selector).addClass("seat-R");
-        $(selector).removeClass("seat-L");
+        seat_reserved(session, layout, seat);
     });
 
     $(".seats-input").each(function() {

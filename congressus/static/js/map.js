@@ -10,21 +10,25 @@
         parentObj.find(display).show();
     },
 
-    map.bindLayout = function(obj) {
-        obj.find(".seat-L").click(function() {
-            var isSelected = $(this).hasClass("seat-selected");
-            var seat = $(this);
-            if (isSelected) {
-                map.cbs.fire("unselect", seat);
-                $(this).removeClass("seat-selected");
-            } else {
-                map.cbs.fire("select", seat);
-                $(this).addClass("seat-selected");
-            }
+    map.clickSeat = function(obj) {
+        var isSelected = obj.hasClass("seat-selected");
+        var seat = obj;
+        if (isSelected) {
+            map.cbs.fire("unselect", seat);
+            obj.removeClass("seat-selected");
+        } else {
+            map.cbs.fire("select", seat);
+            obj.addClass("seat-selected");
+        }
 
+    },
+
+    map.bindLayout = function(obj) {
+        obj.find(".seat-L").unbind("click").click(function() {
+            map.clickSeat($(this));
         });
 
-        obj.find(".layout").click(function() {
+        obj.find(".layout").unbind("click").click(function() {
             map.showLayout(obj, $(this));
         });
 

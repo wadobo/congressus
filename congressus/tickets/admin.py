@@ -3,6 +3,7 @@ from django.contrib import admin
 from .models import Ticket
 from .models import MultiPurchase
 from .models import TicketWarning
+from .models import TicketSeatHold
 from admin_csv import CSVMixin
 
 
@@ -84,6 +85,12 @@ class TicketWarningAdmin(admin.ModelAdmin):
         return ', '.join(str(s) for s in obj.sessions2.all())
 
 
+class TicketSeatHoldAdmin(admin.ModelAdmin):
+    list_display = ('client', 'session',  'layout', 'seat', 'date')
+    list_filter = ('session',)
+
+
 admin.site.register(Ticket, TicketAdmin)
 admin.site.register(TicketWarning, TicketWarningAdmin)
 admin.site.register(MultiPurchase, MPAdmin)
+admin.site.register(TicketSeatHold, TicketSeatHoldAdmin)

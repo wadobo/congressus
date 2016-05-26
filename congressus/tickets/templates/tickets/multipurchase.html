@@ -55,6 +55,12 @@
                                             data-layout="{{ sr.seat_layout.id }}"
                                             data-seat="{{ sr.seat }}"></div>
                                     {% endfor %}
+                                    {% for sh in session.seats_holded %}
+                                        <div class="hidden seat-holded"
+                                            data-session="{{ session.id }}"
+                                            data-layout="{{ sh.layout.id }}"
+                                            data-seat="{{ sh.seat }}"></div>
+                                    {% endfor %}
                                 </td>
                                 {% endif %}
                                 <td>
@@ -102,26 +108,15 @@
     <script src="{% static "js/jquery-1.12.3.min.js" %}"></script>
     <script src="{% static "js/map.js" %}"></script>
 
-    <script src="{% static 'js/multipurchase.js' %}"></script>
     <script src="{% static "js/websocket.js" %}"></script>
+    <script src="{% static 'js/multipurchase.js' %}"></script>
 
     <script>
-        // websocket example
-        function f(ev, msg) {
-            if (ev == 'msg') {
-                data = JSON.parse(msg.data);
-                console.log(data);
-            }
-            if (ev == 'open') {
-                ws.send("get_events");
-            }
-        }
-        ws.cbs.add(f);
+        var client = '{{ client }}';
         try {
             ws.init("{{ ws_server }}");
         } catch (e) {
             console.log("NO WS");
         }
-        //ws.cbs.remove(f);
     </script>
 {% endblock %}

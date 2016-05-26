@@ -1,6 +1,8 @@
+import datetime
 from django.db import models
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -162,17 +164,40 @@ class Session(models.Model):
         s = self.sold()
         return (s + number) < self.space.capacity
 
-    def is_seat_available(self, layout, row, column):
-        # TODO check here reserved seats
+    def is_seat_available(self, layout, row, column, client=None):
+        seat = row + '-' + column
         n = self.tickets.filter(confirmed=True,
                                 seat_layout=layout,
-                                seat=row + '-' + column).count()
-        return n == 0
+                                seat=seat).count()
+        avail = bool(n == 0)
+        h = False
+
+        if client:
+            h = self.is_seat_holded(layout, row, column, client)
+
+        return avail and not h
+
+    def is_seat_holded(self, layout, row, column, client=None):
+        seat = row + '-' + column
+        # 5 minutes seconds
+        d = (timezone.now() - datetime.timedelta(seconds=5 * 60))
+        holds = self.seat_holds.filter(layout=layout,
+                                        seat=seat,
+                                        date__gt=d)
+        if client:
+            holds = holds.exclude(client=client)
+        return bool(holds.count())
+
 
     def seats_reserved(self):
         n = self.tickets.filter(confirmed=True,
                                 seat__isnull=False)
         return n
+
+    def seats_holded(self):
+        d = (timezone.now() - datetime.timedelta(seconds=5 * 60))
+        holds = self.seat_holds.filter(date__gt=d)
+        return holds
 
     def places(self):
         self.space.capacity

@@ -254,6 +254,17 @@ class TicketWarning(models.Model):
         return self.name
 
 
+class TicketSeatHold(models.Model):
+    client = models.CharField(max_length=20)
+    session = models.ForeignKey(Session, related_name='seat_holds')
+    layout = models.ForeignKey(SeatLayout)
+    seat = models.CharField(max_length=20, help_text="row-col")
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.seat
+
+
 def confirm_email(sender, instance, created, raw, using, update_fields, **kwargs):
     if not instance.confirm_sent and instance.confirmed:
         instance.send_confirm_email()

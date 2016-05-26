@@ -2,6 +2,7 @@ import hmac
 import json
 import uuid
 import random
+import string
 import operator
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -58,6 +59,9 @@ class MultiPurchaseView(TemplateView):
         ctx['ev'] = ev
         ctx['form'] = MPRegisterForm(event=ev)
         ctx['ws_server'] = 'localhost:9007'
+        client = ''.join(random.choice(string.hexdigits) for _ in range(20))
+        self.request.session['client'] = client
+        ctx['client'] = client
         return ctx
 
     def post(self, request, ev=None):
@@ -66,7 +70,9 @@ class MultiPurchaseView(TemplateView):
         ids = [(i[len('number_'):], request.POST[i]) for i in request.POST if i.startswith('number_')]
         seats = [(i[len('seats_'):], request.POST[i].split(',')) for i in request.POST if i.startswith('seats_')]
 
-        form = MPRegisterForm(request.POST, event=ev, ids=ids, seats=seats)
+        form = MPRegisterForm(request.POST,
+                              event=ev, ids=ids, seats=seats,
+                              client=request.session.get('client', ''))
         if form.is_valid():
             mp = form.save()
             mp.send_reg_email()

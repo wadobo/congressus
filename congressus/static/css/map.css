@@ -73,6 +73,12 @@ td.seat-R {
     border: 2px transparent dotted !important;
 }
 
+td.seat-H {
+    background-color: #f0ad4e;
+    cursor: not-allowed;
+    border: 2px transparent dotted !important;
+}
+
 td.seat-selected {
     background-color: #337ab7;
     color: white;

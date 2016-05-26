@@ -62,6 +62,7 @@ class MPRegisterForm(forms.ModelForm):
         self.event = kwargs.pop('event')
         self.ids = kwargs.pop('ids', [])
         self.seats = kwargs.pop('seats', [])
+        self.client = kwargs.pop('client', '')
 
         super(MPRegisterForm, self).__init__(*args, **kwargs)
 
@@ -85,7 +86,7 @@ class MPRegisterForm(forms.ModelForm):
             for seat in seats:
                 layout, row, column = seat.split('_')
                 layout = session.space.seat_map.layouts.get(pk=layout)
-                if not session.is_seat_available(layout, row, column):
+                if not session.is_seat_available(layout, row, column, self.client):
                     s = row + '-' + column
                     raise forms.ValidationError(_("The seat %s is not available for %s") % (s, session))
 
