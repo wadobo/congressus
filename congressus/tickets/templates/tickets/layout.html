@@ -21,28 +21,98 @@
             <!-- layout -->
             <table class="seat-layout table">
                 <tr>
-                    <th></th>
-                    {% for c in layout.cols %}
-                        <th>{{ forloop.counter }}</th>
-                    {% endfor %}
+                    {% if layout.direction == 'u' %}
+                        {% for c in layout.cols %}
+                            <th>{{ forloop.revcounter }}</th>
+                        {% endfor %}
+                    {% elif layout.direction == 'l' %}
+                        <th></th>
+                        {% for c in layout.cols %}
+                            <th>{{ forloop.counter }}</th>
+                        {% endfor %}
+                    {% endif %}
                 </tr>
                 {% for row in layout.rows %}
                 <tr>
-                    <th>{{ forloop.counter }}</th>
-                    {% for seat in row %}
-                    <td class="seat-{{ seat }}"
-                        id="{{ session.id }}_{{ c.id }}_{{ forloop.parentloop.counter }}_{{ forloop.counter }}"
-                        data-session="{{ session.id }}"
-                        data-layout="{{ c.id }}"
-                        data-row="{{ forloop.parentloop.counter }}"
-                        data-col="{{ forloop.counter }}">
-                        {% if seat != '_' %}
-                        {% if forloop.counter < 10 %}0{% endif %}{{ forloop.counter }}
-                        {% endif %}
-                    </td>
-                    {% endfor %}
+                    {% if layout.direction == 'd' %}
+                        <th>{{ forloop.revcounter }}</th>
+                    {% elif layout.direction == 'l' %}
+                        <th>{{ forloop.counter }}</th>
+                    {% endif %}
+
+                    {% if layout.direction == 'r' %}
+                        {% for seat in row %}
+                        <td class="seat-{{ seat }}"
+                            id="{{ session.id }}_{{ c.id }}_{{ forloop.revcounter }}_{{ forloop.parentloop.revcounter }}"
+                            data-session="{{ session.id }}"
+                            data-layout="{{ c.id }}"
+                            data-row="{{ forloop.revcounter }}"
+                            data-col="{{ forloop.parentloop.revcounter }}">
+                            {% if seat != '_' %}
+                            {% if forloop.revcounter < 10 %}0{% endif %}{{ forloop.revcounter }}
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    {% elif layout.direction == 'u' %}
+                        {% for seat in row %}
+                        <td class="seat-{{ seat }}"
+                            id="{{ session.id }}_{{ c.id }}_{{ forloop.parentloop.counter }}_{{ forloop.revcounter }}"
+                            data-session="{{ session.id }}"
+                            data-layout="{{ c.id }}"
+                            data-row="{{ forloop.parentloop.counter }}"
+                            data-col="{{ forloop.revcounter }}">
+                            {% if seat != '_' %}
+                            {% if forloop.revcounter < 10 %}0{% endif %}{{ forloop.revcounter }}
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    {% elif layout.direction == 'l' %}
+                        {% for seat in row %}
+                        <td class="seat-{{ seat }}"
+                            id="{{ session.id }}_{{ c.id }}_{{ forloop.counter }}_{{ forloop.parentloop.counter }}"
+                            data-session="{{ session.id }}"
+                            data-layout="{{ c.id }}"
+                            data-row="{{ forloop.counter }}"
+                            data-col="{{ forloop.parentloop.counter }}">
+                            {% if seat != '_' %}
+                            {% if forloop.counter < 10 %}0{% endif %}{{ forloop.counter }}
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    {% elif layout.direction == 'd' %}
+                        {% for seat in row %}
+                        <td class="seat-{{ seat }}"
+                            id="{{ session.id }}_{{ c.id }}_{{ forloop.parentloop.revcounter }}_{{ forloop.counter }}"
+                            data-session="{{ session.id }}"
+                            data-layout="{{ c.id }}"
+                            data-row="{{ forloop.parentloop.revcounter }}"
+                            data-col="{{ forloop.counter }}">
+                            {% if seat != '_' %}
+                            {% if forloop.counter < 10 %}0{% endif %}{{ forloop.counter }}
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if layout.direction == 'r' %}
+                        <th>{{ forloop.revcounter }}</th>
+                    {% elif layout.direction == 'u' %}
+                        <th>{{ forloop.counter }}</th>
+                    {% endif %}
                 </tr>
                 {% endfor %}
+                <tr>
+                    {% if layout.direction == 'r' %}
+                        {% for c in layout.cols %}
+                            <th>{{ forloop.revcounter }}</th>
+                        {% endfor %}
+                    {% elif layout.direction == 'd' %}
+                        <th></th>
+                        {% for c in layout.cols %}
+                            <th>{{ forloop.counter }}</th>
+                        {% endfor %}
+                    {% endif %}
+                </tr>
             </table>
 
             </td>
