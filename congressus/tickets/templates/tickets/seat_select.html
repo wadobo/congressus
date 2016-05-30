@@ -1,6 +1,8 @@
 {% load i18n %}
+{% load staticfiles %}
+
 <div class="btn {% if session.have_places %}btn-success{% else %}btn-danger{% endif %}"
-    data-toggle="modal" data-target="#modal-{{ session.id }}">
+    data-toggle="modal" data-target="#modal-{{ session.id }}" onclick="assignSeat();">
     <span class="glyphicon glyphicon-th" aria-hidden="true"></span>
 </div>
 
