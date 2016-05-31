@@ -49,7 +49,7 @@
                             data-row="{{ forloop.revcounter }}"
                             data-col="{{ forloop.parentloop.revcounter }}">
                             {% if seat != '_' %}
-                            {% if forloop.revcounter < 10 %}0{% endif %}{{ forloop.revcounter }}
+                            {% if forloop.parentloop.revcounter < 10 %}0{% endif %}{{ forloop.parentloop.revcounter }}
                             {% endif %}
                         </td>
                         {% endfor %}
@@ -75,7 +75,7 @@
                             data-row="{{ forloop.counter }}"
                             data-col="{{ forloop.parentloop.counter }}">
                             {% if seat != '_' %}
-                            {% if forloop.counter < 10 %}0{% endif %}{{ forloop.counter }}
+                            {% if forloop.parentloop.counter < 10 %}0{% endif %}{{ forloop.parentloop.counter }}
                             {% endif %}
                         </td>
                         {% endfor %}
