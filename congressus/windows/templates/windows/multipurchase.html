@@ -1,0 +1,70 @@
+{% extends "tickets/multipurchase.html" %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block personal_info %}
+{% endblock %}
+
+{% block info %}
+{% endblock %}
+
+{% block header %}
+    <h1> {{ window.name }} /
+    <small class="text-danger">{{ request.user.username }}</small> /
+    <small>{{ ev }}</small>
+    <small class="text-info pull-right">
+        <a href="{% url 'window_logout' window.event.slug window.slug %}">
+        {% trans "logout" %}
+        </a>
+    </small>
+    </h1>
+{% endblock %}
+
+{% block button %}
+    <div class="row window-foot">
+        <div class="col-sm-2">
+            <!-- TODO, add discounts here -->
+            <button id="clean" class="btn btn-danger btn-block btn-lg"> {% trans "Clean" %} </button>
+        </div>
+        <div class="col-sm-8">
+            <table class="table table-bordered text-center">
+                <tr>
+                    <th class="text-center">{% trans "Total" %}</th>
+                    <th class="text-center">{% trans "Payment" %}</th>
+                    <th class="text-center">{% trans "Payed" %}</th>
+                    <th class="text-center">{% trans "Change" %}</th>
+                </tr>
+                <tr>
+                    <td><div id="total" class="outputbox text-primary">0</div></td>
+                    <td class="text-left">
+                        <div class="radio">
+                          <label>
+                            <input type="radio" name="payment" value="cash" checked>
+                            {% trans "cash" %}
+                          </label>
+                        </div>
+                        <div class="radio">
+                          <label>
+                            <input type="radio" name="payment" value="card">
+                            {% trans "credit card" %}
+                          </label>
+                        </div>
+                    </td>
+                    <td> <input type="number" class="form-control inputbox" id="payed"/> </td>
+                    <td> <div id="change" class="outputbox text-success">0</div> </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-2">
+            <button id="finish" class="btn btn-success btn-block btn-lg"
+                data-msg="{% trans "The ticket will be purchased, are you sure?" %}">
+                {% trans "Finish" %}
+            </button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extrabody %}
+    {{ block.super }}
+    <script src="{% static 'js/window.js' %}"></script>
+{% endblock %}

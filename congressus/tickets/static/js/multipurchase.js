@@ -100,6 +100,14 @@ function seatCB(ev, seat) {
 
     $("#seats-"+session).val(current.join(","));
     $("#"+session).val(current.length);
+    $("#"+session).change();
+}
+
+function recalcSums(obj) {
+    var session = obj.attr("id");
+    var val = parseInt(obj.val(), 10);
+    var price = parseFloat(obj.data("price"));
+    $("#"+session+"-subtotal-price").html(val * price);
 }
 
 $(document).ready(function() {
@@ -172,6 +180,15 @@ $(document).ready(function() {
                 $(selector).addClass("seat-selected");
             });
             $("#"+session).val(current.length);
+            $("#"+session).change();
         }
+    });
+
+    // calculating sums
+    $('.sessioninput').change(function() {
+        recalcSums($(this));
+    });
+    $('.sessioninput').each(function() {
+        recalcSums($(this));
     });
 });

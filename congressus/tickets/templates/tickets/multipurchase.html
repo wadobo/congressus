@@ -20,10 +20,14 @@
 
 {% block content %}
     <div class="page-header">
+        {% block header %}
         <h1> {{ ev }} </h1>
+        {% endblock %}
     </div>
 
+    {% block info %}
     <p> {{ ev.info }} </p>
+    {% endblock %}
 
     <form method="POST" action="">
 
@@ -65,10 +69,17 @@
                                 {% endif %}
                                 <td>
                                     <div class="input-group">
-                                        <input id="{{ session.id }}" class="sessioninput form-control" min='1' max='15' type="number"
+                                        <input id="{{ session.id }}" class="sessioninput form-control" min='0' max='15' type="number"
+                                            data-price="{{ session.price }}"
                                             {% if not session.space.numbered %}name="number_{{ session.id }}"{% endif %}
-                                            value="1"/>
-                                        <span class="input-group-addon" id="basic-addon2">{{ session.price }} € / ticket</span>
+                                            value="0"/>
+                                        <span class="input-group-addon">{{ session.price }} € / ticket</span>
+                                        {% if subsum %}
+                                        <span class="input-group-addon">
+                                            <span class="subtotal" id="{{ session.id }}-subtotal-price">0</span>
+                                            €
+                                        </span>
+                                        {% endif %}
                                     </div>
                                 </td>
 
@@ -81,14 +92,18 @@
     {% endfor %}
     </div>
 
+    {% block personal_info %}
     <fieldset>
         <legend>{% trans "Personal info" %}:</legend>
         <div class="reg-form">
             {{ form|bootstrap }}
         </div>
     </fieldset>
+    {% endblock %}
 
+    {% block button %}
     <button class="btn btn-primary btn-block btn-lg">{% trans "Continue" %}</button>
+    {% endblock %}
 
     </form>
 
