@@ -116,6 +116,11 @@ USE_TZ = True
 LOCALE_PATHS = (BASE_DIR + '/locale', )
         
 
+from django.contrib.messages import constants as messages
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger'
+}
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
