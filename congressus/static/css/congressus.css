@@ -28,4 +28,5 @@ input[type=number] {
     font-weight: bold;
     width: 120px;
     margin: 0 auto;
+    text-align: center;
 }

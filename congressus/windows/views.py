@@ -9,6 +9,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.urlresolvers import reverse
 
 from .models import TicketWindow
+from .models import TicketWindowSale
 from tickets.views import MultiPurchaseView
 from tickets.views import get_ticket_or_404
 from events.models import Event
@@ -98,7 +99,16 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
         if form.is_valid():
             mp = form.save(commit=False)
             mp.confirm()
-            # TODO store ticketwindow related information after each purchase
+            
+            price = data.get('price', 0)
+            payed = data.get('payed', 0)
+            change = data.get('change', 0)
+            payment = data.get('payment', 'cash')
+            sale = TicketWindowSale(purchase=mp, window=w, user=request.user,
+                                    price=price, payed=payed,
+                                    change=change, payment=payment)
+            sale.save()
+
             pdf = mp.gen_pdf()
             response = HttpResponse(content_type='application/pdf')
             response['Content-Disposition'] = 'filename="tickets.pdf"'

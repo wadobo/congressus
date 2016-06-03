@@ -37,7 +37,7 @@
                     <th class="text-center">{% trans "Change" %}</th>
                 </tr>
                 <tr>
-                    <td><div id="total" class="outputbox text-primary">0</div></td>
+                    <td><input type="text" name="price" id="total" class="outputbox text-primary" value="0" readonly tabindex="-1"/></td>
                     <td class="text-left">
                         <div class="radio">
                           <label>
@@ -52,8 +52,8 @@
                           </label>
                         </div>
                     </td>
-                    <td> <input type="number" class="form-control inputbox" id="payed"/> </td>
-                    <td> <div id="change" class="outputbox text-success">0</div> </td>
+                    <td> <input type="number" name="payed" class="form-control inputbox" id="payed"/> </td>
+                    <td> <input type="text" id="change" name="change" class="outputbox text-success" value="0" readonly tabindex="-1"/> </td>
                 </tr>
             </table>
         </div>

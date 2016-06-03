@@ -12,20 +12,20 @@ function clean() {
         }
     });
 
-    $("#total").html("0");
-    $("#change").html("0");
+    $("#total").val(0);
+    $("#change").val(0);
     $("#payed").val(0);
 
     return false;
 }
 
 function calcChange() {
-    var total = parseFloat($("#total").html());
+    var total = parseFloat($("#total").val());
     var payed = parseFloat($("#payed").val());
     if (isNaN(payed - total)) {
-        $("#change").html(0);
+        $("#change").val(0);
     } else {
-        $("#change").html(payed - total);
+        $("#change").val(payed - total);
     }
 }
 
@@ -36,7 +36,7 @@ function recalcTotal() {
         var price = parseFloat($(this).data("price"));
         sum += price * n;
     });
-    $("#total").html(sum);
+    $("#total").val(sum);
 }
 
 $(document).ready(function() {
