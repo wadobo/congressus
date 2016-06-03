@@ -16,6 +16,7 @@ from events.models import Event, InvCode
 from events.models import Session
 from events.models import SeatLayout
 from tickets.utils import generate_pdf
+from tickets.utils import concat_pdf
 
 
 WARNING_TYPES = (
@@ -75,6 +76,13 @@ class BaseTicketMixing:
         email.send(fail_silently=False)
 
     def send_confirm_email(self):
+        self.confirm_sent = True
+        self.save()
+
+        if self.email == settings.FROM_EMAIL:
+            # ticket from ticket window
+            return
+
         # email to admin
         tmpl = get_template('emails/confirm.txt')
         body = tmpl.render({'ticket': self})
@@ -106,9 +114,6 @@ class BaseTicketMixing:
             email.attach(filename, ticket.gen_pdf(), 'application/pdf')
 
         email.send(fail_silently=False)
-
-        self.confirm_sent = True
-        self.save()
 
     def get_absolute_url(self):
         return reverse('payment', kwargs={'order': self.order})
@@ -156,6 +161,12 @@ class MultiPurchase(models.Model, BaseTicketMixing):
 
     def is_mp(self):
         return True
+
+    def gen_pdf(self):
+        files = []
+        for ticket in self.tickets.all():
+            files.append(generate_pdf(ticket, asbuf=True))
+        return concat_pdf(files)
 
     class Meta:
         ordering = ['-created']

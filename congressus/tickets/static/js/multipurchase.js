@@ -190,5 +190,6 @@ $(document).ready(function() {
     });
     $('.sessioninput').each(function() {
         recalcSums($(this));
+        $(this).click(function() { $(this).select(); });
     });
 });

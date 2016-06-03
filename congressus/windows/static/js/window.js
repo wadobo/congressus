@@ -42,7 +42,11 @@ function recalcTotal() {
 $(document).ready(function() {
     $("form").submit(function() {
         var msg = $("#finish").data("msg");
-        return confirm(msg);
+        var ret = confirm(msg);
+        if (ret) {
+            setTimeout(clean, 1000);
+        }
+        return ret;
     });
 
     $("#clean").click(clean);

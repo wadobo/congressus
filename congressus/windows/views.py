@@ -1,5 +1,6 @@
 from django.views.generic import TemplateView, View
 from django.shortcuts import get_object_or_404
+from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
@@ -9,10 +10,13 @@ from django.core.urlresolvers import reverse
 
 from .models import TicketWindow
 from tickets.views import MultiPurchaseView
+from tickets.views import get_ticket_or_404
 from events.models import Event
 from tickets.forms import MPRegisterForm
 
 from django.contrib.auth import logout as auth_logout
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
 
 
 class WindowLogin(TemplateView):
@@ -76,22 +80,38 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
         ids = [(i[len('number_'):], request.POST[i]) for i in request.POST if i.startswith('number_')]
         seats = [(i[len('seats_'):], request.POST[i].split(',')) for i in request.POST if i.startswith('seats_')]
 
-        form = MPRegisterForm(request.POST,
+        data = request.POST.copy()
+        data['email'] = settings.FROM_EMAIL
+
+        form = MPRegisterForm(data,
                               event=w.event, ids=ids, seats=seats,
                               client=request.session.get('client', ''))
-        form.fields = {}
-        # TODO add the ticket email to the mp before save
+
+        keys = list(form.fields.keys())
+        for k in keys:
+            # email is required
+            if k == 'email':
+                continue
+            # removing not required fields
+            form.fields.pop(k)
+
         if form.is_valid():
-            mp = form.save()
+            mp = form.save(commit=False)
             mp.confirm()
-            # TODO return the downloadable ticket PDF
             # TODO store ticketwindow related information after each purchase
+            pdf = mp.gen_pdf()
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = 'filename="tickets.pdf"'
+            response.write(pdf)
+            return response
 
         ctx = self.get_context_data()
         ctx['form'] = form
 
         return render(request, self.template_name, ctx)
-window_multipurchase = WindowMultiPurchase.as_view()
+# csrf_exempt because we use the same multipurchase form several times, we
+# use target="_blank" in the form to return the PDF
+window_multipurchase = csrf_exempt(WindowMultiPurchase.as_view())
 
 
 class WindowLogout(View):

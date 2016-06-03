@@ -29,7 +29,7 @@
     <p> {{ ev.info }} </p>
     {% endblock %}
 
-    <form method="POST" action="">
+    <form method="POST" action="" {% block extraform %}{% endblock %}>
 
     {% csrf_token %}
     <div class="row">

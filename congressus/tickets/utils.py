@@ -11,6 +11,8 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.units import inch
 from io import BytesIO
 
+from PyPDF2 import PdfFileMerger
+
 
 class QRFlowable(Flowable):
     def __init__(self, qr_value):
@@ -36,7 +38,7 @@ class QRFlowable(Flowable):
         renderPDF.draw(d, self.canv, 90, 230)
 
 
-def generate_pdf(ticket, logo='img/logo.png'):
+def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
     """ Generate ticket in pdf with the get ticket. """
 
     data = {
@@ -76,8 +78,25 @@ def generate_pdf(ticket, logo='img/logo.png'):
             code = code128.Code128(data.get('code'), barWidth= 0.01 * inch, barHeight= .5 * inch)
         Story.append(code)
         doc.build(Story, onFirstPage=ticketPage, onLaterPages=ticketPage)
-        pdf = buffer.getvalue()
-        buffer.close()
-        return pdf
+
+        if not asbuf:
+            pdf = buffer.getvalue()
+            buffer.close()
+            return pdf
+        else:
+            buffer.seek(0)
+            return buffer
 
     return gen_ticket()
+
+def concat_pdf(files):
+    buffer = BytesIO()
+    fm = PdfFileMerger()
+    for f in files:
+        fm.append(f)
+    fm.write(buffer)
+    fm.close()
+
+    pdf = buffer.getvalue()
+    buffer.close()
+    return pdf
