@@ -141,10 +141,14 @@ class SeatLayout(models.Model):
     def free(self):
         return self.layout.count('L')
 
-    def contiguous_seats(self, amount):
-        """ Free contiguous seats in each row. """
+    def contiguous_seats(self, amount, holded):
+        """ Free contiguous seats in a row. """
+        layout = self.real_rows()
+        for h in holded: # Changed free by holded seats before search
+            r, c = h.seat.split("-")
+            layout[int(r) - 1, int(c) - 1] = 'H'
         nrow = 1
-        for row in self.real_rows():
+        for row in layout:
             free = ''.join(row).find(amount*'L')
             if free != -1:
                 return {'row': nrow, 'col_ini': free + 1, 'col_end': free + amount + 1}
@@ -220,9 +224,12 @@ class Session(models.Model):
                                 seat__isnull=False)
         return n
 
-    def seats_holded(self):
+    def seats_holded(self, layout=None):
         d = (timezone.now() - datetime.timedelta(seconds=5 * 60))
-        holds = self.seat_holds.filter(date__gt=d)
+        if layout:
+            holds = self.seat_holds.filter(date__gt=d, layout=layout)
+        else:
+            holds = self.seat_holds.filter(date__gt=d)
         return holds
 
     def places(self):
