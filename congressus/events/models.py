@@ -1,4 +1,5 @@
 import datetime
+import numpy as np
 from django.db import models
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -117,13 +118,38 @@ class SeatLayout(models.Model):
         return g[self.direction]
 
     def rows(self):
-        return self.layout.split()
+        return np.array([list(row) for row in self.layout.split()])
+
+    def real_rows(self):
+        """ Show rows in real position. """
+        if self.direction == 'd':
+            return np.flipud(self.rows())
+        elif self.direction == 'u':
+            return np.fliplr(self.rows())
+        elif self.direction == 'l':
+            return np.transpose(self.rows())
+        elif self.direction == 'r':
+            return np.fliplr(np.rot90(self.rows()))
 
     def cols(self):
-        return self.layout.split()[0]
+        return np.transpose(self.rows())
+
+    def real_cols(self):
+        """ Show cols in real position. """
+        return np.transpose(self.real_rows())
 
     def free(self):
         return self.layout.count('L')
+
+    def contiguous_seats(self, amount):
+        """ Free contiguous seats in each row. """
+        nrow = 1
+        for row in self.real_rows():
+            free = ''.join(row).find(amount*'L')
+            if free != -1:
+                return {'row': nrow, 'col_ini': free + 1, 'col_end': free + amount + 1}
+            nrow += 1
+        return {}
 
 
 class Space(models.Model):

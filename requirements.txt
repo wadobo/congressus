@@ -8,3 +8,4 @@ reportlab
 django-autoslug
 websocket-server
 pypdf2
+numpy

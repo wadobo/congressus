@@ -261,13 +261,41 @@ seats = SeatView.as_view()
 
 
 class AutoSeats(View):
+    def search_seats(self, id_session, amount):
+        session = Session.objects.get(id=id_session)
+        layouts = session.space.seat_map.layouts.all()
+        best_avail = None
+        for layout in layouts:
+            avail = layout.contiguous_seats(amount)
+            if not avail:
+                continue
+            if not best_avail or avail.get('row') < best_avail.get('row'):
+                best_avail = {
+                    'space': layout.id,
+                    'row': avail.get('row'),
+                    'col_ini': avail.get('col_ini'),
+                    'col_end': avail.get('col_end')
+                }
+        seats = []
+        if best_avail:
+            for col in range(best_avail.get('col_ini'), best_avail.get('col_end')):
+                seats.append({
+                    "session": id_session,
+                    "space": best_avail.get('space'),
+                    "row": best_avail.get('row'),
+                    "col": col})
+        return seats
+
     def post(self, request):
         req = request.POST
         session = req.get('session')
-        amount_seats = int(req.get('amount_seats'))
+        amount = int(req.get('amount_seats'))
         ctx = {'seats': []}
-        # TODO
-        for i in range(1, amount_seats + 1):
-            ctx['seats'].append({"session": session, "space": 1, "col": i, "row": i})
+        seats = self.search_seats(session, amount)
+        if seats:
+            ctx['seats'] = seats
+        else:
+            ctx['error'] = "Not found contiguous seats"
+
         return HttpResponse(json.dumps(ctx), content_type="application/json")
 autoseats = csrf_exempt(AutoSeats.as_view())

@@ -22,12 +22,12 @@
             <table class="seat-layout table">
                 <tr>
                     {% if layout.direction == 'u' %}
-                        {% for c in layout.cols %}
+                        {% for c in layout.rows.0 %}
                             <th>{{ forloop.revcounter }}</th>
                         {% endfor %}
                     {% elif layout.direction == 'l' %}
                         <th></th>
-                        {% for c in layout.cols %}
+                        {% for c in layout.rows.0 %}
                             <th>{{ forloop.counter }}</th>
                         {% endfor %}
                     {% endif %}
@@ -103,12 +103,12 @@
                 {% endfor %}
                 <tr>
                     {% if layout.direction == 'r' %}
-                        {% for c in layout.cols %}
+                        {% for c in layout.rows.0 %}
                             <th>{{ forloop.revcounter }}</th>
                         {% endfor %}
                     {% elif layout.direction == 'd' %}
                         <th></th>
-                        {% for c in layout.cols %}
+                        {% for c in layout.rows.0 %}
                             <th>{{ forloop.counter }}</th>
                         {% endfor %}
                     {% endif %}
