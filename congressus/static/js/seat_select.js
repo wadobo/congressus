@@ -1,33 +1,25 @@
-function assignSeat() {
-    console.log("assignSeat");
-    var seats = {}; // sid: {id, length}
-    $('[id^="seats-"]').each(function() {
-        // Get session id
-        id = $(this).attr("id");
-        ini = parseInt(id.indexOf("-")) + 1;
-        sid = parseInt(id.substring(ini, id.length));
-        seats[sid] = {};
+function getSession(input) {
+    // Get session id
+    id = $(input).attr("id");
+    ini = parseInt(id.indexOf("-")) + 1;
+    return parseInt(id.substring(ini, id.length));
+}
 
-        // Get values of session
-        var values = $(this).val().split(",");
-        // If not values, assign auto
-        if (values == "") {
-            console.log("ID", sid, $("#"+sid).val());
-            // TODO: autoassign
-            return;
-        }
-        for (val in values) {
-            to = values[val].indexOf("_");
-            res = values[val].substring(0, parseInt(to));
-            if (res in seats[sid]) {
-                seats[sid][res] = seats[sid][res] + 1;
-            } else {
-                seats[sid][res] = 1;
-            }
+function autoSeats(session, amount_seats) {
+    var deferred = new $.Deferred();
+    $.ajax({
+        type: "POST",
+        data: {session: session, amount_seats: amount_seats},
+        dataType: 'JSON',
+        url: "/seats/auto/",
+        success: function(msg){
+            deferred.resolve(msg["seats"]);
         }
     });
+    return deferred.promise();
+}
 
-    // Update badges
+function updateBadges(seats) {
     for (var sid in seats) {
         if (seats.hasOwnProperty(sid)) {
             for (var key in seats[sid]) {
@@ -38,4 +30,47 @@ function assignSeat() {
             }
         }
     }
+}
+
+function markSeats(seats, session_id, session_seats) {
+    for (ss in session_seats) {
+        to = session_seats[ss].indexOf("_");
+        res = session_seats[ss].substring(0, parseInt(to));
+        if (res in seats[session_id]) {
+            seats[session_id][res] = seats[session_id][res] + 1;
+        } else {
+            seats[session_id][res] = 1;
+        }
+    }
+    updateBadges(seats);
+}
+
+function assignSeat() {
+    var seats = {}; // sid: {id, length}
+    $('[id^="seats-"]').each(function() {
+        session_id = getSession(this);
+        seats[session_id] = {};
+
+        // Get session seats
+        var session_seats = $(this).val().split(",");
+
+        // If not session seats, assign auto
+        if (session_seats == "") {
+            amount_seats = Number($("#"+session_id).val());
+            if (amount_seats > 0) {
+                autoSeats(session_id, amount_seats).then(function(autoseats) {
+                    for (as in autoseats) {
+                        obj = autoseats[as];
+                        id = "#"+obj.session+"_"+obj.space+"_"+obj.row+"_"+obj.col;
+                        $("#"+obj.session+"_"+obj.space+"_"+obj.row+"_"+obj.col).click();
+                    }
+                    session_seats = $("#seats-"+obj.session).val().split(",");
+                    markSeats(seats, obj.session, session_seats);
+                });
+            }
+        } else {
+            markSeats(seats, session_id, session_seats);
+        }
+    });
+
 }

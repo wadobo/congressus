@@ -258,3 +258,16 @@ class SeatView(TemplateView):
         ctx['q'] = self.request.GET.get('q', '')
         return ctx
 seats = SeatView.as_view()
+
+
+class AutoSeats(View):
+    def post(self, request):
+        req = request.POST
+        session = req.get('session')
+        amount_seats = int(req.get('amount_seats'))
+        ctx = {'seats': []}
+        # TODO
+        for i in range(1, amount_seats + 1):
+            ctx['seats'].append({"session": session, "space": 1, "col": i, "row": i})
+        return HttpResponse(json.dumps(ctx), content_type="application/json")
+autoseats = csrf_exempt(AutoSeats.as_view())

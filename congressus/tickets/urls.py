@@ -13,5 +13,6 @@ urlpatterns = [
     url(r'^(?P<ev>[\w-]+)/$', views.multipurchase, name='multipurchase'),
 
     url(r'^seats/view/(?P<map>\d+)/$', views.seats, name='seats'),
+    url(r'^seats/auto/$', views.autoseats, name='autoseats'),
 ]
 
