@@ -4,7 +4,7 @@
     ws.cbs = $.Callbacks();
 
     ws.init = function(server) {
-        ws.socket = new WebSocket("ws://"+server, 'congressus');
+        ws.socket = new WebSocket("ws://"+server);
         ws.socket.onmessage = function(ev) {
             var data = JSON.parse(ev.data);
             if (data.action) {
