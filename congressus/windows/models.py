@@ -20,8 +20,6 @@ class TicketWindow(models.Model):
     name = models.CharField(_('name'), max_length=200)
     slug = AutoSlugField(populate_from='name')
 
-    # users that can login to this window
-    users = models.ManyToManyField(User, related_name='windows', blank=True)
     location = models.CharField(max_length=500, blank=True, null=True)
 
     def __str__(self):

@@ -8,7 +8,6 @@ class TicketWindowAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug', 'event', 'location')
     list_filter = ('event', 'location')
     search_fields = ('name', 'slug', 'event__name')
-    filter_horizontal = ('users', )
 
 
 class TicketWindowSaleAdmin(admin.ModelAdmin):

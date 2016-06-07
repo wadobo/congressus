@@ -38,7 +38,8 @@ class WindowLogin(TemplateView):
         user = authenticate(username=username, password=password)
 
         if user is not None:
-            if user.is_active and w.users.filter(id=user.id).count():
+            have_access = user.groups.filter(name='window').count()
+            if user.is_active and have_access:
                 login(request, user)
                 return redirect('window_multipurchase', ev=w.event.slug, w=w.slug)
             else:
@@ -63,7 +64,8 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
     def test_func(self):
         u = self.request.user
         w = self.get_window()
-        return u.is_authenticated() and w.users.filter(id=u.id).count()
+        have_access = u.groups.filter(name='window').count()
+        return u.is_authenticated() and have_access
 
     def get_login_url(self):
         return reverse('window_login', kwargs=self.kwargs)
