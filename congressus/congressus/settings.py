@@ -48,6 +48,7 @@ INSTALLED_APPS = (
     'events',
     'websocket',
     'windows',
+    'access',
 )
 
 if os.path.exists(os.path.join(BASE_DIR, 'theme')):

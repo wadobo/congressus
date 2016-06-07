@@ -63,7 +63,6 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
 
     def test_func(self):
         u = self.request.user
-        w = self.get_window()
         have_access = u.groups.filter(name='window').count()
         return u.is_authenticated() and have_access
 
