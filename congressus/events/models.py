@@ -165,6 +165,11 @@ class Space(models.Model):
     numbered = models.BooleanField(_('numbered'), default=False)
     seat_map = models.ForeignKey(SeatMap, related_name='spaces', null=True, blank=True)
 
+    order = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ['order']
+
     def __str__(self):
         return '%s - %s' % (self.event, self.name)
 

@@ -23,7 +23,7 @@ class SpaceInline(admin.TabularInline):
 
 
 class SpaceAdmin(admin.ModelAdmin):
-    list_display = ('event', 'name', 'capacity', 'numbered')
+    list_display = ('event', 'order', 'name', 'capacity', 'numbered')
     list_filter = ('event', 'capacity', 'numbered')
     search_fields = ('event__name', 'name')
 
