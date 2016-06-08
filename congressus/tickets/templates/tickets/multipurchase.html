@@ -29,6 +29,7 @@
     <p> {{ ev.info }} </p>
     {% endblock %}
 
+    {% block form %}
     <form method="POST" action="" {% block extraform %}{% endblock %}>
 
     {% csrf_token %}
@@ -91,10 +92,11 @@
         </div>
     {% endfor %}
     </div>
+    {% endblock %}
 
     {% block personal_info %}
     <fieldset>
-        <legend>{% trans "Personal info" %}:</legend>
+        <legend>{% trans "Personal info" %}</legend>
         <div class="reg-form">
             {{ form|bootstrap }}
         </div>
@@ -120,7 +122,6 @@
 {% endblock %}
 
 {% block extrabody %}
-    <script src="{% static "js/jquery-1.12.3.min.js" %}"></script>
     <script src="{% static "js/map.js" %}"></script>
 
     <script src="{% static "js/websocket.js" %}"></script>

@@ -1,8 +1,10 @@
 {% load i18n %}
 {% load staticfiles %}
 
-<div class="btn {% if session.have_places %}btn-success{% else %}btn-danger{% endif %}"
-    data-toggle="modal" data-target="#modal-{{ session.id }}" onclick="assignSeat();">
+<div class="withtooltip btn {% if session.have_places %}btn-success{% else %}btn-danger{% endif %}"
+    data-toggle="modal" data-target="#modal-{{ session.id }}" onclick="assignSeat();"
+    title="{% trans "select the seat" %}" data-placement="top"
+    >
     <span class="glyphicon glyphicon-th" aria-hidden="true"></span>
 </div>
 
@@ -17,6 +19,9 @@
             <div class="seatmap" data-session="{{ session.id }}">
             {% include "tickets/map.html" with map=session.space.seat_map %}
             </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-block btn-lg" data-dismiss="modal">{% trans "Continue" %}</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

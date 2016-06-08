@@ -192,4 +192,6 @@ $(document).ready(function() {
         recalcSums($(this));
         $(this).click(function() { $(this).select(); });
     });
+
+    $('.withtooltip').tooltip();
 });
