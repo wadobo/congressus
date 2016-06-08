@@ -2,7 +2,7 @@ django
 pytz
 ipdb
 pillow
-django-bootstrap-form
+django-crispy-forms
 django-admin-csv
 reportlab
 django-autoslug

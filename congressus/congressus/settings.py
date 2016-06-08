@@ -39,7 +39,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     # 3rd party
-    'bootstrapform',
+    'crispy_forms',
     'admin_csv',
     'autoslug',
 
@@ -121,6 +121,8 @@ from django.contrib.messages import constants as messages
 MESSAGE_TAGS = {
     messages.ERROR: 'danger'
 }
+
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 
 # Static files (CSS, JavaScript, Images)

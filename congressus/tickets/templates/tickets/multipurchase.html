@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% load bootstrap %}
+{% load crispy_forms_tags %}
 {% load staticfiles %}
 
 {% block title %}{{ ev }}{% endblock %}
@@ -109,8 +109,8 @@
     {% block personal_info %}
     <fieldset>
         <legend>{% trans "Personal info" %}</legend>
-        <div class="reg-form">
-            {{ form|bootstrap }}
+        <div class="reg-form bootstrap">
+            {{ form|crispy }}
         </div>
     </fieldset>
     {% endblock %}
