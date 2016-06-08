@@ -82,15 +82,18 @@ class AccessView(UserPassesTestMixin, TemplateView):
         return ctx
 
     def post(self, request, *args, **kwargs):
-        order = request.POST.get('order', '')
-        s = Session.objects.get(id=self.request.session.get('session', ''))
-        ac = self.get_ac()
-        ticket = get_object_or_404(Ticket, order=order,
-                                   confirmed=True,
-                                   used=False)
-
         data = {'st': "right", 'extra': ''}
-        if ticket.session != s:
+        order = request.POST.get('order', '')
+        s = self.request.session.get('session', '')
+        try:
+            ticket = Ticket.objects.get(order=order,
+                                        confirmed=True,
+                                        used=False)
+        except:
+            data['st'] = 'wrong'
+            return HttpResponse(json.dumps(data), content_type="application/json")
+
+        if ticket.session_id != s:
             data['st'] = 'maybe'
             data['extra'] = str(ticket.session)
         else:
