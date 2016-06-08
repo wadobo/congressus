@@ -207,6 +207,9 @@ class Ticket(models.Model, BaseTicketMixing):
     end = models.DateTimeField(_('end date'), null=True)
     seat_layout_name = models.CharField(max_length=200, null=True, blank=True)
 
+    # field to control the access
+    used = models.BooleanField(default=False)
+
     class Meta:
         ordering = ['-created']
 

@@ -1,3 +1,4 @@
+import json
 from django.views.generic import TemplateView, View
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
@@ -10,6 +11,8 @@ from django.core.urlresolvers import reverse
 
 from .models import AccessControl
 from events.models import Event
+from events.models import Session
+from tickets.models import Ticket
 
 from django.contrib.auth import logout as auth_logout
 from django.conf import settings
@@ -17,7 +20,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 class AccessLogin(TemplateView):
-    template_name = 'windows/login.html'
+    template_name = 'access/login.html'
 
     def get_context_data(self, *args, **kwargs):
         ev = self.kwargs.get('ev')
@@ -25,6 +28,7 @@ class AccessLogin(TemplateView):
         ac = get_object_or_404(AccessControl, event__slug=ev, slug=ac)
         ctx = super(AccessLogin, self).get_context_data(*args, **kwargs)
         ctx['ac'] = ac
+        ctx['sessions'] = ac.event.get_sessions()
         return ctx
 
     def post(self, request, ev=None, ac=None):
@@ -36,6 +40,10 @@ class AccessLogin(TemplateView):
         if user is not None:
             have_access = user.groups.filter(name='access').count()
             if user.is_active and have_access:
+                session = get_object_or_404(Session,
+                            space__event__slug=ev,
+                            id=request.POST['session'])
+                request.session['session'] = session.id
                 login(request, user)
                 return redirect('access', ev=ac.event.slug, ac=ac.slug)
             else:
@@ -69,11 +77,27 @@ class AccessView(UserPassesTestMixin, TemplateView):
         ctx = super(AccessView, self).get_context_data(*args, **kwargs)
         ac = self.get_ac()
         ctx['ac'] = ac
+        s = Session.objects.get(id=self.request.session.get('session', ''))
+        ctx['session'] = s
         return ctx
 
     def post(self, request, *args, **kwargs):
-        # TODO check access
-        return render(request, self.template_name, ctx)
+        order = request.POST.get('order', '')
+        s = Session.objects.get(id=self.request.session.get('session', ''))
+        ac = self.get_ac()
+        ticket = get_object_or_404(Ticket, order=order,
+                                   confirmed=True,
+                                   used=False)
+
+        data = {'st': "right", 'extra': ''}
+        if ticket.session != s:
+            data['st'] = 'maybe'
+            data['extra'] = str(ticket.session)
+        else:
+            ticket.used = True
+            ticket.save()
+
+        return HttpResponse(json.dumps(data), content_type="application/json")
 access = csrf_exempt(AccessView.as_view())
 
 

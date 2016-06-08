@@ -1,0 +1,21 @@
+body {
+    background: #aaa;
+}
+
+body.wrong {
+    background: #ff0000;
+}
+
+body.right {
+    background: #00ff00;
+}
+
+body.maybe {
+    background: #0000ff;
+}
+
+#extra {
+    text-align: center;
+    font-weight: bold;
+    font-size: 50px;
+}
