@@ -110,6 +110,16 @@ function recalcSums(obj) {
     $("#"+session+"-subtotal-price").html(val * price);
 }
 
+function recalcTotal() {
+    var sum = 0;
+    $(".sessioninput").each(function() {
+        var n = parseInt($(this).val(), 10);
+        var price = parseFloat($(this).data("price"));
+        sum += price * n;
+    });
+    $("#total").html(sum);
+}
+
 $(document).ready(function() {
     $("form").submit(function() {
         var warnings = [];
@@ -187,7 +197,10 @@ $(document).ready(function() {
     // calculating sums
     $('.sessioninput').change(function() {
         recalcSums($(this));
+        recalcTotal();
     });
+    recalcTotal();
+
     $('.sessioninput').each(function() {
         recalcSums($(this));
         $(this).click(function() { $(this).select(); });

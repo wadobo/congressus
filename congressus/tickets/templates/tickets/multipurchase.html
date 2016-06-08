@@ -92,6 +92,18 @@
         </div>
     {% endfor %}
     </div>
+
+        {% block total %}
+            <div class="totalinfo text-right">
+                <h2>
+                    {% trans "Total" %}
+                    <span id="total" class="outputbox text-primary">0</span>
+                    €
+                </h2>
+            </div>
+            <br/>
+        {% endblock %}
+
     {% endblock %}
 
     {% block personal_info %}
