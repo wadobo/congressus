@@ -204,8 +204,7 @@ class Thanks(TemplateView):
     template_name = 'tickets/thanks.html'
 
     def post(self, request, order):
-        from reportlab.pdfgen import canvas
-        ticket = Ticket.objects.get(order=request.POST.get('ticket'), confirmed=True)
+        ticket = get_ticket_or_404(order=request.POST.get('ticket'), confirmed=True)
         pdf = ticket.gen_pdf()
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="tickets.pdf"'

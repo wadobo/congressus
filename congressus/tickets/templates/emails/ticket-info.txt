@@ -17,7 +17,7 @@
 -----
 
 {% if ticket.is_mp %}
-{% for t in ticket.tickets.all %}{% include "emails/ticket-detail.txt" with ticket=t %}
+{% for t in ticket.all_tickets %}{% include "emails/ticket-detail.txt" with ticket=t %}
 {% endfor %}
 {% else %}
 {% include "emails/ticket-detail.txt" %}

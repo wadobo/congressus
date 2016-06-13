@@ -109,10 +109,7 @@ class BaseTicketMixing:
             for att in e.attachs.all():
                 email.attach_file(att.attach.path)
 
-        for ticket in self.tickets.all():
-            filename = 'ticket_%d.pdf' % (list(self.tickets.all()).index(ticket) + 1)
-            email.attach(filename, ticket.gen_pdf(), 'application/pdf')
-
+        email.attach(filename, ticket.gen_pdf(), 'application/pdf')
         email.send(fail_silently=False)
 
     def get_absolute_url(self):
@@ -164,9 +161,12 @@ class MultiPurchase(models.Model, BaseTicketMixing):
 
     def gen_pdf(self):
         files = []
-        for ticket in self.tickets.all():
+        for ticket in self.all_tickets():
             files.append(generate_pdf(ticket, asbuf=True))
         return concat_pdf(files)
+
+    def all_tickets(self):
+        return self.tickets.all().order_by('session__start')
 
     class Meta:
         ordering = ['-created']

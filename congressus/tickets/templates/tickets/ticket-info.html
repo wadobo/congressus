@@ -24,6 +24,22 @@
         <th>{% trans "Ticket confirmed" %}</th>
         <td>{{ ticket.confirmed|yesno }}</td>
     </tr>
+
+    {% if ticket.confirmed %}
+    <tr>
+        <td colspan="2">
+            <form id="download-{{ ticket.order }}" method="post" action="{% url 'thanks' ticket.order %}">
+                {% csrf_token %}
+                <input type="hidden" name="ticket" value="{{ ticket.order }}"/>
+                <button class="btn btn-lg btn-block btn-warning">
+                    <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+                    {% trans "DOWNLOAD ALL TICKETS" %}
+                </button>
+            </form>
+        </td>
+    </tr>
+    {% endif %}
+
     <tr>
         <th class="bg-info" colspan="2">{% trans "Personal info" %}</th>
     </tr>
@@ -46,7 +62,7 @@
 
 <h2>{% trans "Tickets" %}</h2>
 {% if ticket.is_mp %}
-    {% for t in ticket.tickets.all %}
+    {% for t in ticket.all_tickets %}
         {% include "tickets/ticket-detail.html" with ticket=t %}
     {% endfor %}
 {% else %}

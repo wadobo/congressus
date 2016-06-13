@@ -32,6 +32,10 @@
 <form id="download-{{ ticket.order }}" method="post" action="{% url 'thanks' ticket.order %}">
     {% csrf_token %}
     <input type="hidden" name="ticket" value="{{ ticket.order }}"/>
-    <button class="btn btn-lg btn-block btn-warning">{% trans "DOWNLOAD TICKET" %}</button>
+    <button class="btn btn-lg btn-block btn-warning">
+        <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+        {% trans "DOWNLOAD TICKET" %}
+    </button>
 </form>
+<hr/>
 {% endif %}
