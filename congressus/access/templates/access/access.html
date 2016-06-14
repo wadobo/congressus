@@ -5,7 +5,7 @@
 {% block extraclasses %}access{% endblock %}
 
 {% block extrahead %}
-    <link href="{% static "css/access.css" %}" rel="stylesheet">
+    <link href="{% static "css/access.css" %}?v=4.0" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -31,6 +31,8 @@
     </form>
 
     <p id="extra"> </p>
+
+    <div id="reader"></div>
 {% endblock %}
 
 {% block foot %}
@@ -42,5 +44,8 @@
     <audio id="audio-wrong" src="{% static "audio/wrong.mp3" %}" class="hidden"> </audio>
     <audio id="audio-maybe" src="{% static "audio/maybe.mp3" %}" class="hidden"> </audio>
 
-    <script src="{% static "js/access.js" %}"></script>
+    <script src="{% static "js/adapter-latest.js" %}"></script>
+    <script src="{% static "js/jsqrcode-combined.min.js" %}"></script>
+    <script src="{% static "js/html5-qrcode.js" %}?v=9.0"></script>
+    <script src="{% static "js/access.js" %}?v=7.0"></script>
 {% endblock %}

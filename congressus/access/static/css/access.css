@@ -19,3 +19,12 @@ body.maybe {
     font-weight: bold;
     font-size: 50px;
 }
+
+#qr-video {
+    width: 90%;
+    margin: 0 auto;
+}
+
+#qr-canvas {
+    display: none;
+}
