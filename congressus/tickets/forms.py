@@ -1,4 +1,3 @@
-import uuid
 from django import forms
 from .models import Ticket
 from .models import MultiPurchase
@@ -34,7 +33,7 @@ class RegisterForm(forms.ModelForm):
     def save(self, *args, **kwargs):
         obj = super(RegisterForm, self).save(commit=False)
         obj.session = self.session
-        obj.order = str(uuid.uuid4())
+        obj.gen_order()
         obj.gen_order_tpv()
 
         data = self.cleaned_data
@@ -100,12 +99,12 @@ class MPRegisterForm(forms.ModelForm):
             for seat in seats:
                 layout, row, column = seat.split('_')
                 layout = session.space.seat_map.layouts.get(pk=layout)
-                order = str(uuid.uuid4())
                 # confirm_sent should be true to avoid multiple emails for
                 # the same purchase
                 t = Ticket(session=session, mp=mp, email=mp.email,
                            seat_layout=layout, seat=row + '-' + column,
-                           confirm_sent=True, order=order)
+                           confirm_sent=True)
+                t.gen_order()
                 t.fill_duplicated_data()
                 t.save()
 
@@ -115,11 +114,11 @@ class MPRegisterForm(forms.ModelForm):
             session = Session.objects.get(space__event=self.event, id=sid)
             n = int(number)
             for i in range(n):
-                order = str(uuid.uuid4())
                 # confirm_sent should be true to avoid multiple emails for
                 # the same purchase
                 t = Ticket(session=session, mp=mp, email=mp.email,
-                           confirm_sent=True, order=order)
+                           confirm_sent=True)
+                t.gen_order()
                 t.fill_duplicated_data()
                 t.save()
 
@@ -131,7 +130,7 @@ class MPRegisterForm(forms.ModelForm):
     def save(self, *args, **kwargs):
         obj = super(MPRegisterForm, self).save(commit=False)
         obj.ev = self.event
-        obj.order = str(uuid.uuid4())
+        obj.gen_order()
         obj.gen_order_tpv()
 
         data = self.cleaned_data

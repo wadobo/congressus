@@ -138,6 +138,7 @@ STATICFILES_DIRS = (
 
 # CUSTOM SETTINGS
 
+ORDER_SIZE = 15
 TPV_TERMINAL = 1
 TPV_MERCHANT = 'XXXXXX'
 TPV_URL = "https://sis-t.redsys.es:25443/sis/realizarPago"

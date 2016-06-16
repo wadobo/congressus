@@ -44,7 +44,7 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
     data = {
         'title': ticket.session.name,
         'date': ticket.session.start.date().isoformat(),
-        'code': ticket.order.upper(),
+        'code': ticket.order,
     }
 
     PAGE_HEIGHT= 11 * inch

@@ -1,3 +1,4 @@
+import string
 import random
 import json
 from django.utils import timezone
@@ -57,6 +58,26 @@ class BaseTicketMixing:
 
     def event(self):
         return self.space().event
+
+    def is_order_used(self, order):
+        tk = Ticket.objects.filter(order=order).exists()
+        mp = MultiPurchase.objects.filter(order=order).exists()
+        return mp or tk
+
+    def gen_order(self):
+        chars = string.ascii_uppercase + string.digits
+        l = 8
+        if hasattr(settings, 'ORDER_SIZE'):
+            l = settings.ORDER_SIZE
+
+        order = ''
+        used = True
+        while used:
+            order = ''.join(random.choice(chars) for _ in range(l))
+            used = self.is_order_used(order)
+
+        self.order = order
+        self.save()
 
     def gen_order_tpv(self):
         chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
