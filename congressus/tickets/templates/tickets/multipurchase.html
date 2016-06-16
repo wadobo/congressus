@@ -76,7 +76,7 @@
                                             value="0"/>
                                         <span class="input-group-addon">
                                             {% if window %}{{ session.window_price }}{% else %}{{ session.price }}{% endif %}
-                                            € / ticket
+                                            € / {% trans "ticket" %}
                                         </span>
                                         {% if subsum %}
                                         <span class="input-group-addon">

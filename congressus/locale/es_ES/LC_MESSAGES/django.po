@@ -7,202 +7,256 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-09 11:27+0100\n"
-"PO-Revision-Date: 2015-11-09 11:29+0100\n"
-"Last-Translator: Daniel García <danigm@wadobo.com>\n"
+"POT-Creation-Date: 2016-06-16 11:29+0200\n"
+"PO-Revision-Date: 2016-06-16 11:28+0200\n"
+"Last-Translator: Daniel Garcia Moreno <danigm@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
-"Language: ES\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
-"X-Generator: Gtranslator 2.91.7\n"
+"X-Generator: Poedit 1.8.7.1\n"
 
-#: tickets/forms.py:21
-msgid "Invitation code"
-msgstr "Código de invitación"
-
-#: tickets/forms.py:24
-msgid "Add your invitation code, if you've one"
-msgstr "Añade tu código de invitación si tienes uno"
-
-#: tickets/forms.py:32
-msgid "Invitation code is required for speaker or invited"
-msgstr "Código de invitación requerido para orador o invitado"
-
-#: tickets/forms.py:37
-msgid "Invitation code is only for speaker or invited"
-msgstr "Código de invitación válido unicamente para orador o invitado"
-
-#: tickets/forms.py:42
-msgid "Invitation code invalid"
-msgstr "Código de invitación inválido"
-
-#: tickets/models.py:17
-msgid "Invited"
-msgstr "Invitado"
-
-#: tickets/models.py:18
-msgid "Speaker"
-msgstr "Orador"
-
-#: tickets/models.py:19
-msgid "Sponsor"
-msgstr "Patrocinador"
-
-#: tickets/models.py:20
-msgid "Regular"
-msgstr "Regular"
-
-#: tickets/models.py:21
-msgid "Student"
-msgstr "Estudiante"
-
-#: tickets/models.py:25
-msgid "All"
-msgstr "Todo"
-
-#: tickets/models.py:26
-msgid "Vegetarian"
-msgstr "Vegetariano"
-
-#: tickets/models.py:27
-msgid "Vegan"
-msgstr "Vegano"
-
-#: tickets/models.py:31
+#: access/models.py:12 events/models.py:36 events/models.py:66
+#: events/models.py:100 events/models.py:161 events/models.py:179
+#: windows/models.py:20
 msgid "name"
 msgstr "nombre"
 
-#: tickets/models.py:32
-msgid "start date"
-msgstr "fecha llegada"
+#: access/templates/access/access.html:18
+#: windows/templates/windows/multipurchase.html:17
+msgid "logout"
+msgstr "salir"
 
-#: tickets/models.py:33
-msgid "end date"
-msgstr "fecha salida"
+#: access/templates/access/access.html:26
+msgid "ticket order"
+msgstr "código de entrada"
 
-#: tickets/models.py:34 tickets/templates/emails/ticket-info.txt:7
-msgid "ticket price"
-msgstr "precio de entrada"
+#: access/templates/access/login.html:18
+#: windows/templates/windows/login.html:18
+msgid "Please sign in"
+msgstr "Por favor, accede"
 
-#: tickets/models.py:35
-msgid "sponsor price"
-msgstr "precio patrocinador"
+#: access/templates/access/login.html:20 access/templates/access/login.html:21
+#: windows/templates/windows/login.html:20
+#: windows/templates/windows/login.html:21
+msgid "username"
+msgstr "nombre de usuario"
 
-#: tickets/models.py:36
-msgid "student price"
-msgstr "precio estudiante"
+#: access/templates/access/login.html:23 access/templates/access/login.html:24
+#: windows/templates/windows/login.html:23
+#: windows/templates/windows/login.html:24
+msgid "password"
+msgstr "contraseña"
 
-#: tickets/models.py:37
-msgid "speaker price"
-msgstr "precio orador"
+#: access/templates/access/login.html:26
+msgid "session"
+msgstr "sesión"
 
-#: tickets/models.py:38
-msgid "invited price"
-msgstr "precio de invitado"
+#: access/templates/access/login.html:33
+#: windows/templates/windows/login.html:26
+msgid "sign in"
+msgstr "entrar"
 
-#: tickets/models.py:41
+#: access/views.py:50
+msgid "This user can't access in this access control"
+msgstr "Este usuario no puede acceder a este punto de control de acceso"
+
+#: access/views.py:52 windows/views.py:48
+msgid "Invalid username or password"
+msgstr "Nombre de usuario o contraseña incorrectos"
+
+#: events/models.py:15
+msgid "Invited"
+msgstr "Invitado"
+
+#: events/models.py:16
+msgid "Speaker"
+msgstr "Orador"
+
+#: events/models.py:17
+msgid "Student"
+msgstr "Estudiante"
+
+#: events/models.py:21
+msgid "Text"
+msgstr "Texto"
+
+#: events/models.py:22
+msgid "TextArea"
+msgstr "Bloque de texto"
+
+#: events/models.py:23
+msgid "CheckBox"
+msgstr "Verificación"
+
+#: events/models.py:24
+msgid "Select"
+msgstr "Selección"
+
+#: events/models.py:28
+msgid "Up"
+msgstr "Arriba"
+
+#: events/models.py:29
+msgid "Left"
+msgstr "Izquierda"
+
+#: events/models.py:30
+msgid "Right"
+msgstr "Derecha"
+
+#: events/models.py:31
+msgid "Down"
+msgstr "Abajo"
+
+#: events/models.py:41
 msgid "admin email"
 msgstr "correo de administrador"
 
-#: tickets/models.py:61
-msgid "code"
-msgstr "código"
+#: events/models.py:67
+msgid "map image"
+msgstr "Imagen del mapa"
 
-#: tickets/models.py:62
-msgid "for person"
-msgstr "para persona"
+#: events/models.py:104
+msgid "seats layout"
+msgstr "disposición de asientos"
 
-#: tickets/models.py:63
-msgid "used"
-msgstr "usado"
+#: events/models.py:105
+msgid "the layout to select the numbered seat"
+msgstr "la disposición para seleccionar los asientos numerados"
 
-#: tickets/models.py:71
+#: events/models.py:164
+msgid "capacity"
+msgstr "capacidad"
+
+#: events/models.py:165
+msgid "numbered"
+msgstr "numerado"
+
+#: events/models.py:182 tickets/models.py:234
+msgid "start date"
+msgstr "fecha llegada"
+
+#: events/models.py:183 tickets/models.py:235
+msgid "end date"
+msgstr "fecha salida"
+
+#: events/models.py:185 tickets/templates/emails/ticket-info.txt.py:7
+msgid "ticket price"
+msgstr "precio de entrada"
+
+#: events/models.py:186
+msgid "price in the ticket window"
+msgstr "precio en taquilla"
+
+#: events/models.py:187
+msgid "ticket tax percentage"
+msgstr "porcentaje de impuestos"
+
+#: events/models.py:256
 msgid "subject"
 msgstr "asunto"
 
-#: tickets/models.py:72
+#: events/models.py:257
 msgid "body"
 msgstr "cuerpo"
 
-#: tickets/models.py:80
+#: events/models.py:265
 msgid "attach"
 msgstr "adjunto"
 
-#: tickets/models.py:86
-#| msgid "order"
-msgid "Order"
-msgstr "Pedido"
+#: events/models.py:270
+msgid "code"
+msgstr "código"
 
-#: tickets/models.py:87
-#| msgid "order TPV"
-msgid "Order TPV"
-msgstr "Pedido TPV"
+#: events/models.py:271
+msgid "for person"
+msgstr "para persona"
 
-#: tickets/models.py:88
-#| msgid "created at"
-msgid "Created at"
-msgstr "Creado el"
+#: events/models.py:272
+msgid "used"
+msgstr "usado"
 
-#: tickets/models.py:90
-#| msgid "confirmed at"
-msgid "Confirmed at"
-msgstr "Confirmado el"
+#: events/models.py:273
+msgid "type"
+msgstr "tipo"
 
-#: tickets/models.py:95
-#| msgid "email"
-msgid "Email"
-msgstr "Correo"
+#: events/models.py:283
+msgid "label"
+msgstr "etiqueta"
 
-#: tickets/models.py:96
-#| msgid "full name"
-msgid "Full name"
-msgstr "Nombre completo"
+#: events/models.py:284
+msgid "help text"
+msgstr "texto de ayuda"
 
-#: tickets/models.py:97
-#| msgid "organization"
-msgid "Organization"
-msgstr "Organización"
+#: tickets/forms.py:29 tickets/templates/tickets/ticket_form.html.py:21
+msgid "Sorry, there's no more places for this event"
+msgstr "Lo siento, no hay más plazas para este evento"
 
-#: tickets/models.py:99
-msgid "Type"
-msgstr "Tipo"
+#: tickets/forms.py:78
+#, python-format
+msgid "Sorry, you can't buy %(n)s tickets"
+msgstr "Lo siento, no puedes comprar %(n)s entradas"
 
-#: tickets/models.py:100
-#| msgid "food preferences"
-msgid "Food preferences"
-msgstr "Preferencias de comida"
+#: tickets/forms.py:80
+#, python-format
+msgid "There's no %(n)s places for %(session)s"
+msgstr "No hay %(n)s plazas para la sesión %(session)s"
 
-#: tickets/models.py:101
-#| msgid "Especial needs"
-msgid "Special needs"
-msgstr "Necesidades especiales"
+#: tickets/forms.py:90
+#, python-format
+msgid "The seat %(seat)s is not available for %(session)s"
+msgstr "El asiento %(seat)s no está disponible para la sesión %(session)s"
 
-#: tickets/models.py:102
-msgid "Arrival date"
-msgstr "Fecha de llegada"
+#: tickets/models.py:24
+msgid "Required"
+msgstr "Obligatorio"
 
-#: tickets/models.py:103
-msgid "Departure date"
-msgstr "Fecha de salida"
-
-#: tickets/models.py:150
+#: tickets/models.py:98
 #, python-format
 msgid "New Register / %s"
 msgstr "Nuevo Registro / %s"
 
-#: tickets/models.py:159
+#: tickets/models.py:113
 #, python-format
 msgid "Confirmed / %s"
 msgstr "Confirmado / %s"
 
-#: tickets/models.py:170
+#: tickets/models.py:124
 #, python-format
 msgid "Ticket Confirmed / %s"
 msgstr "Entrada Confirmada / %s"
 
-#: tickets/templates/base.html:10 tickets/templates/tickets/ticket_form.html:19
+#: tickets/models.py:151 tickets/models.py:210
+msgid "Order"
+msgstr "Código"
+
+#: tickets/models.py:152 tickets/models.py:211
+msgid "Order TPV"
+msgstr "Código TPV"
+
+#: tickets/models.py:154 tickets/models.py:213
+msgid "Created at"
+msgstr "Creado el"
+
+#: tickets/models.py:155 tickets/models.py:214
+msgid "Confirmed at"
+msgstr "Confirmado el"
+
+#: tickets/models.py:160 tickets/models.py:223
+#: tickets/templates/emails/ticket-info.txt:12
+#: tickets/templates/tickets/ticket-info.html:47
+msgid "Email"
+msgstr "Correo"
+
+#: tickets/models.py:251
+#, python-format
+msgid "L%(layout)s-R%(row)s-C%(col)s"
+msgstr "L%(layout)s-F%(row)s-C%(col)s"
+
+#: tickets/templates/base.html:11
 msgid "Register"
 msgstr "Registrarse"
 
@@ -223,6 +277,36 @@ msgstr "Un usuario nuevo ha confirmado su entrada:"
 #: tickets/templates/emails/reg.txt:2
 msgid "A new user has registered in the platform:"
 msgstr "Un usuario nuevo se ha registrado en la plataforma:"
+
+#: tickets/templates/emails/ticket-detail.txt:2
+#: tickets/templates/tickets/multipurchase.html:79
+#: tickets/templates/tickets/ticket-detail.html:5
+msgid "ticket"
+msgstr "entrada"
+
+#: tickets/templates/emails/ticket-detail.txt:4
+#: tickets/templates/tickets/ticket-detail.html:8
+msgid "Space"
+msgstr "Espacio"
+
+#: tickets/templates/emails/ticket-detail.txt:5
+#: tickets/templates/tickets/ticket-detail.html:12
+msgid "Session"
+msgstr "Sesión"
+
+#: tickets/templates/emails/ticket-detail.txt:6
+#: tickets/templates/tickets/ticket-detail.html:17
+msgid "Seat"
+msgstr "Asiento"
+
+#: tickets/templates/emails/ticket-detail.txt:6
+#, python-format
+msgid " Section: %(layout)s, Row: %(row)s, Seat: %(column)s "
+msgstr "Sección: %(layout)s, Fila: %(row)s, Asiento: %(column)s "
+
+#: tickets/templates/emails/ticket-detail.txt:8
+msgid "Price"
+msgstr "Precio"
 
 #: tickets/templates/emails/ticket-info.txt:2
 #: tickets/templates/tickets/ticket-info.html:5
@@ -247,16 +331,43 @@ msgid "ticket confirmed"
 msgstr "Entrada confirmada"
 
 #: tickets/templates/emails/ticket-info.txt:10
-#: tickets/templates/tickets/ticket-info.html:28
+#: tickets/templates/tickets/multipurchase.html:114
+#: tickets/templates/tickets/ticket-info.html:44
 msgid "Personal info"
 msgstr "Información personal"
 
-#: tickets/templates/emails/ticket-info.txt:15
-#: tickets/templates/tickets/ticket-info.html:37
-msgid "Registration info"
-msgstr "Información de registro"
+#: tickets/templates/emails/ticket-info.txt:16
+#: tickets/templates/tickets/ticket-info.html:63
+msgid "Tickets"
+msgstr "Entradas"
+
+#: tickets/templates/tickets/layout.html:9
+#: tickets/templates/tickets/layout.html:15
+#: tickets/templates/tickets/layout.html:122
+#: tickets/templates/tickets/layout.html:128
+msgid "Scene"
+msgstr "Escenario"
+
+#: tickets/templates/tickets/map.html:9
+msgid "scene"
+msgstr "escenario"
+
+#: tickets/templates/tickets/map.html:17
+msgid "free"
+msgstr "libre"
+
+#: tickets/templates/tickets/multipurchase.html:102
+#: windows/templates/windows/multipurchase.html:34
+msgid "Total"
+msgstr "Total"
+
+#: tickets/templates/tickets/multipurchase.html:122
+#: tickets/templates/tickets/seat_select.html:24
+msgid "Continue"
+msgstr "Continuar"
 
 #: tickets/templates/tickets/payment.html:4
+#: tickets/templates/tickets/ticket_form.html:28
 msgid "Confirm"
 msgstr "Confirmar"
 
@@ -277,41 +388,179 @@ msgstr ""
 "Ha ocurrido un error en el pago. Prueba otra vez y si el problema continua, "
 "contacta con el administrador: %(admin)s"
 
-#: tickets/templates/tickets/payment.html:26
-#| msgid "make payment"
+#: tickets/templates/tickets/payment.html:28
 msgid "Make payment"
 msgstr "Realizar pago"
+
+#: tickets/templates/tickets/payment.html:30
+msgid "\"Make payment\" will redirect to"
+msgstr "\"Realizar pago\" te redirigirá a"
+
+#: tickets/templates/tickets/seat_select.html:6
+msgid "select the seat"
+msgstr "selecciona el asiento"
 
 #: tickets/templates/tickets/thanks.html:10
 msgid "Here you can view your ticket information"
 msgstr "Aquí puede ver la información de su entrada"
 
+#: tickets/templates/tickets/ticket-detail.html:19
+#, python-format
+msgid ""
+"\n"
+"            Section: %(layout)s, Row: %(row)s, Seat: %(column)s\n"
+"        "
+msgstr ""
+"\n"
+"            Sección: %(layout)s, Fila: %(row)s, Asiento: %(column)s\n"
+"        "
+
+#: tickets/templates/tickets/ticket-detail.html:26
+#: tickets/templates/tickets/ticket-info.html:20
+msgid "Ticket price"
+msgstr "Precio de entrada"
+
+#: tickets/templates/tickets/ticket-detail.html:37
+msgid "DOWNLOAD TICKET"
+msgstr "DESCARGAR ENTRADA"
+
 #: tickets/templates/tickets/ticket-info.html:12
-#| msgid "ticket number"
 msgid "Ticket number"
 msgstr "Número de entrada"
 
 #: tickets/templates/tickets/ticket-info.html:16
-#| msgid "payment number"
 msgid "Payment number"
 msgstr "Número de pago"
 
-#: tickets/templates/tickets/ticket-info.html:20
-#| msgid "ticket price"
-msgid "Ticket price"
-msgstr "Precio de entrada"
-
 #: tickets/templates/tickets/ticket-info.html:24
-#| msgid "ticket confirmed"
 msgid "Ticket confirmed"
 msgstr "Entrada confirmada"
 
-#: tickets/templates/tickets/ticket_form.html:9
-msgid "Fill the form and continue to complete the payment"
-msgstr "Rellenar el formulario y continuar para completar el pago"
+#: tickets/templates/tickets/ticket-info.html:36
+msgid "DOWNLOAD ALL TICKETS"
+msgstr "DESCARGAR TODAS LA ENTRADAS"
 
-#~ msgid "type"
-#~ msgstr "tipo"
+#: tickets/templates/tickets/ticket_form.html:16
+msgid "Price:"
+msgstr "Precio:"
+
+#: windows/models.py:12
+msgid "Cash"
+msgstr "Efectivo"
+
+#: windows/models.py:13
+msgid "Credit Card"
+msgstr "Tarjeta de crédito"
+
+#: windows/templates/windows/multipurchase.html:29
+msgid "Clean"
+msgstr "Limpiar"
+
+#: windows/templates/windows/multipurchase.html:35
+msgid "Payment"
+msgstr "Forma de pago"
+
+#: windows/templates/windows/multipurchase.html:36
+msgid "Payed"
+msgstr "Pagado"
+
+#. Translators: change for the ticket window cash payment process
+#: windows/templates/windows/multipurchase.html:38
+msgid "Change"
+msgstr "Cambio"
+
+#: windows/templates/windows/multipurchase.html:46
+msgid "cash"
+msgstr "efectivo"
+
+#: windows/templates/windows/multipurchase.html:52
+msgid "credit card"
+msgstr "tarjeta de crédito"
+
+#: windows/templates/windows/multipurchase.html:63
+msgid "The ticket will be purchased, are you sure?"
+msgstr "La entrada va a ser comprada, ¿estás seguro?"
+
+#: windows/templates/windows/multipurchase.html:64
+msgid "Finish"
+msgstr "Terminar"
+
+#: windows/views.py:46
+msgid "This user can't access in this ticket window"
+msgstr "Este usuario no puede acceder a esta taquilla"
+
+#~ msgid "Invitation code"
+#~ msgstr "Código de invitación"
+
+#~ msgid "Add your invitation code, if you've one"
+#~ msgstr "Añade tu código de invitación si tienes uno"
+
+#~ msgid "Invitation code is required for speaker or invited"
+#~ msgstr "Código de invitación requerido para orador o invitado"
+
+#~ msgid "Invitation code is only for speaker or invited"
+#~ msgstr "Código de invitación válido unicamente para orador o invitado"
+
+#~ msgid "Invitation code invalid"
+#~ msgstr "Código de invitación inválido"
+
+#~ msgid "Sponsor"
+#~ msgstr "Patrocinador"
+
+#~ msgid "Regular"
+#~ msgstr "Regular"
+
+#~ msgid "All"
+#~ msgstr "Todo"
+
+#~ msgid "Vegetarian"
+#~ msgstr "Vegetariano"
+
+#~ msgid "Vegan"
+#~ msgstr "Vegano"
+
+#~ msgid "sponsor price"
+#~ msgstr "precio patrocinador"
+
+#~ msgid "student price"
+#~ msgstr "precio estudiante"
+
+#~ msgid "speaker price"
+#~ msgstr "precio orador"
+
+#~ msgid "invited price"
+#~ msgstr "precio de invitado"
+
+#~| msgid "full name"
+#~ msgid "Full name"
+#~ msgstr "Nombre completo"
+
+#~| msgid "organization"
+#~ msgid "Organization"
+#~ msgstr "Organización"
+
+#~ msgid "Type"
+#~ msgstr "Tipo"
+
+#~| msgid "food preferences"
+#~ msgid "Food preferences"
+#~ msgstr "Preferencias de comida"
+
+#~| msgid "Especial needs"
+#~ msgid "Special needs"
+#~ msgstr "Necesidades especiales"
+
+#~ msgid "Arrival date"
+#~ msgstr "Fecha de llegada"
+
+#~ msgid "Departure date"
+#~ msgstr "Fecha de salida"
+
+#~ msgid "Registration info"
+#~ msgstr "Información de registro"
+
+#~ msgid "Fill the form and continue to complete the payment"
+#~ msgstr "Rellenar el formulario y continuar para completar el pago"
 
 #~ msgid "address"
 #~ msgstr "dirección"

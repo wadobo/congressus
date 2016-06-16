@@ -75,9 +75,9 @@ class MPRegisterForm(forms.ModelForm):
             session = Session.objects.get(space__event=self.event, id=sid)
             n = int(number)
             if n < 0 or n > 10:
-                raise forms.ValidationError(_("Sorry, you can't buy %s tickets") % n)
+                raise forms.ValidationError(_("Sorry, you can't buy %(n)s tickets") %  {"n": n})
             if not session.have_places(n):
-                raise forms.ValidationError(_("There's no %s places for %s") % (n, session))
+                raise forms.ValidationError(_("There's no %(n)s places for %(session)s") % {"n": n, "session": session})
 
         for sid, seats in self.seats:
             seats = list(filter(None, seats))
@@ -87,7 +87,7 @@ class MPRegisterForm(forms.ModelForm):
                 layout = session.space.seat_map.layouts.get(pk=layout)
                 if not session.is_seat_available(layout, row, column, self.client):
                     s = row + '-' + column
-                    raise forms.ValidationError(_("The seat %s is not available for %s") % (s, session))
+                    raise forms.ValidationError(_("The seat %(seat)s is not available for %(session)s") % {"seat": s, "session": session})
 
         return data
 
