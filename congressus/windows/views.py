@@ -100,6 +100,10 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
         if form.is_valid():
             mp = form.save(commit=False)
             mp.confirm()
+            for tk in mp.tickets.all():
+                tk.sold_in_window = True
+                tk.price = tk.get_window_price()
+                tk.save()
             
             price = data.get('price', 0)
             payed = data.get('payed', 0)

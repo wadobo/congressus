@@ -89,6 +89,9 @@ class BaseTicketMixing:
         # TODO manage ticket type
         return self.session.price
 
+    def get_window_price(self):
+        return self.session.window_price
+
     def send_reg_email(self):
         tmpl = get_template('emails/reg.txt')
         body = tmpl.render({'ticket': self})
@@ -168,6 +171,9 @@ class MultiPurchase(models.Model, BaseTicketMixing):
     def get_price(self):
         return sum(i.get_price() for i in self.tickets.all())
 
+    def get_window_price(self):
+        return sum(i.get_window_price() for i in self.tickets.all())
+
     def confirm(self):
         self.confirmed = True
         self.confirmed_date = timezone.now()
@@ -208,6 +214,7 @@ class Ticket(models.Model, BaseTicketMixing):
     confirmed_date = models.DateTimeField(_('Confirmed at'), blank=True, null=True)
     confirmed = models.BooleanField(default=False)
     confirm_sent = models.BooleanField(default=False)
+    sold_in_window = models.BooleanField(default=False)
 
     seat = models.CharField(max_length=20, null=True, blank=True)
     seat_layout = models.ForeignKey(SeatLayout, null=True, blank=True)

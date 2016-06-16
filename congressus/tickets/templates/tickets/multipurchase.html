@@ -71,10 +71,13 @@
                                 <td>
                                     <div class="input-group">
                                         <input id="{{ session.id }}" class="sessioninput form-control" min='0' max='15' type="number"
-                                            data-price="{{ session.price }}"
+                                            data-price="{% if window %}{{ session.window_price }}{% else %}{{ session.price }}{% endif %}" 
                                             {% if not session.space.numbered %}name="number_{{ session.id }}"{% endif %}
                                             value="0"/>
-                                        <span class="input-group-addon">{{ session.price }} € / ticket</span>
+                                        <span class="input-group-addon">
+                                            {% if window %}{{ session.window_price }}{% else %}{{ session.price }}{% endif %}
+                                            € / ticket
+                                        </span>
                                         {% if subsum %}
                                         <span class="input-group-addon">
                                             <span class="subtotal" id="{{ session.id }}-subtotal-price">0</span>
