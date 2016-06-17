@@ -2,14 +2,17 @@ body {
     background: #aaa;
 }
 
+.wrong .content,
 body.wrong {
     background: #ff0000;
 }
 
+.right .content,
 body.right {
     background: #00ff00;
 }
 
+.maybe .content,
 body.maybe {
     background: #0000ff;
 }
@@ -18,6 +21,10 @@ body.maybe {
     text-align: center;
     font-weight: bold;
     font-size: 50px;
+}
+
+.maybe #extra {
+    color: white;
 }
 
 #qr-video {

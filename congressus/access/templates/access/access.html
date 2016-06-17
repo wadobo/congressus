@@ -8,10 +8,16 @@
     <link href="{% static "css/access.css" %}?v=4.0" rel="stylesheet">
 {% endblock %}
 
+{% block head %}
+{% endblock %}
+
 {% block content %}
     <div class="page-header">
         <h1> {{ ac.name }} /
         <small class="text-danger">{{ request.user.username }}</small> /
+        {% if gate %}
+        <small> {% trans "Gate" %}: {{ gate }} </small> /
+        {% endif %}
         <small> {{ session }} </small>
         <small class="text-info pull-right">
             <a href="{% url 'access_logout' ac.event.slug ac.slug %}">

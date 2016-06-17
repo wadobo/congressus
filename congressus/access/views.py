@@ -12,6 +12,7 @@ from django.core.urlresolvers import reverse
 from .models import AccessControl
 from events.models import Event
 from events.models import Session
+from events.models import Gate
 from tickets.models import Ticket
 
 from django.contrib.auth import logout as auth_logout
@@ -49,7 +50,7 @@ class AccessLogin(TemplateView):
                 # gate
                 gate = request.POST.get('gate', '')
                 if gate:
-                    gate = get_object_or_404(Gate, event=ev,
+                    gate = get_object_or_404(Gate, event__slug=ev,
                                 id=gate)
                     request.session['gate'] = gate.name
                 else:
@@ -78,6 +79,9 @@ class AccessView(UserPassesTestMixin, TemplateView):
     def test_func(self):
         u = self.request.user
         have_access = u.groups.filter(name='access').count()
+        have_access = have_access and 'session' in self.request.session
+        have_access = have_access and 'gate' in self.request.session
+
         return u.is_authenticated() and have_access
 
     def get_login_url(self):
@@ -89,6 +93,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
         ctx['ac'] = ac
         s = Session.objects.get(id=self.request.session.get('session', ''))
         ctx['session'] = s
+        ctx['gate'] = self.request.session.get('gate', '')
         return ctx
 
     def post(self, request, *args, **kwargs):
