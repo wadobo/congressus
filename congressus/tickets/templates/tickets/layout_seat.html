@@ -1,0 +1,10 @@
+<td class="seat-{{ seat }}"
+    id="{{ session.id }}_{{ c.id }}_{{ row }}_{{ col }}"
+    data-session="{{ session.id }}"
+    data-layout="{{ c.id }}"
+    data-row="{{ row }}"
+    data-col="{{ col }}">
+    {% if seat != '_' %}
+        {% if col < 10 %}0{% endif %}{{ col }}
+    {% endif %}
+</td>

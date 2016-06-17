@@ -234,6 +234,7 @@ class Ticket(models.Model, BaseTicketMixing):
     start = models.DateTimeField(_('start date'), null=True)
     end = models.DateTimeField(_('end date'), null=True)
     seat_layout_name = models.CharField(max_length=200, null=True, blank=True)
+    gate_name = models.CharField(max_length=100, null=True, blank=True)
 
     # field to control the access
     used = models.BooleanField(default=False)
@@ -272,6 +273,8 @@ class Ticket(models.Model, BaseTicketMixing):
         self.end = self.session.end
         if self.seat_layout:
             self.seat_layout_name = self.seat_layout.name
+            if self.seat_layout.gate:
+                self.gate_name = self.seat_layout.gate.name
 
     def gen_pdf(self):
         return generate_pdf(self)

@@ -95,6 +95,14 @@ class SeatMap(models.Model):
         return table
 
 
+class Gate(models.Model):
+    event = models.ForeignKey(Event, related_name='gates')
+    name = models.CharField(_('name'), max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
 class SeatLayout(models.Model):
     map = models.ForeignKey(SeatMap, related_name='layouts')
     name = models.CharField(_('name'), max_length=300)
@@ -103,6 +111,9 @@ class SeatLayout(models.Model):
     direction = models.CharField(max_length=2, choices=DIRECTIONS, default='d')
     layout = models.TextField(_('seats layout'),
                               help_text=_('the layout to select the numbered seat'))
+
+    column_start_number = models.IntegerField(default=1)
+    gate = models.ForeignKey(Gate, blank=True, null=True)
 
     def __str__(self):
         return self.name

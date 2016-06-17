@@ -30,6 +30,14 @@
         {% endfor %}
     </select>
 
+    <label for="inputGate" class="sr-only">{% trans "gate" %}</label>
+    <select name="gate" class="form-control" id="inputGate">
+        <option value="">{% trans "None" %}</option>
+        {% for g in gates %}
+            <option value="{{ g.id }}">{{ g.name }}</option>
+        {% endfor %}
+    </select>
+
     <button class="btn btn-lg btn-primary btn-block" type="submit">{% trans "sign in" %}</button>
 </form>
 {% endblock %}

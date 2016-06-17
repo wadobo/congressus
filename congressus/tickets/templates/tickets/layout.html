@@ -23,7 +23,7 @@
                 <tr>
                     {% if layout.direction == 'u' %}
                         {% for c in layout.rows.0 %}
-                            <th>{{ forloop.revcounter }}</th>
+                            <th>{{ forloop.counter0|add:layout.column_start_number }}</th>
                         {% endfor %}
                     {% elif layout.direction == 'l' %}
                         <th></th>
@@ -42,60 +42,24 @@
 
                     {% if layout.direction == 'r' %}
                         {% for seat in row %}
-                        <td class="seat-{{ seat }}"
-                            id="{{ session.id }}_{{ c.id }}_{{ forloop.revcounter }}_{{ forloop.parentloop.revcounter }}"
-                            data-session="{{ session.id }}"
-                            data-layout="{{ c.id }}"
-                            data-row="{{ forloop.revcounter }}"
-                            data-col="{{ forloop.parentloop.revcounter }}">
-                            {% if seat != '_' %}
-                            {% if forloop.parentloop.revcounter < 10 %}0{% endif %}{{ forloop.parentloop.revcounter }}
-                            {% endif %}
-                        </td>
+                            {% include "tickets/layout_seat.html" with row=forloop.revcounter col=forloop.parentloop.revcounter0|add:layout.column_start_number %}
                         {% endfor %}
                     {% elif layout.direction == 'u' %}
                         {% for seat in row %}
-                        <td class="seat-{{ seat }}"
-                            id="{{ session.id }}_{{ c.id }}_{{ forloop.parentloop.counter }}_{{ forloop.revcounter }}"
-                            data-session="{{ session.id }}"
-                            data-layout="{{ c.id }}"
-                            data-row="{{ forloop.parentloop.counter }}"
-                            data-col="{{ forloop.revcounter }}">
-                            {% if seat != '_' %}
-                            {% if forloop.revcounter < 10 %}0{% endif %}{{ forloop.revcounter }}
-                            {% endif %}
-                        </td>
+                            {% include "tickets/layout_seat.html" with row=forloop.parentloop.counter col=forloop.counter0|add:layout.column_start_number %}
                         {% endfor %}
                     {% elif layout.direction == 'l' %}
                         {% for seat in row %}
-                        <td class="seat-{{ seat }}"
-                            id="{{ session.id }}_{{ c.id }}_{{ forloop.counter }}_{{ forloop.parentloop.counter }}"
-                            data-session="{{ session.id }}"
-                            data-layout="{{ c.id }}"
-                            data-row="{{ forloop.counter }}"
-                            data-col="{{ forloop.parentloop.counter }}">
-                            {% if seat != '_' %}
-                            {% if forloop.parentloop.counter < 10 %}0{% endif %}{{ forloop.parentloop.counter }}
-                            {% endif %}
-                        </td>
+                            {% include "tickets/layout_seat.html" with row=forloop.counter col=forloop.parentloop.counter0|add:layout.column_start_number %}
                         {% endfor %}
                     {% elif layout.direction == 'd' %}
                         {% for seat in row %}
-                        <td class="seat-{{ seat }}"
-                            id="{{ session.id }}_{{ c.id }}_{{ forloop.parentloop.revcounter }}_{{ forloop.counter }}"
-                            data-session="{{ session.id }}"
-                            data-layout="{{ c.id }}"
-                            data-row="{{ forloop.parentloop.revcounter }}"
-                            data-col="{{ forloop.counter }}">
-                            {% if seat != '_' %}
-                            {% if forloop.counter < 10 %}0{% endif %}{{ forloop.counter }}
-                            {% endif %}
-                        </td>
+                            {% include "tickets/layout_seat.html" with row=forloop.parentloop.revcounter col=forloop.counter0|add:layout.column_start_number %}
                         {% endfor %}
                     {% endif %}
 
                     {% if layout.direction == 'r' %}
-                        <th>{{ forloop.revcounter }}</th>
+                        <th>{{ forloop.revcounter0|add:layout.column_start_number }}</th>
                     {% elif layout.direction == 'u' %}
                         <th>{{ forloop.counter }}</th>
                     {% endif %}
@@ -109,7 +73,7 @@
                     {% elif layout.direction == 'd' %}
                         <th></th>
                         {% for c in layout.rows.0 %}
-                            <th>{{ forloop.counter }}</th>
+                            <th>{{ forloop.counter0|add:layout.column_start_number }}</th>
                         {% endfor %}
                     {% endif %}
                 </tr>

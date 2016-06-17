@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 from django.shortcuts import redirect, render
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.urlresolvers import reverse
@@ -29,6 +29,7 @@ class AccessLogin(TemplateView):
         ctx = super(AccessLogin, self).get_context_data(*args, **kwargs)
         ctx['ac'] = ac
         ctx['sessions'] = ac.event.get_sessions()
+        ctx['gates'] = ac.event.gates.all()
         return ctx
 
     def post(self, request, ev=None, ac=None):
@@ -40,10 +41,19 @@ class AccessLogin(TemplateView):
         if user is not None:
             have_access = user.groups.filter(name='access').count()
             if user.is_active and have_access:
+                # session
                 session = get_object_or_404(Session,
                             space__event__slug=ev,
                             id=request.POST['session'])
                 request.session['session'] = session.id
+                # gate
+                gate = request.POST.get('gate', '')
+                if gate:
+                    gate = get_object_or_404(Gate, event=ev,
+                                id=gate)
+                    request.session['gate'] = gate.name
+                else:
+                    request.session['gate'] = ''
                 login(request, user)
                 return redirect('access', ev=ac.event.slug, ac=ac.slug)
             else:
@@ -85,6 +95,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
         data = {'st': "right", 'extra': ''}
         order = request.POST.get('order', '')
         s = self.request.session.get('session', '')
+        g = self.request.session.get('gate', '')
         try:
             ticket = Ticket.objects.get(order=order,
                                         confirmed=True,
@@ -96,9 +107,15 @@ class AccessView(UserPassesTestMixin, TemplateView):
         if ticket.session_id != s:
             data['st'] = 'maybe'
             data['extra'] = str(ticket.session)
-        else:
-            ticket.used = True
-            ticket.save()
+            return HttpResponse(json.dumps(data), content_type="application/json")
+
+        if g and ticket.gate_name != g:
+            data['st'] = 'maybe'
+            data['extra'] = _("%(session)s - Gate: %(gate)s") % {'session': ticket.session, 'gate': ticket.gate_name}
+            return HttpResponse(json.dumps(data), content_type="application/json")
+
+        ticket.used = True
+        ticket.save()
 
         return HttpResponse(json.dumps(data), content_type="application/json")
 access = csrf_exempt(AccessView.as_view())
