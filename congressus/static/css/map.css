@@ -57,6 +57,10 @@
     border: 0px !important;
 }
 
+td.seat {
+    padding: 4px !important;
+}
+
 td.seat-L {
     cursor: pointer;
     background-color: #5cb85c;

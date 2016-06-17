@@ -26,6 +26,13 @@ function updateBadges(seats) {
                 if (seats[sid].hasOwnProperty(key)) {
                     value = seats[sid][key];
                     $("#badge-"+sid+"-"+key).text(value);
+                    if (parseInt(value, 10)) {
+                        $("#badge-"+sid+"-"+key).addClass("label-success");
+                        $("#badge-"+sid+"-"+key).removeClass("label-default");
+                    } else {
+                        $("#badge-"+sid+"-"+key).removeClass("label-success");
+                        $("#badge-"+sid+"-"+key).addClass("label-default");
+                    }
                 }
             }
         }

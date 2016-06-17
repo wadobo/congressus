@@ -14,7 +14,7 @@
                     data-name="{{ c.name }}" data-layout="{{ c.layout }}"
                     data-dir="{{ c.direction }}"
                     data-glyph="{{ c.glyph }}">
-                        <span id="badge-{{ session.id }}-{{ c.id }}" class="badge">0</span> {{ c }} / {% trans "free" %}: {{ c.free }}
+                        <span id="badge-{{ session.id }}-{{ c.id }}" class="label label-default">0</span> {{ c }} / {{ c.free }}
                         <span class="glyphicon {{ c.glyph }}" aria-hidden="true"></span>
                     </td>
                 {% else %}

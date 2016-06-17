@@ -100,6 +100,24 @@ function seatCB(ev, seat) {
 
     $("#seats-"+session).val(current.join(","));
     $("#"+session).val(current.length);
+
+    //updating the label with the number of selected seats
+    var n = 0;
+    current.forEach(function(element) {
+        if (element.startsWith(layout + '_')) {
+            n++;
+        }
+    });
+    badge = $("#badge-"+session+"-"+layout);
+    badge.text(n);
+    if (n) {
+        badge.addClass("label-success");
+        badge.removeClass("label-default");
+    } else {
+        badge.removeClass("label-success");
+        badge.addClass("label-default");
+    }
+
     $("#"+session).change();
 }
 
