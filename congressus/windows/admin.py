@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from .models import TicketWindow
 from .models import TicketWindowSale
+from .models import TicketWindowCashMovement
 
 
 class TicketWindowAdmin(admin.ModelAdmin):
@@ -17,5 +18,13 @@ class TicketWindowSaleAdmin(admin.ModelAdmin):
     date_hierarchy = 'date'
 
 
+class TicketWindowCashMovementAdmin(admin.ModelAdmin):
+    list_display = ('window', 'type', 'amount', 'date')
+    list_filter = ('window', 'type')
+    search_fields = ('window__name', )
+    date_hierarchy = 'date'
+
+
 admin.site.register(TicketWindow, TicketWindowAdmin)
 admin.site.register(TicketWindowSale, TicketWindowSaleAdmin)
+admin.site.register(TicketWindowCashMovement, TicketWindowCashMovementAdmin)

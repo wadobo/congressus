@@ -1,3 +1,5 @@
+import datetime
+from django.utils import timezone
 from django.views.generic import TemplateView, View
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
@@ -134,3 +136,37 @@ class WindowLogout(View):
         auth_logout(request)
         return redirect('window_multipurchase', ev=ev, w=w)
 window_logout = WindowLogout.as_view()
+
+
+class WindowList(UserPassesTestMixin, TemplateView):
+    template_name = 'windows/list.html'
+
+    def test_func(self):
+        u = self.request.user
+        return u.is_authenticated() and u.is_superuser
+
+    def get_context_data(self, *args, **kwargs):
+        ev = self.kwargs.get('ev')
+        ev = get_object_or_404(Event, slug=ev)
+        ctx = super(WindowList, self).get_context_data(*args, **kwargs)
+        ctx['windows'] = ev.windows.all()
+        ctx['ev'] = ev
+
+        ctx['date'] = timezone.now()
+
+        d = self.request.GET.get('date', '')
+        if d:
+            date = datetime.datetime(*map(int, d.split('-')))
+            ctx['date'] = date
+
+        days = []
+        d = timezone.now() - datetime.timedelta(10)
+        d1 = timezone.now() + datetime.timedelta(10)
+        while d < d1:
+            days.append(d)
+            d = d + datetime.timedelta(1)
+        ctx['days'] = days
+        ctx['today'] = timezone.now()
+
+        return ctx
+window_list = WindowList.as_view()

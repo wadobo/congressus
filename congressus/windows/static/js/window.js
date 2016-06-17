@@ -3,7 +3,7 @@ function clean() {
         $(this).click();
     });
 
-    $("input").each(function() {
+    $("input[type=number]").each(function() {
         if ($(this).attr("type") == 'number') {
             $(this).val("0");
             $(this).change();
@@ -12,6 +12,7 @@ function clean() {
         }
     });
 
+    $("[value=cash]").click();
     $("#total").val(0);
     $("#change").val(0);
     $("#payed").val(0);
