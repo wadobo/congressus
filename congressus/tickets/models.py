@@ -72,9 +72,11 @@ class BaseTicketMixing:
 
         order = ''
         used = True
-        while used:
+        reserved = True
+        while used or reserved:
             order = ''.join(random.choice(chars) for _ in range(l))
             used = self.is_order_used(order)
+            reserved = order.startswith('00001') or order.startswith('00002')
 
         self.order = order
         self.save()
@@ -308,6 +310,84 @@ class TicketSeatHold(models.Model):
 
     def __str__(self):
         return self.seat
+
+
+class BasePassInvitation:
+    ''' Common base class for Passes and Invitations. '''
+
+    def gen_order(self, starts):
+        """ Generate order for passes and invitations """
+        if isinstance(self, Pass):
+            starts = '00001'
+        elif isinstance(self, Invitation):
+            starts = '00002'
+        else:
+            assert('Invalid Model')
+        chars = string.ascii_uppercase + string.digits
+        l = 8
+        if hasattr(settings, 'ORDER_SIZE'):
+            l = settings.ORDER_SIZE
+            l -= len(starts)
+
+        order = ''
+        used = True
+        reserved = True
+        while used:
+            order = ''.join(random.choice(chars) for _ in range(l))
+            order = starts + order
+            used = self.is_order_used(order)
+        self.order = order
+        self.save()
+
+    def is_order_used(self, order):
+        if order.startswith('00001'):
+            p = Pass.objects.filter(order=order).exists()
+        elif order.startswith('00002'):
+            i = Invitation.objects.filter(order=order).exists()
+        else:
+            assert('Invalid order')
+        return p or i
+
+
+
+PASSES_TYPES = (
+    ('org', _('Organization Pass')),
+    ('vip', _('Vip Pass')),
+    ('par', _('Rancher Partner Pass')),
+    ('sym', _('Sympathizer Pass')),
+    ('exh', _('Exhibitor Pass')),
+    ('pre', _('Press Pass')),
+    ('jur', _('Jury Pass')),
+)
+
+
+class Pass(models.Model):
+    order = models.CharField(_('Order'), max_length=200, unique=True)
+    created = models.DateTimeField(_('Created at'), auto_now_add=True)
+    seat = models.CharField(max_length=20, null=True, blank=True)
+    seat_layout = models.ForeignKey(SeatLayout, null=True, blank=True)
+    type = models.CharField(max_length=3, choices=PASSES_TYPES, default="vip")
+
+    # field to control the access
+    used = models.BooleanField(default=False)
+
+
+INVOTATIONS_TYPES = (
+    ('ina', _('Inauguration Invitation')),
+    ('mad', _('MaD Facility Invitation')),
+    ('thu', _('Thursday Show Invitation')),
+)
+
+
+class Invitation(models.Model):
+    order = models.CharField(_('Order'), max_length=200, unique=True)
+    created = models.DateTimeField(_('Created at'), auto_now_add=True)
+    seat = models.CharField(max_length=20, null=True, blank=True)
+    seat_layout = models.ForeignKey(SeatLayout, null=True, blank=True)
+    type = models.CharField(max_length=3, choices=INVOTATIONS_TYPES, default="mad")
+
+    # field to control the access
+    used = models.BooleanField(default=False)
 
 
 def confirm_email(sender, instance, created, raw, using, update_fields, **kwargs):
