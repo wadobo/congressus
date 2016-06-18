@@ -361,7 +361,7 @@ PASSES_TYPES = (
 )
 
 
-class Pass(models.Model):
+class Pass(models.Model, BasePassInvitation):
     order = models.CharField(_('Order'), max_length=200, unique=True)
     created = models.DateTimeField(_('Created at'), auto_now_add=True)
     seat = models.CharField(max_length=20, null=True, blank=True)
@@ -379,7 +379,7 @@ INVOTATIONS_TYPES = (
 )
 
 
-class Invitation(models.Model):
+class Invitation(models.Model, BasePassInvitation):
     order = models.CharField(_('Order'), max_length=200, unique=True)
     created = models.DateTimeField(_('Created at'), auto_now_add=True)
     seat = models.CharField(max_length=20, null=True, blank=True)
