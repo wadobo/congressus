@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from django.views.generic import TemplateView, View
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
@@ -109,18 +110,38 @@ class AccessView(UserPassesTestMixin, TemplateView):
             data['st'] = 'wrong'
             return HttpResponse(json.dumps(data), content_type="application/json")
 
-        if ticket.session_id != s:
-            data['st'] = 'maybe'
-            data['extra'] = str(ticket.session)
-            return HttpResponse(json.dumps(data), content_type="application/json")
+        special = False
+        valid_session = ticket.session_id == s
 
-        if g and ticket.gate_name != g:
+        if valid_session and g and ticket.gate_name != g:
             data['st'] = 'maybe'
             data['extra'] = _("%(session)s - Gate: %(gate)s") % {'session': ticket.session, 'gate': ticket.gate_name}
             return HttpResponse(json.dumps(data), content_type="application/json")
 
-        ticket.used = True
-        ticket.save()
+        if not valid_session: # checking extra
+            if ticket.get_extra_data('session') == s:
+                if ticket.get_extra_data('used'):
+                    data['st'] = 'wrong'
+                    return HttpResponse(json.dumps(data), content_type="application/json")
+                start = datetime.strptime(ticket.get_extra_data('start'), "%Y-%m-%dT%H:%M:%S.%f")
+                end = datetime.strptime(ticket.get_extra_data('end'), "%Y-%m-%dT%H:%M:%S.%f")
+                if end < datetime.now():
+                    data['st'] = 'wrong'
+                    data['extra'] = _("Expired session: ") + str(ticket.session)
+                elif start > datetime.now():
+                    data['st'] = 'maybe'
+                    data['extra'] = _("Wait 1.5h before") + str(ticket.session)
+                else:
+                    special = True
+                    ticket.set_extra_data('used', True)
+                    ticket.save()
+            else:
+                data['st'] = 'wrong'
+                data['extra'] = str(ticket.session)
+
+        if data['st'] == 'right' and not special:
+            ticket.used = True
+            ticket.save()
 
         return HttpResponse(json.dumps(data), content_type="application/json")
 access = csrf_exempt(AccessView.as_view())
