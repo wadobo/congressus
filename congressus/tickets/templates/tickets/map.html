@@ -1,13 +1,12 @@
 {% load i18n %}
+{% load tickets %}
 <div class="map">
     <table class="table-bordered table">
         {% for r in map.get_table %}
             <tr>
             {% for c in r %}
                 {% if c == 'scene' %}
-                    <td class="scene">
-                        {% trans "scene" %}
-                    </td>
+                    {% scene_span map %}
                 {% elif c %}
                     <td class="layout layout-{{ session.id }}-{{ c.id }}"
                     data-session="{{ session.id }}" data-id="{{ c.id }}"
