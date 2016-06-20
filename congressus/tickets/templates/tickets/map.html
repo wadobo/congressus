@@ -29,8 +29,10 @@
 {% for r in map.get_table %}
     {% for c in r %}
         {% if c and c != 'scene' %}
-            <div class="display display-{{ session.id }}-{{ c.id }}">
-            {% include "tickets/layout.html" with layout=c session=session classes="" %}
+            <div class="display display-{{ session.id }}-{{ c.id }} ajax-layout"
+                 data-url="{% url 'ajax_layout' session=session.id layout=c.id %}">
+                <!-- loading layout using ajax to speed up -->
+                <div class="loading">{% trans "Loading..." %}</div>
             </div>
         {% endif %}
     {% endfor %}

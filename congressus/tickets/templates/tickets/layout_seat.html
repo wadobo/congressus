@@ -1,7 +1,7 @@
 <td class="seat seat-{{ seat }}"
-    id="{{ session.id }}_{{ c.id }}_{{ row }}_{{ col }}"
+    id="{{ session.id }}_{{ layout.id }}_{{ row }}_{{ col }}"
     data-session="{{ session.id }}"
-    data-layout="{{ c.id }}"
+    data-layout="{{ layout.id }}"
     data-row="{{ row }}"
     data-col="{{ col }}">
     {% if seat != '_' %}

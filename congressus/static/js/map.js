@@ -23,6 +23,27 @@
 
     },
 
+    map.loadLayouts = function(obj) {
+        var deferred = $.Deferred();
+        var promises = [];
+        obj.find(".ajax-layout").each(function() {
+            var obj1 = $(this);
+            var url = obj1.data('url');
+            var get = $.get(url, function(data) {
+                obj1.find(".loading").remove();
+                obj1.append(data);
+            });
+            promises.push(get);
+        });
+
+        $.when.apply($, promises).done(function() {
+            map.bindLayout(obj);
+            deferred.resolve();
+        });
+
+        return deferred;
+    }
+
     map.bindLayout = function(obj) {
         obj.find(".seat-L").unbind("click").click(function() {
             map.clickSeat($(this));

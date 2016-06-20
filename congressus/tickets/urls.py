@@ -12,6 +12,7 @@ urlpatterns = [
 
     url(r'^(?P<ev>[\w-]+)/$', views.multipurchase, name='multipurchase'),
 
+    url(r'^seats/(?P<session>\d+)/(?P<layout>\d+)/$', views.ajax_layout, name='ajax_layout'),
     url(r'^seats/view/(?P<map>\d+)/$', views.seats, name='seats'),
     url(r'^seats/auto/$', views.autoseats, name='autoseats'),
 ]

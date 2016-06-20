@@ -29,6 +29,7 @@ from events.models import Session
 from events.models import Event
 from events.models import Space
 from events.models import SeatMap
+from events.models import SeatLayout
 
 from .forms import RegisterForm
 from .forms import MPRegisterForm
@@ -299,3 +300,16 @@ class AutoSeats(View):
 
         return HttpResponse(json.dumps(ctx), content_type="application/json")
 autoseats = csrf_exempt(AutoSeats.as_view())
+
+
+class AjaxLayout(TemplateView):
+    template_name = 'tickets/layout.html'
+
+    def get_context_data(self, session, layout, **kwargs):
+        ctx = super(AjaxLayout, self).get_context_data(**kwargs)
+        layout = get_object_or_404(SeatLayout, id=layout)
+        session = get_object_or_404(Session, id=session)
+        ctx['layout'] = layout
+        ctx['session'] = session
+        return ctx
+ajax_layout = AjaxLayout.as_view()
