@@ -218,6 +218,7 @@ class Ticket(models.Model, BaseTicketMixing):
     confirm_sent = models.BooleanField(default=False)
     sold_in_window = models.BooleanField(default=False)
 
+    # row-col
     seat = models.CharField(max_length=20, null=True, blank=True)
     seat_layout = models.ForeignKey(SeatLayout, null=True, blank=True)
 

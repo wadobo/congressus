@@ -173,59 +173,46 @@ $(document).ready(function() {
 
     $('.withtooltip').tooltip();
 
-    var promises = [];
     $(".seatmap").each(function() {
         var session = $(this).data('session');
         var obj = $("#modal-" + session);
-        promises.push(SeatMap.loadLayouts(obj));
+        SeatMap.bindLayout(obj);
     });
 
-    $.when.apply($, promises).done(function() {
-        SeatMap.cbs.add(seatCB);
-        ws.cbs.add(websocketCB);
+    SeatMap.cbs.add(seatCB);
+    ws.cbs.add(websocketCB);
 
-        // removing holds seats
-        $(".seat-holded").each(function() {
-            var session = $(this).data('session');
-            var layout = $(this).data('layout');
-            var seat = $(this).data('seat').replace(/-/g, '_');
-            var selector = '#' + session + '_' + layout + '_' + seat;
-            seat_holded(session, layout, seat);
-        });
+    $(".seats-input").each(function() {
+        var session = $(this).data('session');
+        var v = $(this).val();
+        if (v) {
+            var current = [];
+            current = v.split(",");
 
-        // removing reserved seats
-        $(".seat-reserved").each(function() {
-            var session = $(this).data('session');
-            var layout = $(this).data('layout');
-            var seat = $(this).data('seat').replace(/-/g, '_');
-            seat_reserved(session, layout, seat);
-        });
+            current.forEach(function(c) {
+                var selector = '#' + session + '_' + c;
+                var layout = c.split('_')[0];
+                var l = $('.layout-'+session+'-'+layout);
+                var obj = $('.display-'+session+'-'+layout);
 
-        $(".seats-input").each(function() {
-            var session = $(this).data('session');
-            var v = $(this).val();
-            if (v) {
-                var current = [];
-                current = v.split(",");
-                current.forEach(function(c) {
-                    var selector = '#' + session + '_' + c;
+                SeatMap.preloadLayout(l, obj, function() {
                     $(selector).addClass("seat-selected");
                 });
-                $("#"+session).val(current.length);
-                $("#"+session).change();
-            }
-        });
+            });
+            $("#"+session).val(current.length);
+            $("#"+session).change();
+        }
+    });
 
-        // calculating sums
-        $('.sessioninput').change(function() {
-            recalcSums($(this));
-            recalcTotal();
-        });
+    // calculating sums
+    $('.sessioninput').change(function() {
+        recalcSums($(this));
         recalcTotal();
+    });
+    recalcTotal();
 
-        $('.sessioninput').each(function() {
-            recalcSums($(this));
-            $(this).click(function() { $(this).select(); });
-        });
+    $('.sessioninput').each(function() {
+        recalcSums($(this));
+        $(this).click(function() { $(this).select(); });
     });
 });

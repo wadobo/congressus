@@ -1,4 +1,6 @@
-<td class="seat seat-{{ seat }}"
+{% load tickets %}
+
+<td class="seat {% ticket_seat_class session layout seat row col %}"
     id="{{ session.id }}_{{ layout.id }}_{{ row }}_{{ col }}"
     data-session="{{ session.id }}"
     data-layout="{{ layout.id }}"

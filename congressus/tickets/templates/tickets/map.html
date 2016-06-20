@@ -9,7 +9,7 @@
                         {% trans "scene" %}
                     </td>
                 {% elif c %}
-                    <td class="layout"
+                    <td class="layout layout-{{ session.id }}-{{ c.id }}"
                     data-session="{{ session.id }}" data-id="{{ c.id }}"
                     data-name="{{ c.name }}" data-layout="{{ c.layout }}"
                     data-dir="{{ c.direction }}"
@@ -32,8 +32,8 @@
             <div class="display display-{{ session.id }}-{{ c.id }} ajax-layout"
                  data-url="{% url 'ajax_layout' session=session.id layout=c.id %}">
                 <!-- loading layout using ajax to speed up -->
+                <div class="ajax-loading loading">{% trans "Loading..." %}</div>
             </div>
         {% endif %}
     {% endfor %}
 {% endfor %}
-<div class="ajax-loading loading">{% trans "Loading..." %}</div>

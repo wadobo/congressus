@@ -23,36 +23,61 @@
 
     },
 
-    map.loadLayouts = function(obj) {
-        obj.find('.display').hide();
+    map.preloadLayout = function(layout, obj, f) {
+        var url = obj.data('url');
+        
+        if (!obj.find(".ajax-loading").length) {
+            f();
+            return;
+        }
 
-        var deferred = $.Deferred();
-        var promises = [];
-        obj.find(".ajax-layout").each(function() {
-            var obj1 = $(this);
-            var url = obj1.data('url');
-            var get = $.get(url, function(data) {
-                obj1.append(data);
-                obj.parent().find(".ajax-loading").remove();
+        var get = $.get(url, function(data) {
+            obj.append(data);
+            obj.find(".ajax-loading").remove();
+            // binding click
+            obj.find(".seat-L").unbind("click").click(function() {
+                map.clickSeat($(this));
             });
-            promises.push(get);
-        });
+            // binding show for the next click
+            layout.unbind("click").click(function() {
+                map.showLayout(obj.parent(), layout);
+            });
 
-        $.when.apply($, promises).done(function() {
-            map.bindLayout(obj);
-            deferred.resolve();
+            f();
         });
+    },
 
-        return deferred;
-    }
+    map.loadLayout = function(parentObj, obj) {
+        var session = obj.data('session');
+        var layout = obj.data('id');
+
+        var display = '.display-' + session + '-' + layout;
+        parentObj.find('.display').hide();
+        parentObj.find(display).show();
+
+        var obj1 = $(display);
+        var url = obj1.data('url');
+        var get = $.get(url, function(data) {
+            obj1.append(data);
+            obj1.find(".ajax-loading").remove();
+            map.showLayout(parentObj, obj);
+
+            // binding click
+            parentObj.find(".seat-L").unbind("click").click(function() {
+                map.clickSeat($(this));
+            });
+
+            // binding show for the next click
+            obj.unbind("click").click(function() {
+                map.showLayout(parentObj, obj);
+            });
+
+        });
+    },
 
     map.bindLayout = function(obj) {
-        obj.find(".seat-L").unbind("click").click(function() {
-            map.clickSeat($(this));
-        });
-
         obj.find(".layout").unbind("click").click(function() {
-            map.showLayout(obj, $(this));
+            map.loadLayout(obj, $(this));
         });
 
         obj.find('.display').hide();

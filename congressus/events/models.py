@@ -216,10 +216,10 @@ class Session(models.Model):
 
     def is_seat_available(self, layout, row, column, client=None):
         seat = row + '-' + column
-        n = self.tickets.filter(confirmed=True,
+        exists = self.tickets.filter(confirmed=True,
                                 seat_layout=layout,
-                                seat=seat).count()
-        avail = bool(n == 0)
+                                seat=seat).exists()
+        avail = not exists
         h = False
 
         if client:
@@ -236,7 +236,7 @@ class Session(models.Model):
                                         date__gt=d)
         if client:
             holds = holds.exclude(client=client)
-        return bool(holds.count())
+        return holds.exists()
 
 
     def seats_reserved(self):

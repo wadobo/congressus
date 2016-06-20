@@ -54,18 +54,6 @@
                                 <td>
                                     {% include "tickets/seat_select.html" %}
                                     <input id="seats-{{ session.id }}" class="hidden seats-input" data-session="{{ session.id }}" type="text" name="seats_{{ session.id }}" value=""/>
-                                    {% for sr in session.seats_reserved %}
-                                        <div class="hidden seat-reserved"
-                                            data-session="{{ session.id }}"
-                                            data-layout="{{ sr.seat_layout.id }}"
-                                            data-seat="{{ sr.seat }}"></div>
-                                    {% endfor %}
-                                    {% for sh in session.seats_holded %}
-                                        <div class="hidden seat-holded"
-                                            data-session="{{ session.id }}"
-                                            data-layout="{{ sh.layout.id }}"
-                                            data-seat="{{ sh.seat }}"></div>
-                                    {% endfor %}
                                 </td>
                                 {% endif %}
                                 <td>
