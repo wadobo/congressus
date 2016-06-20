@@ -24,14 +24,16 @@
     },
 
     map.loadLayouts = function(obj) {
+        obj.find('.display').hide();
+
         var deferred = $.Deferred();
         var promises = [];
         obj.find(".ajax-layout").each(function() {
             var obj1 = $(this);
             var url = obj1.data('url');
             var get = $.get(url, function(data) {
-                obj1.find(".loading").remove();
                 obj1.append(data);
+                obj.parent().find(".ajax-loading").remove();
             });
             promises.push(get);
         });
