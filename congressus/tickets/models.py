@@ -278,6 +278,7 @@ class Ticket(models.Model, BaseTicketMixing):
             self.seat_layout_name = self.seat_layout.name
             if self.seat_layout.gate:
                 self.gate_name = self.seat_layout.gate.name
+        # TODO: added extra_sessions
 
     def gen_pdf(self):
         return generate_pdf(self)
@@ -350,7 +351,6 @@ class BasePassInvitation:
         return p or i
 
 
-
 PASSES_TYPES = (
     ('org', _('Organization Pass')),
     ('vip', _('Vip Pass')),
@@ -373,7 +373,7 @@ class Pass(models.Model, BasePassInvitation):
     used = models.BooleanField(default=False)
 
 
-INVOTATIONS_TYPES = (
+INVITATIONS_TYPES = (
     ('ina', _('Inauguration Invitation')),
     ('mad', _('MaD Facility Invitation')),
     ('thu', _('Thursday Show Invitation')),
@@ -385,7 +385,7 @@ class Invitation(models.Model, BasePassInvitation):
     created = models.DateTimeField(_('Created at'), auto_now_add=True)
     seat = models.CharField(max_length=20, null=True, blank=True)
     seat_layout = models.ForeignKey(SeatLayout, null=True, blank=True)
-    type = models.CharField(max_length=3, choices=INVOTATIONS_TYPES, default="mad")
+    type = models.CharField(max_length=3, choices=INVITATIONS_TYPES, default="mad")
 
     # field to control the access
     used = models.BooleanField(default=False)

@@ -262,6 +262,14 @@ class Session(models.Model):
         return '%s - %s' % (self.space, self.name)
 
 
+class ExtraSession(models.Model):
+    orig = models.ForeignKey(Session, related_name='orig_sessions')
+    extra = models.ForeignKey(Session, related_name='extra_sessions')
+    start = models.DateTimeField(_('Start at'))
+    end = models.DateTimeField(_('End at'))
+    used = models.BooleanField(default=False)
+
+
 class ConfirmEmail(models.Model):
     event = models.OneToOneField(Event, related_name='email')
     subject = models.CharField(_('subject'), max_length=300)

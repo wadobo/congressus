@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from .models import Event, InvCode
+from .models import ExtraSession
 from .models import ConfirmEmail, EmailAttachment
 from .models import Space
 from .models import Session
@@ -52,7 +53,17 @@ class ConfirmEmailAdmin(admin.ModelAdmin):
     search_fields = ('event', 'subject', 'body')
 
 
+class ExtraSessionInline(admin.TabularInline):
+    model = ExtraSession
+    fk_name = 'orig'
+
+
+class ExtraSessionAdmin(admin.ModelAdmin):
+    list_display = ('orig', 'extra', 'start', 'end', 'used')
+
+
 class SessionAdmin(admin.ModelAdmin):
+    inlines = [ExtraSessionInline]
     list_display = ('space', 'name', 'start', 'end', 'price', 'tax')
     list_filter = ('space', )
     search_fields = ('space__name', 'name', 'space__event__name')
@@ -81,6 +92,7 @@ admin.site.register(Event, EventAdmin)
 admin.site.register(InvCode, InvCodeAdmin)
 admin.site.register(ConfirmEmail, ConfirmEmailAdmin)
 admin.site.register(Space, SpaceAdmin)
+admin.site.register(ExtraSession, ExtraSessionAdmin)
 admin.site.register(Session, SessionAdmin)
 
 admin.site.register(SeatMap, SeatMapAdmin)
