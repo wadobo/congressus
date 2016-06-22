@@ -119,21 +119,22 @@ class AccessView(UserPassesTestMixin, TemplateView):
             return HttpResponse(json.dumps(data), content_type="application/json")
 
         if not valid_session: # checking extra
-            if ticket.get_extra_data('session') == s:
-                if ticket.get_extra_data('used'):
+            extra = ticket.get_extra_session(s)
+            if extra:
+                if extra.get('used'):
                     data['st'] = 'wrong'
                     return HttpResponse(json.dumps(data), content_type="application/json")
-                start = datetime.strptime(ticket.get_extra_data('start'), "%Y-%m-%dT%H:%M:%S.%f")
-                end = datetime.strptime(ticket.get_extra_data('end'), "%Y-%m-%dT%H:%M:%S.%f")
+                start = datetime.strptime(extra.get('start'), settings.DATETIME_FORMAT)
+                end = datetime.strptime(extra.get('end'), settings.DATETIME_FORMAT)
                 if end < datetime.now():
                     data['st'] = 'wrong'
-                    data['extra'] = _("Expired session: ") + str(ticket.session)
+                    data['extra'] = _("Expired session: ") + str(extra.get('session'))
                 elif start > datetime.now():
                     data['st'] = 'maybe'
-                    data['extra'] = _("Wait 1.5h before") + str(ticket.session)
+                    data['extra'] = _("Wait 1.5h before for session") + str(extra.get('session'))
                 else:
                     special = True
-                    ticket.set_extra_data('used', True)
+                    ticket.set_extra_session_to_used(s)
                     ticket.save()
             else:
                 data['st'] = 'wrong'

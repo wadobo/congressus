@@ -278,10 +278,41 @@ class Ticket(models.Model, BaseTicketMixing):
             self.seat_layout_name = self.seat_layout.name
             if self.seat_layout.gate:
                 self.gate_name = self.seat_layout.gate.name
-        # TODO: added extra_sessions
+
+        data = []
+        for extra in self.session.orig_sessions.all():
+           data.append({
+               'session': extra.extra.id,
+               'start': extra.start.strftime(settings.DATETIME_FORMAT),
+               'end': extra.end.strftime(settings.DATETIME_FORMAT),
+               'used': extra.used
+           })
+        self.extra_data = json.dumps(data)
 
     def gen_pdf(self):
         return generate_pdf(self)
+
+    def get_extra_sessions(self):
+        if not self.extra_data:
+            data = []
+        else:
+            data = json.loads(self.extra_data)
+        return data
+
+    def get_extra_session(self, pk):
+        for extra in self.get_extra_sessions():
+            if extra.get('session') == pk:
+                return extra
+        return False
+
+    def set_extra_session_to_used(self, pk):
+        data = self.get_extra_sessions()
+        for extra in range(len(data)):
+            if data[extra].get('session') == pk:
+                data[extra]['used'] = True
+                break
+        self.extra_data = json.dumps(data)
+        self.save()
 
 
 class TicketWarning(models.Model):

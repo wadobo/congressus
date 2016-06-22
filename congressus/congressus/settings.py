@@ -149,6 +149,7 @@ SITE_URL = "http://localhost:8000"
 TPV_MERCHANT_URL = SITE_URL + '/ticket/confirm/'
 
 QRCODE = True
+DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
 
 try:
     from local_settings import *
