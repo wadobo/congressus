@@ -59,6 +59,7 @@
                                 <td>
                                     <div class="input-group">
                                         <input id="{{ session.id }}" class="sessioninput form-control" min='0' max='15' type="number"
+                                            data-session="{{ session.id }}"
                                             data-price="{% if window %}{{ session.window_price }}{% else %}{{ session.price }}{% endif %}" 
                                             {% if not session.space.numbered %}name="number_{{ session.id }}"{% endif %}
                                             value="0"/>

@@ -101,7 +101,15 @@ function seatCB(ev, seat) {
     $("#seats-"+session).val(current.join(","));
     $("#"+session).val(current.length);
 
+    updateBadges(session, layout);
+
+    $("#"+session).change();
+}
+
+function updateBadges(session, layout) {
     //updating the label with the number of selected seats
+    var currentval = $("#seats-"+session).val();
+    var current = currentval.split(",");
     var n = 0;
     current.forEach(function(element) {
         if (element.startsWith(layout + '_')) {
@@ -117,8 +125,6 @@ function seatCB(ev, seat) {
         badge.removeClass("label-success");
         badge.addClass("label-default");
     }
-
-    $("#"+session).change();
 }
 
 function recalcSums(obj) {
@@ -136,6 +142,98 @@ function recalcTotal() {
         sum += price * n;
     });
     $("#total").html(sum);
+}
+
+function fillSelectedSeats(obj) {
+    // obj should be a .seats-input
+    var session = obj.data('session');
+    var v = obj.val();
+    if (v) {
+        var current = [];
+        current = v.split(",");
+        $("#"+session).val(current.length);
+        $("#"+session).change();
+
+        function recursiveSelection(arr, finish) {
+            var c = arr.pop();
+            var selector = '#' + session + '_' + c;
+            var layout = c.split('_')[0];
+            var l = $('.layout-'+session+'-'+layout);
+            var obj = $('.display-'+session+'-'+layout);
+
+            SeatMap.preloadLayout(l, obj, function() {
+                $(selector).addClass("seat-selected");
+                if (arr.length) {
+                    recursiveSelection(arr, finish);
+                } else {
+                    finish();
+                }
+            });
+        }
+
+        recursiveSelection(current.slice(0), function() {
+            current.forEach(function(c) {
+                var layout = c.split('_')[0];
+                updateBadges(session, layout);
+            });
+        });
+    }
+}
+
+function autoSelectSeat(s, n) {
+    autoSeats(s, n).then(function(autoseats) {
+        var value = [];
+        autoseats.forEach(function(obj) {
+            value.push(obj.layout+"_"+obj.row+"_"+obj.col);
+
+            args = s;
+            args += ' ' + obj.layout;
+            args += ' ' + obj.row;
+            args += ' ' + obj.col;
+            args += ' ' + client;
+            ws.send('hold_seat ' + args);
+        });
+        $("#seats-"+s).val(value.join(","));
+        fillSelectedSeats($("#seats-"+s));
+    });
+}
+
+function seatsChange() {
+    // this should be a .sessioninput
+    recalcSums($(this));
+    recalcTotal();
+
+    // if no name in the input, it's a numbered session
+    // we do here the seat auto selection
+    if (!$(this).attr("name")) {
+        var val = $(this).val();
+        var s = $(this).data('session');
+        var v = $("#seats-"+s).val();
+        if (!v) {
+            autoSelectSeat(s, val);
+        } else {
+            var current = [];
+            current = v.split(",");
+            if (current.length != val) {
+                // unselecting all selected
+                current.forEach(function(c) {
+                    selector = '#' + s + '_' + c;
+                    $(selector).removeClass('seat-selected');
+
+                    a = c.split('_');
+                    args = s;
+                    args += ' ' + a[0];
+                    args += ' ' + a[1];
+                    args += ' ' + a[2];
+                    args += ' ' + client;
+                    ws.send('drop_seat ' + args);
+                });
+                $("#seats-"+s).val("");
+
+                autoSelectSeat(s, val);
+            }
+        }
+    }
 }
 
 $(document).ready(function() {
@@ -183,32 +281,12 @@ $(document).ready(function() {
     ws.cbs.add(websocketCB);
 
     $(".seats-input").each(function() {
-        var session = $(this).data('session');
-        var v = $(this).val();
-        if (v) {
-            var current = [];
-            current = v.split(",");
-
-            current.forEach(function(c) {
-                var selector = '#' + session + '_' + c;
-                var layout = c.split('_')[0];
-                var l = $('.layout-'+session+'-'+layout);
-                var obj = $('.display-'+session+'-'+layout);
-
-                SeatMap.preloadLayout(l, obj, function() {
-                    $(selector).addClass("seat-selected");
-                });
-            });
-            $("#"+session).val(current.length);
-            $("#"+session).change();
-        }
+        fillSelectedSeats($(this));
     });
 
     // calculating sums
-    $('.sessioninput').change(function() {
-        recalcSums($(this));
-        recalcTotal();
-    });
+    $('.sessioninput').change(seatsChange);
+    $('.sessioninput').keyup(seatsChange);
     recalcTotal();
 
     $('.sessioninput').each(function() {

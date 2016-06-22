@@ -272,7 +272,7 @@ class AutoSeats(View):
                 continue
             if not best_avail or avail.get('row') < best_avail.get('row'):
                 best_avail = {
-                    'space': layout.id,
+                    'layout': layout.id,
                     'row': avail.get('row'),
                     'col_ini': avail.get('col_ini'),
                     'col_end': avail.get('col_end')
@@ -282,8 +282,8 @@ class AutoSeats(View):
             for col in range(best_avail.get('col_ini'), best_avail.get('col_end')):
                 seats.append({
                     "session": id_session,
-                    "space": best_avail.get('space'),
-                    "row": best_avail.get('row'),
+                    "layout": best_avail['layout'],
+                    "row": best_avail['row'],
                     "col": col})
         return seats
 
