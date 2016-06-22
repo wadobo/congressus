@@ -197,6 +197,8 @@ class Session(models.Model):
     window_price = models.IntegerField(_('price in the ticket window'), default=10)
     tax = models.IntegerField(_('ticket tax percentage'), default=21)
 
+    template = models.ForeignKey("TicketTemplate", blank=True, null=True)
+
     def price_without_tax(self):
         return self.price * (self.tax / 100)
 
@@ -330,3 +332,15 @@ def gencode(sender, instance, created, raw, using, update_fields, **kwargs):
         chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         instance.code = ''.join(random.choice(chars) for _ in range(10))
         instance.save()
+
+
+class TicketTemplate(models.Model):
+    name = models.CharField(_('name'), max_length=200, unique=True)
+    header = models.ImageField(_('header'), upload_to='templheader', blank=True, null=True)
+    sponsors = models.ImageField(_('sponsors'), upload_to='templsponsors', blank=True, null=True)
+    contributors = models.ImageField(_('contributors'), upload_to='templcontributors', blank=True, null=True)
+    links = models.CharField(_('links'), max_length=200, blank=True, null=True)
+    info = models.TextField(_('info text'), blank=True, null=True)
+
+    def __str__(self):
+        return self.name

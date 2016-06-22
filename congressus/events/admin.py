@@ -7,6 +7,7 @@ from .models import Space
 from .models import Session
 from .models import TicketField
 from .models import SeatMap, SeatLayout, Gate
+from .models import TicketTemplate
 
 
 class InvCodeInline(admin.TabularInline):
@@ -88,6 +89,10 @@ class GateAdmin(admin.ModelAdmin):
     list_filter = ('event', )
 
 
+class TicketTemplateAdmin(admin.ModelAdmin):
+    list_display = ('name', )
+
+
 admin.site.register(Event, EventAdmin)
 admin.site.register(InvCode, InvCodeAdmin)
 admin.site.register(ConfirmEmail, ConfirmEmailAdmin)
@@ -98,3 +103,5 @@ admin.site.register(Session, SessionAdmin)
 admin.site.register(SeatMap, SeatMapAdmin)
 admin.site.register(SeatLayout, SeatLayoutAdmin)
 admin.site.register(Gate, GateAdmin)
+
+admin.site.register(TicketTemplate, TicketTemplateAdmin)

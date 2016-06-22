@@ -1,5 +1,6 @@
 import os
 from django.conf import settings
+from django.utils.translation import ugettext as _
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.graphics.shapes import Drawing
 from reportlab.graphics import renderPDF
@@ -8,7 +9,11 @@ from reportlab.graphics.barcode.qr import QrCodeWidget
 from reportlab.platypus import *
 from reportlab.pdfgen import canvas
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-from reportlab.lib.units import inch
+from reportlab.lib.units import inch, cm
+from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
+from reportlab.lib import utils
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib import colors
 from io import BytesIO
 
 from PyPDF2 import PdfFileMerger
@@ -30,29 +35,54 @@ class QRFlowable(Flowable):
         # Flowable canva
         qr_code = QrCodeWidget(self.qr_value)
         bounds = qr_code.getBounds()
-        qr_width = (bounds[2] - bounds[0])*2
-        qr_height = (bounds[3] - bounds[1])*2
+        qr_width = (bounds[2] - bounds[0])
+        qr_height = (bounds[3] - bounds[1])
         w = float(self.width)
         d = Drawing(w, w, transform=[w/qr_width, 0, 0, w/qr_height, 0, 0])
         d.add(qr_code)
-        renderPDF.draw(d, self.canv, 90, 230)
+        renderPDF.draw(d, self.canv, 0, 0)
+
+
+def get_image(path, width=3*cm):
+    path = path.encode('utf8')
+    img = utils.ImageReader(path)
+    iw, ih = img.getSize()
+    aspect = ih / float(iw)
+    return Image(path, width=width, height=(width * aspect))
 
 
 def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
     """ Generate ticket in pdf with the get ticket. """
 
-    data = {
-        'title': ticket.session.name,
-        'date': ticket.session.start.date().isoformat(),
-        'code': ticket.order,
-    }
+    space = ticket.session.space.name
+    session = ticket.session.name
+    start = ticket.session.start.strftime("%A %d/%m/%Y")
+    date = _('%s (%s to %s)') % (
+        start,
+        ticket.session.start.strftime("%H:%M"), 
+        ticket.session.end.strftime("%H:%M")
+    )
+    code = ticket.order
+
+    initials = _('T') + space[0].upper() + session[0].upper()
+    text = _('Ticket %(space)s %(session)s') % {'space': space.capitalize(), 'session': session.capitalize()}
+
+    price = _('%4.2f €') % ticket.price
+    price = '<font size=14>%s</font>   <font size=8>%s%% TAX INC.</font>' % (price, ticket.tax)
+
+    if settings.QRCODE:
+        codeimg = QRFlowable(code)
+    else:
+        codeimg = code128.Code128(code, barWidth= 0.01 * inch, barHeight= .5 * inch)
 
     PAGE_HEIGHT= 11 * inch
     PAGE_WIDTH= 8.5 * inch
     styles = getSampleStyleSheet()
 
+    template = ticket.session.template
+
     def ticketPage(canvas, doc):
-        if logo:
+        if logo and not template:
             canvas.saveState()
             H = 1.5 * inch
             W = 1.5 * .69 * inch
@@ -60,34 +90,61 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
                     PAGE_HEIGHT - (1.75 * inch), width = W, height = H)
             canvas.restoreState()
 
-    def gen_ticket():
-        buffer = BytesIO()
-        doc = SimpleDocTemplate(buffer)
-        Story = []
-        styleN = styles["Normal"]
-        styleH = styles['Heading1']
-        Story.append(Paragraph(data.get('title'), styleH))
-        Story.append(Spacer(1 * inch, .5 * inch))
-        Story.append(Paragraph("Date: %s" % (data.get('date')), styleN))
-        Story.append(Spacer(1 * inch, .25 * inch))
-        Story.append(Paragraph("Code: %s" % (data.get('code')), styleN))
-        Story.append(Spacer(1 * inch, .5 * inch))
-        if settings.QRCODE:
-            code = QRFlowable(data.get('code'))
         else:
-            code = code128.Code128(data.get('code'), barWidth= 0.01 * inch, barHeight= .5 * inch)
-        Story.append(code)
-        doc.build(Story, onFirstPage=ticketPage, onLaterPages=ticketPage)
+            header = template.header
+            header = get_image(header.path, width=doc.width)
 
-        if not asbuf:
-            pdf = buffer.getvalue()
-            buffer.close()
-            return pdf
-        else:
-            buffer.seek(0)
-            return buffer
+            canvas.saveState()
+            header.drawOn(canvas, doc.leftMargin, doc.height + doc.topMargin)
+            canvas.restoreState()
 
-    return gen_ticket()
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer)
+    Story = []
+    styleN = styles["Normal"]
+    styleH = styles['Heading1']
+
+    styleR = ParagraphStyle(name="rightStyle", fontSize=10, alignment=TA_RIGHT)
+    styleL = ParagraphStyle(name="leftStyle", fontSize=10, alignment=TA_LEFT)
+
+    # heading notice
+    t = Table([
+        [Paragraph(_("PRINT AND BRING THIS TICKET WITH YOU"), styleL),
+         Paragraph("PRINT AND BRING THIS TICKET WITH YOU", styleR)]
+    ], colWidths='*')
+    tstyle_list = [ ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ]
+    tstyle = TableStyle(tstyle_list)
+    t.setStyle(tstyle)
+    Story.append(t)
+
+    # ticket information table
+    t = Table([
+        [codeimg, Paragraph('<font size=60>'+initials+'</font>', styleN)],
+        ['',      Paragraph(text, styleN)],
+        ['',      Paragraph(date, styleN)],
+        ['',      Paragraph(price, styleN)],
+        [code, '']
+    ], colWidths=[5*cm, '*'], rowHeights=[2.5*cm, 0.5*cm, 0.5*cm, 0.5*cm, 0.5*cm])
+    tstyle_list = [
+        ('VALIGN', (0,0), (1,-1), 'TOP'),
+        ('VALIGN', (0,0), (0,-1), 'MIDDLE'),
+        ('ALIGN', (0,0), (0,-1), 'CENTER'),
+        ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+        ('SPAN', (0, 0), (0, 3)),
+    ]
+    tstyle = TableStyle(tstyle_list)
+    t.setStyle(tstyle)
+    Story.append(t)
+
+    doc.build(Story, onFirstPage=ticketPage, onLaterPages=ticketPage)
+
+    if not asbuf:
+        pdf = buffer.getvalue()
+        buffer.close()
+        return pdf
+    else:
+        buffer.seek(0)
+        return buffer
 
 def concat_pdf(files):
     buffer = BytesIO()
