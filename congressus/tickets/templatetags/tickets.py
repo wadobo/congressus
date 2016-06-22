@@ -26,11 +26,12 @@ def ticket_seat_class(session, layout, seat, row, col):
 
 
 @register.simple_tag(takes_context=True)
-def scene_span(context, map):
-    if 'scenedraw' in context:
+def scene_span(context, session, map):
+    flag = 'scenedraw-%s' % session.id
+    if flag in context:
         return ''
 
-    context.dicts[0]['scenedraw'] = True
+    context.dicts[0][flag] = True
     rows = (map.scene_bottom - map.scene_top) + 1
     cols = (map.scene_right - map.scene_left) + 1
 

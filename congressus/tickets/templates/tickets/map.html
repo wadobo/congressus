@@ -6,7 +6,7 @@
             <tr>
             {% for c in r %}
                 {% if c == 'scene' %}
-                    {% scene_span map %}
+                    {% scene_span session map %}
                 {% elif c %}
                     <td class="layout layout-{{ session.id }}-{{ c.id }}"
                     data-session="{{ session.id }}" data-id="{{ c.id }}"
