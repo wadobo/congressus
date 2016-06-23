@@ -396,6 +396,7 @@ class BasePassInvitation:
 
 
 class PassType(models.Model):
+    session = models.ForeignKey(Session, related_name='passes_types', null=True, blank=True)
     name = models.CharField(max_length=200)
     start = models.DateTimeField(_('start date'), null=True)
     end = models.DateTimeField(_('end date'), null=True)
@@ -415,6 +416,7 @@ class Pass(models.Model, BasePassInvitation, BaseExtraData):
 
 
 class InvitationType(models.Model):
+    session = models.ForeignKey(Session, related_name='invitations_types', null=True, blank=True)
     name = models.CharField(max_length=200)
     start = models.DateTimeField(_('start date'), null=True)
     end = models.DateTimeField(_('end date'), null=True)

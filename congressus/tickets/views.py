@@ -25,6 +25,8 @@ from django.utils.translation import ugettext as _
 
 from .models import Ticket
 from .models import MultiPurchase
+from .models import InvitationType
+from .models import PassType
 from events.models import Session
 from events.models import Event
 from events.models import Space
@@ -313,3 +315,47 @@ class AjaxLayout(TemplateView):
         ctx['session'] = session
         return ctx
 ajax_layout = AjaxLayout.as_view()
+
+
+class GenInvitationsView(View):
+    def get_context_data(self, *args, **kwargs):
+        ctx = super(GenInvitationsView, self).get_context_data(*args, **kwargs)
+        return ctx
+
+    def post(self, request):
+        type = request.POST.get('type', None)
+        amount = request.POST.get('amount', '0')
+        amount = int(amount)
+        # TODO: generate invitations
+        return redirect('/admin/tickets/invitation/')
+
+gen_invitations = GenInvitationsView.as_view()
+
+
+class GenPassesView(View):
+    def get_context_data(self, *args, **kwargs):
+        ctx = super(GenPassesView, self).get_context_data(*args, **kwargs)
+        return ctx
+
+    def post(self, request):
+        type = request.POST.get('type', None)
+        amount = request.POST.get('amount', '0')
+        amount = int(amount)
+        # TODO: generate passes
+        return redirect('/admin/tickets/pass/')
+
+gen_passes = GenPassesView.as_view()
+
+
+class GetTypes(View):
+    def get_context_data(self, *args, **kwargs):
+        ctx = super(GenPassesView, self).get_context_data(*args, **kwargs)
+        return ctx
+    def post(self, request):
+        ctx = {
+            'pass_types': [(x.id, x.name) for x in PassType.objects.all()],
+            'invitation_types': [(x.id, x.name) for x in InvitationType.objects.all()],
+        }
+        return HttpResponse(json.dumps(ctx), content_type="application/json")
+
+get_types = csrf_exempt(GetTypes.as_view())

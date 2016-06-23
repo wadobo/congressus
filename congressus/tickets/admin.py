@@ -118,3 +118,4 @@ admin.site.register(Ticket, TicketAdmin)
 admin.site.register(TicketWarning, TicketWarningAdmin)
 admin.site.register(MultiPurchase, MPAdmin)
 admin.site.register(TicketSeatHold, TicketSeatHoldAdmin)
+admin.site.index_template = 'admin/generator.html'

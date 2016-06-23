@@ -10,6 +10,10 @@ urlpatterns = [
     url(r'^ticket/(?P<order>[\w-]+)/thanks/$', views.thanks, name='thanks'),
     url(r'^ticket/confirm/$', views.confirm, name='confirm'),
 
+    url(r'^generator/invitations/$', views.gen_invitations, name='gen_invitations'),
+    url(r'^generator/passes/$', views.gen_passes, name='gen_passes'),
+    url(r'^generator/get-types/$', views.get_types, name='get_types'),
+
     url(r'^(?P<ev>[\w-]+)/$', views.multipurchase, name='multipurchase'),
 
     url(r'^seats/(?P<session>\d+)/(?P<layout>\d+)/$', views.ajax_layout, name='ajax_layout'),
