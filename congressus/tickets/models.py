@@ -382,15 +382,10 @@ class BasePassInvitation:
         return p or i
 
 
-PASSES_TYPES = (
-    ('org', _('Organization Pass')),
-    ('vip', _('Vip Pass')),
-    ('par', _('Rancher Partner Pass')),
-    ('sym', _('Sympathizer Pass')),
-    ('exh', _('Exhibitor Pass')),
-    ('pre', _('Press Pass')),
-    ('jur', _('Jury Pass')),
-)
+class PassType(models.Model):
+    name = models.CharField(max_length=200)
+    start = models.DateTimeField(_('start date'), null=True)
+    end = models.DateTimeField(_('end date'), null=True)
 
 
 class Pass(models.Model, BasePassInvitation):
@@ -398,17 +393,16 @@ class Pass(models.Model, BasePassInvitation):
     created = models.DateTimeField(_('Created at'), auto_now_add=True)
     seat = models.CharField(max_length=20, null=True, blank=True)
     seat_layout = models.ForeignKey(SeatLayout, null=True, blank=True)
-    type = models.CharField(max_length=3, choices=PASSES_TYPES, default="vip")
+    type = models.ForeignKey(PassType, null=True, blank=True)
 
     # field to control the access
     used = models.BooleanField(default=False)
 
 
-INVITATIONS_TYPES = (
-    ('ina', _('Inauguration Invitation')),
-    ('mad', _('MaD Facility Invitation')),
-    ('thu', _('Thursday Show Invitation')),
-)
+class InvitationType(models.Model):
+    name = models.CharField(max_length=200)
+    start = models.DateTimeField(_('start date'), null=True)
+    end = models.DateTimeField(_('end date'), null=True)
 
 
 class Invitation(models.Model, BasePassInvitation):
@@ -416,7 +410,7 @@ class Invitation(models.Model, BasePassInvitation):
     created = models.DateTimeField(_('Created at'), auto_now_add=True)
     seat = models.CharField(max_length=20, null=True, blank=True)
     seat_layout = models.ForeignKey(SeatLayout, null=True, blank=True)
-    type = models.CharField(max_length=3, choices=INVITATIONS_TYPES, default="mad")
+    type = models.ForeignKey(InvitationType, null=True, blank=True)
 
     # field to control the access
     used = models.BooleanField(default=False)
@@ -429,3 +423,4 @@ def confirm_email(sender, instance, created, raw, using, update_fields, **kwargs
 
 post_save.connect(confirm_email, Ticket)
 post_save.connect(confirm_email, MultiPurchase)
+
