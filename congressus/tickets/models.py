@@ -147,6 +147,42 @@ class BaseTicketMixing:
         self.save()
 
 
+class BaseExtraData:
+    def get_extra_sessions(self):
+        if not self.extra_data:
+            data = []
+        else:
+            data = json.loads(self.extra_data)
+        return data
+
+    def get_extra_session(self, pk):
+        for extra in self.get_extra_sessions():
+            if extra.get('session') == pk:
+                return extra
+        return False
+
+    def set_extra_session_to_used(self, pk):
+        data = self.get_extra_sessions()
+        for extra in range(len(data)):
+            if data[extra].get('session') == pk:
+                data[extra]['used'] = True
+                break
+        self.extra_data = json.dumps(data)
+        self.save()
+
+    def save_extra_sessions(self):
+        data = []
+        for extra in self.session.orig_sessions.all():
+           data.append({
+               'session': extra.extra.id,
+               'start': extra.start.strftime(settings.DATETIME_FORMAT),
+               'end': extra.end.strftime(settings.DATETIME_FORMAT),
+               'used': extra.used
+           })
+        self.extra_data = json.dumps(data)
+
+
+
 class MultiPurchase(models.Model, BaseTicketMixing):
     ev = models.ForeignKey(Event, related_name='mps')
 
@@ -204,7 +240,7 @@ class MultiPurchase(models.Model, BaseTicketMixing):
         return self.order
 
 
-class Ticket(models.Model, BaseTicketMixing):
+class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
     session = models.ForeignKey(Session, related_name='tickets')
 
     inv = models.OneToOneField(InvCode, blank=True, null=True)
@@ -278,41 +314,10 @@ class Ticket(models.Model, BaseTicketMixing):
             self.seat_layout_name = self.seat_layout.name
             if self.seat_layout.gate:
                 self.gate_name = self.seat_layout.gate.name
-
-        data = []
-        for extra in self.session.orig_sessions.all():
-           data.append({
-               'session': extra.extra.id,
-               'start': extra.start.strftime(settings.DATETIME_FORMAT),
-               'end': extra.end.strftime(settings.DATETIME_FORMAT),
-               'used': extra.used
-           })
-        self.extra_data = json.dumps(data)
+        self.save_extra_sessions()
 
     def gen_pdf(self):
         return generate_pdf(self)
-
-    def get_extra_sessions(self):
-        if not self.extra_data:
-            data = []
-        else:
-            data = json.loads(self.extra_data)
-        return data
-
-    def get_extra_session(self, pk):
-        for extra in self.get_extra_sessions():
-            if extra.get('session') == pk:
-                return extra
-        return False
-
-    def set_extra_session_to_used(self, pk):
-        data = self.get_extra_sessions()
-        for extra in range(len(data)):
-            if data[extra].get('session') == pk:
-                data[extra]['used'] = True
-                break
-        self.extra_data = json.dumps(data)
-        self.save()
 
 
 class TicketWarning(models.Model):
@@ -381,6 +386,14 @@ class BasePassInvitation:
             assert('Invalid order')
         return p or i
 
+    def get_extra_data(self, key):
+        data = {}
+        if not self.extra_data:
+            return None
+        else:
+            data = json.loads(self.extra_data)
+        return data.get(key, None)
+
 
 class PassType(models.Model):
     name = models.CharField(max_length=200)
@@ -388,12 +401,14 @@ class PassType(models.Model):
     end = models.DateTimeField(_('end date'), null=True)
 
 
-class Pass(models.Model, BasePassInvitation):
+class Pass(models.Model, BasePassInvitation, BaseExtraData):
+    session = models.ForeignKey(Session, related_name='passes', null=True, blank=True)
     order = models.CharField(_('Order'), max_length=200, unique=True)
     created = models.DateTimeField(_('Created at'), auto_now_add=True)
     seat = models.CharField(max_length=20, null=True, blank=True)
     seat_layout = models.ForeignKey(SeatLayout, null=True, blank=True)
     type = models.ForeignKey(PassType, null=True, blank=True)
+    extra_data = models.TextField(blank=True, null=True)
 
     # field to control the access
     used = models.BooleanField(default=False)
@@ -405,12 +420,14 @@ class InvitationType(models.Model):
     end = models.DateTimeField(_('end date'), null=True)
 
 
-class Invitation(models.Model, BasePassInvitation):
+class Invitation(models.Model, BasePassInvitation, BaseExtraData):
+    session = models.ForeignKey(Session, related_name='invitations', null=True, blank=True)
     order = models.CharField(_('Order'), max_length=200, unique=True)
     created = models.DateTimeField(_('Created at'), auto_now_add=True)
     seat = models.CharField(max_length=20, null=True, blank=True)
     seat_layout = models.ForeignKey(SeatLayout, null=True, blank=True)
     type = models.ForeignKey(InvitationType, null=True, blank=True)
+    extra_data = models.TextField(blank=True, null=True)
 
     # field to control the access
     used = models.BooleanField(default=False)
