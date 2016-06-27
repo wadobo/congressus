@@ -9,8 +9,9 @@ from reportlab.graphics.barcode.qr import QrCodeWidget
 from reportlab.platypus import *
 from reportlab.pdfgen import canvas
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.platypus.flowables import HRFlowable
 from reportlab.lib.units import inch, cm
-from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
+from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT, TA_JUSTIFY
 from reportlab.lib import utils
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib import colors
@@ -81,6 +82,26 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
 
     template = ticket.session.template
 
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer)
+    Story = []
+    styleN = styles["Normal"]
+    styleH = styles['Heading1']
+
+    styleR = ParagraphStyle(name="rightStyle", fontSize=10, alignment=TA_RIGHT)
+    styleL = ParagraphStyle(name="leftStyle", fontSize=10, alignment=TA_LEFT)
+    styleLinks = ParagraphStyle(name="links", fontSize=14,
+                                alignment=TA_CENTER, textColor=colors.gray)
+    styleInfo = ParagraphStyle(name="info", alignment=TA_JUSTIFY)
+
+    def add_full_width_image(header, img):
+        Story.append(Spacer(width=1, height=8))
+        Story.append(Paragraph(header, styleL))
+        Story.append(HRFlowable(width="100%", thickness=1, hAlign='CENTER',
+                                vAlign='BOTTOM', dash=None, spaceAfter=5))
+        img = get_image(img, width=doc.width - 8)
+        Story.append(img)
+
     def ticketPage(canvas, doc):
         if logo and not template:
             canvas.saveState()
@@ -98,14 +119,24 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
             header.drawOn(canvas, doc.leftMargin, doc.height + doc.topMargin)
             canvas.restoreState()
 
-    buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer)
-    Story = []
-    styleN = styles["Normal"]
-    styleH = styles['Heading1']
+        # drawing the footer
+        canvas.saveState()
 
-    styleR = ParagraphStyle(name="rightStyle", fontSize=10, alignment=TA_RIGHT)
-    styleL = ParagraphStyle(name="leftStyle", fontSize=10, alignment=TA_LEFT)
+        # qrcode
+        codeimg.wrap(3*cm, 3*cm)
+        codeimg.drawOn(canvas, doc.width, 1.5*cm)
+        # line
+        hr = HRFlowable(width="100%", thickness=0.25, hAlign='CENTER',
+                        color=colors.black, vAlign='BOTTOM', dash=None,
+                        spaceAfter=5)
+        hr.wrap(doc.width, 1*cm)
+        hr.drawOn(canvas, doc.leftMargin, 1.5*cm)
+        # code
+        pr = Paragraph(code, styleL)
+        pr.wrap(doc.width, 1*cm)
+        pr.drawOn(canvas, doc.leftMargin, 1.0*cm)
+
+        canvas.restoreState()
 
     # heading notice
     t = Table([
@@ -135,6 +166,32 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
     tstyle = TableStyle(tstyle_list)
     t.setStyle(tstyle)
     Story.append(t)
+
+    if template:
+        # sponsors
+        if template.sponsors:
+            add_full_width_image(_("Sponsors"), template.sponsors.path)
+
+        # info text
+        Story.append(Spacer(width=1, height=1*cm))
+
+        t = Table([
+            [Paragraph(template.links, styleLinks)],
+            [Paragraph(template.info.replace('\n', '<br/>'), styleInfo)]
+        ], colWidths=['*'], rowHeights=[1*cm, None])
+        tstyle_list = [
+            ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+            ('VALIGN', (0,0), (-1,-1), 'TOP'),
+        ]
+        tstyle = TableStyle(tstyle_list)
+        t.setStyle(tstyle)
+        Story.append(t)
+
+        Story.append(Spacer(width=1, height=1*cm))
+
+        # contributors
+        if template.contributors:
+            add_full_width_image(_("Contributors"), template.contributors.path)
 
     doc.build(Story, onFirstPage=ticketPage, onLaterPages=ticketPage)
 
