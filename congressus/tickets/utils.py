@@ -67,6 +67,8 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
 
     initials = _('T') + space[0].upper() + session[0].upper()
     text = _('Ticket %(space)s %(session)s') % {'space': space.capitalize(), 'session': session.capitalize()}
+    if ticket.seat:
+        text += ' ' + ticket.cseat()
 
     price = _('%4.2f €') % ticket.price
     price = '<font size=14>%s</font>   <font size=8>%s%% TAX INC.</font>' % (price, ticket.tax)
@@ -104,14 +106,11 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
 
     def ticketPage(canvas, doc):
         if logo and not template:
+            img = get_image(os.path.join(settings.MEDIA_ROOT, logo), width=2*cm)
             canvas.saveState()
-            H = 1.5 * inch
-            W = 1.5 * .69 * inch
-            canvas.drawImage(os.path.join(settings.MEDIA_ROOT, logo), 6 * inch,
-                    PAGE_HEIGHT - (1.75 * inch), width = W, height = H)
+            img.drawOn(canvas, doc.width, doc.height + doc.topMargin)
             canvas.restoreState()
-
-        else:
+        elif template:
             header = template.header
             header = get_image(header.path, width=doc.width)
 
