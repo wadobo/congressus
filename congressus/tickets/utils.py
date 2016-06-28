@@ -90,8 +90,8 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
     styleN = styles["Normal"]
     styleH = styles['Heading1']
 
-    styleR = ParagraphStyle(name="rightStyle", fontSize=10, alignment=TA_RIGHT)
-    styleL = ParagraphStyle(name="leftStyle", fontSize=10, alignment=TA_LEFT)
+    styleR = ParagraphStyle(name="rightStyle", fontSize=8, alignment=TA_RIGHT)
+    styleL = ParagraphStyle(name="leftStyle", fontSize=8, alignment=TA_LEFT)
     styleLinks = ParagraphStyle(name="links", fontSize=14,
                                 alignment=TA_CENTER, textColor=colors.gray)
     styleInfo = ParagraphStyle(name="info", alignment=TA_JUSTIFY)
