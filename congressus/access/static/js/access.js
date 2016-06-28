@@ -1,4 +1,5 @@
 var notifyTimer = null;
+var enabled = true;
 
 function gonormal() {
     $("body").removeClass("wrong");
@@ -12,10 +13,29 @@ function notify(what) {
     var audio = new Audio($("#audio-"+what).attr('src'));
     audio.play();
     clearTimeout(notifyTimer);
-    notifyTimer = setTimeout(gonormal, 1000);
+    notifyTimer = setTimeout(function() {
+        gonormal();
+        setEnabled(true);
+    }, 1000);
+}
+
+function setEnabled(t) {
+    enabled = t;
+    if (!enabled) {
+        $("#order").attr("disabled", "disabled");
+        $("#ordergo").attr("disabled", "disabled");
+    } else {
+        $("#order").removeAttr("disabled");
+        $("#ordergo").removeAttr("disabled");
+    }
 }
 
 function makeReq() {
+    if (!enabled) {
+        return;
+    }
+
+    setEnabled(false);
     var req = $("#order").val();
     var url = $("#access").attr("action");
     d = {'order': req};
