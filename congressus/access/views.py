@@ -14,6 +14,8 @@ from .models import AccessControl
 from events.models import Event
 from events.models import Session
 from events.models import Gate
+from tickets.models import Invitation
+from tickets.models import Pass
 from tickets.models import Ticket
 
 from django.contrib.auth import logout as auth_logout
@@ -96,49 +98,75 @@ class AccessView(UserPassesTestMixin, TemplateView):
         ctx['session'] = s
         ctx['gate'] = self.request.session.get('gate', '')
         return ctx
+    
+    def get_order_type(self, order):
+        if order.startswith(Pass.ORDER_START):
+            obj = Pass
+        elif order.startswith(Invitation.ORDER_START):
+            obj = Invitation
+        else:
+            obj = Ticket
+        return obj
+
 
     def post(self, request, *args, **kwargs):
+        def check_extra():
+            if extra.get('used'):
+                data['st'] = 'wrong'
+                data['extra'] = _('Used')
+                return HttpResponse(json.dumps(data), content_type="application/json")
+            start = datetime.strptime(extra.get('start'), settings.DATETIME_FORMAT)
+            end = datetime.strptime(extra.get('end'), settings.DATETIME_FORMAT)
+            if end < datetime.now():
+                data['st'] = 'wrong'
+                data['extra'] = _("Expired session: ") + str(extra.get('session'))
+            elif start > datetime.now():
+                data['st'] = 'maybe'
+                data['extra'] = _("Wait 1.5h before for session") + str(extra.get('session'))
+            else:
+                ticket.set_extra_session_to_used(s)
+                ticket.save()
+
         data = {'st': "right", 'extra': ''}
         order = request.POST.get('order', '')
         s = self.request.session.get('session', '')
         g = self.request.session.get('gate', '')
+
+        obj = self.get_order_type(order)
         try:
-            ticket = Ticket.objects.get(order=order,
-                                        confirmed=True,
-                                        used=False)
+            if obj == Ticket:
+                ticket = obj.objects.get(order=order, confirmed=True)
+            else:
+                ticket = obj.objects.get(order=order)
         except:
             data['st'] = 'wrong'
+            data['extra'] = _('Not exist')
             return HttpResponse(json.dumps(data), content_type="application/json")
 
-        special = False
         valid_session = ticket.session_id == s
+        valid_gate = ticket.gate_name == g
+        extra = ticket.get_extra_session(s)
+        special = False
 
-        if valid_session and g and ticket.gate_name != g:
-            data['st'] = 'maybe'
-            data['extra'] = _("%(session)s - Gate: %(gate)s") % {'session': ticket.session, 'gate': ticket.gate_name}
-            return HttpResponse(json.dumps(data), content_type="application/json")
-
-        if not valid_session: # checking extra
-            extra = ticket.get_extra_session(s)
+        if ticket.used:
             if extra:
-                if extra.get('used'):
-                    data['st'] = 'wrong'
-                    return HttpResponse(json.dumps(data), content_type="application/json")
-                start = datetime.strptime(extra.get('start'), settings.DATETIME_FORMAT)
-                end = datetime.strptime(extra.get('end'), settings.DATETIME_FORMAT)
-                if end < datetime.now():
-                    data['st'] = 'wrong'
-                    data['extra'] = _("Expired session: ") + str(extra.get('session'))
-                elif start > datetime.now():
-                    data['st'] = 'maybe'
-                    data['extra'] = _("Wait 1.5h before for session") + str(extra.get('session'))
-                else:
-                    special = True
-                    ticket.set_extra_session_to_used(s)
-                    ticket.save()
+                special = True
+                check_extra()
+            else:
+                data['st'] = 'wrong'
+                data['extra'] = _('Used')
+                return HttpResponse(json.dumps(data), content_type="application/json")
+        elif not valid_session:
+            if extra:
+                special = True
+                check_extra()
             else:
                 data['st'] = 'wrong'
                 data['extra'] = str(ticket.session)
+        elif not valid_gate:
+            data['st'] = 'maybe'
+            data['extra'] = _("%(session)s - Gate: %(gate)s") % {'session': ticket.session, 'gate': ticket.gate_name}
+            return HttpResponse(json.dumps(data), content_type="application/json")
 
         if data['st'] == 'right' and not special:
             ticket.used = True

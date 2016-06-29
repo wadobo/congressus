@@ -76,7 +76,7 @@ class BaseTicketMixing:
         while used or reserved:
             order = ''.join(random.choice(chars) for _ in range(l))
             used = self.is_order_used(order)
-            reserved = order.startswith('00001') or order.startswith('00002')
+            reserved = order.startswith(Pass.ORDER_START) or order.startswith(Invitation.ORDER_START)
 
         self.order = order
         self.save()
@@ -356,9 +356,9 @@ class BasePassInvitation:
     def gen_order(self, starts):
         """ Generate order for passes and invitations """
         if isinstance(self, Pass):
-            starts = '00001'
+            starts = Pass.ORDER_START
         elif isinstance(self, Invitation):
-            starts = '00002'
+            starts = Invitation.ORDER_START
         else:
             assert('Invalid Model')
         chars = string.ascii_uppercase + string.digits
@@ -378,9 +378,9 @@ class BasePassInvitation:
         self.save()
 
     def is_order_used(self, order):
-        if order.startswith('00001'):
+        if order.startswith(Pass.ORDER_START):
             p = Pass.objects.filter(order=order).exists()
-        elif order.startswith('00002'):
+        elif order.startswith(Invitation.ORDER_START):
             i = Invitation.objects.filter(order=order).exists()
         else:
             assert('Invalid order')
@@ -403,6 +403,7 @@ class PassType(models.Model):
 
 
 class Pass(models.Model, BasePassInvitation, BaseExtraData):
+    ORDER_START = '00001'
     session = models.ForeignKey(Session, related_name='passes', null=True, blank=True)
     order = models.CharField(_('Order'), max_length=200, unique=True)
     created = models.DateTimeField(_('Created at'), auto_now_add=True)
@@ -423,6 +424,7 @@ class InvitationType(models.Model):
 
 
 class Invitation(models.Model, BasePassInvitation, BaseExtraData):
+    ORDER_START = '00002'
     session = models.ForeignKey(Session, related_name='invitations', null=True, blank=True)
     order = models.CharField(_('Order'), max_length=200, unique=True)
     created = models.DateTimeField(_('Created at'), auto_now_add=True)
