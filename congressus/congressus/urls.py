@@ -20,5 +20,6 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^window/', include('windows.urls')),
     url(r'^access/', include('access.urls')),
+    url(r'^dashboard/', include('dashboard.urls')),
     url(r'', include('tickets.urls')),
 ]

@@ -49,6 +49,7 @@ INSTALLED_APPS = (
     'websocket',
     'windows',
     'access',
+    'dashboard',
 )
 
 if os.path.exists(os.path.join(BASE_DIR, 'theme')):
