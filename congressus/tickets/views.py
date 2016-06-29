@@ -25,7 +25,9 @@ from django.utils.translation import ugettext as _
 
 from .models import Ticket
 from .models import MultiPurchase
+from .models import Invitation
 from .models import InvitationType
+from .models import Pass
 from .models import PassType
 from events.models import Session
 from events.models import Event
@@ -323,10 +325,16 @@ class GenInvitationsView(View):
         return ctx
 
     def post(self, request):
-        type = request.POST.get('type', None)
+        idtype = request.POST.get('type', None)
+        type = get_object_or_404(InvitationType, id=idtype)
         amount = request.POST.get('amount', '0')
         amount = int(amount)
-        # TODO: generate invitations
+        for x in range(amount):
+            invi = Invitation(session=type.session, type=type)
+            invi.gen_order()
+            invi.save()
+            invi.save_extra_sessions()
+            invi.save()
         return redirect('/admin/tickets/invitation/')
 
 gen_invitations = GenInvitationsView.as_view()
@@ -338,10 +346,16 @@ class GenPassesView(View):
         return ctx
 
     def post(self, request):
-        type = request.POST.get('type', None)
+        idtype = request.POST.get('type', None)
+        type = get_object_or_404(PassType, id=idtype)
         amount = request.POST.get('amount', '0')
         amount = int(amount)
-        # TODO: generate passes
+        for x in range(amount):
+            pas = Pass(session=type.session, type=type)
+            pas.gen_order()
+            pas.save()
+            pas.save_extra_sessions()
+            pas.save()
         return redirect('/admin/tickets/pass/')
 
 gen_passes = GenPassesView.as_view()
@@ -349,7 +363,7 @@ gen_passes = GenPassesView.as_view()
 
 class GetTypes(View):
     def get_context_data(self, *args, **kwargs):
-        ctx = super(GenPassesView, self).get_context_data(*args, **kwargs)
+        ctx = super(GetTypes, self).get_context_data(*args, **kwargs)
         return ctx
     def post(self, request):
         ctx = {

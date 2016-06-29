@@ -21,7 +21,7 @@
             </tr>
         </form>
 
-        <form id="form-gen-passes" method="POST" action="{% url 'gen_invitations' %}">
+        <form id="form-gen-passes" method="POST" action="{% url 'gen_passes' %}">
             {% csrf_token %}
             <tr class="model-generate">
                 <th scope="row"><a href="javascript:document.getElementById('form-gen-passes').submit();" target="_blank">{% trans "Generate passes" %}</a></th>

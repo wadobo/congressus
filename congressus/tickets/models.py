@@ -353,7 +353,7 @@ class TicketSeatHold(models.Model):
 class BasePassInvitation:
     ''' Common base class for Passes and Invitations. '''
 
-    def gen_order(self, starts):
+    def gen_order(self, starts=''):
         """ Generate order for passes and invitations """
         if isinstance(self, Pass):
             starts = Pass.ORDER_START
@@ -378,9 +378,10 @@ class BasePassInvitation:
         self.save()
 
     def is_order_used(self, order):
-        if order.startswith(Pass.ORDER_START):
+        p = i = False
+        if isinstance(self, Pass):
             p = Pass.objects.filter(order=order).exists()
-        elif order.startswith(Invitation.ORDER_START):
+        elif isinstance(self, Invitation):
             i = Invitation.objects.filter(order=order).exists()
         else:
             assert('Invalid order')

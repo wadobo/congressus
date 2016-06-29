@@ -16,7 +16,7 @@ class InvitationAdmin(admin.ModelAdmin):
 
 
 class InvitationTypeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'start', 'end')
+    list_display = ('session', 'name', 'start', 'end')
 
 
 class PassAdmin(admin.ModelAdmin):
@@ -24,7 +24,7 @@ class PassAdmin(admin.ModelAdmin):
 
 
 class PassTypeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'start', 'end')
+    list_display = ('session', 'name', 'start', 'end')
 
 
 class TicketAdmin(CSVMixin, admin.ModelAdmin):
