@@ -1,52 +1,20 @@
-function initial_data() {
-    data_sales = {
-        labels: ["1", "2", "3", "4", "5", "6", "7"],
-        datasets: [
-            {
-                label: "All",
-                borderColor: "rgba(0,0,0,1)",
-                borderWidth: 5,
-                pointBorderWidth: 1,
-                pointRadius: 1,
-                data: [5, 15, 20, 21, 40, 60, 100],
-            }, 
-            {
-                label: "C1",
-                fill: false,
-                borderColor: "rgba(75,192,192,1)",
-                borderWidth: 1,
-                pointBorderWidth: 0,
-                pointRadius: 0,
-                data: [1, 7, 16, 17, 24, 44, 68],
-            } 
-        ]
-    };
-
-    data_access = {
-        labels: [1, 5, 10, 15, 20, 25, 30],
-        datasets: [
-            {
-                label: "All",
-                borderColor: "rgba(0,0,0,1)",
-                borderWidth: 5,
-                pointBorderWidth: 1,
-                pointRadius: 1,
-                data: [5, 15, 20, 21, 40, 60, 100],
-            }, 
-            {
-                label: "C1",
-                fill: false,
-                borderColor: "rgba(75,192,192,1)",
-                borderWidth: 1,
-                pointBorderWidth: 0,
-                pointRadius: 0,
-                data: [1, 7, 16, 17, 24, 44, 68],
-            } 
-        ]
-    };
-    last_label_access = 30;
+function get_initial_data() {
+    var deferred = new $.Deferred();
+    $.ajax({
+        type: "POST",
+        data: {},
+        dataType: 'JSON',
+        url: "/dashboard/general/",
+        success: function(msg){
+            data_sales = msg.sales_log;
+            data_access = msg.access_log;
+            fill_charts();
+            deferred.resolve(msg);
+        }
+    });
+    return deferred.promise();
 }
-initial_data();
+get_initial_data();
 
 
 function fill_charts() {
@@ -56,35 +24,31 @@ function fill_charts() {
     window.chart_sales = new Chart(ctx_sales, {
         type: 'line',
         data: data_sales,
-        options: {}
+        options: {
+            scales: {yAxes: [{ ticks: { beginAtZero: true }}]}
+        }
     });
 
     window.chart_access = new Chart(ctx_access, {
         type: 'line',
         data: data_access,
-        options: {}
+        options: {
+            scales: {yAxes: [{ ticks: { beginAtZero: true }}]}
+        }
     });
 }
-fill_charts();
 
 function update_charts(chart, label, datasets) {
     chart.data.labels.shift();
     chart.data.labels.push(label);
-
     var d = 0;
     for (var dset in chart.data.datasets) {
-        console.log(chart.data.datasets[dset].data);
         chart.data.datasets[dset].data.shift();
         chart.data.datasets[dset].data.push(datasets[d]);
         d++;
     }
     chart.update();
 }
-
-setTimeout(function(){
-    update_charts(window.chart_access, 35, [100, 80]);
-}, 5000);
-
 
 $(document).ready(function() {
 });
