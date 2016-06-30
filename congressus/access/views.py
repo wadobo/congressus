@@ -11,6 +11,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.urlresolvers import reverse
 
 from .models import AccessControl
+from .models import LogAccessControl
 from events.models import Event
 from events.models import Session
 from events.models import Gate
@@ -144,7 +145,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
             return HttpResponse(json.dumps(data), content_type="application/json")
 
         valid_session = ticket.session_id == s
-        valid_gate = ticket.gate_name == g
+        valid_gate = ticket.gate_name is None or ticket.gate_name == g
         extra = ticket.get_extra_session(s)
         special = False
 
@@ -172,6 +173,9 @@ class AccessView(UserPassesTestMixin, TemplateView):
             ticket.used = True
             ticket.save()
 
+        ac = kwargs.get('ac')
+        log = LogAccessControl(access_control=AccessControl.objects.get(slug=ac))
+        log.save()
         return HttpResponse(json.dumps(data), content_type="application/json")
 access = csrf_exempt(AccessView.as_view())
 

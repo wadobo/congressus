@@ -16,3 +16,8 @@ class AccessControl(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class LogAccessControl(models.Model):
+    access_control = models.ForeignKey(AccessControl, related_name='log_access')
+    date = models.DateTimeField(auto_now_add=True)

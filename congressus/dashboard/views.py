@@ -8,6 +8,7 @@ from django.views.generic import TemplateView
 from random import randint
 
 from access.models import AccessControl
+from access.models import LogAccessControl
 from tickets.models import Ticket
 from windows.models import TicketWindow
 from windows.models import TicketWindowSale
@@ -52,22 +53,18 @@ class GeneralView(TemplateView):
             new_dataset['borderColor'] = self.get_random_color()
             res['datasets'].append(new_dataset)
         # Get logs access control
-        content_type = ContentType.objects.get_for_model(Ticket)
-        log = LogEntry.objects.filter(content_type=content_type,
-                                      change_message__icontains='used',
-                                      action_flag=CHANGE)
-        for l in log:
-            date = l.action_time.date().isoformat()
-            # TODO: get control access
-            #extra_index = self.dataset_index(res['datasets'], 'TODO')
+        access_controls = LogAccessControl.objects.all()
+        for ac in access_controls:
+            date = ac.date.date().isoformat()
+            extra_index = self.dataset_index(res['datasets'], ac.access_control.name)
             if date in res.get("labels"):
                 index = res.get("labels").index(date)
                 res.get("datasets")[self.INDEX_MAIN].get('data')[index] += 1
-                #res.get("datasets")[extra_index].get('data')[index] += 1
+                res.get("datasets")[extra_index].get('data')[index] += 1
             else:
                 index = res.get("labels").append(date)
                 res.get("datasets")[self.INDEX_MAIN].get('data').append(1)
-                #res.get("datasets")[extra_index].get('data').append(1)
+                res.get("datasets")[extra_index].get('data').append(1)
         return res
 
     def get_random_color(self):
