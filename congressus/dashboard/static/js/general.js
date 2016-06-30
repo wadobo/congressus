@@ -9,6 +9,10 @@ function get_initial_data() {
             data_sales = msg.sales_log;
             data_access = msg.access_log;
             fill_charts();
+            // TODO: get data to websocket
+            //setTimeout(function() {
+            //    update_charts(window.chart_sales, 'window1', '2016-06-30', 1);
+            //}, 5000);
             deferred.resolve(msg);
         }
     });
@@ -38,14 +42,22 @@ function fill_charts() {
     });
 }
 
-function update_charts(chart, label, datasets) {
-    chart.data.labels.shift();
-    chart.data.labels.push(label);
-    var d = 0;
-    for (var dset in chart.data.datasets) {
-        chart.data.datasets[dset].data.shift();
-        chart.data.datasets[dset].data.push(datasets[d]);
-        d++;
+function update_charts(chart, dataset_label, label, amount) {
+    main_dataset = 0
+    n = 0
+    ndataset = null;
+    for (var dat in chart.data.datasets) {
+        if (chart.data.datasets[dat].label == dataset_label) {
+            ndataset = n;
+            break;
+        }
+        n++;
+    }
+    index = chart.data.labels.indexOf(label);
+
+    chart.data.datasets[main_dataset].data[index] += amount;
+    if (ndataset !== null) {
+        chart.data.datasets[ndataset].data[index] += amount;
     }
     chart.update();
 }
