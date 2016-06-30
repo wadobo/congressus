@@ -62,6 +62,7 @@ class GeneralView(TemplateView):
                 res.get("datasets")[self.INDEX_MAIN].get('data')[index] += 1
                 res.get("datasets")[extra_index].get('data')[index] += 1
             else:
+                res.get("labels").append(date);
                 # Create value in all data
                 for i in range(len(res.get("datasets"))):
                     if i in (self.INDEX_MAIN, extra_index):
@@ -95,6 +96,7 @@ class GeneralView(TemplateView):
                 res.get("datasets")[self.INDEX_MAIN].get('data')[index] += 1
                 res.get("datasets")[extra_index].get('data')[index] += 1
             else:
+                res.get("labels").append(date);
                 # Create value in all data
                 for i in range(len(res.get("datasets"))):
                     if i in (self.INDEX_MAIN, extra_index):
