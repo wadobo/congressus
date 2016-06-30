@@ -62,9 +62,12 @@ class GeneralView(TemplateView):
                 res.get("datasets")[self.INDEX_MAIN].get('data')[index] += 1
                 res.get("datasets")[extra_index].get('data')[index] += 1
             else:
-                index = res.get("labels").append(date)
-                res.get("datasets")[self.INDEX_MAIN].get('data').append(1)
-                res.get("datasets")[extra_index].get('data').append(1)
+                # Create value in all data
+                for i in range(len(res.get("datasets"))):
+                    if i in (self.INDEX_MAIN, extra_index):
+                        res.get("datasets")[i].get('data').append(1)
+                    else:
+                        res.get("datasets")[i].get('data').append(0)
         return res
 
     def get_random_color(self):
@@ -92,9 +95,12 @@ class GeneralView(TemplateView):
                 res.get("datasets")[self.INDEX_MAIN].get('data')[index] += 1
                 res.get("datasets")[extra_index].get('data')[index] += 1
             else:
-                index = res.get("labels").append(date)
-                res.get("datasets")[self.INDEX_MAIN].get('data').append(1)
-                res.get("datasets")[extra_index].get('data').append(1)
+                # Create value in all data
+                for i in range(len(res.get("datasets"))):
+                    if i in (self.INDEX_MAIN, extra_index):
+                        res.get("datasets")[i].get('data').append(1)
+                    else:
+                        res.get("datasets")[i].get('data').append(0)
         return res
 
     def get_context_data(self, *args, **kwargs):
