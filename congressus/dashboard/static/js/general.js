@@ -8,7 +8,10 @@ function get_initial_data() {
         success: function(msg){
             data_sales = msg.sales_log;
             data_access = msg.access_log;
-            fill_charts();
+            fill_line_charts();
+            data_pie_sales = msg.sales_pie_log;
+            data_pie_access = msg.access_pie_log;
+            fill_pie_charts();
             deferred.resolve(msg);
         }
     });
@@ -17,11 +20,11 @@ function get_initial_data() {
 get_initial_data();
 
 
-function fill_charts() {
-    var ctx_sales = $("#chart-sales").get(0).getContext("2d");
-    var ctx_access = $("#chart-access").get(0).getContext("2d");
+function fill_line_charts() {
+    var ctx_line_sales = $("#chart-sales").get(0).getContext("2d");
+    var ctx_line_access = $("#chart-access").get(0).getContext("2d");
 
-    window.chart_sales = new Chart(ctx_sales, {
+    window.chart_line_sales = new Chart(ctx_line_sales, {
         type: 'line',
         data: data_sales,
         options: {
@@ -29,11 +32,32 @@ function fill_charts() {
         }
     });
 
-    window.chart_access = new Chart(ctx_access, {
+    window.chart_line_access = new Chart(ctx_line_access, {
         type: 'line',
         data: data_access,
         options: {
             scales: {yAxes: [{ ticks: { beginAtZero: true }}]}
+        }
+    });
+}
+
+function fill_pie_charts() {
+    var ctx_pie_sales = $("#chart-pie-sales").get(0).getContext("2d");
+    var ctx_pie_access = $("#chart-pie-access").get(0).getContext("2d");
+
+    window.chart_pie_sales = new Chart(ctx_pie_sales, {
+        type: 'doughnut',
+        data: data_pie_sales,
+        options: {
+            responsive: true,
+        }
+    });
+
+    window.chart_pie_access = new Chart(ctx_pie_access, {
+        type: 'doughnut',
+        data: data_pie_access,
+        options: {
+            responsive: true,
         }
     });
 }
@@ -101,11 +125,11 @@ function websocketCB(ev, data) {
     if (ev === 'add_ac') {
         toT = data.date.indexOf('T');
         date = data.date.substring(0, toT);
-        update_line_charts(window.chart_access, data.control, date);
+        update_line_charts(window.chart_line_access, data.control, date);
     } else if (ev === 'add_sale') {
         toT = data.date.indexOf('T');
         date = data.date.substring(0, toT);
-        update_line_charts(window.chart_sales, data.window, date, data.amount);
+        update_line_charts(window.chart_line_sales, data.window, date, data.amount);
     }
 }
 
