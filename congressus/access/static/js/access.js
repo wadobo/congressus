@@ -17,6 +17,11 @@ function notify(what) {
         gonormal();
         setEnabled(true);
     }, 1000);
+
+    args = ' ' + window.ac;
+    args += ' ' + moment().format('YYYY-MM-DDThh:mm:ss.SSSSSSZ');
+    args += ' ' + what;
+    ws.send('add_ac' + args);
 }
 
 function setEnabled(t) {

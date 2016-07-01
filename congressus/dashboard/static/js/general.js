@@ -9,10 +9,6 @@ function get_initial_data() {
             data_sales = msg.sales_log;
             data_access = msg.access_log;
             fill_charts();
-            // TODO: get data to websocket
-            //setTimeout(function() {
-            //    update_charts(window.chart_sales, 'window1', '2016-06-30', 1);
-            //}, 5000);
             deferred.resolve(msg);
         }
     });
@@ -62,5 +58,18 @@ function update_charts(chart, dataset_label, label, amount) {
     chart.update();
 }
 
+function websocketCB(ev, data) {
+    if (ev === 'add_ac') {
+        toT = data.date.indexOf('T');
+        date = data.date.substring(0, toT);
+        #update_line_charts(window.chart_access, data.control, date);
+    } else if (ev === 'add_sale') {
+        toT = data.date.indexOf('T');
+        date = data.date.substring(0, toT);
+        #update_line_charts(window.chart_sales, data.window, date, data.amount);
+    }
+}
+
 $(document).ready(function() {
+    ws.cbs.add(websocketCB);
 });

@@ -72,5 +72,9 @@
 
 {% block extrabody %}
     {{ block.super }}
+    <script src="{% static 'js/moment.min.js' %}"></script>
     <script src="{% static 'js/window.js' %}"></script>
+    <script>
+        var windows = '{{ window }}';
+    </script>
 {% endblock %}

@@ -45,6 +45,11 @@ $(document).ready(function() {
         var msg = $("#finish").data("msg");
         var ret = confirm(msg);
         if (ret) {
+            args = ' ' + window.windows;
+            args += ' ' + moment().format('YYYY-MM-DDThh:mm:ss.SSSSSSZ');
+            args += ' ' + $('input[name=payment]:checked').val();
+            args += ' ' + $(".seat-selected").length;
+            ws.send('add_sale' + args);
             setTimeout(clean, 1000);
         }
         return ret;

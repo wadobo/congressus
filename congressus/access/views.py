@@ -173,10 +173,6 @@ class AccessView(UserPassesTestMixin, TemplateView):
         if data['st'] == 'right' and not special:
             ticket.used = True
             ticket.save()
-
-        ac = kwargs.get('ac')
-        log = LogAccessControl(access_control=AccessControl.objects.get(slug=ac))
-        log.save()
         return HttpResponse(json.dumps(data), content_type="application/json")
 access = csrf_exempt(AccessView.as_view())
 

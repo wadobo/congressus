@@ -117,3 +117,24 @@ class WSServer:
             self.server.send_message_to_all(json.dumps(data))
         except:
             pass
+
+    def internal_ws_add_ac(self, client, control, date, st):
+        data = {
+            'action': 'add_ac',
+            'control': control,
+            'date': date,
+            'st': st,
+        }
+        log = LogAccessControl(access_control=AccessControl.objects.get(slug=control), status=st)
+        log.save()
+        self.server.send_message_to_all(json.dumps(data))
+
+    def internal_ws_add_sale(self, client, window, date, payment, amount):
+        data = {
+            'action': 'add_ac',
+            'window': window,
+            'date': date,
+            'payment': payment,
+            'amount': amount,
+        }
+        self.server.send_message_to_all(json.dumps(data))
