@@ -25,7 +25,15 @@
 {% endblock %}
 
 {% block extrabody %}
+    <script src="{% static "js/websocket.js" %}"></script>
     <script src="{% static "js/Chart.bundle.min.js" %}"></script>
     <script src="{% static "js/Chart.min.js" %}"></script>
     <script src="{% static "js/general.js" %}"></script>
+    <script>
+        try {
+            ws.init("{{ ws_server }}");
+        } catch (e) {
+            console.log("NO WS");
+        }
+    </script>
 {% endblock %}

@@ -97,6 +97,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
         ctx['ac'] = ac
         s = Session.objects.get(id=self.request.session.get('session', ''))
         ctx['session'] = s
+        ctx['ws_server'] = settings.WS_SERVER
         ctx['gate'] = self.request.session.get('gate', '')
         return ctx
     

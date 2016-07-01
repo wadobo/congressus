@@ -1,4 +1,5 @@
 from copy import deepcopy
+from django.conf import settings
 from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.contenttypes.models import ContentType
 from django.http import JsonResponse
@@ -107,6 +108,7 @@ class GeneralView(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         ctx = super(GeneralView, self).get_context_data(*args, **kwargs)
+        ctx['ws_server'] = settings.WS_SERVER
         return ctx
 
     def post(self, request):
