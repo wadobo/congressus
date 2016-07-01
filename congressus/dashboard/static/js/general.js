@@ -121,15 +121,32 @@ function update_line_charts(chart, dataset_label, label, amount=1) {
     chart.update();
 }
 
+function update_pie_charts(chart, label, amount=1) {
+    amount = Number(amount);
+    index = chart.data.labels.indexOf(label);
+    if (index === -1) {
+        chart.data.labels.push(label);
+        color = randColor();
+        chart.data.datasets[0].backgroundColor.push(color);
+        chart.data.datasets[0].hoverBackgroundColor.push(color);
+        chart.data.datasets[0].data.push(amount);
+    } else {
+        chart.data.datasets[0].data[index] += amount;
+    }
+    chart.update();
+}
+
 function websocketCB(ev, data) {
     if (ev === 'add_ac') {
         toT = data.date.indexOf('T');
         date = data.date.substring(0, toT);
         update_line_charts(window.chart_line_access, data.control, date);
+        update_pie_charts(window.chart_pie_access, data.st);
     } else if (ev === 'add_sale') {
         toT = data.date.indexOf('T');
         date = data.date.substring(0, toT);
         update_line_charts(window.chart_line_sales, data.window, date, data.amount);
+        update_pie_charts(window.chart_pie_sales, data.payment);
     }
 }
 

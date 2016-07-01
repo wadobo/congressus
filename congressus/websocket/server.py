@@ -2,6 +2,8 @@ import json
 from django.core import serializers
 
 from websocket_server import WebsocketServer
+from access.models import AccessControl
+from access.models import LogAccessControl
 from events.models import Event
 from events.models import Session
 from events.models import SeatLayout
