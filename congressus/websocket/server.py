@@ -131,7 +131,7 @@ class WSServer:
 
     def internal_ws_add_sale(self, client, window, date, payment, amount):
         data = {
-            'action': 'add_ac',
+            'action': 'add_sale',
             'window': window,
             'date': date,
             'payment': payment,
