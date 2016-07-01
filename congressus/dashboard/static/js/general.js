@@ -48,6 +48,7 @@ function randColor() {
 }
 
 function update_line_charts(chart, dataset_label, label, amount=1) {
+    amount = Number(amount);
     main_dataset = 0
     n = 0
     extra_dataset = null;
