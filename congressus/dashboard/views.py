@@ -1,9 +1,11 @@
 from copy import deepcopy
+from datetime import timedelta
 from django.conf import settings
 from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.contenttypes.models import ContentType
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from random import randint
@@ -56,31 +58,52 @@ class GeneralView(TemplateView):
             index += 1
         return -1
 
-    def get_access(self):
+    def get_timesteps_vars(self, timestep='daily'):
+        if timestep == 'daily':
+            strftime = '%Y-%m-%d'
+            delta = timedelta(days=1)
+        elif timestep == 'hourly':
+            strftime= '%Hh %Y-%m-%d'
+            delta = timedelta(hours=1)
+        elif timestep == 'minly':
+            strftime = '%H:%M %Y-%m-%d'
+            delta = timedelta(minutes=1)
+        else:
+            strftime = '%Y-%m-%d'
+            delta = timedelta(days=1)
+        return strftime, delta
+
+    def get_access(self, timestep='daily', max=10):
+        strftime, delta = self.get_timesteps_vars(timestep)
+        now = timezone.now()
+        min_date = now - delta*max
         res = deepcopy(self.DATA_LINE)
+
         # Create datasets
+        res['datasets'][0]['data'] = [0]*max
         for control in AccessControl.objects.all():
             new_dataset = deepcopy(self.DEFAULT_LINE_DATASET)
             new_dataset['label'] = control.name
             new_dataset['borderColor'] = self.get_random_color()
+            new_dataset['data'] = [0]*max
             res['datasets'].append(new_dataset)
-        # Get logs access control
-        access_controls = LogAccessControl.objects.all()
-        for ac in access_controls:
-            date = ac.date.date().isoformat()
-            extra_index = self.dataset_index(res['datasets'], ac.access_control.name)
-            if date in res.get("labels"):
+
+        # Create labels
+        for l in reversed(range(0, max)):
+            date = (now - delta*l).strftime(strftime)
+            res.get("labels").append(date)
+
+        # Fill access control
+        acs = LogAccessControl.objects.filter(date__gt=min_date).order_by('date')
+        for ac in acs:
+            date = ac.date.strftime(strftime)
+            try:
                 index = res.get("labels").index(date)
-                res.get("datasets")[self.INDEX_MAIN].get('data')[index] += 1
-                res.get("datasets")[extra_index].get('data')[index] += 1
-            else:
-                res.get("labels").append(date);
-                # Create value in all data
-                for i in range(len(res.get("datasets"))):
-                    if i in (self.INDEX_MAIN, extra_index):
-                        res.get("datasets")[i].get('data').append(1)
-                    else:
-                        res.get("datasets")[i].get('data').append(0)
+            except ValueError:
+                continue
+            extra_index = self.dataset_index(res['datasets'], ac.access_control.name)
+            res.get("datasets")[self.INDEX_MAIN].get('data')[index] += 1
+            res.get("datasets")[extra_index].get('data')[index] += 1
         return res
 
     def get_random_color(self):
@@ -89,32 +112,37 @@ class GeneralView(TemplateView):
             rand.append(randint(0, 255))
         return 'rgba(%s,1)' % (','.join(map(str, rand)))
 
-
-    def get_sales(self):
+    def get_sales(self, timestep='daily', max=10):
+        strftime, delta = self.get_timesteps_vars(timestep)
+        now = timezone.now()
+        min_date = now - delta*max
         res = deepcopy(self.DATA_LINE)
+
         # Create datasets
+        res['datasets'][0]['data'] = [0]*max
         for ticket_window in TicketWindow.objects.all():
             new_dataset = deepcopy(self.DEFAULT_LINE_DATASET)
             new_dataset['label'] = ticket_window.name
             new_dataset['borderColor'] = self.get_random_color()
+            new_dataset['data'] = [0]*max
             res['datasets'].append(new_dataset)
-        # Get sales
-        sales = TicketWindowSale.objects.all()
+
+        # Create labels
+        for l in reversed(range(0, max)):
+            date = (now - delta*l).strftime(strftime)
+            res.get("labels").append(date)
+
+        # Fill sales
+        sales = TicketWindowSale.objects.filter(date__gt=min_date).order_by('date')
         for sale in sales:
-            date = sale.date.date().isoformat()
-            extra_index = self.dataset_index(res['datasets'], sale.window.name)
-            if date in res.get("labels"):
+            date = sale.date.strftime(strftime)
+            try:
                 index = res.get("labels").index(date)
-                res.get("datasets")[self.INDEX_MAIN].get('data')[index] += 1
-                res.get("datasets")[extra_index].get('data')[index] += 1
-            else:
-                res.get("labels").append(date);
-                # Create value in all data
-                for i in range(len(res.get("datasets"))):
-                    if i in (self.INDEX_MAIN, extra_index):
-                        res.get("datasets")[i].get('data').append(1)
-                    else:
-                        res.get("datasets")[i].get('data').append(0)
+            except ValueError:
+                continue
+            extra_index = self.dataset_index(res['datasets'], sale.window.name)
+            res.get("datasets")[self.INDEX_MAIN].get('data')[index] += 1
+            res.get("datasets")[extra_index].get('data')[index] += 1
         return res
 
 
@@ -132,7 +160,7 @@ class GeneralView(TemplateView):
 
         dataset = deepcopy(self.DEFAULT_PIE_DATASET)
         for label in labels:
-            res.get("labels").append(label);
+            res.get("labels").append(label)
             color = self.get_random_color()
             dataset['backgroundColor'].append(color)
             dataset['hoverBackgroundColor'].append(color)
@@ -152,8 +180,8 @@ class GeneralView(TemplateView):
 
     def post(self, request):
         ctx = {}
-        ctx['access_log'] = self.get_access()
-        ctx['sales_log'] = self.get_sales()
+        ctx['access_log'] = self.get_access('hourly', 20)
+        ctx['sales_log'] = self.get_sales('hourly', 20)
         ctx['access_pie_log'] = self.get_pie('access')
         ctx['sales_pie_log'] = self.get_pie('sale')
         return JsonResponse(ctx)
