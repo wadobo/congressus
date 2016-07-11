@@ -16,7 +16,6 @@ from events.models import Event
 from events.models import Session
 from events.models import Gate
 from tickets.models import Invitation
-from tickets.models import Pass
 from tickets.models import Ticket
 
 from django.contrib.auth import logout as auth_logout
@@ -102,9 +101,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
         return ctx
     
     def get_order_type(self, order):
-        if order.startswith(Pass.ORDER_START):
-            obj = Pass
-        elif order.startswith(Invitation.ORDER_START):
+        if order.startswith(Invitation.ORDER_START):
             obj = Invitation
         else:
             obj = Ticket

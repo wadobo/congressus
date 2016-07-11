@@ -2,8 +2,6 @@ from django.contrib import admin
 
 from .models import Invitation
 from .models import InvitationType
-from .models import Pass
-from .models import PassType
 from .models import Ticket
 from .models import MultiPurchase
 from .models import TicketWarning
@@ -12,18 +10,11 @@ from admin_csv import CSVMixin
 
 
 class InvitationAdmin(admin.ModelAdmin):
-    list_display = ('order', 'created', 'seat', 'seat_layout', 'type', 'used')
+    list_display = ('order', 'created', 'seat', 'seat_layout', 'type', 'used', 'is_pass')
+    list_filter = ('is_pass', )
 
 
 class InvitationTypeAdmin(admin.ModelAdmin):
-    list_display = ('session', 'name', 'start', 'end')
-
-
-class PassAdmin(admin.ModelAdmin):
-    list_display = ('order', 'created', 'seat', 'seat_layout', 'type', 'used')
-
-
-class PassTypeAdmin(admin.ModelAdmin):
     list_display = ('session', 'name', 'start', 'end')
 
 
@@ -112,10 +103,7 @@ class TicketSeatHoldAdmin(admin.ModelAdmin):
 
 admin.site.register(Invitation, InvitationAdmin)
 admin.site.register(InvitationType, InvitationTypeAdmin)
-admin.site.register(Pass, PassAdmin)
-admin.site.register(PassType, PassTypeAdmin)
 admin.site.register(Ticket, TicketAdmin)
 admin.site.register(TicketWarning, TicketWarningAdmin)
 admin.site.register(MultiPurchase, MPAdmin)
 admin.site.register(TicketSeatHold, TicketSeatHoldAdmin)
-admin.site.index_template = 'admin/generator.html'

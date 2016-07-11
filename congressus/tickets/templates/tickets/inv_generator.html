@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ ev }}{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h1>
+            {{ ev }} <small>{% trans "Invitation and passes generator" %}</small>
+        </h1>
+    </div>
+
+    <form method="POST" action="" class="form">
+        {% csrf_token %}
+
+        <label class="form-label" for="type-invitations">{% trans "type" %}</label>
+        <select id="type-invitations" name="type" class="form-control">
+            {% for t in types %}
+            <option value="{{ t.id }}">{{ t.name }}</option>
+            {% endfor %}
+        </select>
+
+        <label class="form-label" for="type-invitations">{% trans "amount" %}</label>
+        <input name="amount" type="number" min="1" value="1" class="form-control"/>
+        <br/>
+
+        <input class="btn btn-primary" name="inv" type="submit" value="{% trans "Generate Invitations" %}"/>
+        <input class="btn btn-success" name="pass" type="submit" value="{% trans "Generate Passes" %}"/>
+    </form>
+{% endblock %}
