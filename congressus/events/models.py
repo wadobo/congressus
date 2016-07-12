@@ -36,9 +36,13 @@ class Event(models.Model):
     name = models.CharField(_('name'), max_length=200, unique=True)
     slug = AutoSlugField(populate_from='name')
 
-    info = models.TextField(blank=True, null=True)
-    active = models.BooleanField(default=False)
+    info = models.TextField(_('info'), blank=True, null=True)
+    active = models.BooleanField(_('active'), default=False)
     admin = models.EmailField(_('admin email'), blank=True, null=True)
+
+    class Meta:
+        verbose_name = _('event')
+        verbose_name_plural = _('events')
 
     def __str__(self):
         return self.name
@@ -67,10 +71,14 @@ class SeatMap(models.Model):
     img = models.ImageField(_('map image'), upload_to='maps',
                             blank=True, null=True)
 
-    scene_top = models.IntegerField(default=0)
-    scene_bottom = models.IntegerField(default=0)
-    scene_left = models.IntegerField(default=0)
-    scene_right = models.IntegerField(default=0)
+    scene_top = models.IntegerField(_('scene top limit'), default=0)
+    scene_bottom = models.IntegerField(_('scene bottom limit'), default=0)
+    scene_left = models.IntegerField(_('scene left limit'), default=0)
+    scene_right = models.IntegerField(_('scene right limit'), default=0)
+
+    class Meta:
+        verbose_name = _('seat Map')
+        verbose_name_plural = _('seat Maps')
 
     def __str__(self):
         return self.name
@@ -96,24 +104,32 @@ class SeatMap(models.Model):
 
 
 class Gate(models.Model):
-    event = models.ForeignKey(Event, related_name='gates')
+    event = models.ForeignKey(Event, related_name='gates', verbose_name=_('event'))
     name = models.CharField(_('name'), max_length=100)
+
+    class Meta:
+        verbose_name = _('gate')
+        verbose_name_plural = _('gates')
 
     def __str__(self):
         return self.name
 
 
 class SeatLayout(models.Model):
-    map = models.ForeignKey(SeatMap, related_name='layouts')
+    map = models.ForeignKey(SeatMap, related_name='layouts', verbose_name=_('map'))
     name = models.CharField(_('name'), max_length=300)
-    top = models.IntegerField(default=0)
-    left = models.IntegerField(default=0)
-    direction = models.CharField(max_length=2, choices=DIRECTIONS, default='d')
+    top = models.IntegerField(_('top'), default=0)
+    left = models.IntegerField(_('left'), default=0)
+    direction = models.CharField(_('direction'), max_length=2, choices=DIRECTIONS, default='d')
     layout = models.TextField(_('seats layout'),
                               help_text=_('the layout to select the numbered seat'))
 
-    column_start_number = models.IntegerField(default=1)
-    gate = models.ForeignKey(Gate, blank=True, null=True)
+    column_start_number = models.IntegerField(_('column start number'), default=1)
+    gate = models.ForeignKey(Gate, blank=True, null=True, verbose_name=_('gate'))
+
+    class Meta:
+        verbose_name = _('seat Layout')
+        verbose_name_plural = _('seat Layouts')
 
     def __str__(self):
         return self.name
@@ -168,25 +184,27 @@ class SeatLayout(models.Model):
 
 
 class Space(models.Model):
-    event = models.ForeignKey(Event, related_name='spaces')
+    event = models.ForeignKey(Event, related_name='spaces', verbose_name=_('event'))
     name = models.CharField(_('name'), max_length=300)
     slug = AutoSlugField(populate_from='name')
 
     capacity = models.IntegerField(_('capacity'), default=100)
     numbered = models.BooleanField(_('numbered'), default=False)
-    seat_map = models.ForeignKey(SeatMap, related_name='spaces', null=True, blank=True)
+    seat_map = models.ForeignKey(SeatMap, related_name='spaces', null=True, blank=True, verbose_name=_('seat map'))
 
-    order = models.IntegerField(default=0)
+    order = models.IntegerField(_('order'), default=0)
 
     class Meta:
         ordering = ['order']
+        verbose_name = _('space')
+        verbose_name_plural = _('spaces')
 
     def __str__(self):
         return '%s - %s' % (self.event, self.name)
 
 
 class Session(models.Model):
-    space = models.ForeignKey(Space, related_name='sessions')
+    space = models.ForeignKey(Space, related_name='sessions', verbose_name=_('space'))
     name = models.CharField(_('name'), max_length=300)
     slug = AutoSlugField(populate_from='name')
 
@@ -197,7 +215,15 @@ class Session(models.Model):
     window_price = models.IntegerField(_('price in the ticket window'), default=10)
     tax = models.IntegerField(_('ticket tax percentage'), default=21)
 
-    template = models.ForeignKey("TicketTemplate", blank=True, null=True)
+    template = models.ForeignKey("TicketTemplate", blank=True, null=True, verbose_name=_('template'))
+
+    class Meta:
+        ordering = ['start']
+        verbose_name = _('session')
+        verbose_name_plural = _('sessions')
+
+    def __str__(self):
+        return '%s - %s' % (self.space, self.name)
 
     def price_without_tax(self):
         return self.price * (self.tax / 100)
@@ -257,59 +283,74 @@ class Session(models.Model):
     def places(self):
         self.space.capacity
 
-    class Meta:
-        ordering = ['start']
-
-    def __str__(self):
-        return '%s - %s' % (self.space, self.name)
-
 
 class ExtraSession(models.Model):
-    orig = models.ForeignKey(Session, related_name='orig_sessions')
-    extra = models.ForeignKey(Session, related_name='extra_sessions')
+    orig = models.ForeignKey(Session, related_name='orig_sessions', verbose_name=_('orig'))
+    extra = models.ForeignKey(Session, related_name='extra_sessions', verbose_name=_('extra'))
     start = models.DateTimeField(_('Start at'))
     end = models.DateTimeField(_('End at'))
-    used = models.BooleanField(default=False)
+    used = models.BooleanField(_('used'), default=False)
+
+    class Meta:
+        verbose_name = _('extra session')
+        verbose_name_plural = _('extra sessions')
+
+    def __str__(self):
+        return '%s -> %s' % (self.orig, self.extra)
 
 
 class ConfirmEmail(models.Model):
-    event = models.OneToOneField(Event, related_name='email')
+    event = models.OneToOneField(Event, related_name='email', verbose_name=_('event'))
     subject = models.CharField(_('subject'), max_length=300)
     body = models.TextField(_('body'))
+
+    class Meta:
+        verbose_name = _('confirm email')
+        verbose_name_plural = _('confirm emails')
 
     def __str__(self):
         return "ConfirmEmail - %s" % self.event
 
 
 class EmailAttachment(models.Model):
-    email = models.ForeignKey(ConfirmEmail, related_name='attachs')
+    email = models.ForeignKey(ConfirmEmail, related_name='attachs', verbose_name=_('email'))
     attach = models.FileField(_('attach'), upload_to='attachments')
+
+    class Meta:
+        verbose_name = _('email attachment')
+        verbose_name_plural = _('email attachments')
 
 
 class InvCode(models.Model):
-    event = models.ForeignKey(Event, related_name='codes')
+    event = models.ForeignKey(Event, related_name='codes', verbose_name=_('event'))
     code = models.CharField(_('code'), max_length=10, blank=True, null=True)
     person = models.CharField(_('for person'), max_length=100, blank=True, null=True)
     used = models.BooleanField(_('used'), default=False)
     type = models.CharField(_('type'), choices=INV_TYPES, default='invited', max_length=15)
+
+    class Meta:
+        verbose_name = _('invitation code')
+        verbose_name_plural = _('invitation codes')
 
     def __str__(self):
         return "%s - %s" % (self.code, self.type)
 
 
 class TicketField(models.Model):
-    event = models.ForeignKey(Event, related_name='fields')
-    order = models.IntegerField(default=0)
-    type = models.CharField(max_length=100, choices=FIELD_TYPES, default='text')
+    event = models.ForeignKey(Event, related_name='fields', verbose_name=_('event'))
+    order = models.IntegerField(_('order'), default=0)
+    type = models.CharField(_('type'), max_length=100, choices=FIELD_TYPES, default='text')
     label = models.CharField(_('label'), max_length=100)
     help_text = models.CharField(_('help text'), max_length=200, blank=True, null=True)
-    required = models.BooleanField(default=False)
-    options = models.CharField(max_length=500,
+    required = models.BooleanField(_('required'), default=False)
+    options = models.CharField(_('options'), max_length=500,
                                help_text='comma separated values, only for select type',
                                blank=True, null=True)
 
     class Meta:
         ordering = ['order']
+        verbose_name = _('ticket field')
+        verbose_name_plural = _('ticket fields')
 
     def form_type(self):
         from django import forms
@@ -341,6 +382,10 @@ class TicketTemplate(models.Model):
     contributors = models.ImageField(_('contributors'), upload_to='templcontributors', blank=True, null=True)
     links = models.CharField(_('links'), max_length=200, blank=True, null=True)
     info = models.TextField(_('info text'), blank=True, null=True)
+
+    class Meta:
+        verbose_name = _('ticket template')
+        verbose_name_plural = _('ticket templates')
 
     def __str__(self):
         return self.name

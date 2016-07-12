@@ -58,11 +58,11 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
     space = ticket.session.space.name
     session = ticket.session.name
     start = ticket.session.start.strftime("%A %d/%m/%Y")
-    date = _('%s (%s to %s)') % (
-        start,
-        ticket.session.start.strftime("%H:%M"), 
-        ticket.session.end.strftime("%H:%M")
-    )
+    date = _('%(date)s (%(start)s to %(end)s)') % {
+        'date': start,
+        'start': ticket.session.start.strftime("%H:%M"), 
+        'end': ticket.session.end.strftime("%H:%M"),
+    }
     code = ticket.order
 
     initials = _('T') + space[0].upper() + session[0].upper()

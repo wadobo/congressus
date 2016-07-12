@@ -7,12 +7,16 @@ from events.models import Event
 
 
 class AccessControl(models.Model):
-    event = models.ForeignKey(Event, related_name='access')
+    event = models.ForeignKey(Event, related_name='access', verbose_name=_('event'))
 
     name = models.CharField(_('name'), max_length=200)
     slug = AutoSlugField(populate_from='name')
 
-    location = models.CharField(max_length=500, blank=True, null=True)
+    location = models.CharField(_('location'), max_length=500, blank=True, null=True)
+
+    class Meta:
+        verbose_name = _('access control point')
+        verbose_name_plural = _('access control points')
 
     def __str__(self):
         return self.name
@@ -26,6 +30,10 @@ AC_TYPES = (
 )
 
 class LogAccessControl(models.Model):
-    access_control = models.ForeignKey(AccessControl, related_name='log_access')
+    access_control = models.ForeignKey(AccessControl, related_name='log_access', verbose_name=_('access control'))
     date = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=10, choices=AC_TYPES, default="ok")
+    status = models.CharField(_('status'), max_length=10, choices=AC_TYPES, default="ok")
+
+    class Meta:
+        verbose_name = _('access control point log')
+        verbose_name_plural = _('access control point logs')

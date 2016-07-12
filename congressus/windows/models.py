@@ -27,13 +27,17 @@ CASH_MOVEMENT_TYPES = (
 
 
 class TicketWindow(models.Model):
-    event = models.ForeignKey(Event, related_name='windows')
+    event = models.ForeignKey(Event, related_name='windows', verbose_name=_('event'))
 
     name = models.CharField(_('name'), max_length=200)
     slug = AutoSlugField(populate_from='name')
     cash = models.IntegerField(_('cash in the ticket window'), default=0)
 
-    location = models.CharField(max_length=500, blank=True, null=True)
+    location = models.CharField(_('location'), max_length=500, blank=True, null=True)
+
+    class Meta:
+        verbose_name = _('ticket window')
+        verbose_name_plural = _('ticket windows')
 
     def get_sales(self, date, **kwargs):
         if not date:
@@ -71,16 +75,20 @@ class TicketWindow(models.Model):
 
 
 class TicketWindowSale(models.Model):
-    window = models.ForeignKey(TicketWindow, related_name='sales')
-    user = models.ForeignKey(User, related_name='sales')
-    purchase = models.ForeignKey(MultiPurchase, related_name='sales')
+    window = models.ForeignKey(TicketWindow, related_name='sales', verbose_name=_('window'))
+    user = models.ForeignKey(User, related_name='sales', verbose_name=_('user'))
+    purchase = models.ForeignKey(MultiPurchase, related_name='sales', verbose_name=_('multipurchase'))
 
-    price = models.PositiveIntegerField(default=0)
-    payed = models.PositiveIntegerField(default=0)
-    change = models.PositiveIntegerField(default=0)
-    payment = models.CharField(max_length=10, choices=PAYMENT_TYPES, default='cash')
+    price = models.PositiveIntegerField(_('price'), default=0)
+    payed = models.PositiveIntegerField(_('payed'), default=0)
+    change = models.PositiveIntegerField(_('change'), default=0)
+    payment = models.CharField(_('payment'), max_length=10, choices=PAYMENT_TYPES, default='cash')
 
     date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _('ticket window sale')
+        verbose_name_plural = _('ticket window sales')
 
     def __str__(self):
         return '%s - %s - %s' % (self.user, self.window, self.purchase)
@@ -90,11 +98,15 @@ class TicketWindowSale(models.Model):
 
 
 class TicketWindowCashMovement(models.Model):
-    window = models.ForeignKey(TicketWindow, related_name='movements')
-    type = models.CharField(max_length=10, choices=CASH_MOVEMENT_TYPES, default='add')
-    amount = models.PositiveIntegerField(default=0)
+    window = models.ForeignKey(TicketWindow, related_name='movements', verbose_name=_('window'))
+    type = models.CharField(_('type'), max_length=10, choices=CASH_MOVEMENT_TYPES, default='add')
+    amount = models.PositiveIntegerField(_('amount'), default=0)
 
     date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _('ticket window cash movement')
+        verbose_name_plural = _('ticket window cash movements')
 
     def __str__(self):
         return "%s - %s - %s" % (self.window, self.type, self.amount)

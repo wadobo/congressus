@@ -184,20 +184,20 @@ class BaseExtraData:
 
 
 class MultiPurchase(models.Model, BaseTicketMixing):
-    ev = models.ForeignKey(Event, related_name='mps')
+    ev = models.ForeignKey(Event, related_name='mps', verbose_name=_('event'))
 
-    order = models.CharField(_('Order'), max_length=200, unique=True)
-    order_tpv = models.CharField(_('Order TPV'), max_length=12, blank=True, null=True)
+    order = models.CharField(_('order'), max_length=200, unique=True)
+    order_tpv = models.CharField(_('order TPV'), max_length=12, blank=True, null=True)
 
-    created = models.DateTimeField(_('Created at'), auto_now_add=True)
-    confirmed_date = models.DateTimeField(_('Confirmed at'), blank=True, null=True)
-    confirmed = models.BooleanField(default=False)
-    confirm_sent = models.BooleanField(default=False)
+    created = models.DateTimeField(_('created at'), auto_now_add=True)
+    confirmed_date = models.DateTimeField(_('confirmed at'), blank=True, null=True)
+    confirmed = models.BooleanField(_('confirmed'), default=False)
+    confirm_sent = models.BooleanField(_('confirmation sent'), default=False)
 
     # Form Fields
-    email = models.EmailField(_('Email'))
+    email = models.EmailField(_('email'))
 
-    extra_data = models.TextField(blank=True, null=True)
+    extra_data = models.TextField(_('extra data'), blank=True, null=True)
 
     def space(self):
         ''' Multiple spaces '''
@@ -235,51 +235,55 @@ class MultiPurchase(models.Model, BaseTicketMixing):
 
     class Meta:
         ordering = ['-created']
+        verbose_name = _('multipurchase')
+        verbose_name_plural = _('multipurchases')
 
     def __str__(self):
         return self.order
 
 
 class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
-    session = models.ForeignKey(Session, related_name='tickets')
+    session = models.ForeignKey(Session, related_name='tickets', verbose_name=_('event'))
 
-    inv = models.OneToOneField(InvCode, blank=True, null=True)
+    inv = models.OneToOneField(InvCode, blank=True, null=True, verbose_name=_('invitation code'))
 
-    order = models.CharField(_('Order'), max_length=200, unique=True)
-    order_tpv = models.CharField(_('Order TPV'), max_length=12, blank=True, null=True)
+    order = models.CharField(_('order'), max_length=200, unique=True)
+    order_tpv = models.CharField(_('order TPV'), max_length=12, blank=True, null=True)
 
-    created = models.DateTimeField(_('Created at'), auto_now_add=True)
-    confirmed_date = models.DateTimeField(_('Confirmed at'), blank=True, null=True)
-    confirmed = models.BooleanField(default=False)
-    confirm_sent = models.BooleanField(default=False)
-    sold_in_window = models.BooleanField(default=False)
+    created = models.DateTimeField(_('created at'), auto_now_add=True)
+    confirmed_date = models.DateTimeField(_('confirmed at'), blank=True, null=True)
+    confirmed = models.BooleanField(_('confirmed'), default=False)
+    confirm_sent = models.BooleanField(_('confirmation sent'), default=False)
+    sold_in_window = models.BooleanField(_('sold in window'), default=False)
 
     # row-col
-    seat = models.CharField(max_length=20, null=True, blank=True)
-    seat_layout = models.ForeignKey(SeatLayout, null=True, blank=True)
+    seat = models.CharField(_('seat'), max_length=20, null=True, blank=True)
+    seat_layout = models.ForeignKey(SeatLayout, null=True, blank=True, verbose_name=_('seat layout'))
 
     # Form Fields
-    email = models.EmailField(_('Email'))
-    extra_data = models.TextField(blank=True, null=True)
+    email = models.EmailField(_('email'))
+    extra_data = models.TextField(_('extra data'), blank=True, null=True)
 
-    mp = models.ForeignKey(MultiPurchase, related_name='tickets', null=True, blank=True)
+    mp = models.ForeignKey(MultiPurchase, related_name='tickets', null=True, blank=True, verbose_name=_('multipurchase'))
 
     # duplicated data to optimize queries
-    session_name = models.CharField(max_length=200, null=True, blank=True)
-    space_name = models.CharField(max_length=200, null=True, blank=True)
-    event_name = models.CharField(max_length=200, null=True, blank=True)
-    price = models.IntegerField(null=True)
-    tax = models.IntegerField(null=True)
+    session_name = models.CharField(_('session name'), max_length=200, null=True, blank=True)
+    space_name = models.CharField(_('space name'), max_length=200, null=True, blank=True)
+    event_name = models.CharField(_('event name'), max_length=200, null=True, blank=True)
+    price = models.IntegerField(_('price'), null=True)
+    tax = models.IntegerField(_('tax'), null=True)
     start = models.DateTimeField(_('start date'), null=True)
     end = models.DateTimeField(_('end date'), null=True)
-    seat_layout_name = models.CharField(max_length=200, null=True, blank=True)
-    gate_name = models.CharField(max_length=100, null=True, blank=True)
+    seat_layout_name = models.CharField(_('seat layout name'), max_length=200, null=True, blank=True)
+    gate_name = models.CharField(_('gate name'), max_length=100, null=True, blank=True)
 
     # field to control the access
-    used = models.BooleanField(default=False)
+    used = models.BooleanField(_('used'), default=False)
 
     class Meta:
         ordering = ['-created']
+        verbose_name = _('ticket')
+        verbose_name_plural = _('tickets')
 
     def __str__(self):
         return self.order
@@ -323,11 +327,15 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
 class TicketWarning(models.Model):
     name = models.CharField(max_length=50)
 
-    ev = models.ForeignKey(Event, related_name='warnings')
-    sessions1 = models.ManyToManyField(Session, related_name='warnings1')
-    sessions2 = models.ManyToManyField(Session, related_name='warnings2')
-    message = models.TextField()
-    type = models.CharField(max_length=10, choices=WARNING_TYPES, default="req")
+    ev = models.ForeignKey(Event, related_name='warnings', verbose_name=_('event'))
+    sessions1 = models.ManyToManyField(Session, related_name='warnings1', verbose_name=_('sessions1'))
+    sessions2 = models.ManyToManyField(Session, related_name='warnings2', verbose_name=_('sessions2'))
+    message = models.TextField(_('message'))
+    type = models.CharField(_('type'), max_length=10, choices=WARNING_TYPES, default="req")
+
+    class Meta:
+        verbose_name = _('ticket warning')
+        verbose_name_plural = _('ticket warnings')
 
     def sessions1_ids(self):
         return ','.join(str(s.id) for s in self.sessions1.all())
@@ -340,21 +348,29 @@ class TicketWarning(models.Model):
 
 
 class TicketSeatHold(models.Model):
-    client = models.CharField(max_length=20)
-    session = models.ForeignKey(Session, related_name='seat_holds')
-    layout = models.ForeignKey(SeatLayout)
-    seat = models.CharField(max_length=20, help_text="row-col")
+    client = models.CharField(_('client'), max_length=20)
+    session = models.ForeignKey(Session, related_name='seat_holds', verbose_name=_('session'))
+    layout = models.ForeignKey(SeatLayout, verbose_name=_('layout'))
+    seat = models.CharField(_('seat'), max_length=20, help_text="row-col")
     date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _('ticket seat hold')
+        verbose_name_plural = _('ticket seat holds')
 
     def __str__(self):
         return self.seat
 
 
 class InvitationType(models.Model):
-    session = models.ForeignKey(Session, related_name='invitations_types', null=True, blank=True)
-    name = models.CharField(max_length=200)
+    session = models.ForeignKey(Session, related_name='invitations_types', null=True, blank=True, verbose_name=_('session'))
+    name = models.CharField(_('name'), max_length=200)
     start = models.DateTimeField(_('start date'), null=True)
     end = models.DateTimeField(_('end date'), null=True)
+
+    class Meta:
+        verbose_name = _('invitation type')
+        verbose_name_plural = _('invitation types')
 
     def __str__(self):
         return self.name
@@ -362,17 +378,21 @@ class InvitationType(models.Model):
 
 class Invitation(models.Model, BaseExtraData):
     ORDER_START = '00001'
-    session = models.ForeignKey(Session, related_name='invitations', null=True, blank=True)
-    order = models.CharField(_('Order'), max_length=200, unique=True)
-    created = models.DateTimeField(_('Created at'), auto_now_add=True)
-    seat = models.CharField(max_length=20, null=True, blank=True)
-    seat_layout = models.ForeignKey(SeatLayout, null=True, blank=True)
-    type = models.ForeignKey(InvitationType, null=True, blank=True)
-    extra_data = models.TextField(blank=True, null=True)
-    is_pass = models.BooleanField(default=False)
+    session = models.ForeignKey(Session, related_name='invitations', null=True, blank=True, verbose_name=_('session'))
+    order = models.CharField(_('order'), max_length=200, unique=True)
+    created = models.DateTimeField(_('created at'), auto_now_add=True)
+    seat = models.CharField(_('seat'), max_length=20, null=True, blank=True)
+    seat_layout = models.ForeignKey(SeatLayout, null=True, blank=True, verbose_name=_('seat layout'))
+    type = models.ForeignKey(InvitationType, null=True, blank=True, verbose_name=_('type'))
+    extra_data = models.TextField(_('extra data'), blank=True, null=True)
+    is_pass = models.BooleanField(_('is pass'), default=False)
 
     # field to control the access
-    used = models.BooleanField(default=False)
+    used = models.BooleanField(_('used'), default=False)
+
+    class Meta:
+        verbose_name = _('invitation')
+        verbose_name_plural = _('invitations')
 
     def gen_order(self, starts=''):
         """ Generate order for passes and invitations """
