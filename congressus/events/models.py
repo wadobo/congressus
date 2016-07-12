@@ -122,7 +122,9 @@ class SeatLayout(models.Model):
     left = models.IntegerField(_('left'), default=0)
     direction = models.CharField(_('direction'), max_length=2, choices=DIRECTIONS, default='d')
     layout = models.TextField(_('seats layout'),
-                              help_text=_('the layout to select the numbered seat'))
+                              help_text=_('the layout to select the '
+                                          'numbered seat. '
+                                          'L = Free, _ = Space, R = Reserved'))
 
     column_start_number = models.IntegerField(_('column start number'), default=1)
     gate = models.ForeignKey(Gate, blank=True, null=True, verbose_name=_('gate'))
