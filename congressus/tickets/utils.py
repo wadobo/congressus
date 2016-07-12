@@ -64,6 +64,7 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
         'end': ticket.session.end.strftime("%H:%M"),
     }
     code = ticket.order
+    wcode = ticket.window_code()
 
     initials = _('T') + space[0].upper() + session[0].upper()
     text = _('Ticket %(space)s %(session)s') % {'space': space.capitalize(), 'session': session.capitalize()}
@@ -124,6 +125,10 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
         # qrcode
         codeimg.wrap(3*cm, 3*cm)
         codeimg.drawOn(canvas, doc.width, 1.5*cm)
+        # ticket window code
+        pr = Paragraph(wcode, styleL)
+        pr.wrap(doc.width, 1*cm)
+        pr.drawOn(canvas, doc.leftMargin, 1.5*cm)
         # line
         hr = HRFlowable(width="100%", thickness=0.25, hAlign='CENTER',
                         color=colors.black, vAlign='BOTTOM', dash=None,

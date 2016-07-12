@@ -31,6 +31,7 @@ class TicketWindow(models.Model):
 
     name = models.CharField(_('name'), max_length=200)
     slug = AutoSlugField(populate_from='name')
+    code = models.CharField(_('code'), max_length=5, help_text=_('code to show in tickets'))
     cash = models.IntegerField(_('cash in the ticket window'), default=0)
 
     location = models.CharField(_('location'), max_length=500, blank=True, null=True)

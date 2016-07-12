@@ -323,6 +323,20 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
     def gen_pdf(self):
         return generate_pdf(self)
 
+    def window_code(self):
+        '''
+        ONLMMDDHHMM
+        '''
+
+        prefix = 'ONL'
+        postfix = self.created.strftime('%m%d%H%M')
+        if self.sold_in_window:
+            from windows.models import TicketWindowSale
+            tws = TicketWindowSale.objects.get(purchase__tickets=self)
+            prefix = tws.window.code
+
+        return prefix + postfix
+
 
 class TicketWarning(models.Model):
     name = models.CharField(max_length=50)
