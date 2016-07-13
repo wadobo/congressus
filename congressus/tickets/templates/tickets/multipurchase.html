@@ -48,7 +48,7 @@
                                     {{ session.name }}
                                 </th>
                                 <td class="hidden-xs">
-                                    <span class="text-muted">{{ session.start|date:"d/m/Y" }}</span>
+                                    <span class="text-muted text-date">{{ session.start|date:"d/m/Y" }}</span>
                                 </td>
                                 {% if session.space.numbered %}
                                 <td>
@@ -58,7 +58,8 @@
                                 {% endif %}
                                 <td>
                                     <div class="input-group">
-                                        <input id="{{ session.id }}" class="sessioninput form-control" min='0' max='15' type="number"
+                                        <input id="{{ session.id }}" class="sessioninput form-control ui-spinner-button"
+                                            min='0' max='15' type="number"
                                             data-session="{{ session.id }}"
                                             data-price="{% if window %}{{ session.window_price }}{% else %}{{ session.price }}{% endif %}" 
                                             {% if not session.space.numbered %}name="number_{{ session.id }}"{% endif %}
