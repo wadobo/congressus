@@ -2,29 +2,23 @@
 
 <table class="table table-striped table-bordered" role="table">
     <tr>
-        <th class="bg-info" colspan="2">{% trans "ticket" %}: {{ ticket.order }}</th>
+        <th class="bg-info">
+            {% trans "ticket" %}: {{ ticket.order }}
+        </th>
     </tr>
     <tr>
-        <th>{% trans "Space" %}</th>
-        <td>{{ ticket.space.name }}</td>
-    </tr>
-    <tr>
-        <th>{% trans "Session" %}</th>
-        <td>{{ ticket.session.name }}</td>
-    </tr>
-    {% if ticket.space.numbered %}
-    <tr>
-        <th>{% trans "Seat" %}</th>
         <td>
-        {% blocktrans with layout=ticket.seat_layout row=ticket.seat_row column=ticket.seat_column %}
-            Section: {{ layout }}, Row: {{ row }}, Seat: {{ column }}
-        {% endblocktrans %}
+            <span>{{ ticket.space.name }} - {{ ticket.session.name }}</span>
+            {% if ticket.space.numbered %}
+             || 
+            <span>
+                {% blocktrans with layout=ticket.seat_layout row=ticket.seat_row column=ticket.seat_column %}
+                    Section: {{ layout }}, Row: {{ row }}, Seat: {{ column }}
+                {% endblocktrans %}
+            </span>
+            <span class="right"> {{ ticket.get_price|floatformat:2 }} €</span>
+            {% endif %}
         </td>
-    </tr>
-    {% endif %}
-    <tr>
-        <th>{% trans "Ticket price" %}</th>
-        <td>{{ ticket.get_price|floatformat:2 }} €</td>
     </tr>
 </table>
 

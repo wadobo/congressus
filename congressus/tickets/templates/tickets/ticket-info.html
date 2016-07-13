@@ -2,27 +2,18 @@
 
 <table class="table table-striped table-bordered" role="table">
     <tr>
-        <th class="bg-info" colspan="2">{% trans "Ticket info" %}</th>
+        <th class="bg-info" colspan="2">
+            {% trans "Ticket info" %}
+            <span class="font-large right"> {{ ticket.get_price|floatformat:2 }} €</span>
+        </th>
     </tr>
     <tr>
         <th>{% trans "Event" %}</th>
         <td>{{ ticket.event }}</td>
     </tr>
     <tr>
-        <th>{% trans "Ticket number" %}</th>
-        <td>{{ ticket.order }}</td>
-    </tr>
-    <tr>
         <th>{% trans "Payment number" %}</th>
         <td>{{ ticket.order_tpv }}</td>
-    </tr>
-    <tr>
-        <th>{% trans "Ticket price" %}</th>
-        <td>{{ ticket.get_price|floatformat:2 }} €</td>
-    </tr>
-    <tr>
-        <th>{% trans "Ticket confirmed" %}</th>
-        <td>{{ ticket.confirmed|yesno }}</td>
     </tr>
 
     {% if ticket.confirmed %}
