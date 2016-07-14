@@ -270,12 +270,12 @@ class AutoSeats(View):
         best_avail = None
         for layout in layouts:
             holded = session.seats_holded(layout)
-            avail = layout.contiguous_seats(amount, holded)
+            avail = layout.contiguous_seats(amount, holded, layout.column_start_number)
             if not avail:
                 continue
             if not best_avail or avail.get('row') < best_avail.get('row'):
                 best_avail = {
-                    'layout': layout.id,
+                    'layout': layout,
                     'row': avail.get('row'),
                     'col_ini': avail.get('col_ini'),
                     'col_end': avail.get('col_end')
@@ -285,9 +285,9 @@ class AutoSeats(View):
             for col in range(best_avail.get('col_ini'), best_avail.get('col_end')):
                 seats.append({
                     "session": id_session,
-                    "layout": best_avail['layout'],
+                    "layout": best_avail['layout'].id,
                     "row": best_avail['row'],
-                    "col": col})
+                    "col": col+best_avail['layout'].column_start_number-1})
         return seats
 
     def post(self, request):
