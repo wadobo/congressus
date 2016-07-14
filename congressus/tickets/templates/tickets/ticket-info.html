@@ -51,11 +51,18 @@
     {% endfor %}
 </table>
 
-<h2>{% trans "Tickets" %}</h2>
-{% if ticket.is_mp %}
-    {% for t in ticket.all_tickets %}
-        {% include "tickets/ticket-detail.html" with ticket=t %}
-    {% endfor %}
-{% else %}
-    {% include "tickets/ticket-detail.html" %}
-{% endif %}
+<table class="table table-striped table-bordered" role="table">
+    <tr>
+        <th class="bg-info" colspan="2">
+            {% trans "Tickets" %}
+            <span class="font-large right"> {{ ticket.get_price|floatformat:2 }} €</span>
+        </th>
+    </tr>
+    {% if ticket.is_mp %}
+        {% for t in ticket.all_tickets %}
+            {% include "tickets/ticket-detail.html" with ticket=t %}
+        {% endfor %}
+    {% else %}
+        {% include "tickets/ticket-detail.html" %}
+    {% endif %}
+</table>
