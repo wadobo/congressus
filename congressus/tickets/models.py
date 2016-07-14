@@ -135,7 +135,7 @@ class BaseTicketMixing:
             for att in e.attachs.all():
                 email.attach_file(att.attach.path)
 
-        filename = 'ticket_%d.pdf' % self.order
+        filename = 'ticket_%s.pdf' % self.order
         email.attach(filename, self.gen_pdf(), 'application/pdf')
         email.send(fail_silently=False)
 
