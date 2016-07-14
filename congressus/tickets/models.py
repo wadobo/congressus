@@ -135,7 +135,8 @@ class BaseTicketMixing:
             for att in e.attachs.all():
                 email.attach_file(att.attach.path)
 
-        email.attach(filename, ticket.gen_pdf(), 'application/pdf')
+        filename = 'ticket_%d.pdf' % self.order
+        email.attach(filename, self.gen_pdf(), 'application/pdf')
         email.send(fail_silently=False)
 
     def get_absolute_url(self):
