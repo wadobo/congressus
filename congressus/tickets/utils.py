@@ -87,6 +87,7 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
 
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer)
+    doc.topMargin = 3.1*cm
     Story = []
     styleN = styles["Normal"]
     styleH = styles['Heading1']
@@ -116,7 +117,7 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
             header = get_image(header.path, width=doc.width)
 
             canvas.saveState()
-            header.drawOn(canvas, doc.leftMargin, doc.height + doc.topMargin)
+            header.drawOn(canvas, doc.leftMargin, doc.height + doc.topMargin - 1*cm)
             canvas.restoreState()
 
         # drawing the footer
