@@ -105,11 +105,14 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
     styleL = ParagraphStyle(name="leftStyle", fontSize=8, alignment=TA_LEFT)
     styleLinks = ParagraphStyle(name="links", fontSize=14,
                                 alignment=TA_CENTER, textColor=colors.gray)
-    styleInfo = ParagraphStyle(name="info", alignment=TA_JUSTIFY)
+    styleInfo = ParagraphStyle(name="info", alignment=TA_JUSTIFY, fontSize=7,
+                               textColor=colors.gray)
 
     def add_full_width_image(header, img):
+        pstyle = ParagraphStyle(name="leftStyle", fontSize=8,
+                                alignment=TA_LEFT, textColor=colors.gray)
         Story.append(Spacer(width=1, height=8))
-        Story.append(Paragraph(header, styleL))
+        Story.append(Paragraph(header, pstyle))
         Story.append(HRFlowable(width="100%", thickness=1, hAlign='CENTER',
                                 vAlign='BOTTOM', dash=None, spaceAfter=5))
         img = get_image(img, width=doc.width - 8)
