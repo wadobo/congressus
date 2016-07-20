@@ -64,7 +64,7 @@ class BaseTicketMixing:
         mp = MultiPurchase.objects.filter(order=order).exists()
         return mp or tk
 
-    def gen_order(self):
+    def gen_order(self, save=True):
         chars = string.ascii_uppercase + string.digits
         l = 8
         if hasattr(settings, 'ORDER_SIZE'):
@@ -79,7 +79,8 @@ class BaseTicketMixing:
             reserved = order.startswith(Invitation.ORDER_START)
 
         self.order = order
-        self.save()
+        if save:
+            self.save()
 
     def gen_order_tpv(self):
         chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'

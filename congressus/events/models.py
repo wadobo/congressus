@@ -389,5 +389,8 @@ class TicketTemplate(models.Model):
         verbose_name = _('ticket template')
         verbose_name_plural = _('ticket templates')
 
+    def get_absolute_url(self):
+        return reverse('template_preview', kwargs={'id': self.id})
+
     def __str__(self):
         return self.name

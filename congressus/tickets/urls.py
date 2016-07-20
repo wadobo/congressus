@@ -12,6 +12,8 @@ urlpatterns = [
 
     url(r'^ticket/inv/gen/(?P<ev>[\w-]+)/$', views.gen_invitations, name='gen_invitations'),
 
+    url(r'^ticket/template/(?P<id>\d+)/preview/$', views.template_preview, name='template_preview'),
+
     url(r'^(?P<ev>[\w-]+)/$', views.multipurchase, name='multipurchase'),
 
     url(r'^seats/(?P<session>\d+)/(?P<layout>\d+)/$', views.ajax_layout, name='ajax_layout'),

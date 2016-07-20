@@ -10,6 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.conf import settings
 from django.utils import timezone
+from django.utils import formats
 from django.views.generic.edit import CreateView
 from django.views.generic.edit import ModelFormMixin
 from django.views.generic import TemplateView
@@ -341,7 +342,7 @@ class GenInvitationsView(UserPassesTestMixin, TemplateView):
 
         for x in range(amount):
             invi = Invitation(session=type.session, type=type)
-            invi.is_pass = ispass 
+            invi.is_pass = ispass
             invi.gen_order()
             invi.save()
             invi.save_extra_sessions()
@@ -363,3 +364,33 @@ class GetTypes(View):
         return HttpResponse(json.dumps(ctx), content_type="application/json")
 
 get_types = csrf_exempt(GetTypes.as_view())
+
+
+class TicketTemplatePreview(UserPassesTestMixin, View):
+    def test_func(self):
+        u = self.request.user
+        return u.is_authenticated() and u.is_superuser
+
+    def get(self, request, id):
+        from events.models import TicketTemplate
+        template = get_object_or_404(TicketTemplate, pk=id)
+
+        # fake ticket
+        ticket = Ticket(email='test@email.com', price=12, tax=21, confirm_sent=True)
+        ticket.gen_order(save=False)
+        ticket.created = timezone.now()
+
+        ticket.session = Session(
+                          name=formats.date_format(timezone.now(), "l"),
+                          template=template,
+                          space=random.choice(list(Space.objects.all())),
+                          start=timezone.now(),
+                          end=timezone.now())
+
+        pdf = ticket.gen_pdf()
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="tickets.pdf"'
+        response.write(pdf)
+        return response
+
+template_preview = TicketTemplatePreview.as_view()
