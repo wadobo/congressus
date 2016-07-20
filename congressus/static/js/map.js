@@ -25,7 +25,7 @@
 
     map.preloadLayout = function(layout, obj, f) {
         var url = obj.data('url');
-        
+
         if (!obj.find(".ajax-loading").length) {
             f();
             return;

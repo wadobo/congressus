@@ -114,3 +114,7 @@ td.seat-selected {
 .bigscene {
     font-size: 20px;
 }
+
+.loader-inner > div {
+  background: black !important;
+}
