@@ -6,3 +6,7 @@ congressus/theme
 congressus/db.sqlite3
 congressus/local_settings.py
 
+congressus/locale/es_ES/LC_MESSAGES/django.mo
+congressus/static/media/templcontributors/*
+congressus/static/media/templheader/*
+congressus/static/media/templsponsors/*
