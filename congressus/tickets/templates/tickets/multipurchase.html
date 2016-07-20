@@ -45,9 +45,10 @@
                         {% for session in space.sessions.all %}
                             <tr>
                                 <th width="30%">
-                                    {{ session.name }}
+                                    <span class="session-name">{{ session.name }}</span>
+                                    <span class="visible-xs visible-sm text-muted text-date">{{ session.start|date:"d/m/Y" }}</span>
                                 </th>
-                                <td class="hidden-xs">
+                                <td class="hidden-sm hidden-xs">
                                     <span class="text-muted text-date">{{ session.start|date:"d/m/Y" }}</span>
                                 </td>
                                 {% if session.space.numbered %}
@@ -64,9 +65,9 @@
                                             data-price="{% if window %}{{ session.window_price }}{% else %}{{ session.price }}{% endif %}" 
                                             {% if not session.space.numbered %}name="number_{{ session.id }}"{% endif %}
                                             value="0"/>
-                                        <span class="input-group-addon">
+                                        <span class="ticket-price input-group-addon">
                                             {% if window %}{{ session.window_price }}{% else %}{{ session.price }}{% endif %}
-                                            € / {% trans "ticket" %}
+                                            € <span class="hidden-xs">/ {% trans "ticket" %}</span>
                                         </span>
                                         {% if subsum %}
                                         <span class="input-group-addon">
