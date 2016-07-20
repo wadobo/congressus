@@ -1,0 +1,9 @@
+.sessioninput-group {
+    float: right;
+}
+
+.sessioninput {
+    text-align: center;
+    width: 50px !important;
+}
+

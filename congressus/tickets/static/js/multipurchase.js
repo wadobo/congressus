@@ -293,4 +293,29 @@ $(document).ready(function() {
         recalcSums($(this));
         $(this).click(function() { $(this).select(); });
     });
+
+    $(".plus").click(function() {
+        var id = '#' + $(this).data("id");
+        var max = parseInt($(id).attr('max') || 500, 10);
+        var current = parseInt($(id).val(), 10);
+
+        var next = current + 1;
+        if (next > max) {
+            next = max;
+        }
+        $(id).val(next);
+        $(id).change();
+    });
+    $(".minus").click(function() {
+        var id = '#' + $(this).data("id");
+        var min = parseInt($(id).attr('min') || 0, 10);
+        var current = parseInt($(id).val(), 10);
+
+        var next = current - 1;
+        if (next < min) {
+            next = min;
+        }
+        $(id).val(next);
+        $(id).change();
+    });
 });
