@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-20 12:15+0200\n"
+"POT-Creation-Date: 2016-07-20 12:32+0200\n"
 "PO-Revision-Date: 2016-07-20 12:23+0200\n"
 "Last-Translator: Daniel Garcia Moreno <danigm@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
@@ -844,34 +844,38 @@ msgstr "Precio:"
 msgid "scene"
 msgstr "escenario"
 
-#: tickets/utils.py:61
+#: tickets/utils.py:62
 #, python-format
 msgid "%(date)s (%(start)s to %(end)s)"
-msgstr "%(date)s (%(start)s to %(end)s)"
+msgstr "%(date)s (%(start)s a %(end)s)"
 
-#: tickets/utils.py:69
+#: tickets/utils.py:70
 msgid "T"
 msgstr "E"
 
-#: tickets/utils.py:70
+#: tickets/utils.py:71
 #, python-format
 msgid "Ticket %(space)s %(session)s"
 msgstr "Entrada %(space)s %(session)s"
 
-#: tickets/utils.py:74
+#: tickets/utils.py:75
 #, python-format
 msgid "%4.2f €"
 msgstr "%4.2f €"
 
-#: tickets/utils.py:148
+#: tickets/utils.py:76
+msgid "TAX INC."
+msgstr "IVA INC."
+
+#: tickets/utils.py:150
 msgid "PRINT AND BRING THIS TICKET WITH YOU"
 msgstr "IMPRIME Y LLEVA ESTA ENTRADA CONTIGO"
 
-#: tickets/utils.py:178
+#: tickets/utils.py:180
 msgid "Sponsors"
 msgstr "Patrocinadores"
 
-#: tickets/utils.py:199
+#: tickets/utils.py:201
 msgid "Contributors"
 msgstr "Colaboradores"
 

@@ -1,6 +1,7 @@
 import os
 from django.conf import settings
 from django.utils.translation import ugettext as _
+from django.utils import formats
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.graphics.shapes import Drawing
 from reportlab.graphics import renderPDF
@@ -57,7 +58,7 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
 
     space = ticket.session.space.name
     session = ticket.session.name
-    start = ticket.session.start.strftime("%A %d/%m/%Y")
+    start = formats.date_format(ticket.session.start, "l d/m/Y")
     date = _('%(date)s (%(start)s to %(end)s)') % {
         'date': start,
         'start': ticket.session.start.strftime("%H:%M"), 
@@ -72,7 +73,8 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
         text += ' ' + ticket.cseat()
 
     price = _('%4.2f €') % ticket.price
-    price = '<font size=14>%s</font>   <font size=8>%s%% TAX INC.</font>' % (price, ticket.tax)
+    taxtext = _('TAX INC.')
+    price = '<font size=14>%s</font>   <font size=8>%s%% %s</font>' % (price, ticket.tax, taxtext)
 
     if settings.QRCODE:
         codeimg = QRFlowable(code)
