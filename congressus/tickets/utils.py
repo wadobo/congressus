@@ -61,7 +61,7 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
     start = formats.date_format(ticket.session.start, "l d/m/Y")
     date = _('%(date)s (%(start)s to %(end)s)') % {
         'date': start,
-        'start': ticket.session.start.strftime("%H:%M"), 
+        'start': ticket.session.start.strftime("%H:%M"),
         'end': ticket.session.end.strftime("%H:%M"),
     }
     code = ticket.order
@@ -69,12 +69,19 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
 
     initials = _('T') + space[0].upper() + session[0].upper()
     text = _('Ticket %(space)s %(session)s') % {'space': space.capitalize(), 'session': session.capitalize()}
-    if ticket.seat:
-        text += ' ' + ticket.cseat()
 
     price = _('%4.2f €') % ticket.price
     taxtext = _('TAX INC.')
     price = '<font size=14>%s</font>   <font size=8>%s%% %s</font>' % (price, ticket.tax, taxtext)
+    seatinfo = ''
+    if ticket.seat:
+        seatdata = {
+            'layout': ticket.seat_layout.name,
+            'row': ticket.seat_row(),
+            'col': ticket.seat_column()
+        }
+        seatinfo = _('SECTOR: %(layout)s &nbsp;&nbsp;&nbsp; ROW: %(row)s &nbsp;&nbsp;&nbsp; SEAT: %(col)s') % seatdata
+        seatinfo = '<font size=11><b>'+ seatinfo +'</b></font><br/>'
 
     if settings.QRCODE:
         codeimg = QRFlowable(code)
@@ -157,15 +164,16 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
 
     # ticket information table
     t = Table([
-        [codeimg, Paragraph('<font size=60>'+initials+'</font>', styleN)],
-        ['',      Paragraph(text, styleN)],
-        ['',      Paragraph(date, styleN)],
-        ['',      Paragraph(price, styleN)],
+        [codeimg, Paragraph('<font size=60>'+initials+'</font>', styleN), Paragraph(price, styleN)],
+        ['',      Paragraph(text, styleN), ''],
+        ['',      Paragraph(date, styleN), ''],
+        ['',      Paragraph(seatinfo, styleN), ''],
         [code, '']
-    ], colWidths=[5*cm, '*'], rowHeights=[2.5*cm, 0.5*cm, 0.5*cm, 0.5*cm, 0.5*cm])
+    ], colWidths=[5*cm, '*', 2.5*cm], rowHeights=[2.5*cm, 0.5*cm, 0.5*cm, 0.5*cm, 0.5*cm])
     tstyle_list = [
+        ('VALIGN', (0,0), (0, 1), 'MIDDLE'),
         ('VALIGN', (0,0), (1,-1), 'TOP'),
-        ('VALIGN', (0,0), (0,-1), 'MIDDLE'),
+        ('VALIGN', (-1,0), (-1,0), 'TOP'),
         ('ALIGN', (0,0), (0,-1), 'CENTER'),
         ('BOX', (0,0), (-1,-1), 0.25, colors.black),
         ('SPAN', (0, 0), (0, 3)),
