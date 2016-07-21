@@ -38,3 +38,11 @@ def scene_span(context, session, map):
     html = '<td class="scene" rowspan="%s" colspan="%s"> %s </td>' % (rows, cols, _('scene'))
 
     return mark_safe(html)
+
+
+@register.simple_tag
+def key(data, key, prefix="", default=''):
+    k = key
+    if prefix:
+        k = prefix + str(key)
+    return data.get(k, default)

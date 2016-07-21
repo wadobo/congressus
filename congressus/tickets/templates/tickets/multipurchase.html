@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load crispy_forms_tags %}
 {% load staticfiles %}
+{% load tickets %}
 
 {% block title %}{{ ev }}{% endblock %}
 
@@ -53,7 +54,9 @@
                                 {% if session.space.numbered %}
                                 <td>
                                     {% include "tickets/seat_select.html" %}
-                                    <input id="seats-{{ session.id }}" class="hidden seats-input" data-session="{{ session.id }}" type="text" name="seats_{{ session.id }}" value=""/>
+                                    <input id="seats-{{ session.id }}" class="hidden seats-input" data-session="{{ session.id }}" type="text" name="seats_{{ session.id }}"
+                                       value="{% key request.POST session.id "seats_" %}"
+                                    />
                                 </td>
                                 {% endif %}
                                 <td class="sessioninput-td">
@@ -61,9 +64,10 @@
                                         <input id="{{ session.id }}" class="sessioninput form-control"
                                             min='0' max='15' type="text"
                                             data-session="{{ session.id }}"
-                                            data-price="{% if window %}{{ session.window_price }}{% else %}{{ session.price }}{% endif %}" 
+                                            data-price="{% if window %}{{ session.window_price }}{% else %}{{ session.price }}{% endif %}"
                                             {% if not session.space.numbered %}name="number_{{ session.id }}"{% endif %}
-                                            value="0"/>
+                                            value="{% key request.POST session.id "number_" "0" %}"
+                                        />
                                         <span class="buttons input-group-btn">
                                             <button data-id="{{ session.id }}" class="plus btn btn-default" type="button">
                                                 <span class="glyphicon glyphicon-plus" ahire-hidden="true"></span>
