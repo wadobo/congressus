@@ -36,6 +36,7 @@ function setEnabled(t) {
     } else {
         $("#order").removeAttr("disabled");
         $("#ordergo").removeAttr("disabled");
+        $("#order").focus();
     }
 }
 
