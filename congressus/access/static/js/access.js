@@ -13,10 +13,14 @@ function notify(what) {
     var audio = new Audio($("#audio-"+what).attr('src'));
     audio.play();
     clearTimeout(notifyTimer);
+    timeTimeout = 1000;
+    if (what == 'right') {
+        timeTimeout = 500;
+    }
     notifyTimer = setTimeout(function() {
         gonormal();
         setEnabled(true);
-    }, 1000);
+    }, timeTimeout);
 
     args = ' ' + window.ac;
     args += ' ' + moment().format('YYYY-MM-DDThh:mm:ss.SSSSSSZ');
