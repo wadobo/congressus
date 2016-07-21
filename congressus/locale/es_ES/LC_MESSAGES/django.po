@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-21 10:26+0200\n"
-"PO-Revision-Date: 2016-07-21 10:27+0200\n"
+"POT-Creation-Date: 2016-07-21 10:28+0200\n"
+"PO-Revision-Date: 2016-07-21 10:29+0200\n"
 "Last-Translator: Daniel Garcia Moreno <danigm@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
 "Language: es\n"
@@ -499,21 +499,21 @@ msgstr "plantillas de entrada"
 msgid "Tickets"
 msgstr "Entradas"
 
-#: tickets/forms.py:29 tickets/templates/tickets/ticket_form.html.py:21
+#: tickets/forms.py:34 tickets/templates/tickets/ticket_form.html.py:21
 msgid "Sorry, there's no more places for this event"
 msgstr "Lo siento, no hay más plazas para este evento"
 
-#: tickets/forms.py:83
+#: tickets/forms.py:88
 #, python-format
 msgid "Sorry, you can't buy %(n)s tickets"
 msgstr "Lo siento, no puedes comprar %(n)s entradas"
 
-#: tickets/forms.py:85
+#: tickets/forms.py:90
 #, python-format
 msgid "There's no %(n)s places for %(session)s"
 msgstr "No hay %(n)s plazas para la sesión %(session)s"
 
-#: tickets/forms.py:95
+#: tickets/forms.py:100
 #, python-format
 msgid "The seat %(seat)s is not available for %(session)s"
 msgstr "El asiento %(seat)s no está disponible para la sesión %(session)s"
@@ -816,6 +816,10 @@ msgstr "Realizar pago"
 #: tickets/templates/tickets/payment.html:32
 msgid "\"Make payment\" will redirect to"
 msgstr "\"Realizar pago\" redirigirá a "
+
+#: tickets/templates/tickets/payment.html:42
+msgid "Cancel payment"
+msgstr "Cancelar pago"
 
 #: tickets/templates/tickets/seat_select.html:6
 msgid "select the seat"
