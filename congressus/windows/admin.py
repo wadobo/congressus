@@ -6,7 +6,7 @@ from .models import TicketWindowCashMovement
 
 
 class TicketWindowAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'event', 'location')
+    list_display = ('name', 'slug', 'event', 'location', 'online')
     list_filter = ('event', 'location')
     search_fields = ('name', 'slug', 'event__name')
 

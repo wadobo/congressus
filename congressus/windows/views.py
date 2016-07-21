@@ -106,7 +106,7 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
                 tk.sold_in_window = True
                 tk.price = tk.get_window_price()
                 tk.save()
-            
+
             price = data.get('price', 0)
             payed = data.get('payed', 0)
             change = data.get('change', 0)

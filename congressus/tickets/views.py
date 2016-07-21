@@ -35,6 +35,8 @@ from events.models import Space
 from events.models import SeatMap
 from events.models import SeatLayout
 
+from windows.utils import online_sale
+
 from .forms import RegisterForm
 from .forms import MPRegisterForm
 
@@ -84,6 +86,7 @@ class MultiPurchaseView(TemplateView):
 
             if not mp.get_price():
                 mp.confirm()
+                online_sale(mp)
                 return redirect('thanks', order=mp.order)
             return redirect('payment', order=mp.order)
 
@@ -147,10 +150,10 @@ def tpv_sig_data(mdata, order, key, alt=b'+/'):
 
 def get_ticket_or_404(**kwargs):
     try:
-        tk = Ticket.objects.get(**kwargs)
+        tk = MultiPurchase.objects.get(**kwargs)
     except ObjectDoesNotExist:
         try:
-            tk = MultiPurchase.objects.get(**kwargs)
+            tk = Ticket.objects.get(**kwargs)
         except ObjectDoesNotExist:
             raise Http404
     return tk
@@ -249,6 +252,7 @@ class Confirm(View):
 
         tk = get_ticket_or_404(order_tpv=order_tpv)
         tk.confirm()
+        online_sale(tk)
         return HttpResponse("")
 confirm = csrf_exempt(Confirm.as_view())
 

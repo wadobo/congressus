@@ -35,6 +35,7 @@ class TicketWindow(models.Model):
     cash = models.IntegerField(_('cash in the ticket window'), default=0)
 
     location = models.CharField(_('location'), max_length=500, blank=True, null=True)
+    online = models.BooleanField(_('online'), default=False)
 
     class Meta:
         verbose_name = _('ticket window')
@@ -77,7 +78,7 @@ class TicketWindow(models.Model):
 
 class TicketWindowSale(models.Model):
     window = models.ForeignKey(TicketWindow, related_name='sales', verbose_name=_('window'))
-    user = models.ForeignKey(User, related_name='sales', verbose_name=_('user'))
+    user = models.ForeignKey(User, related_name='sales', verbose_name=_('user'), blank=True, null=True)
     purchase = models.ForeignKey(MultiPurchase, related_name='sales', verbose_name=_('multipurchase'))
 
     price = models.PositiveIntegerField(_('price'), default=0)
