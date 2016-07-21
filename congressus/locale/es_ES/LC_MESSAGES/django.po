@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-07-21 10:54+0200\n"
-"PO-Revision-Date: 2016-07-21 10:55+0200\n"
+"PO-Revision-Date: 2016-07-21 12:04+0200\n"
 "Last-Translator: Daniel Garcia Moreno <danigm@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
 "Language: es\n"
@@ -178,7 +178,7 @@ msgstr "Estudiante"
 #: events/models.py:25 tickets/templates/emails/ticket-info.txt.py:12
 #: tickets/templates/tickets/ticket-info.html:46
 msgid "Email"
-msgstr "Correo"
+msgstr "Correo electrónico"
 
 #: events/models.py:26
 msgid "Phone"
@@ -402,7 +402,7 @@ msgstr "emails de confirmación"
 
 #: events/models.py:325 tickets/models.py:200 tickets/models.py:266
 msgid "email"
-msgstr "correo"
+msgstr "correo electrónico"
 
 #: events/models.py:326
 msgid "attach"
@@ -501,7 +501,7 @@ msgstr "Entradas"
 
 #: tickets/forms.py:12 tickets/forms.py:67
 msgid "Confirm email"
-msgstr "Confirmar email"
+msgstr "Confirmar correo electrónico"
 
 #: tickets/forms.py:13 tickets/forms.py:68
 msgid "Enter the same email to confirm that it's well written"
