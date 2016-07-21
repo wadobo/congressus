@@ -54,8 +54,8 @@ class TicketWindow(models.Model):
 
     def tickets_today(self, date=None):
         sales = self.get_sales(date)
-        sales = sales.aggregate(sold=Sum('price'))
-        return sales['sold'] or 0
+        sales = sum(i.purchase.tickets.count() for i in sales)
+        return sales
 
     def sold_today(self, date=None):
         sales = self.get_sales(date)
