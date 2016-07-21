@@ -721,7 +721,7 @@ msgstr "Número de entrada"
 
 #: tickets/templates/emails/ticket-info.txt:6
 msgid "payment number"
-msgstr "Número de pago"
+msgstr "Localizador"
 
 #: tickets/templates/emails/ticket-info.txt:8
 msgid "ticket confirmed"
@@ -830,7 +830,7 @@ msgstr ""
 
 #: tickets/templates/tickets/ticket-info.html:15
 msgid "Payment number"
-msgstr "Número de pago"
+msgstr "Localizador"
 
 #: tickets/templates/tickets/ticket-info.html:27
 msgid "DOWNLOAD ALL TICKETS"
