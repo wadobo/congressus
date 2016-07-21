@@ -6,8 +6,10 @@
 {% block content %}
     <div class="page-header">
         <h1>
+            {% block thx_text %}
             {% trans "Thank you" %}
             <small>{% trans "Here you can view your ticket information" %}</small>
+            {% endblock %}
         </h1>
     </div>
 

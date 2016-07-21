@@ -3,8 +3,10 @@
 <table class="table table-striped table-bordered" role="table">
     <tr>
         <th class="bg-info" colspan="2">
+            {% block payment_ticket_info_header %}
             {% trans "Ticket info" %}
             <span class="font-large right"> {{ ticket.get_price|floatformat:2 }} €</span>
+            {% endblock %}
         </th>
     </tr>
     <tr>
@@ -24,8 +26,12 @@
                 <input type="hidden" name="ticket" value="{{ ticket.order }}"/>
                 <button class="btn btn-lg btn-block btn-warning">
                     <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+                    {% block payment_download_all_text %}
                     {% trans "DOWNLOAD ALL TICKETS" %}
+                    {% endblock %}
                 </button>
+                {% block payment_download_extra_text %}
+                {% endblock %}
             </form>
         </td>
     </tr>
@@ -35,7 +41,11 @@
         <th class="bg-info" colspan="2">{% trans "Personal info" %}</th>
     </tr>
     <tr>
-        <th>{% trans "Email" %}</th>
+        <th>
+            {% block payment_email_text %}
+            {% trans "Email" %}
+            {% endblock %}
+        </th>
         <td>{{ ticket.email }}</td>
     </tr>
     <!-- todo add custom fields -->
@@ -54,7 +64,9 @@
 <table class="table table-striped table-bordered" role="table">
     <tr>
         <th class="bg-info" colspan="2">
+            {% block payment_tickets_text %}
             {% trans "Tickets" %}
+            {% endblock %}
             <span class="font-large right"> {{ ticket.get_price|floatformat:2 }} €</span>
         </th>
     </tr>

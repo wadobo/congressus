@@ -699,7 +699,7 @@ msgstr "Asiento"
 #: tickets/templates/emails/ticket-detail.txt:6
 #, python-format
 msgid " Section: %(layout)s, Row: %(row)s, Seat: %(column)s "
-msgstr "Sección: %(layout)s, Fila: %(row)s, Asiento: %(column)s "
+msgstr " Sector: %(layout)s, Fila: %(row)s, Asiento: %(column)s "
 
 #: tickets/templates/emails/ticket-detail.txt:8
 msgid "Price"
@@ -825,7 +825,7 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"            Sección: %(layout)s, Fila: %(row)s, Asiento: %(column)s\n"
+"            Sector: %(layout)s, Fila: %(row)s, Asiento: %(column)s\n"
 "           "
 
 #: tickets/templates/tickets/ticket-info.html:15
