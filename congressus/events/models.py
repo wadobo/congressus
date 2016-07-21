@@ -11,6 +11,10 @@ from django.dispatch import receiver
 from autoslug import AutoSlugField
 
 
+from django import forms
+from django.core.validators import RegexValidator
+
+
 INV_TYPES = (
     ('invited', _('Invited')),
     ('speaker', _('Speaker')),
@@ -18,6 +22,9 @@ INV_TYPES = (
 )
 
 FIELD_TYPES = (
+    ('email', _('Email')),
+    ('tel', _('Phone')),
+    ('url', _('URL')),
     ('text', _('Text')),
     ('textarea', _('TextArea')),
     ('check', _('CheckBox')),
@@ -355,18 +362,27 @@ class TicketField(models.Model):
         verbose_name_plural = _('ticket fields')
 
     def form_type(self):
-        from django import forms
-
         choices = ((i, i) for i in map(str.strip, self.options.split(',')))
 
         types = {
-            'text': forms.CharField(help_text=self.help_text, required=self.required),
-            'textarea': forms.CharField(help_text=self.help_text, widget=forms.Textarea, required=self.required),
-            'check': forms.BooleanField(help_text=self.help_text, required=self.required),
-            'select': forms.ChoiceField(help_text=self.help_text, choices=choices, required=self.required),
+            'text': forms.CharField(),
+            'textarea': forms.CharField(widget=forms.Textarea),
+            'check': forms.BooleanField(),
+            'select': forms.ChoiceField(choices=choices),
+            'email': forms.EmailField(),
+            'url': forms.URLField(),
+            'tel': forms.CharField(
+                    validators=[ RegexValidator(r'^\+?[0-9]+$', _('Enter a valid phone')) ],
+            ),
         }
 
-        return types[self.type]
+        field = types[self.type]
+
+        field.help_text = self.help_text
+        if not self.required:
+            field.required = False
+
+        return field
 
 
 @receiver(post_save, sender=InvCode)

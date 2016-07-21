@@ -22,6 +22,11 @@ class RegisterForm(forms.ModelForm):
         for field in self.session.event().fields.all():
             self.fields[field.label] = field.form_type()
 
+        # Adding html5 required attr to required fields
+        for f in self.fields.values():
+            if f.required:
+                f.widget.attrs['required'] = 'true'
+
     def clean(self):
         data = super(RegisterForm, self).clean()
 
@@ -67,6 +72,11 @@ class MPRegisterForm(forms.ModelForm):
 
         for field in self.event.fields.all():
             self.fields[field.label] = field.form_type()
+
+        # Adding html5 required attr to required fields
+        for f in self.fields.values():
+            if f.required:
+                f.widget.attrs['required'] = 'true'
 
     def clean(self):
         data = super(MPRegisterForm, self).clean()
