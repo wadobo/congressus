@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-21 10:28+0200\n"
-"PO-Revision-Date: 2016-07-21 10:29+0200\n"
+"POT-Creation-Date: 2016-07-21 10:54+0200\n"
+"PO-Revision-Date: 2016-07-21 10:55+0200\n"
 "Last-Translator: Daniel Garcia Moreno <danigm@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
 "Language: es\n"
@@ -499,21 +499,37 @@ msgstr "plantillas de entrada"
 msgid "Tickets"
 msgstr "Entradas"
 
-#: tickets/forms.py:34 tickets/templates/tickets/ticket_form.html.py:21
+#: tickets/forms.py:12 tickets/forms.py:67
+msgid "Confirm email"
+msgstr "Confirmar email"
+
+#: tickets/forms.py:13 tickets/forms.py:68
+msgid "Enter the same email to confirm that it's well written"
+msgstr "Introduce el mismo email para confirmar que está bien escrito"
+
+#: tickets/forms.py:37 tickets/forms.py:94
+msgid "Emails didn't match"
+msgstr "Los emails no concuerdan"
+
+#: tickets/forms.py:40 tickets/templates/tickets/ticket_form.html.py:21
 msgid "Sorry, there's no more places for this event"
 msgstr "Lo siento, no hay más plazas para este evento"
 
-#: tickets/forms.py:88
+#: tickets/forms.py:100
+msgid "Select at least one ticket"
+msgstr "Selecciona al menos una entrada"
+
+#: tickets/forms.py:106
 #, python-format
 msgid "Sorry, you can't buy %(n)s tickets"
 msgstr "Lo siento, no puedes comprar %(n)s entradas"
 
-#: tickets/forms.py:90
+#: tickets/forms.py:108
 #, python-format
 msgid "There's no %(n)s places for %(session)s"
 msgstr "No hay %(n)s plazas para la sesión %(session)s"
 
-#: tickets/forms.py:100
+#: tickets/forms.py:118
 #, python-format
 msgid "The seat %(seat)s is not available for %(session)s"
 msgstr "El asiento %(seat)s no está disponible para la sesión %(session)s"

@@ -9,9 +9,12 @@ from django.utils import timezone
 
 
 class RegisterForm(forms.ModelForm):
+    confirm_email = forms.EmailField(label=_('Confirm email'),
+            help_text=_("Enter the same email to confirm that it's well written"))
+
     class Meta:
         model = Ticket
-        fields = ['email']
+        fields = ['email', 'confirm_email']
 
     def __init__(self, *args, **kwargs):
         self.session = kwargs.pop('session')
@@ -29,6 +32,9 @@ class RegisterForm(forms.ModelForm):
 
     def clean(self):
         data = super(RegisterForm, self).clean()
+
+        if not data['email'] == data['confirm_email']:
+            raise forms.ValidationError(_("Emails didn't match"))
 
         if not self.session.have_places():
             raise forms.ValidationError(_("Sorry, there's no more places for this event"))
@@ -58,9 +64,12 @@ class RegisterForm(forms.ModelForm):
 
 
 class MPRegisterForm(forms.ModelForm):
+    confirm_email = forms.EmailField(label=_('Confirm email'),
+            help_text=_("Enter the same email to confirm that it's well written"))
+
     class Meta:
         model = MultiPurchase
-        fields = ['email']
+        fields = ['email', 'confirm_email']
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
@@ -80,6 +89,9 @@ class MPRegisterForm(forms.ModelForm):
 
     def clean(self):
         data = super(MPRegisterForm, self).clean()
+
+        if not data['email'] == data['confirm_email']:
+            raise forms.ValidationError(_("Emails didn't match"))
 
         tickets_without_seat = list(filter(lambda x: int(x[1]), self.ids))
         tickets_with_seat = list(filter(lambda x: bool(list(filter(None, x[1]))), self.seats))
