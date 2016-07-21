@@ -1,0 +1,11 @@
+[
+{
+  "model": "events.confirmemail",
+  "pk": 1,
+  "fields": {
+    "event": 1,
+    "subject": "Confirmaci\u00f3n de entrada: {{ ticket.event }}",
+    "body": "Tu ticket ha sido confirmado:\r\n\r\nInformaci\u00f3n de ticket:\r\n-----\r\nEvento: {{ ticket.event }}\r\nLocalizador: {{ ticket.order }}\r\nN\u00famero de pago: {{ ticket.order_tpv }}\r\nPrecio de ticket: {{ ticket.get_price|floatformat:2 }} \u20ac\r\n\r\nInformaci\u00f3n personal:\r\n-----\r\nEmail: {{ ticket.email }}\r\n\r\nEntradas:\r\n-----\r\n{% if ticket.is_mp %}\r\n{% for t in ticket.all_tickets %}\r\n{{ t.order }} - {{ t.space.name }} {{ t.session.name }} - {{ t.get_price|floatformat:2 }} \u20ac\r\n{% if t.space.numbered %}\r\nAsiento:{% blocktrans with layout=t.seat_layout row=t.seat_row column=t.seat_column %} Sector: {{ layout }}, Fila: {{ row }}, Columna: {{ column }}{% endblocktrans %}\r\n{% endif %}\r\n{% endfor %}\r\n{% else %}\r\n{{ ticket.order }} - {{ ticket.space.name }} {{ ticket.session.name }} - {{ ticket.get_price|floatformat:2 }} \u20ac\r\n{% if ticket.space.numbered %}\r\nAsiento:{% blocktrans with layout=ticket.seat_layout row=ticket.seat_row column=ticket.seat_column %} Sector: {{ layout }}, Fila: {{ row }}, Columna: {{ column }}{% endblocktrans %}\r\n{% endif %}\r\n{% endif %}"
+  }
+}
+]
