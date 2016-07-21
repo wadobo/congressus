@@ -37,6 +37,10 @@
             <br/>
 
             {% include "tickets/ticket-info.html" %}
+            <a href="javascript:history.back()" class="btn btn-lg btn-warning btn-block">
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                {% trans "Cancel payment" %}
+            </a>
         </div>
     </div>
 {% endblock %}
