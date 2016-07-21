@@ -81,6 +81,12 @@ class MPRegisterForm(forms.ModelForm):
     def clean(self):
         data = super(MPRegisterForm, self).clean()
 
+        tickets_without_seat = list(filter(lambda x: int(x[1]), self.ids))
+        tickets_with_seat = list(filter(lambda x: bool(list(filter(None, x[1]))), self.seats))
+
+        if not tickets_without_seat and not tickets_with_seat:
+            raise forms.ValidationError(_("Select at least one ticket"))
+
         for sid, number in self.ids:
             session = Session.objects.get(space__event=self.event, id=sid)
             n = int(number)
