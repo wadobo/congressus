@@ -34,8 +34,8 @@ unconfirm.short_description = _("Manual unconfirm")
 
 
 class TicketAdmin(CSVMixin, admin.ModelAdmin):
-    list_display = ('order', 'order_tpv', 'event', 'confirmed', 'email', 'session', 'price', 'cseat', 'mp', 'twin')
-    list_filter = ('confirmed',)
+    list_display = ('order', 'order_tpv', 'event_name', 'confirmed', 'email', 'session', 'price', 'cseat', 'mp', 'twin')
+    list_filter = ('confirmed', 'event_name')
     search_fields = ('order', 'order_tpv', 'email', 'mp__order', 'mp__order_tpv')
     date_hierarchy = 'created'
     actions = [confirm, unconfirm]
@@ -53,23 +53,14 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
         'mp',
         'twin',
 
-        'eventname',
-        'spacename',
-        'sessionname',
+        'event_name',
+        'space_name',
+        'session_name',
         'created',
     ]
 
     def price(self, obj):
         return obj.get_price()
-
-    def eventname(self, obj):
-        return obj.event().name
-
-    def spacename(self, obj):
-        return obj.space().name
-
-    def sessionname(self, obj):
-        return obj.session.name
 
     def twin(self, obj):
         from windows.models import TicketWindowSale
