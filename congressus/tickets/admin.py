@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.translation import ugettext_lazy as _
 
 from .models import Invitation
 from .models import InvitationType
@@ -18,20 +19,39 @@ class InvitationTypeAdmin(admin.ModelAdmin):
     list_display = ('session', 'name', 'start', 'end')
 
 
+def confirm(modeladmin, request, queryset):
+    for i in queryset:
+        i.confirmed = True
+        i.save()
+confirm.short_description = _("Manual confirm")
+
+
+def unconfirm(modeladmin, request, queryset):
+    for i in queryset:
+        i.confirmed = False
+        i.save()
+unconfirm.short_description = _("Manual unconfirm")
+
+
 class TicketAdmin(CSVMixin, admin.ModelAdmin):
-    list_display = ('order', 'order_tpv', 'event', 'confirmed', 'email', 'session', 'price', 'cseat', 'mp')
+    list_display = ('order', 'order_tpv', 'event', 'confirmed', 'email', 'session', 'price', 'cseat', 'mp', 'twin')
     list_filter = ('confirmed',)
     search_fields = ('order', 'order_tpv', 'email', 'mp__order', 'mp__order_tpv')
     date_hierarchy = 'created'
+    actions = [confirm, unconfirm]
     csv_fields = [
         'email',
 
-        'invcode',
         'order',
         'order_tpv',
 
+        'confirmed',
         'confirmed_date',
-        'confirm_sent',
+
+        'price',
+        'cseat',
+        'mp',
+        'twin',
 
         'eventname',
         'spacename',
@@ -51,37 +71,57 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
     def sessionname(self, obj):
         return obj.session.name
 
-    def invcode(self, obj):
-        return obj.inv.code if obj.inv else ''
+    def twin(self, obj):
+        from windows.models import TicketWindowSale
+        try:
+            tws = TicketWindowSale.objects.get(purchase__tickets=obj)
+        except:
+            return '-'
+        prefix = tws.window.code
+        return prefix
+    twin.short_description = _('ticket window')
 
 
 class MPAdmin(CSVMixin, admin.ModelAdmin):
-    list_display = ('order', 'order_tpv', 'event', 'confirmed', 'email', 'ntickets')
-    list_filter = ('confirmed',)
+    list_display = ('order', 'order_tpv', 'ev', 'confirmed', 'email', 'price', 'ntickets', 'twin')
+    list_filter = ('confirmed', 'ev')
     search_fields = ('order', 'order_tpv', 'email')
     date_hierarchy = 'created'
+    actions = [confirm, unconfirm]
     csv_fields = [
         'email',
 
-        'invcode',
         'order',
         'order_tpv',
 
+        'confirmed',
         'confirmed_date',
-        'confirm_sent',
 
-        'eventname',
+        'price',
+        'ntickets',
+        'twin',
+
+        'ev',
         'created',
     ]
 
     def ntickets(self, obj):
         return obj.tickets.count()
+    ntickets.short_description = _('ntickets')
 
-    def eventname(self, obj):
-        return obj.event.name
+    def twin(self, obj):
+        from windows.models import TicketWindowSale
+        try:
+            tws = TicketWindowSale.objects.get(purchase=obj)
+        except:
+            return '-'
+        prefix = tws.window.code
+        return prefix
+    twin.short_description = _('ticket window')
 
-    def invcode(self, obj):
-        return obj.inv.code if obj.inv else ''
+    def price(self, obj):
+        return obj.get_price()
+    price.short_description = _('price')
 
 
 class TicketWarningAdmin(admin.ModelAdmin):
