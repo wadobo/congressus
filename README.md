@@ -161,3 +161,35 @@ Y habilitamos el servicio
 Con esto ya tendremos la aplicación ejecutandose en
 http://mydomain.com:8080, y podemos hacer un simple proxy html desde apache
 o nginx.
+
+
+## Generar UML de modelos django
+
+Instalar django-extensions y pygraphviz.
+
+```
+sudo apt-get install graphviz-dev
+pip install django-extensions pygraphviz
+```
+
+Añadir django_extensions en INSTALLED_APPS:
+
+```
+    'django_extensions',
+```
+
+Generar png:
+
+```
+# Normal
+./manage.py graph_models -a -o testg.png
+# Agrupado por app
+./manage.py graph_models -a -g -o testg.png
+```
+
+Si obtenemos el error "CommandError: Neither pygraphviz nor pydot could be found to generate the image"
+
+```
+pip uninstall pygraphviz
+pip install pygraphviz --install-option="--include-path=/usr/include/graphviz" --install-option="--library-path=/usr/lib/graphviz/"
+```
