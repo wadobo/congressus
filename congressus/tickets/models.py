@@ -144,12 +144,9 @@ class BaseTicketMixing:
     def get_absolute_url(self):
         return reverse('payment', kwargs={'order': self.order})
 
-    def confirm(self, save=True):
+    def confirm(self):
         self.confirmed = True
-        self.confirmed_date = timezone.now()
-
-        if save:
-            self.save()
+        self.save()
 
 
 class BaseExtraData:
@@ -207,12 +204,17 @@ class MultiPurchase(models.Model, BaseTicketMixing):
     def save(self, *args, **kw):
         if self.pk is not None:
             orig = MultiPurchase.objects.get(pk=self.pk)
-            if self.confirmed and not orig.confirmed:
-                self.confirm(save=False)
-            elif orig.confirmed and not self.confirmed:
-                for t in self.tickets.all():
-                    t.confirmed = False
-                    t.save()
+            confirm = self.confirmed != orig.confirmed
+        else:
+            confirm = True
+
+        if confirm:
+            for t in self.tickets.all():
+                t.confirmed = self.confirmed
+                t.save()
+            if self.confirmed:
+                self.confirmed_date = timezone.now()
+
         super(MultiPurchase, self).save(*args, **kw)
 
     def space(self):
@@ -228,16 +230,9 @@ class MultiPurchase(models.Model, BaseTicketMixing):
     def get_window_price(self):
         return sum(i.get_window_price() for i in self.tickets.all())
 
-    def confirm(self, save=True):
+    def confirm(self):
         self.confirmed = True
-        self.confirmed_date = timezone.now()
-        for t in self.tickets.all():
-            t.confirmed = True
-            t.confirmed_date = timezone.now()
-            t.save()
-
-        if save:
-            self.save()
+        self.save()
 
     def is_mp(self):
         return True
@@ -309,8 +304,13 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
     def save(self, *args, **kw):
         if self.pk is not None:
             orig = Ticket.objects.get(pk=self.pk)
-            if self.confirmed and not orig.confirmed:
-                self.confirm(save=False)
+            confirm = self.confirmed != orig.confirmed
+        else:
+            confirm = True
+
+        if confirm and self.confirmed:
+            self.confirmed_date = timezone.now()
+
         super(Ticket, self).save(*args, **kw)
 
     def cseat(self):
