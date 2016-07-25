@@ -130,7 +130,7 @@ class BaseTicketMixing:
 
         body = body.replace('TICKETID', self.order)
 
-        email = EmailMessage(subject, body, settings.FROM_EMAIL, [self.email])
+        email = EmailMessage(subject.strip(), body, settings.FROM_EMAIL, [self.email])
 
         if e:
             # adding attachments
@@ -144,10 +144,12 @@ class BaseTicketMixing:
     def get_absolute_url(self):
         return reverse('payment', kwargs={'order': self.order})
 
-    def confirm(self):
+    def confirm(self, save=True):
         self.confirmed = True
         self.confirmed_date = timezone.now()
-        self.save()
+
+        if save:
+            self.save()
 
 
 class BaseExtraData:
@@ -202,6 +204,17 @@ class MultiPurchase(models.Model, BaseTicketMixing):
 
     extra_data = models.TextField(_('extra data'), blank=True, null=True)
 
+    def save(self, *args, **kw):
+        if self.pk is not None:
+            orig = MultiPurchase.objects.get(pk=self.pk)
+            if self.confirmed and not orig.confirmed:
+                self.confirm(save=False)
+            elif orig.confirmed and not self.confirmed:
+                for t in self.tickets.all():
+                    t.confirmed = False
+                    t.save()
+        super(MultiPurchase, self).save(*args, **kw)
+
     def space(self):
         ''' Multiple spaces '''
         return None
@@ -215,14 +228,16 @@ class MultiPurchase(models.Model, BaseTicketMixing):
     def get_window_price(self):
         return sum(i.get_window_price() for i in self.tickets.all())
 
-    def confirm(self):
+    def confirm(self, save=True):
         self.confirmed = True
         self.confirmed_date = timezone.now()
         for t in self.tickets.all():
             t.confirmed = True
             t.confirmed_date = timezone.now()
             t.save()
-        self.save()
+
+        if save:
+            self.save()
 
     def is_mp(self):
         return True
@@ -290,6 +305,13 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
 
     def __str__(self):
         return self.order
+
+    def save(self, *args, **kw):
+        if self.pk is not None:
+            orig = Ticket.objects.get(pk=self.pk)
+            if self.confirmed and not orig.confirmed:
+                self.confirm(save=False)
+        super(Ticket, self).save(*args, **kw)
 
     def cseat(self):
         if not self.seat:
