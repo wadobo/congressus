@@ -317,6 +317,10 @@ class ConfirmEmail(models.Model):
         verbose_name = _('confirm email')
         verbose_name_plural = _('confirm emails')
 
+    def get_absolute_url(self):
+        return reverse('email_confirm_preview', kwargs={'id': self.id})
+
+
     def __str__(self):
         return "ConfirmEmail - %s" % self.event
 

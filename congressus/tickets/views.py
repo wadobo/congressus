@@ -9,6 +9,8 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.conf import settings
+from django.template import Context
+from django.template import Template
 from django.utils import timezone
 from django.utils import formats
 from django.views.generic.edit import CreateView
@@ -398,3 +400,40 @@ class TicketTemplatePreview(UserPassesTestMixin, View):
         return response
 
 template_preview = TicketTemplatePreview.as_view()
+
+
+class EmailConfirmPreview(UserPassesTestMixin, View):
+    def test_func(self):
+        u = self.request.user
+        return u.is_authenticated() and u.is_superuser
+
+    def get(self, request, id):
+        from events.models import ConfirmEmail
+        email_confirm = get_object_or_404(ConfirmEmail, pk=id)
+
+        event = Event.objects.filter(email=email_confirm).first()
+        if event:
+            # fake ticket
+            ticket = Ticket(email='test@email.com', price=12, tax=21,  confirm_sent=True)
+            ticket.gen_order(save=False)
+            ticket.created = timezone.now()
+
+            ticket.session = Session(
+                              name=formats.date_format(timezone.now(), "l"),
+                              #template=template,
+                              space=random.choice(list(Space.objects.all())),
+                              start=timezone.now(),
+                              end=timezone.now())
+
+            subject = Template(event.email.subject).render(Context({'ticket': ticket}))
+            body = Template(event.email.body).render(Context({'ticket': ticket}))
+            sname = _("SUBJECT")
+            bname = _("BODY")
+            email = "%s:\n%s\n\n%s:\n%s" % (sname, subject, bname, body)
+        else:
+            email = _("You should assing this email_confirm to some events.")
+        response = HttpResponse(email, content_type='text/plain')
+        response['Content-Disposition'] = 'attachment; filename="email.txt"'
+        return response
+
+email_confirm_preview = EmailConfirmPreview.as_view()
