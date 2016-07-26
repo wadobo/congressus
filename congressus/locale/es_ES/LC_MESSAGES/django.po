@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-25 18:43+0200\n"
-"PO-Revision-Date: 2016-07-25 18:43+0200\n"
+"POT-Creation-Date: 2016-07-26 11:40+0200\n"
+"PO-Revision-Date: 2016-07-26 11:41+0200\n"
 "Last-Translator: Daniel Garcia Moreno <danigm@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
 "Language: es\n"
@@ -23,15 +23,15 @@ msgid "Access"
 msgstr "Control de acceso"
 
 #: access/models.py:10 events/models.py:51 events/models.py:114
-#: events/models.py:196 events/models.py:312 events/models.py:334
-#: events/models.py:349 tickets/admin.py:128 tickets/models.py:189
-#: tickets/models.py:259 tickets/models.py:369 windows/models.py:30
+#: events/models.py:196 events/models.py:312 events/models.py:338
+#: events/models.py:353 tickets/models.py:189 tickets/models.py:259
+#: tickets/models.py:369 windows/models.py:30
 msgid "event"
 msgstr "evento"
 
 #: access/models.py:12 events/models.py:43 events/models.py:77
 #: events/models.py:115 events/models.py:127 events/models.py:197
-#: events/models.py:217 events/models.py:397 tickets/models.py:406
+#: events/models.py:217 events/models.py:401 tickets/models.py:406
 #: windows/models.py:32 windows/templates/windows/list.html:32
 msgid "name"
 msgstr "nombre"
@@ -56,7 +56,7 @@ msgstr "valido"
 msgid "wrong"
 msgstr "incorrecto"
 
-#: access/models.py:28 events/models.py:301 events/models.py:337
+#: access/models.py:28 events/models.py:301 events/models.py:341
 #: tickets/models.py:294 tickets/models.py:430
 msgid "used"
 msgstr "usado"
@@ -319,7 +319,7 @@ msgstr "numerado"
 msgid "seat map"
 msgstr "graderio"
 
-#: events/models.py:204 events/models.py:350 tickets/models.py:191
+#: events/models.py:204 events/models.py:354 tickets/models.py:191
 #: tickets/models.py:263 tickets/models.py:421
 msgid "order"
 msgstr "orden"
@@ -400,97 +400,97 @@ msgstr "email de confirmación"
 msgid "confirm emails"
 msgstr "emails de confirmación"
 
-#: events/models.py:325 tickets/models.py:200 tickets/models.py:277
+#: events/models.py:329 tickets/models.py:200 tickets/models.py:277
 msgid "email"
 msgstr "correo electrónico"
 
-#: events/models.py:326
+#: events/models.py:330
 msgid "attach"
 msgstr "adjunto"
 
-#: events/models.py:329
+#: events/models.py:333
 msgid "email attachment"
 msgstr "adjunto de email"
 
-#: events/models.py:330
+#: events/models.py:334
 msgid "email attachments"
 msgstr "adjuntos de emails"
 
-#: events/models.py:335 windows/models.py:34
+#: events/models.py:339 windows/models.py:34
 msgid "code"
 msgstr "código"
 
-#: events/models.py:336
+#: events/models.py:340
 msgid "for person"
 msgstr "para persona"
 
-#: events/models.py:338 events/models.py:351 tickets/models.py:373
+#: events/models.py:342 events/models.py:355 tickets/models.py:373
 #: tickets/models.py:425 tickets/templates/tickets/inv_generator.html:16
 #: windows/models.py:104
 msgid "type"
 msgstr "tipo"
 
-#: events/models.py:341 tickets/models.py:261
+#: events/models.py:345 tickets/models.py:261
 msgid "invitation code"
 msgstr "código de invitación"
 
-#: events/models.py:342
+#: events/models.py:346
 msgid "invitation codes"
 msgstr "códigos de invitación"
 
-#: events/models.py:352
+#: events/models.py:356
 msgid "label"
 msgstr "etiqueta"
 
-#: events/models.py:353
+#: events/models.py:357
 msgid "help text"
 msgstr "texto de ayuda"
 
-#: events/models.py:354
+#: events/models.py:358
 msgid "required"
 msgstr "obligatorio"
 
-#: events/models.py:355
+#: events/models.py:359
 msgid "options"
 msgstr "opciones"
 
-#: events/models.py:361
+#: events/models.py:365
 msgid "ticket field"
 msgstr "campo de entrada"
 
-#: events/models.py:362
+#: events/models.py:366
 msgid "ticket fields"
 msgstr "campos de entrada"
 
-#: events/models.py:375
+#: events/models.py:379
 msgid "Enter a valid phone"
 msgstr "Introduce un teléfono válido"
 
-#: events/models.py:398
+#: events/models.py:402
 msgid "header"
 msgstr "cabecera"
 
-#: events/models.py:399
+#: events/models.py:403
 msgid "sponsors"
 msgstr "patrocinadores"
 
-#: events/models.py:400
+#: events/models.py:404
 msgid "contributors"
 msgstr "colaboradores"
 
-#: events/models.py:401
+#: events/models.py:405
 msgid "links"
 msgstr "enlaces"
 
-#: events/models.py:402
+#: events/models.py:406
 msgid "info text"
 msgstr "texto informativo"
 
-#: events/models.py:405
+#: events/models.py:409
 msgid "ticket template"
 msgstr "plantilla de entrada"
 
-#: events/models.py:406
+#: events/models.py:410
 msgid "ticket templates"
 msgstr "plantillas de entrada"
 
@@ -502,15 +502,15 @@ msgstr "Confirmación manual"
 msgid "Manual unconfirm"
 msgstr "Des-confirmación manual"
 
-#: tickets/admin.py:82 tickets/admin.py:120 windows/models.py:41
+#: tickets/admin.py:73 tickets/admin.py:111 windows/models.py:41
 msgid "ticket window"
 msgstr "taquilla"
 
-#: tickets/admin.py:110
+#: tickets/admin.py:101
 msgid "ntickets"
 msgstr "nentradas"
 
-#: tickets/admin.py:124 tickets/models.py:286 windows/models.py:84
+#: tickets/admin.py:115 tickets/models.py:286 windows/models.py:84
 msgid "price"
 msgstr "precio"
 
@@ -705,6 +705,18 @@ msgstr "invitación"
 #: tickets/models.py:434
 msgid "invitations"
 msgstr "invitaciones"
+
+#: tickets/templates/503.html:5
+msgid "503, maintenance"
+msgstr "503, mantenimiento"
+
+#: tickets/templates/503.html:11
+msgid "We're down for maintenance,"
+msgstr "Estamos fuera de servicio por mantenimiento,"
+
+#: tickets/templates/503.html:12
+msgid "but we'll be back soon"
+msgstr "pero volveremos pronto"
 
 #: tickets/templates/base.html:11
 msgid "Register"
@@ -930,6 +942,18 @@ msgstr "Patrocinadores"
 #: tickets/utils.py:212
 msgid "Contributors"
 msgstr "Colaboradores"
+
+#: tickets/views.py:436
+msgid "SUBJECT"
+msgstr "ASUNTO"
+
+#: tickets/views.py:437
+msgid "BODY"
+msgstr "CUERPO"
+
+#: tickets/views.py:440
+msgid "You should assing this email_confirm to some events."
+msgstr "Tienes que asignar este email_confirm a algún evento."
 
 #: windows/apps.py:7
 msgid "Windows"

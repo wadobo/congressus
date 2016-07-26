@@ -24,3 +24,19 @@
 form.btn-download {
     float: right;
 }
+
+.maintenance {
+    min-height: 300px;
+    margin: 80px;
+    color: #888;
+}
+
+.maintenance h1 {
+    font-size: 70px;
+}
+
+.maintenance .errorcode {
+    font-size: 120px;
+    text-align: center;
+    font-family: "courier new";
+}

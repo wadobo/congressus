@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% trans "503, maintenance" %}
+{% endblock %}
+
+{% block content %}
+    <div class="maintenance">
+        <div class="errorcode"> 503 </div>
+        <h1> {% trans "We're down for maintenance," %} </h1>
+        <h2> {% trans "but we'll be back soon" %} </h2>
+    </div>
+{% endblock %}

@@ -9,3 +9,4 @@ django-autoslug
 websocket-server
 pypdf2
 numpy
+django-maintenancemode-2

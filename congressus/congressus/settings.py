@@ -37,11 +37,13 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
 
     # 3rd party
     'crispy_forms',
     'admin_csv',
     'autoslug',
+    'maintenancemode',
 
     # custom apps
     'tickets',
@@ -51,6 +53,8 @@ INSTALLED_APPS = (
     'access',
     'dashboard',
 )
+
+SITE_ID = 1
 
 if os.path.exists(os.path.join(BASE_DIR, 'theme')):
     print("Custom theme found... Using it")
@@ -66,6 +70,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'maintenancemode.middleware.MaintenanceModeMiddleware',
 )
 
 ROOT_URLCONF = 'congressus.urls'
