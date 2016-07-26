@@ -326,6 +326,14 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
         row, column = self.seat.split('-')
         return column
 
+    def update_mp_extra_data(self):
+        if not self.mp:
+            return
+
+        data = self.mp.get_extra_data() or {}
+        for k, v in data.items():
+            self.set_extra_data(k, v)
+
     def fill_duplicated_data(self):
         self.session_name = self.session.name
         self.space_name = self.space().name
@@ -338,6 +346,8 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
             self.seat_layout_name = self.seat_layout.name
             if self.seat_layout.gate:
                 self.gate_name = self.seat_layout.gate.name
+
+        self.update_mp_extra_data()
         self.save_extra_sessions()
 
     def gen_pdf(self):
