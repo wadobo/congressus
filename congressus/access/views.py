@@ -108,6 +108,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
         return obj
 
     def response_json(self, msg, st='right'):
+        data = {}
         data['st'] = st
         data['extra'] = msg
         return HttpResponse(json.dumps(data), content_type="application/json")
