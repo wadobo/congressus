@@ -273,7 +273,13 @@ seats = SeatView.as_view()
 class AutoSeats(View):
     def search_seats(self, id_session, amount):
         session = Session.objects.get(id=id_session)
-        layouts = session.space.seat_map.layouts.all()
+        layouts = []
+        if settings.SORTED_LAYOUT:
+            for layout in settings.SORTED_LAYOUT:
+                layouts.append(session.space.seat_map.layouts.get(name=layout))
+        else:
+            layouts = session.space.seat_map.layouts.all().order_by('name')
+
         best_avail = None
         for layout in layouts:
             holded = session.seats_holded(layout)
