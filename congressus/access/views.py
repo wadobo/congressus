@@ -99,7 +99,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
         ctx['ws_server'] = settings.WS_SERVER
         ctx['gate'] = self.request.session.get('gate', '')
         return ctx
-    
+
     def get_order_type(self, order):
         if order.startswith(Invitation.ORDER_START):
             obj = Invitation
@@ -107,70 +107,83 @@ class AccessView(UserPassesTestMixin, TemplateView):
             obj = Ticket
         return obj
 
+    def response_json(self, msg, st='right'):
+        data['st'] = st
+        data['extra'] = msg
+        return HttpResponse(json.dumps(data), content_type="application/json")
+
+    def get_ticket(self, order):
+        obj = self.get_order_type(order)
+        if obj == Ticket:
+            return obj.objects.get(order=order, confirmed=True)
+        else:
+            return obj.objects.get(order=order)
+
+    def check_extra_session(self, ticket, s):
+        extra = ticket.get_extra_session(s)
+
+        if not extra:
+            return 'maybe', str(ticket.session)
+
+        if extra.get('used'):
+            return 'wrong', _('Used')
+
+        start = datetime.strptime(extra.get('start'), settings.DATETIME_FORMAT)
+        end = datetime.strptime(extra.get('end'), settings.DATETIME_FORMAT)
+
+        if end < datetime.now():
+            msg = _("Expired session: ") + str(extra.get('session'))
+            return 'wrong', msg
+        elif start >= datetime.now():
+            msg = _("Too soon: ") + str(extra.get('session'))
+            return 'wrong', msg
+
+        ticket.set_extra_session_to_used(s)
+        ticket.save()
+
+        return 'right', str(ticket.session)
 
     def post(self, request, *args, **kwargs):
-        def check_extra():
-            if extra.get('used'):
-                data['st'] = 'wrong'
-                data['extra'] = _('Used')
-                return HttpResponse(json.dumps(data), content_type="application/json")
-            start = datetime.strptime(extra.get('start'), settings.DATETIME_FORMAT)
-            end = datetime.strptime(extra.get('end'), settings.DATETIME_FORMAT)
-            if end < datetime.now():
-                data['st'] = 'wrong'
-                data['extra'] = _("Expired session: ") + str(extra.get('session'))
-            elif start > datetime.now():
-                data['st'] = 'maybe'
-                data['extra'] = _("Wait 1.5h before for session") + str(extra.get('session'))
-            else:
-                ticket.set_extra_session_to_used(s)
-                ticket.save()
-
         data = {'st': "right", 'extra': ''}
         order = request.POST.get('order', '')
         s = self.request.session.get('session', '')
         g = self.request.session.get('gate', '')
 
-        obj = self.get_order_type(order)
+        # Checking order:
+        #  * Check if the ticket exists
+        #  * Check if it's used
+        #  * Check if it's a valid session
+        #    * check if there's extra session in this ticket
+        #  * Check if it's a valid gate
+        #  * If is a valid ticket, mark as used
+
+        # TODO add ticket checked info to the msg
+
         try:
-            if obj == Ticket:
-                ticket = obj.objects.get(order=order, confirmed=True)
-            else:
-                ticket = obj.objects.get(order=order)
+            ticket = self.get_ticket(order)
         except:
-            data['st'] = 'wrong'
-            data['extra'] = _('Not exist')
-            return HttpResponse(json.dumps(data), content_type="application/json")
+            return self.response_json(_('Not exists'), st='wrong')
 
         valid_session = ticket.session_id == s
         valid_gate = ticket.gate_name is None or ticket.gate_name == g
-        extra = ticket.get_extra_session(s)
-        special = False
 
         if ticket.used:
-            if extra:
-                special = True
-                check_extra()
-            else:
-                data['st'] = 'wrong'
-                data['extra'] = _('Used')
-                return HttpResponse(json.dumps(data), content_type="application/json")
-        elif not valid_session:
-            if extra:
-                special = True
-                check_extra()
-            else:
-                data['st'] = 'wrong'
-                data['extra'] = str(ticket.session)
-        elif not valid_gate:
-            data['st'] = 'maybe'
-            data['extra'] = _("%(session)s - Gate: %(gate)s") % {'session': ticket.session, 'gate': ticket.gate_name}
-            return HttpResponse(json.dumps(data), content_type="application/json")
+            msg = _('Used')
+            return self.response_json(msg, st='wrong')
 
-        if data['st'] == 'right' and not special:
-            ticket.used = True
-            ticket.save()
-        return HttpResponse(json.dumps(data), content_type="application/json")
+        elif not valid_session:
+            # check if this has an extra session
+            st, msg = self.check_extra_session(ticket, s)
+            return self.response_json(msg, st=st)
+
+        elif not valid_gate:
+            msg = _("%(session)s - Gate: %(gate)s") % {'session': ticket.session, 'gate': ticket.gate_name}
+            return self.response_json(msg, st='maybe')
+
+        ticket.used = True
+        ticket.save()
+        msg = str(ticket.session)
+        return self.response_json(msg)
 access = csrf_exempt(AccessView.as_view())
 
 
