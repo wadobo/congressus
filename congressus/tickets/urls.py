@@ -3,6 +3,7 @@ from . import views
 
 
 urlpatterns = [
+    url(r'^$', views.last_event, name='last_event'),
     url(r'^event/(?P<ev>[\w-]+)/$', views.event, name='event'),
 
     url(r'^event/(?P<ev>[\w-]+)/(?P<space>[\w-]+)/(?P<session>[\w-]+)/register/$', views.register, name='register'),

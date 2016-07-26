@@ -52,18 +52,29 @@ class EventView(TemplateView):
     template_name = 'tickets/event.html'
 
     def get_context_data(self, *args, **kwargs):
-        ev = get_object_or_404(Event, slug=self.kwargs['ev'])
+        ev = get_object_or_404(Event, active=True, slug=self.kwargs['ev'])
         ctx = super(EventView, self).get_context_data(*args, **kwargs)
         ctx['ev'] = ev
         return ctx
 event = EventView.as_view()
 
 
+class LastEventView(View):
+    def get(self, request):
+        try:
+            ev = Event.objects.filter(active=True)[0]
+        except:
+            raise Http404
+
+        return redirect('multipurchase', ev=ev.slug)
+last_event = LastEventView.as_view()
+
+
 class MultiPurchaseView(TemplateView):
     template_name = 'tickets/multipurchase.html'
 
     def get_context_data(self, *args, **kwargs):
-        ev = get_object_or_404(Event, slug=self.kwargs['ev'])
+        ev = get_object_or_404(Event, active=True, slug=self.kwargs['ev'])
         ctx = super(MultiPurchaseView, self).get_context_data(*args, **kwargs)
         ctx['ev'] = ev
         ctx['form'] = MPRegisterForm(event=ev)
