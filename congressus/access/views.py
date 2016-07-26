@@ -6,6 +6,8 @@ from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.utils.translation import ugettext as _
+from django.utils import timezone
+from django.utils import formats
 from django.shortcuts import redirect, render
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.urlresolvers import reverse
@@ -21,6 +23,12 @@ from tickets.models import Ticket
 from django.contrib.auth import logout as auth_logout
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
+
+
+def short_date(dt):
+    if timezone.is_aware(dt):
+        dt = timezone.localtime(dt)
+    return formats.date_format(dt, 'SHORT_DATETIME_FORMAT')
 
 
 class AccessLogin(TemplateView):
@@ -107,10 +115,11 @@ class AccessView(UserPassesTestMixin, TemplateView):
             obj = Ticket
         return obj
 
-    def response_json(self, msg, st='right'):
+    def response_json(self, msg, msg2='', st='right'):
         data = {}
         data['st'] = st
         data['extra'] = msg
+        data['extra2'] = msg2
         return HttpResponse(json.dumps(data), content_type="application/json")
 
     def get_ticket(self, order):
@@ -124,25 +133,31 @@ class AccessView(UserPassesTestMixin, TemplateView):
         extra = ticket.get_extra_session(s)
 
         if not extra:
-            return 'maybe', str(ticket.session)
+            return 'wrong', ticket.session.short()
 
         if extra.get('used'):
-            return 'wrong', _('Used')
+            used_date = datetime.strptime(extra['used_date'], settings.DATETIME_FORMAT)
+            msg = _('Used: %(date)s') % {'date': short_date(used_date)}
+            return 'wrong', msg
 
-        start = datetime.strptime(extra.get('start'), settings.DATETIME_FORMAT)
-        end = datetime.strptime(extra.get('end'), settings.DATETIME_FORMAT)
+        start = datetime.strptime(extra['start'], settings.DATETIME_FORMAT)
+        end = datetime.strptime(extra['end'], settings.DATETIME_FORMAT)
+        session = Session.objects.get(pk=extra['session'])
+
+        start_formatted = short_date(start)
+        end_formatted = short_date(end)
 
         if end < datetime.now():
-            msg = _("Expired session: ") + str(extra.get('session'))
+            msg = _("Expired, ended at %(date)s") % { 'date': end_formatted }
             return 'wrong', msg
-        elif start >= datetime.now():
-            msg = _("Too soon: ") + str(extra.get('session'))
+        elif start > datetime.now():
+            msg = _("Too soon, wait until %(date)s") % { 'date': start_formatted }
             return 'wrong', msg
 
         ticket.set_extra_session_to_used(s)
         ticket.save()
 
-        return 'right', str(ticket.session)
+        return 'right', _('Extra session: %(session)s') % { 'session': session.short() }
 
     def post(self, request, *args, **kwargs):
         data = {'st': "right", 'extra': ''}
@@ -166,25 +181,29 @@ class AccessView(UserPassesTestMixin, TemplateView):
             return self.response_json(_('Not exists'), st='wrong')
 
         valid_session = ticket.session_id == s
-        valid_gate = ticket.gate_name is None or ticket.gate_name == g
+        invalid_gate = (g and ticket.gate_name and ticket.gate_name != g)
 
         if ticket.used:
-            msg = _('Used')
-            return self.response_json(msg, st='wrong')
+            msg = _('Used: %(date)s') % {'date': short_date(ticket.used_date)}
+            return self.response_json(msg, msg2=str(ticket.session), st='wrong')
 
-        elif not valid_session:
+        if not valid_session:
             # check if this has an extra session
             st, msg = self.check_extra_session(ticket, s)
-            return self.response_json(msg, st=st)
+            return self.response_json(msg, msg2=str(ticket.session), st=st)
 
-        elif not valid_gate:
-            msg = _("%(session)s - Gate: %(gate)s") % {'session': ticket.session, 'gate': ticket.gate_name}
+        if invalid_gate:
+            data = { 'session': ticket.session.short(),
+                     'gate': ticket.gate_name }
+            msg = _("%(session)s - Gate: %(gate)s") % data
             return self.response_json(msg, st='maybe')
 
+        # if we're here, everything is ok
         ticket.used = True
+        ticket.used_date = timezone.now()
         ticket.save()
-        msg = str(ticket.session)
-        return self.response_json(msg)
+        msg = _("Ok: %(session)s") % { 'session': ticket.session.short() }
+        return self.response_json(msg, msg2=ticket.order)
 access = csrf_exempt(AccessView.as_view())
 
 

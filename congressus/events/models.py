@@ -234,6 +234,9 @@ class Session(models.Model):
     def __str__(self):
         return '%s - %s' % (self.space, self.name)
 
+    def short(self):
+        return '%s - %s' % (self.space.name, self.name)
+
     def price_without_tax(self):
         return self.price * (self.tax / 100)
 

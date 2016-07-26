@@ -52,9 +52,11 @@ function makeReq() {
     $.post(url, d, function(data) {
         notify(data.st);
         $("#extra").html(data.extra);
+        $("#extra2").html(data.extra2);
     }).fail(function() {
         notify("wrong");
         $("#extra").html('');
+        $("#extra2").html('');
     });
     $("#order").val("");
     $("#order").focus();

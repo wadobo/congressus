@@ -2,6 +2,8 @@
 {% load i18n %}
 {% load staticfiles %}
 
+{% block title %}{% trans "Access" %}{% endblock %}
+
 {% block extraclasses %}access{% endblock %}
 
 {% block extrahead %}
@@ -37,6 +39,7 @@
     </form>
 
     <p id="extra"> </p>
+    <p id="extra2"> </p>
 
     <div id="reader"></div>
 {% endblock %}

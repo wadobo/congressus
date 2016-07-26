@@ -165,6 +165,8 @@ class BaseExtraData:
         for extra in data:
             if extra.get('session') == pk:
                 extra['used'] = True
+                dt = timezone.localtime(timezone.now())
+                extra['used_date'] = dt.strftime(settings.DATETIME_FORMAT)
                 break
         self.set_extra_data('extra_sessions', data)
 
@@ -287,6 +289,7 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
 
     # field to control the access
     used = models.BooleanField(_('used'), default=False)
+    used_date = models.DateTimeField(_('ticket used date'), blank=True, null=True)
 
     class Meta:
         ordering = ['-created']
