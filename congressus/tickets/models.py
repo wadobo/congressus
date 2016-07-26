@@ -31,28 +31,6 @@ class BaseTicketMixing:
     inheritance, but to use the same code for methods
     '''
 
-    def get_extra_data(self, key):
-        data = {}
-        if not self.extra_data:
-            return None
-        else:
-            data = json.loads(self.extra_data)
-        return data.get(key, None)
-
-    def set_extra_data(self, key, value):
-        data = json.loads(self.extra_data or '{}')
-        data[key] = value
-        self.extra_data = json.dumps(data)
-
-    def get_extras(self):
-        extras = []
-        for field in self.event().fields.all():
-            extras.append({
-                'field': field,
-                'value': self.get_extra_data(field.label)
-            })
-        return extras
-
     def space(self):
         return self.session.space
 
@@ -150,27 +128,45 @@ class BaseTicketMixing:
 
 
 class BaseExtraData:
-    def get_extra_sessions(self):
+    def get_extra_data(self, key):
+        data = {}
         if not self.extra_data:
-            data = []
+            return None
         else:
             data = json.loads(self.extra_data)
-        return data
+        return data.get(key, None)
+
+    def set_extra_data(self, key, value):
+        data = json.loads(self.extra_data or '{}')
+        data[key] = value
+        self.extra_data = json.dumps(data)
+
+    def get_extras(self):
+        extras = []
+        for field in self.event().fields.all():
+            extras.append({
+                'field': field,
+                'value': self.get_extra_data(field.label)
+            })
+        return extras
+
+    def get_extra_sessions(self):
+        d = self.get_extra_data('extra_sessions')
+        return d or []
 
     def get_extra_session(self, pk):
         for extra in self.get_extra_sessions():
-            if extra.get('session') == pk:
+            if extra['session'] == pk:
                 return extra
-        return False
+        return None
 
     def set_extra_session_to_used(self, pk):
         data = self.get_extra_sessions()
-        for extra in range(len(data)):
-            if data[extra].get('session') == pk:
-                data[extra]['used'] = True
+        for extra in data:
+            if extra.get('session') == pk:
+                extra['used'] = True
                 break
-        self.extra_data = json.dumps(data)
-        self.save()
+        self.set_extra_data('extra_sessions', data)
 
     def save_extra_sessions(self):
         data = []
@@ -181,11 +177,10 @@ class BaseExtraData:
                'end': extra.end.strftime(settings.DATETIME_FORMAT),
                'used': extra.used
            })
-        self.extra_data = json.dumps(data)
+        self.set_extra_data('extra_sessions', data)
 
 
-
-class MultiPurchase(models.Model, BaseTicketMixing):
+class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
     ev = models.ForeignKey(Event, related_name='mps', verbose_name=_('event'))
 
     order = models.CharField(_('order'), max_length=200, unique=True)
