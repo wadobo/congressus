@@ -193,3 +193,13 @@ Si obtenemos el error "CommandError: Neither pygraphviz nor pydot could be found
 pip uninstall pygraphviz
 pip install pygraphviz --install-option="--include-path=/usr/include/graphviz" --install-option="--library-path=/usr/lib/graphviz/"
 ```
+
+## Problema al añadir maintenance-mode
+
+Si nos da error de que no existen las relaciones, es porque hay que añadir algunas tablas:
+
+```
+./manage.py migrate
+./manage.py migrate --run-syncdb
+```
+ 
