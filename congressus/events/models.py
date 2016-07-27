@@ -225,6 +225,8 @@ class Session(models.Model):
     tax = models.IntegerField(_('ticket tax percentage'), default=21)
 
     template = models.ForeignKey("TicketTemplate", blank=True, null=True, verbose_name=_('template'))
+    autoseat_mode = models.CharField(_('autoseat mode'), max_length=300, default='ASC',
+            help_text="ASC, DESC, RANDOM or LIST: layout_name1,layout_name2")
 
     class Meta:
         ordering = ['start']

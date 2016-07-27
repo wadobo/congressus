@@ -285,9 +285,19 @@ class AutoSeats(View):
     def search_seats(self, id_session, amount):
         session = Session.objects.get(id=id_session)
         layouts = []
-        if settings.SORTED_LAYOUT:
-            for layout in settings.SORTED_LAYOUT:
-                layouts.append(session.space.seat_map.layouts.get(name=layout))
+        if session.autoseat_mode == 'ASC':
+            layouts = session.space.seat_map.layouts.all().order_by('name')
+        elif session.autoseat_mode == 'DESC':
+            layouts = session.space.seat_map.layouts.all().order_by('-name')
+        elif session.autoseat_mode == 'RANDOM':
+            layouts = list(session.space.seat_map.layouts.all())
+            random.shuffle(layouts)
+        elif session.autoseat_mode.startswith("LIST"):
+            autoseats = session.autoseat_mode.split(':')[1]
+            for layout in autoseats.split(','):
+                l = session.space.seat_map.layouts.filter(name=layout.strip()).first()
+                if l:
+                    layouts.append(l)
         else:
             layouts = session.space.seat_map.layouts.all().order_by('name')
 
