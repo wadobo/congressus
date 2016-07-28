@@ -330,10 +330,10 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
         return column
 
     def update_mp_extra_data(self):
-        if not self.mp:
+        if not self.mp or not self.mp.extra_data:
             return
 
-        data = self.mp.get_extra_data() or {}
+        data = json.loads(self.mp.extra_data)
         for k, v in data.items():
             self.set_extra_data(k, v)
 
