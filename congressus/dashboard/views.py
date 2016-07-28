@@ -13,6 +13,8 @@ from random import randint
 from access.models import AC_TYPES
 from access.models import AccessControl
 from access.models import LogAccessControl
+from events.models import Session
+from tickets.models import MultiPurchase
 from tickets.models import Ticket
 from windows.models import PAYMENT_TYPES
 from windows.models import TicketWindow
@@ -112,6 +114,41 @@ class GeneralView(TemplateView):
             rand.append(randint(0, 255))
         return 'rgba(%s,1)' % (','.join(map(str, rand)))
 
+    def get_sales_online(self, timestep='daily', max=10):
+        strftime, delta = self.get_timesteps_vars(timestep)
+        now = timezone.now()
+        min_date = now - delta*max
+        res = deepcopy(self.DATA_LINE)
+
+        # Create datasets
+        res['datasets'][0]['data'] = [0]*max
+        for session in Session.objects.all():
+            new_dataset = deepcopy(self.DEFAULT_LINE_DATASET)
+            new_dataset['label'] = session.space.name + "  " + session.name
+            new_dataset['borderColor'] = self.get_random_color()
+            new_dataset['data'] = [0]*max
+            res['datasets'].append(new_dataset)
+
+        # Create labels
+        for l in reversed(range(0, max)):
+            date = (now - delta*l).strftime(strftime)
+            res.get("labels").append(date)
+
+        # Fill sales online
+        mps = MultiPurchase.objects.filter(created__gt=min_date, confirmed=True).order_by('created')
+        for mp in mps:
+            date = mp.created.strftime(strftime)
+            for ticket in mp.all_tickets():
+                try:
+                    index = res.get("labels").index(date)
+                except ValueError:
+                    continue
+                extra_index = self.dataset_index(res['datasets'], ticket.session.space.name + "  " + ticket.session.name)
+                res.get("datasets")[self.INDEX_MAIN].get('data')[index] += 1
+                res.get("datasets")[extra_index].get('data')[index] += 1
+        return res
+
+
     def get_sales(self, timestep='daily', max=10):
         strftime, delta = self.get_timesteps_vars(timestep)
         now = timezone.now()
@@ -173,6 +210,35 @@ class GeneralView(TemplateView):
         return res
 
 
+    def get_pie_sales_online(self, timestep='daily', max=10):
+        strftime, delta = self.get_timesteps_vars(timestep)
+        now = timezone.now()
+        min_date = now - delta*max
+        res = deepcopy(self.DATA_PIE)
+        # Create labels and dataset
+        labels = []
+        values = []
+
+        labels = [
+                {'confirmed': False, 'name': "F", 'color': 'rgba(255,0,0,1)'},
+                {'confirmed': True, 'name': "T", 'color': 'rgba(0,255,0,1)'}
+        ]
+        colors = []
+
+        values = MultiPurchase.objects.filter(created__gt=min_date)
+
+        dataset = deepcopy(self.DEFAULT_PIE_DATASET)
+        for label in labels:
+            res.get("labels").append(label.get('name'))
+            color = label.get('color')
+            dataset['backgroundColor'].append(color)
+            dataset['hoverBackgroundColor'].append(color)
+            value = values.filter(confirmed=label.get('confirmed')).count()
+            dataset['data'].append(value)
+        res['datasets'].append(dataset)
+        return res
+
+
     def get_context_data(self, *args, **kwargs):
         ctx = super(GeneralView, self).get_context_data(*args, **kwargs)
         ctx['ws_server'] = settings.WS_SERVER
@@ -181,8 +247,10 @@ class GeneralView(TemplateView):
     def post(self, request):
         ctx = {}
         ctx['access_log'] = self.get_access('hourly', 20)
+        ctx['sales_online_log'] = self.get_sales_online('daily', 15)
         ctx['sales_log'] = self.get_sales('hourly', 20)
         ctx['access_pie_log'] = self.get_pie('access')
         ctx['sales_pie_log'] = self.get_pie('sale')
+        ctx['sales_pie_online_log'] = self.get_pie_sales_online()
         return JsonResponse(ctx)
 general = csrf_exempt(GeneralView.as_view())

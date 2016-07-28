@@ -6,9 +6,11 @@ function get_initial_data() {
         dataType: 'JSON',
         url: "/dashboard/general/",
         success: function(msg){
+            data_sales_online = msg.sales_online_log;
             data_sales = msg.sales_log;
             data_access = msg.access_log;
             fill_line_charts();
+            data_pie_sales_online = msg.sales_pie_online_log;
             data_pie_sales = msg.sales_pie_log;
             data_pie_access = msg.access_pie_log;
             fill_pie_charts();
@@ -21,8 +23,17 @@ get_initial_data();
 
 
 function fill_line_charts() {
+    var ctx_line_sales_online = $("#chart-sales-online").get(0).getContext("2d");
     var ctx_line_sales = $("#chart-sales").get(0).getContext("2d");
     var ctx_line_access = $("#chart-access").get(0).getContext("2d");
+
+    window.chart_line_sales_online = new Chart(ctx_line_sales_online, {
+        type: 'line',
+        data: data_sales_online,
+        options: {
+            scales: {yAxes: [{ ticks: { beginAtZero: true }}]}
+        }
+    });
 
     window.chart_line_sales = new Chart(ctx_line_sales, {
         type: 'line',
@@ -42,8 +53,17 @@ function fill_line_charts() {
 }
 
 function fill_pie_charts() {
+    var ctx_pie_sales_online = $("#chart-pie-sales-online").get(0).getContext("2d");
     var ctx_pie_sales = $("#chart-pie-sales").get(0).getContext("2d");
     var ctx_pie_access = $("#chart-pie-access").get(0).getContext("2d");
+
+    window.chart_pie_sales_online = new Chart(ctx_pie_sales_online, {
+        type: 'doughnut',
+        data: data_pie_sales_online,
+        options: {
+            responsive: true,
+        }
+    });
 
     window.chart_pie_sales = new Chart(ctx_pie_sales, {
         type: 'doughnut',
