@@ -6,6 +6,8 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.mail import EmailMessage
 from django.conf import settings
+from django.template import Context
+from django.template import Template
 from django.template.loader import get_template
 
 from django.db.models.signals import post_save
@@ -98,8 +100,8 @@ class BaseTicketMixing:
         # email to user
         e = self.event().get_email()
         if e:
-            subject = Template(e.subject).render({'ticket': self})
-            body = Template(e.body).render({'ticket': self})
+            subject = Template(e.subject).render(Context({'ticket': self}))
+            body = Template(e.body).render(Context({'ticket': self}))
         else:
             tmpl = get_template('emails/subject-confirm-user.txt')
             subject = tmpl.render({'ticket': self})
