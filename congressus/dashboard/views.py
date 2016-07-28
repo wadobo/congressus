@@ -183,17 +183,20 @@ class GeneralView(TemplateView):
         return res
 
 
-    def get_pie(self, type='access'):
+    def get_pie(self, type='access', timestep='daily', max=10):
+        strftime, delta = self.get_timesteps_vars(timestep)
+        now = timezone.now()
+        min_date = now - delta*max
         res = deepcopy(self.DATA_PIE)
         # Create labels and dataset
         labels = []
         values = []
         if type == 'access':
             labels = [x[0] for x in AC_TYPES]
-            values = LogAccessControl.objects.all()
+            values = LogAccessControl.objects.filter(date__gt=min_date)
         elif type == 'sale':
             labels = [x[0] for x in PAYMENT_TYPES]
-            values = TicketWindowSale.objects.all()
+            values = TicketWindowSale.objects.filter(date__gt=min_date)
 
         dataset = deepcopy(self.DEFAULT_PIE_DATASET)
         for label in labels:
