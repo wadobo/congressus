@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 
 from autoslug import AutoSlugField
 
@@ -21,6 +22,16 @@ class AccessControl(models.Model):
     def __str__(self):
         return self.name
 
+    def checked_today(self, date, status=None):
+        if not date:
+            date = timezone.now()
+        today = self.log_access.filter(date__year=date.year,
+                                       date__month=date.month,
+                                       date__day=date.day)
+        if status:
+            today = today.filter(status=status)
+        return today.count()
+
 
 AC_TYPES = (
     ('ok', _('ok')),
@@ -28,6 +39,7 @@ AC_TYPES = (
     ('used', _('used')),
     ('maybe', _('maybe')),
 )
+
 
 class LogAccessControl(models.Model):
     access_control = models.ForeignKey(AccessControl, related_name='log_access', verbose_name=_('access control'))

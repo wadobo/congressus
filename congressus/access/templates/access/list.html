@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load access %}
+
+{% block title %}{{ ev }}{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h1>
+            {{ ev }} <small>{% trans "Access control admin" %}</small>
+            <small class="pull-right"> {{ date|date:"l j F Y" }} </small>
+        </h1>
+    </div>
+
+    <div class="text-center">
+        <div class="btn-group" role="group" aria-label="...">
+            {% for d in days %}
+                <a href="?date={{ d|date:"Y-m-d" }}" type="button"
+                   class="btn
+                   {% if d|date:"Y-m-d" == date|date:"Y-m-d" %}btn-success{% else %}btn-default{% endif %}
+                   {% if d|date:"Y-m-d" == today|date:"Y-m-d" %}btn-primary{% endif %}
+                   ">
+                   {{ d.day }}</a>
+            {% endfor %}
+        </div>
+    </div>
+    <hr/>
+
+    <table class="table table-bordered table-striped text-center">
+        <tr>
+            <th class="text-center">{% trans "name" %}</th>
+            <th class="text-center">{% trans "location" %}</th>
+            <th class="text-center">{% trans "today" %}</th>
+            <th class="text-center">{% trans "today ok" %}</th>
+            <th class="text-center">{% trans "today wrong" %}</th>
+            <th class="text-center">{% trans "today used" %}</th>
+            <th class="text-center">{% trans "today maybe" %}</th>
+        </tr>
+        {% for a in access %}
+            <tr>
+                <td>
+                    <a target="_blank" href="{% url 'access' ev.slug a.slug %}">{{ a }}</a>
+                </td>
+                <td>
+                    {{ a.location }}
+                </td>
+                <td> {% checked_today a date %} </td>
+                <td> {% checked_today_ok a date %} </td>
+                <td> {% checked_today_wrong a date %} </td>
+                <td> {% checked_today_used a date %} </td>
+                <td> {% checked_today_maybe a date %} </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

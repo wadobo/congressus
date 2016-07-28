@@ -46,6 +46,7 @@ INSTALLED_APPS = (
     'maintenancemode',
 
     # custom apps
+    'adminmenu',
     'tickets',
     'events',
     'websocket',

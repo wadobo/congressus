@@ -167,6 +167,7 @@ class WindowList(UserPassesTestMixin, TemplateView):
             d = d + datetime.timedelta(1)
         ctx['days'] = days
         ctx['today'] = timezone.now()
+        ctx['menuitem'] = 'windows'
 
         return ctx
 window_list = WindowList.as_view()

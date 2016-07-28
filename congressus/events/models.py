@@ -55,7 +55,7 @@ class Event(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('register', kwargs={'id': self.id})
+        return reverse('multipurchase', kwargs={'ev': self.slug})
 
     def get_email(self):
         try:

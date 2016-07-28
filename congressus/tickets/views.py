@@ -364,6 +364,7 @@ class GenInvitationsView(UserPassesTestMixin, TemplateView):
         ev = get_object_or_404(Event, slug=self.kwargs['ev'])
         ctx['ev'] = ev
         ctx['types'] = InvitationType.objects.all()
+        ctx['menuitem'] = 'inv'
         return ctx
 
     def post(self, request, ev):

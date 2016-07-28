@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from datetime import timedelta
 from django.views.generic import TemplateView, View
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
@@ -39,6 +40,7 @@ class AccessLogin(TemplateView):
         ac = self.kwargs.get('ac')
         ac = get_object_or_404(AccessControl, event__slug=ev, slug=ac)
         ctx = super(AccessLogin, self).get_context_data(*args, **kwargs)
+        ctx['ev'] = ac.event
         ctx['ac'] = ac
         ctx['sessions'] = ac.event.get_sessions()
         ctx['gates'] = ac.event.gates.all()
@@ -212,3 +214,38 @@ class AccessLogout(View):
         auth_logout(request)
         return redirect('access', ev=ev, ac=ac)
 access_logout = AccessLogout.as_view()
+
+
+class AccessList(UserPassesTestMixin, TemplateView):
+    template_name = 'access/list.html'
+
+    def test_func(self):
+        u = self.request.user
+        return u.is_authenticated() and u.is_superuser
+
+    def get_context_data(self, *args, **kwargs):
+        ev = self.kwargs.get('ev')
+        ev = get_object_or_404(Event, slug=ev)
+        ctx = super(AccessList, self).get_context_data(*args, **kwargs)
+        ctx['access'] = ev.access.all()
+        ctx['ev'] = ev
+
+        ctx['date'] = timezone.now()
+
+        d = self.request.GET.get('date', '')
+        if d:
+            date = datetime(*map(int, d.split('-')))
+            ctx['date'] = date
+
+        days = []
+        d = timezone.now() - timedelta(10)
+        d1 = timezone.now() + timedelta(10)
+        while d < d1:
+            days.append(d)
+            d = d + timedelta(1)
+        ctx['days'] = days
+        ctx['today'] = timezone.now()
+        ctx['menuitem'] = 'access'
+
+        return ctx
+access_list = AccessList.as_view()
