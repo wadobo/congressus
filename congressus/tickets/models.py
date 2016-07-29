@@ -414,6 +414,7 @@ class TicketSeatHold(models.Model):
 class InvitationType(models.Model):
     session = models.ForeignKey(Session, related_name='invitations_types', null=True, blank=True, verbose_name=_('session'))
     name = models.CharField(_('name'), max_length=200)
+    is_pass = models.BooleanField(_('is pass'), default=False)
     start = models.DateTimeField(_('start date'), null=True)
     end = models.DateTimeField(_('end date'), null=True)
 
@@ -425,16 +426,43 @@ class InvitationType(models.Model):
         return self.name
 
 
+class InvitationGenerator(models.Model):
+    type = models.ForeignKey(InvitationType, verbose_name=_('type'))
+    amount = models.IntegerField(_('amount'), default=1)
+    price = models.IntegerField(_('price'), blank=True, null=True)
+    concept = models.CharField(_('concept'), max_length=200)
+    created = models.DateTimeField(_('created at'), auto_now_add=True)
+
+    def window_code(self):
+        '''
+        This is a generator code, but use the name window_code to be the same
+        of tickets. Example code: INVMMDDHHMM
+        '''
+        prefix = 'INV'
+        postfix = self.created.strftime('%m%d%H%M')
+        return prefix + postfix
+
+    def save(self, *args, **kwargs):
+        super(InvitationGenerator, self).save(*args, **kwargs)
+        for n in range(self.amount):
+            invi = Invitation(session=self.type.session)
+            invi.generator = self
+            invi.gen_order()
+            invi.save()
+            invi.save_extra_sessions()
+            invi.save()
+
+
 class Invitation(models.Model, BaseExtraData):
-    ORDER_START = '00001'
+    ORDER_START = '01'
     session = models.ForeignKey(Session, related_name='invitations', null=True, blank=True, verbose_name=_('session'))
+    generator = models.ForeignKey(InvitationGenerator, related_name='invitations', null=True,
+            blank=True, verbose_name=_('generator'))
     order = models.CharField(_('order'), max_length=200, unique=True)
     created = models.DateTimeField(_('created at'), auto_now_add=True)
     seat = models.CharField(_('seat'), max_length=20, null=True, blank=True)
     seat_layout = models.ForeignKey(SeatLayout, null=True, blank=True, verbose_name=_('seat layout'))
-    type = models.ForeignKey(InvitationType, null=True, blank=True, verbose_name=_('type'))
     extra_data = models.TextField(_('extra data'), blank=True, null=True)
-    is_pass = models.BooleanField(_('is pass'), default=False)
 
     # field to control the access
     used = models.BooleanField(_('used'), default=False)
