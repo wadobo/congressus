@@ -3,5 +3,5 @@ from . import views
 
 
 urlpatterns = [
-    url(r'^general/$', views.general, name='dashboard_general'),
+    url(r'^(?P<ev>[\w-]+)/(?P<dash>[\w-]+)/$', views.general, name='dashboard_general'),
 ]

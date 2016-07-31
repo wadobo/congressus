@@ -162,6 +162,8 @@ TPV_MERCHANT_URL = SITE_URL + '/ticket/confirm/'
 QRCODE = True
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
 WS_SERVER = 'localhost:9007'
+TIMESTEP_CHART = 'daily'
+MAX_STEP_CHART = 10
 
 try:
     from local_settings import *

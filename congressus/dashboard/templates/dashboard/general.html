@@ -11,7 +11,10 @@
 {% endblock %}
 
 {% block content %}
-<div class="row">
+<div id="charts">
+</div>
+
+<!--div class="row">
     <div class="col-md-8">
         <canvas id="chart-sales-online" width="200" height="200"></canvas>
     </div>
@@ -35,7 +38,7 @@
     <div class="col-md-6">
         <canvas id="chart-pie-access" width="200" height="200"></canvas>
     </div>
-</div>
+</div-->
 {% endblock %}
 
 {% block foot %}
@@ -45,6 +48,10 @@
     <script src="{% static "js/websocket.js" %}"></script>
     <script src="{% static "js/Chart.bundle.min.js" %}"></script>
     <script src="{% static "js/Chart.min.js" %}"></script>
+    <script>
+        var ev = "{{ ev }}";
+        var dash = "{{ dash }}";
+    </script>
     <script src="{% static "js/general.js" %}"></script>
     <script>
         try {

@@ -4,15 +4,19 @@ from django.conf import settings
 from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.contenttypes.models import ContentType
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from random import randint
 
+from .models import CHARTS
+from .models import Dashboard
 from access.models import AC_TYPES
 from access.models import AccessControl
 from access.models import LogAccessControl
+from events.models import Event
 from events.models import Session
 from tickets.models import MultiPurchase
 from tickets.models import Ticket
@@ -60,7 +64,7 @@ class GeneralView(TemplateView):
             index += 1
         return -1
 
-    def get_timesteps_vars(self, timestep='daily'):
+    def get_timesteps_vars(self, timestep):
         if timestep == 'daily':
             strftime = '%Y-%m-%d'
             delta = timedelta(days=1)
@@ -75,7 +79,7 @@ class GeneralView(TemplateView):
             delta = timedelta(days=1)
         return strftime, delta
 
-    def get_access(self, timestep='daily', max=10):
+    def get_access(self, timestep, max):
         strftime, delta = self.get_timesteps_vars(timestep)
         now = timezone.now()
         min_date = now - delta*max
@@ -114,7 +118,7 @@ class GeneralView(TemplateView):
             rand.append(randint(0, 255))
         return 'rgba(%s,1)' % (','.join(map(str, rand)))
 
-    def get_sales_online(self, timestep='daily', max=10):
+    def get_sales_online(self, timestep, max):
         strftime, delta = self.get_timesteps_vars(timestep)
         now = timezone.now()
         min_date = now - delta*max
@@ -149,7 +153,7 @@ class GeneralView(TemplateView):
         return res
 
 
-    def get_sales(self, timestep='daily', max=10):
+    def get_sales(self, timestep, max):
         strftime, delta = self.get_timesteps_vars(timestep)
         now = timezone.now()
         min_date = now - delta*max
@@ -183,7 +187,7 @@ class GeneralView(TemplateView):
         return res
 
 
-    def get_pie(self, type='access', timestep='daily', max=10):
+    def get_pie(self, type, timestep, max):
         strftime, delta = self.get_timesteps_vars(timestep)
         now = timezone.now()
         min_date = now - delta*max
@@ -213,7 +217,7 @@ class GeneralView(TemplateView):
         return res
 
 
-    def get_pie_sales_online(self, timestep='daily', max=10):
+    def get_pie_sales_online(self, timestep, max):
         strftime, delta = self.get_timesteps_vars(timestep)
         now = timezone.now()
         min_date = now - delta*max
@@ -245,15 +249,38 @@ class GeneralView(TemplateView):
     def get_context_data(self, *args, **kwargs):
         ctx = super(GeneralView, self).get_context_data(*args, **kwargs)
         ctx['ws_server'] = settings.WS_SERVER
+        ctx['ev'] = self.kwargs['ev']
+        ctx['dash'] = self.kwargs['dash']
         return ctx
 
-    def post(self, request):
+    def get_chart(self, type_chart, timestep=settings.TIMESTEP_CHART, max=settings.MAX_STEP_CHART):
+        if type_chart == 'os_c':
+            chart = self.get_sales_online(timestep, max)
+        elif type_chart == 'ws_c':
+            chart = self.get_sales(timestep, max)
+        elif type_chart == 'a_c':
+            chart = self.get_access(timestep, max)
+        elif type_chart == 'os_p':
+            chart = self.get_pie_sales_online(timestep, max)
+        elif type_chart == 'ws_p':
+            chart = self.get_pie('sale', timestep, max)
+        elif type_chart == 'a_p':
+            chart = self.get_pie('access', timestep, max)
+        else:
+            chart = None
+        tdata, tchart = type_chart.split('_')
+        return {
+                'data': chart,
+                'type_data': tdata,
+                'type_chart': tchart
+        }
+
+    def post(self, request, ev, dash):
         ctx = {}
-        ctx['access_log'] = self.get_access('hourly', 20)
-        ctx['sales_online_log'] = self.get_sales_online('daily', 15)
-        ctx['sales_log'] = self.get_sales('hourly', 20)
-        ctx['access_pie_log'] = self.get_pie('access')
-        ctx['sales_pie_log'] = self.get_pie('sale')
-        ctx['sales_pie_online_log'] = self.get_pie_sales_online()
+        ctx['charts'] = []
+        ev = get_object_or_404(Event, slug=ev)
+        dashboard = get_object_or_404(Dashboard, event=ev, slug=dash)
+        for chart in dashboard.charts.all():
+            ctx['charts'].append(self.get_chart(chart.type, chart.timestep, chart.max_steps))
         return JsonResponse(ctx)
 general = csrf_exempt(GeneralView.as_view())

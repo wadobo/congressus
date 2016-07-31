@@ -1,19 +1,15 @@
 function get_initial_data() {
+    var ev = window.ev;
+    var dash = window.dash;
     var deferred = new $.Deferred();
     $.ajax({
         type: "POST",
         data: {},
         dataType: 'JSON',
-        url: "/dashboard/general/",
+        url: "/dashboard/"+ev+"/"+dash+"/",
         success: function(msg){
-            data_sales_online = msg.sales_online_log;
-            data_sales = msg.sales_log;
-            data_access = msg.access_log;
-            fill_line_charts();
-            data_pie_sales_online = msg.sales_pie_online_log;
-            data_pie_sales = msg.sales_pie_log;
-            data_pie_access = msg.access_pie_log;
-            fill_pie_charts();
+            charts = msg.charts;
+            fill_charts();
             deferred.resolve(msg);
         }
     });
@@ -22,64 +18,34 @@ function get_initial_data() {
 get_initial_data();
 
 
-function fill_line_charts() {
-    var ctx_line_sales_online = $("#chart-sales-online").get(0).getContext("2d");
-    var ctx_line_sales = $("#chart-sales").get(0).getContext("2d");
-    var ctx_line_access = $("#chart-access").get(0).getContext("2d");
+function fill_charts() {
+    window.data_charts = {'ws': [], 'os': [], 'a': []};
+    for (c=0; c < charts.length; c++) {
+        type_chart = charts[c].type_chart;
+        type_data = charts[c].type_data;
+        id = type_data + String(c);
+        var canvas = $('<canvas id="'+id+'" width="200" height="200"></canvas>');
+        //var html = '<div class="row">';
+        //html += '<div class="col-md-12">';
+        //html += canvas;
+        //html += '</div>';
+        //html += '</div>';
 
-    window.chart_line_sales_online = new Chart(ctx_line_sales_online, {
-        type: 'line',
-        data: data_sales_online,
-        options: {
-            scales: {yAxes: [{ ticks: { beginAtZero: true }}]}
+        $("#charts").append(canvas);
+        var ctx = canvas.get(0).getContext("2d");
+        if (type_chart == 'p') {
+            type = 'doughnut';
+            options = {responsive: true};
+        } else if (type_chart == 'c') {
+            type = 'line';
+            options = {yAxes: [{ ticks: { beginAtZero: true }}]};
         }
-    });
-
-    window.chart_line_sales = new Chart(ctx_line_sales, {
-        type: 'line',
-        data: data_sales,
-        options: {
-            scales: {yAxes: [{ ticks: { beginAtZero: true }}]}
-        }
-    });
-
-    window.chart_line_access = new Chart(ctx_line_access, {
-        type: 'line',
-        data: data_access,
-        options: {
-            scales: {yAxes: [{ ticks: { beginAtZero: true }}]}
-        }
-    });
-}
-
-function fill_pie_charts() {
-    var ctx_pie_sales_online = $("#chart-pie-sales-online").get(0).getContext("2d");
-    var ctx_pie_sales = $("#chart-pie-sales").get(0).getContext("2d");
-    var ctx_pie_access = $("#chart-pie-access").get(0).getContext("2d");
-
-    window.chart_pie_sales_online = new Chart(ctx_pie_sales_online, {
-        type: 'doughnut',
-        data: data_pie_sales_online,
-        options: {
-            responsive: true,
-        }
-    });
-
-    window.chart_pie_sales = new Chart(ctx_pie_sales, {
-        type: 'doughnut',
-        data: data_pie_sales,
-        options: {
-            responsive: true,
-        }
-    });
-
-    window.chart_pie_access = new Chart(ctx_pie_access, {
-        type: 'doughnut',
-        data: data_pie_access,
-        options: {
-            responsive: true,
-        }
-    });
+        window.data_charts[type_data].push(new Chart(ctx, {
+            type: type,
+            data: charts[c].data,
+            options: options
+        }));
+    }
 }
 
 function randColor() {
@@ -160,13 +126,36 @@ function websocketCB(ev, data) {
     if (ev === 'add_ac') {
         toT = data.date.indexOf('T');
         date = data.date.substring(0, toT);
-        update_line_charts(window.chart_line_access, data.control, date);
-        update_pie_charts(window.chart_pie_access, data.st);
+        for (c=0; c < window.data_charts['a'].length; c++) {
+            d = window.data_chart['a'][c];
+            if (d.config.type == 'doughnut') {
+                update_pie_charts(d, data.st);
+            } else if (d.config.type == 'line') {
+                update_line_charts(d, data.control, date);
+            }
+        }
+    } else if (ev === 'add_online_sale') {
+        toT = data.date.indexOf('T');
+        date = data.date.substring(0, toT);
+        for (c=0; c < window.data_charts['os'].length; c++) {
+            d = window.data_charts['os'][c];
+            if (d.config.type == 'doughnut') {
+                update_pie_charts(d, data.payment);
+            } else if (d.config.type == 'line') {
+                update_line_charts(d, data.window, date, data.amount);
+            }
+        }
     } else if (ev === 'add_sale') {
         toT = data.date.indexOf('T');
         date = data.date.substring(0, toT);
-        update_line_charts(window.chart_line_sales, data.window, date, data.amount);
-        update_pie_charts(window.chart_pie_sales, data.payment);
+        for (c=0; c < window.data_charts['ws'].length; c++) {
+            d = window.data_charts['ws'][c];
+            if (d.config.type == 'doughnut') {
+                update_pie_charts(d, data.payment);
+            } else if (d.config.type == 'line') {
+                update_line_charts(d, data.window, date, data.amount);
+            }
+        }
     }
 }
 
