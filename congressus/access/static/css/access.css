@@ -29,6 +29,17 @@ body.maybe {
     font-weight: normal;
 }
 
+.extrainfo {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 30px;
+    font-weight: normal;
+    border: 2px solid #888;
+    border-radius: 3px;
+    background-color: #efefef;
+    color: #555;
+}
+
 .maybe #extra2,
 .maybe #extra {
     color: white;

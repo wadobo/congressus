@@ -39,7 +39,7 @@ unconfirm.short_description = _("Manual unconfirm")
 
 
 class TicketAdmin(CSVMixin, admin.ModelAdmin):
-    list_display = ('order', 'order_tpv', 'event_name', 'confirmed', 'email', 'session', 'price', 'cseat', 'mp', 'twin')
+    list_display = ('order', 'order_tpv', 'event_name', 'confirmed', 'used', 'email', 'session', 'price', 'cseat', 'mp', 'twin')
     list_filter = ('confirmed', 'event_name')
     search_fields = ('order', 'order_tpv', 'email', 'mp__order', 'mp__order_tpv')
     date_hierarchy = 'created'

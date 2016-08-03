@@ -48,6 +48,9 @@ function makeReq() {
     setEnabled(false);
     var req = $("#order").val();
     var url = $("#access").attr("action");
+
+    $("#last").html(req);
+
     d = {'order': req};
     $.post(url, d, function(data) {
         notify(data.st);
@@ -100,7 +103,7 @@ function enableQrCode() {
                 makeReq();
             },
             function(error){
-                //show read errors 
+                //show read errors
             }, function(videoError){
                 //the video stream could be opened
             }
