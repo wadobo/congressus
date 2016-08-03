@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-03 11:50+0200\n"
-"PO-Revision-Date: 2016-08-03 11:57+0200\n"
+"POT-Creation-Date: 2016-08-03 12:06+0200\n"
+"PO-Revision-Date: 2016-08-03 12:06+0200\n"
 "Last-Translator: Daniel Garcia Moreno <danigm@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
 "Language: es\n"
@@ -1010,7 +1010,11 @@ msgstr "selecciona el asiento"
 msgid "Here you can view your ticket information"
 msgstr "Aquí puede ver la información de su entrada"
 
-#: tickets/templates/tickets/ticket-detail.html:22
+#: tickets/templates/tickets/ticket-detail.html:12
+msgid "Download this ticket"
+msgstr "Descarga esta entrada"
+
+#: tickets/templates/tickets/ticket-detail.html:24
 #, python-format
 msgid ""
 "\n"

@@ -7,7 +7,9 @@
         <form id="download-{{ ticket.order }}" class="btn-download" method="post" action="{% url 'thanks' ticket.order %}">
             {% csrf_token %}
             <input type="hidden" name="ticket" value="{{ ticket.order }}"/>
-            <button class="btn btn-warning btn-sm">
+            <button class="btn btn-warning btn-sm"
+                    data-toggle="tooltip" data-placement="top"
+                    title="{% trans "Download this ticket" %}">
                 <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
             </button>
         </form>
