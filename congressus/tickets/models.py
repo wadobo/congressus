@@ -56,7 +56,7 @@ class BaseTicketMixing:
         while used or reserved:
             order = ''.join(random.choice(chars) for _ in range(l))
             used = self.is_order_used(order)
-            reserved = order.startswith(Invitation.ORDER_START)
+            reserved = order.startswith(INVITATION_ORDER_START)
 
         self.order = order
         if save:
@@ -301,6 +301,9 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
     def __str__(self):
         return self.order
 
+    def get_gate_name(self):
+        return self.gate_name
+
     def save(self, *args, **kw):
         if self.pk is not None:
             orig = Ticket.objects.get(pk=self.pk)
@@ -409,103 +412,6 @@ class TicketSeatHold(models.Model):
 
     def __str__(self):
         return self.seat
-
-
-class InvitationType(models.Model):
-    session = models.ForeignKey(Session, related_name='invitations_types', null=True, blank=True, verbose_name=_('session'))
-    name = models.CharField(_('name'), max_length=200)
-    is_pass = models.BooleanField(_('is pass'), default=False)
-    start = models.DateTimeField(_('start date'), null=True)
-    end = models.DateTimeField(_('end date'), null=True)
-
-    class Meta:
-        verbose_name = _('invitation type')
-        verbose_name_plural = _('invitation types')
-
-    def __str__(self):
-        return self.name
-
-
-class InvitationGenerator(models.Model):
-    type = models.ForeignKey(InvitationType, verbose_name=_('type'))
-    amount = models.IntegerField(_('amount'), default=1)
-    price = models.IntegerField(_('price'), blank=True, null=True)
-    concept = models.CharField(_('concept'), max_length=200)
-    created = models.DateTimeField(_('created at'), auto_now_add=True)
-
-    def window_code(self):
-        '''
-        This is a generator code, but use the name window_code to be the same
-        of tickets. Example code: INVMMDDHHMM
-        '''
-        prefix = 'INV'
-        postfix = self.created.strftime('%m%d%H%M')
-        return prefix + postfix
-
-    def save(self, *args, **kwargs):
-        super(InvitationGenerator, self).save(*args, **kwargs)
-        for n in range(self.amount):
-            invi = Invitation(session=self.type.session)
-            invi.generator = self
-            invi.gen_order()
-            invi.save()
-            invi.save_extra_sessions()
-            invi.save()
-
-
-class Invitation(models.Model, BaseExtraData):
-    ORDER_START = '01'
-    session = models.ForeignKey(Session, related_name='invitations', null=True, blank=True, verbose_name=_('session'))
-    generator = models.ForeignKey(InvitationGenerator, related_name='invitations', null=True,
-            blank=True, verbose_name=_('generator'))
-    order = models.CharField(_('order'), max_length=200, unique=True)
-    created = models.DateTimeField(_('created at'), auto_now_add=True)
-    seat = models.CharField(_('seat'), max_length=20, null=True, blank=True)
-    seat_layout = models.ForeignKey(SeatLayout, null=True, blank=True, verbose_name=_('seat layout'))
-    extra_data = models.TextField(_('extra data'), blank=True, null=True)
-
-    # field to control the access
-    used = models.BooleanField(_('used'), default=False)
-
-    class Meta:
-        verbose_name = _('invitation')
-        verbose_name_plural = _('invitations')
-
-    def gen_order(self, starts=''):
-        """ Generate order for passes and invitations """
-        if isinstance(self, Invitation):
-            starts = Invitation.ORDER_START
-        else:
-            assert('Invalid Model')
-        chars = string.ascii_uppercase + string.digits
-        l = 8
-        if hasattr(settings, 'ORDER_SIZE'):
-            l = settings.ORDER_SIZE
-            l -= len(starts)
-
-        order = ''
-        used = True
-        reserved = True
-        while used:
-            order = ''.join(random.choice(chars) for _ in range(l))
-            order = starts + order
-            used = self.is_order_used(order)
-        self.order = order
-        self.save()
-
-    def is_order_used(self, order):
-        return Invitation.objects.filter(order=order).exists()
-
-    def get_extra_data(self, key):
-        data = {}
-        if not self.extra_data:
-            return None
-        else:
-            data = json.loads(self.extra_data)
-        return data.get(key, None)
-
-    def __str__(self):
-        return self.order
 
 
 def confirm_email(sender, instance, created, raw, using, update_fields, **kwargs):

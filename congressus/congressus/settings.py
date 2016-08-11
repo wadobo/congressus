@@ -53,6 +53,7 @@ INSTALLED_APPS = (
     'windows',
     'access',
     'dashboard',
+    'invs',
 )
 
 SITE_ID = 1
@@ -126,7 +127,6 @@ USE_L10N = True
 USE_TZ = True
 
 LOCALE_PATHS = (BASE_DIR + '/locale', )
-        
 
 from django.contrib.messages import constants as messages
 MESSAGE_TAGS = {
@@ -164,6 +164,8 @@ DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
 WS_SERVER = 'localhost:9007'
 TIMESTEP_CHART = 'daily'
 MAX_STEP_CHART = 10
+
+INVITATION_ORDER_START = '01'
 
 try:
     from local_settings import *

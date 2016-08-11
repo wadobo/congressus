@@ -18,8 +18,8 @@ from .models import LogAccessControl
 from events.models import Event
 from events.models import Session
 from events.models import Gate
-from tickets.models import Invitation
 from tickets.models import Ticket
+from invs.models import Invitation
 
 from django.contrib.auth import logout as auth_logout
 from django.conf import settings
@@ -110,12 +110,8 @@ class AccessView(UserPassesTestMixin, TemplateView):
         ctx['gate'] = self.request.session.get('gate', '')
         return ctx
 
-    def get_order_type(self, order):
-        if order.startswith(Invitation.ORDER_START):
-            obj = Invitation
-        else:
-            obj = Ticket
-        return obj
+    def is_inv(self, order):
+        return order.startswith(settings.INVITATION_ORDER_START)
 
     def response_json(self, msg, msg2='', st='right'):
         data = {}
@@ -125,17 +121,16 @@ class AccessView(UserPassesTestMixin, TemplateView):
         return HttpResponse(json.dumps(data), content_type="application/json")
 
     def get_ticket(self, order):
-        obj = self.get_order_type(order)
-        if obj == Ticket:
-            return obj.objects.get(order=order, confirmed=True)
-        else:
-            return obj.objects.get(order=order)
+        return obj.objects.get(order=order, confirmed=True)
 
     def check_extra_session(self, ticket, s):
         extra = ticket.get_extra_session(s)
 
         if not extra:
-            return 'wrong', ticket.session.short()
+            if self.is_inv(ticket.order):
+                return 'wrong', ticket.name
+            else:
+                return 'wrong', ticket.session.short()
 
         if extra.get('used'):
             used_date = datetime.strptime(extra['used_date'], settings.DATETIME_FORMAT)
@@ -156,27 +151,37 @@ class AccessView(UserPassesTestMixin, TemplateView):
             msg = _("Too soon, wait until %(date)s") % { 'date': start_formatted }
             return 'wrong', msg
 
-        ticket.set_extra_session_to_used(s)
-        ticket.save()
+        if not hasattr(ticket, 'is_pass') or not ticket.is_pass:
+            ticket.set_extra_session_to_used(s)
+            ticket.save()
 
         return 'right', _('Extra session: %(session)s') % { 'session': session.short() }
 
-    def post(self, request, *args, **kwargs):
-        data = {'st': "right", 'extra': ''}
-        order = request.POST.get('order', '')
-        s = self.request.session.get('session', '')
-        g = self.request.session.get('gate', '')
+    def check_inv(self, order, s, g):
+        try:
+            inv = Invitation.objects.get(order=order)
+        except:
+            return self.response_json(_('Not exists'), st='wrong')
 
-        # Checking order:
-        #  * Check if the ticket exists
-        #  * Check if it's used
-        #  * Check if it's a valid session
-        #    * check if there's extra session in this ticket
-        #  * Check if it's a valid gate
-        #  * If is a valid ticket, mark as used
+        session = Session.objects.get(pk=s)
+        valid_session = inv.type.sessions.filter(pk=s).exists()
+        invalid_gate = (g and not inv.gates.filter(name=g).exists())
 
-        # TODO add ticket checked info to the msg
+        ret = self.check_all(inv, s, valid_session, invalid_gate, session=session)
+        if ret:
+            return ret
 
+        # if we're here, everything is ok
+        #  * If is a valid inv and it's not a pass, mark as used
+        if not inv.is_pass:
+            inv.used = True
+            inv.used_date = timezone.now()
+            inv.save()
+
+        msg = _("Ok: %(session)s") % { 'session': session.short() }
+        return self.response_json(msg, msg2=inv.order)
+
+    def check_ticket(self, order, s, g):
         try:
             ticket = self.get_ticket(order)
         except:
@@ -185,20 +190,9 @@ class AccessView(UserPassesTestMixin, TemplateView):
         valid_session = ticket.session_id == s
         invalid_gate = (g and ticket.gate_name and ticket.gate_name != g)
 
-        if ticket.used:
-            msg = _('Used: %(date)s') % {'date': short_date(ticket.used_date)}
-            return self.response_json(msg, msg2=str(ticket.session), st='wrong')
-
-        if not valid_session:
-            # check if this has an extra session
-            st, msg = self.check_extra_session(ticket, s)
-            return self.response_json(msg, msg2=str(ticket.session), st=st)
-
-        if invalid_gate:
-            data = { 'session': ticket.session.short(),
-                     'gate': ticket.gate_name }
-            msg = _("%(session)s - Gate: %(gate)s") % data
-            return self.response_json(msg, st='maybe')
+        ret = self.check_all(ticket, s, valid_session, invalid_gate)
+        if ret:
+            return ret
 
         # if we're here, everything is ok
         ticket.used = True
@@ -206,6 +200,43 @@ class AccessView(UserPassesTestMixin, TemplateView):
         ticket.save()
         msg = _("Ok: %(session)s") % { 'session': ticket.session.short() }
         return self.response_json(msg, msg2=ticket.order)
+
+    def check_all(self, ticket, s, valid_session, invalid_gate, session=None):
+        # Checking order:
+        #  * Check if the ticket exists
+        #  * Check if it's used
+        #  * Check if it's a valid session
+        #    * check if there's extra session in this ticket
+        #  * Check if it's a valid gate
+        #  * If is a valid ticket, mark as used
+
+        msg2 = str(session or ticket.session)
+        if ticket.used:
+            msg = _('Used: %(date)s') % {'date': short_date(ticket.used_date)}
+            return self.response_json(msg, msg2=msg2, st='wrong')
+
+        if not valid_session:
+            # check if this has an extra session
+            st, msg = self.check_extra_session(ticket, s)
+            return self.response_json(msg, msg2=msg2, st=st)
+
+        if invalid_gate:
+            data = { 'session': (session or ticket.session).short(),
+                     'gate': ticket.get_gate_name() }
+            msg = _("%(session)s - Gate: %(gate)s") % data
+            return self.response_json(msg, st='maybe')
+
+        return None
+
+    def post(self, request, *args, **kwargs):
+        order = request.POST.get('order', '')
+        s = self.request.session.get('session', '')
+        g = self.request.session.get('gate', '')
+
+        if self.is_inv(order):
+            return self.check_inv(order, s, g)
+
+        return self.check_ticket(order, s, g)
 access = csrf_exempt(AccessView.as_view())
 
 

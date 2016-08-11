@@ -1,27 +1,11 @@
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
-from .models import InvitationGenerator
-from .models import Invitation
-from .models import InvitationType
 from .models import Ticket
 from .models import MultiPurchase
 from .models import TicketWarning
 from .models import TicketSeatHold
 from admin_csv import CSVMixin
-
-
-class InvitationAdmin(admin.ModelAdmin):
-    list_display = ('order', 'created', 'seat', 'seat_layout', 'used')
-
-
-class InvitationTypeAdmin(admin.ModelAdmin):
-    list_display = ('session', 'name', 'is_pass', 'start', 'end')
-    list_filter = ('is_pass', )
-
-
-class InvitationGeneratorAdmin(admin.ModelAdmin):
-    list_display = ('type', 'amount', 'price', 'concept')
 
 
 def confirm(modeladmin, request, queryset):
@@ -137,9 +121,6 @@ class TicketSeatHoldAdmin(admin.ModelAdmin):
     list_filter = ('session',)
 
 
-admin.site.register(InvitationGenerator, InvitationGeneratorAdmin)
-admin.site.register(Invitation, InvitationAdmin)
-admin.site.register(InvitationType, InvitationTypeAdmin)
 admin.site.register(Ticket, TicketAdmin)
 admin.site.register(TicketWarning, TicketWarningAdmin)
 admin.site.register(MultiPurchase, MPAdmin)
