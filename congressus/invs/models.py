@@ -21,11 +21,11 @@ class InvitationType(models.Model):
                                       blank=True,
                                       verbose_name=_('sessions'))
 
-    start = models.DateTimeField(_('start date'), null=True)
-    end = models.DateTimeField(_('end date'), null=True)
-
     gates = models.ManyToManyField(Gate, blank=True,
                                    verbose_name=_('gates'))
+
+    start = models.DateTimeField(_('start date'), null=True, blank=True)
+    end = models.DateTimeField(_('end date'), null=True, blank=True)
 
     class Meta:
         verbose_name = _('invitation type')
