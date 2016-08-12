@@ -2,6 +2,7 @@ import os
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.utils import formats
+from django.utils import timezone
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.graphics.shapes import Drawing
 from reportlab.graphics import renderPDF
@@ -19,6 +20,12 @@ from reportlab.lib import colors
 from io import BytesIO
 
 from PyPDF2 import PdfFileMerger
+
+
+def short_hour(dt):
+    if timezone.is_aware(dt):
+        dt = timezone.localtime(dt)
+    return formats.date_format(dt, 'H:i')
 
 
 class QRFlowable(Flowable):
@@ -61,8 +68,8 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
     start = formats.date_format(ticket.session.start, "l d/m/Y")
     date = _('%(date)s (%(start)s to %(end)s)') % {
         'date': start,
-        'start': ticket.session.start.strftime("%H:%M"),
-        'end': ticket.session.end.strftime("%H:%M"),
+        'start': short_hour(ticket.session.start),
+        'end': short_hour(ticket.session.end),
     }
     code = ticket.order
     wcode = ticket.window_code()
