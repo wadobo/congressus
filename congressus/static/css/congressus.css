@@ -40,3 +40,18 @@ form.btn-download {
     text-align: center;
     font-family: "courier new";
 }
+
+label#print-format {
+    margin-top: 10%;
+    margin-bottom: 0;
+    text-align: center;
+    width: 100%;
+}
+
+select#print-format {
+    width: 75%;
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+    text-align-last: center;
+}

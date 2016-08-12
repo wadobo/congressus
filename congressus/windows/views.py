@@ -56,6 +56,7 @@ window_login = WindowLogin.as_view()
 
 class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
     template_name = 'windows/multipurchase.html'
+    DEFAULT_PF = 'thermal'
 
     def get_window(self):
         ev = self.kwargs['ev']
@@ -76,6 +77,8 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
         w = self.get_window()
         ctx['window'] = w
         ctx['subsum'] = True
+        ctx['print_formats'] = settings.PRINT_FORMATS
+        ctx['default_pf'] = self.DEFAULT_PF
         return ctx
 
     def post(self, request, *args, **kwargs):
@@ -83,6 +86,7 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
 
         ids = [(i[len('number_'):], request.POST[i]) for i in request.POST if i.startswith('number_')]
         seats = [(i[len('seats_'):], request.POST[i].split(',')) for i in request.POST if i.startswith('seats_')]
+        print_format = request.POST.get('print-format', self.DEFAULT_PF)
 
         data = request.POST.copy()
         data['email'] = settings.FROM_EMAIL

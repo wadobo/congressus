@@ -166,6 +166,7 @@ TIMESTEP_CHART = 'daily'
 MAX_STEP_CHART = 10
 
 INVITATION_ORDER_START = '01'
+PRINT_FORMATS = ['A4', 'thermal', 'csv']
 
 try:
     from local_settings import *

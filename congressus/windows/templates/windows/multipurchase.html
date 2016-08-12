@@ -63,6 +63,12 @@
                 data-msg="{% trans "The ticket will be purchased, are you sure?" %}">
                 {% trans "Finish" %}
             </button>
+            <label id="print-format">{% trans "Print format" %}</label>
+            <select id="print-format" name="print-format">
+                {% for pf in print_formats %}
+                    <option value="{{ pf }}" {% if pf == default_pf %} selected{% endif %}>{{ pf }}</option>
+                {% endfor %}
+            </select>
         </div>
     </div>
 {% endblock %}

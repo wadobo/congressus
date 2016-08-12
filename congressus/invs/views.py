@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
@@ -15,6 +16,7 @@ from .utils import gen_csv_from_generators
 
 class GenInvitationsView(UserPassesTestMixin, TemplateView):
     template_name = 'invs/generator.html'
+    DEFAULT_PF = 'csv'
 
     def test_func(self):
         u = self.request.user
@@ -27,10 +29,13 @@ class GenInvitationsView(UserPassesTestMixin, TemplateView):
         ctx['invs'] = InvitationType.objects.filter(is_pass=False, event=ev)
         ctx['passes'] = InvitationType.objects.filter(is_pass=True, event=ev)
         ctx['menuitem'] = 'inv'
+        ctx['print_formats'] = settings.PRINT_FORMATS
+        ctx['default_pf'] = self.DEFAULT_PF
         return ctx
 
     def post(self, request, ev):
         ids = [(i[len('number_'):], request.POST[i]) for i in request.POST if i.startswith('number_')]
+        print_format = request.POST.get('print-format', self.DEFAULT_PF)
 
         igs = []
         for i, v in ids:
