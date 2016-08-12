@@ -56,7 +56,7 @@ class BaseTicketMixing:
         while used or reserved:
             order = ''.join(random.choice(chars) for _ in range(l))
             used = self.is_order_used(order)
-            reserved = order.startswith(INVITATION_ORDER_START)
+            reserved = order.startswith(settings.INVITATION_ORDER_START)
 
         self.order = order
         if save:
