@@ -144,10 +144,10 @@ class AccessView(UserPassesTestMixin, TemplateView):
         start_formatted = short_date(start)
         end_formatted = short_date(end)
 
-        if end < datetime.now():
+        if end < timezone.now():
             msg = _("Expired, ended at %(date)s") % { 'date': end_formatted }
             return 'wrong', msg
-        elif start > datetime.now():
+        elif start > timezone.now():
             msg = _("Too soon, wait until %(date)s") % { 'date': start_formatted }
             return 'wrong', msg
 
@@ -170,6 +170,15 @@ class AccessView(UserPassesTestMixin, TemplateView):
         ret = self.check_all(inv, s, valid_session, invalid_gate, session=session)
         if ret:
             return ret
+
+        now = timezone.now()
+        # Checking if there's start or end date and if it's valid
+        if inv.type.end and timezone.now() > inv.type.end:
+            msg = _("Expired, ended at %(date)s") % { 'date': short_date(inv.type.end) }
+            return 'wrong', msg
+        if inv.type.start and timezone.now() < inv.type.start:
+            msg = _("Too soon, wait until %(date)s") % { 'date': short_date(inv.type.start) }
+            return 'wrong', msg
 
         # if we're here, everything is ok
         #  * If is a valid inv and it's not a pass, mark as used
@@ -208,7 +217,6 @@ class AccessView(UserPassesTestMixin, TemplateView):
         #  * Check if it's a valid session
         #    * check if there's extra session in this ticket
         #  * Check if it's a valid gate
-        #  * If is a valid ticket, mark as used
 
         msg2 = str(session or ticket.session)
         if ticket.used:
