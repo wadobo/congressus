@@ -82,7 +82,7 @@ class Invitation(models.Model, BaseExtraData):
 
     def save_extra_sessions(self):
         data = []
-        for session in self.sessions.all():
+        for session in self.type.sessions.all():
             for extra in session.orig_sessions.all():
                data.append({
                    'session': extra.extra.id,
@@ -123,9 +123,8 @@ class InvitationGenerator(models.Model):
     def save(self, *args, **kwargs):
         super(InvitationGenerator, self).save(*args, **kwargs)
         for n in range(self.amount):
-            invi = Invitation(session=self.type.session)
-            invi.generator = self
-            invi.is_pass = self.type.is_pass
+            invi = Invitation(type=self.type, generator=self,
+                              is_pass=self.type.is_pass)
             invi.gen_order()
             invi.save_extra_sessions()
             invi.save()

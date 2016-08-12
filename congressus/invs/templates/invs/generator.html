@@ -13,18 +13,86 @@
     <form method="POST" action="" class="form">
         {% csrf_token %}
 
-        <label class="form-label" for="type-invitations">{% trans "type" %}</label>
-        <select id="type-invitations" name="type" class="form-control">
-            {% for t in types %}
-            <option value="{{ t.id }}">{{ t.name }}</option>
-            {% endfor %}
-        </select>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="panel panel-info">
+                    <div class="panel panel-heading"> {% trans "Invitations" %} </div>
+                    <div class="panel panel-body">
+                        {% include "invs/invs_table.html" with invs=invs %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="panel panel-info">
+                    <div class="panel panel-heading"> {% trans "Passes" %} </div>
+                    <div class="panel panel-body">
+                        {% include "invs/invs_table.html" with invs=passes %}
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <label class="form-label" for="type-invitations">{% trans "amount" %}</label>
-        <input name="amount" type="number" min="1" value="1" class="form-control"/>
-        <br/>
-
-        <input class="btn btn-primary" name="inv" type="submit" value="{% trans "Generate Invitations" %}"/>
-        <input class="btn btn-success" name="pass" type="submit" value="{% trans "Generate Passes" %}"/>
+        <div class="row window-foot">
+            <div class="col-sm-2">
+                <!-- TODO, add discounts here -->
+                <button id="clean" class="btn btn-danger btn-block btn-lg"> {% trans "Clean" %} </button>
+            </div>
+            <div class="col-sm-8">
+                <table class="table table-bordered text-center">
+                    <tr>
+                        <th class="text-center">{% trans "Price" %}</th>
+                        <th class="text-center">{% trans "Comment" %}</th>
+                    </tr>
+                    <tr>
+                        <td> <input type="number" name="price" class="form-control inputbox" id="price" value="0"/> </td>
+                        <td> <input type="text" id="comment" name="comment" class="form-control"/> </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-sm-2">
+                <button id="finish" class="btn btn-success btn-block btn-lg">
+                    {% trans "Finish" %}
+                </button>
+            </div>
+        </div>
     </form>
+{% endblock %}
+
+{% block extrabody %}
+    <script>
+        $(document).ready(function() {
+            $("#clean").click(function() {
+                $(".invinput").val("0");
+                $("#price").val("0");
+                $("#comment").val("");
+                return false;
+            });
+
+            $(".plus").click(function() {
+                var id = '#' + $(this).data("id");
+                var max = parseInt($(id).attr('max'), 10);
+                var current = parseInt($(id).val(), 10);
+
+                var next = current + 1;
+                if (next > max) {
+                    next = max;
+                }
+                $(id).val(next);
+                $(id).change();
+            });
+            $(".minus").click(function() {
+                var id = '#' + $(this).data("id");
+                var min = parseInt($(id).attr('min') || 0, 10);
+                var current = parseInt($(id).val(), 10);
+
+                var next = current - 1;
+                if (next < min) {
+                    next = min;
+                }
+                $(id).val(next);
+                $(id).change();
+            });
+
+        });
+    </script>
 {% endblock %}

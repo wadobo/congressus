@@ -1,0 +1,24 @@
+{% load i18n %}
+
+<table class="table table-striped">
+    {% for t in invs %}
+        <tr>
+            <th width="50%">
+                <span class="session-name">{{ t.name }}</span>
+            </th>
+            <td class="sessioninput-td">
+                <div class="sessioninput-group input-group">
+                    <input id="{{ t.id }}" name="number_{{ t.id }}" class="invinput form-control" min='0' type="text" value="0"/>
+                    <span class="buttons input-group-btn">
+                        <button data-id="{{ t.id }}" class="plus btn btn-default" type="button">
+                            <span class="glyphicon glyphicon-plus" ahire-hidden="true"></span>
+                        </button>
+                        <button data-id="{{ t.id }}" class="minus btn btn-default" type="button">
+                            <span class="glyphicon glyphicon-minus" ahire-hidden="true"></span>
+                        </button>
+                    </span>
+                </div>
+            </td>
+        </tr>
+    {% endfor %}
+</table>
