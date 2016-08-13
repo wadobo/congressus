@@ -1,5 +1,6 @@
 import os
 from django.conf import settings
+from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.utils import formats
 from django.utils import timezone
@@ -18,8 +19,9 @@ from reportlab.lib import utils
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib import colors
 from io import BytesIO
-
 from PyPDF2 import PdfFileMerger
+
+from events.models import TicketTemplate
 
 
 def short_hour(dt):
@@ -60,36 +62,58 @@ def get_image(path, width=3*cm):
     return Image(path, width=width, height=(width * aspect))
 
 
-def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
+def generate_pdf(ticket, logo='img/logo.png', asbuf=False, inv=False):
     """ Generate ticket in pdf with the get ticket. """
 
-    space = ticket.session.space.name
-    session = ticket.session.name
-    start = formats.date_format(ticket.session.start, "l d/m/Y")
-    date = _('%(date)s (%(start)s to %(end)s)') % {
-        'date': start,
-        'start': short_hour(ticket.session.start),
-        'end': short_hour(ticket.session.end),
-    }
-    code = ticket.order
-    wcode = ticket.window_code()
-
-    initials = _('T') + space[0].upper() + session[0].upper()
-    text = _('Ticket %(space)s %(session)s') % {'space': space.capitalize(), 'session': session.capitalize()}
-
-    price = _('%4.2f €') % ticket.price
-    taxtext = _('TAX INC.')
-    price = '<font size=14>%s</font>   <font size=8>%s%% %s</font>' % (price, ticket.tax, taxtext)
     seatinfo = ''
-    if ticket.seat:
-        seatdata = {
-            'layout': ticket.seat_layout.name,
-            'row': ticket.seat_row(),
-            'col': ticket.seat_column()
+    if inv:
+        if ticket.type.is_pass:
+            initials = "PAS"
+        else:
+            initials = "INV"
+        price = _('%4.2f €') % ticket.get_price()
+        tax = ticket.get_tax()
+        template = TicketTemplate.objects.last()
+        wcode = 'GEN' + str(ticket.generator.id)
+        text = ticket.type.name
+        if ticket.type.start and ticket.type.end:
+            date = _('%(date)s (%(start)s to %(end)s)') % {
+                'date': formats.date_format(ticket.type.start, "l d/m/Y"),
+                'start': short_hour(ticket.type.start),
+                'end': short_hour(ticket.type.end),
+            }
+        else:
+            date = ''
+    else:
+        space = ticket.session.space.name
+        session = ticket.session.name
+        start = formats.date_format(ticket.session.start, "l d/m/Y")
+        date = _('%(date)s (%(start)s to %(end)s)') % {
+            'date': start,
+            'start': short_hour(ticket.session.start),
+            'end': short_hour(ticket.session.end),
         }
-        seatinfo = _('SECTOR: %(layout)s &nbsp;&nbsp;&nbsp; ROW: %(row)s &nbsp;&nbsp;&nbsp; SEAT: %(col)s') % seatdata
-        seatinfo = '<font size=11><b>'+ seatinfo +'</b></font><br/>'
+        wcode = ticket.window_code()
+        initials = _('T') + space[0].upper() + session[0].upper()
+        text = _('Ticket %(space)s %(session)s') % {'space': space.capitalize(), 'session': session.capitalize()}
 
+
+        price = _('%4.2f €') % ticket.price
+        tax = ticket.tax
+        seatinfo = ''
+        if ticket.seat:
+            seatdata = {
+                'layout': ticket.seat_layout.name,
+                'row': ticket.seat_row(),
+                'col': ticket.seat_column()
+            }
+            seatinfo = _('SECTOR: %(layout)s &nbsp;&nbsp;&nbsp; ROW: %(row)s &nbsp;&nbsp;&nbsp; SEAT: %(col)s') % seatdata
+            seatinfo = '<font size=11><b>'+ seatinfo +'</b></font><br/>'
+        template = ticket.session.template
+
+    taxtext = _('TAX INC.')
+    price = '<font size=14>%s</font>   <font size=8>%s%% %s</font>' % (price, tax, taxtext)
+    code = ticket.order
     if settings.QRCODE:
         codeimg = QRFlowable(code)
     else:
@@ -98,8 +122,6 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False):
     PAGE_HEIGHT= 11 * inch
     PAGE_WIDTH= 8.5 * inch
     styles = getSampleStyleSheet()
-
-    template = ticket.session.template
 
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer)
@@ -239,3 +261,30 @@ def concat_pdf(files):
     pdf = buffer.getvalue()
     buffer.close()
     return pdf
+
+
+def get_ticket_format(mp, pf):
+    """ With a list of invitations or invitations,generate ticket output """
+    if pf == 'csv':
+        csv = []
+        if hasattr(mp, 'all_tickets'): # is MultiPurchase
+            for i, ticket in enumerate(mp.all_tickets()):
+                csv.append("%s, %s, %s" % (i+1, ticket.order, ticket.session_name))
+        else: # is Ticket
+            csv.append("%s, %s, %s" % (i+1, mp.order, mp.session_name))
+        response = HttpResponse(content_type='application/csv')
+        response['Content-Disposition'] = 'filename="invs.csv"'
+        response.write('\n'.join(csv))
+    elif pf == 'thermal':
+        pdf = mp.gen_pdf()
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'filename="tickets.pdf"'
+        response.write(pdf)
+    elif pf == 'A4':
+        pdf = mp.gen_pdf()
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="tickets.pdf"'
+        response.write(pdf)
+    else:
+        raise "Ticket format not found"
+    return response

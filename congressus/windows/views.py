@@ -16,6 +16,7 @@ from tickets.views import MultiPurchaseView
 from tickets.views import get_ticket_or_404
 from events.models import Event
 from tickets.forms import MPRegisterForm
+from tickets.utils import get_ticket_format
 
 from django.contrib.auth import logout as auth_logout
 from django.conf import settings
@@ -120,10 +121,7 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
                                     change=change, payment=payment)
             sale.save()
 
-            pdf = mp.gen_pdf()
-            response = HttpResponse(content_type='application/pdf')
-            response['Content-Disposition'] = 'filename="tickets.pdf"'
-            response.write(pdf)
+            response = get_ticket_format(mp, pf=print_format)
             return response
 
         ctx = self.get_context_data()

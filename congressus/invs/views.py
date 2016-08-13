@@ -11,7 +11,7 @@ from events.models import Event
 from .models import Invitation
 from .models import InvitationType
 from .models import InvitationGenerator
-from .utils import gen_csv_from_generators
+from .utils import get_ticket_format
 
 
 class GenInvitationsView(UserPassesTestMixin, TemplateView):
@@ -53,14 +53,7 @@ class GenInvitationsView(UserPassesTestMixin, TemplateView):
             ig.save()
             igs.append(ig)
 
-        # TODO add output type selector:
-        #   * csv
-        #   * A4
-        #   * Thermal
-
-        response = HttpResponse(content_type='application/csv')
-        response['Content-Disposition'] = 'filename="invs.csv"'
-        response.write(gen_csv_from_generators(igs))
+        response = get_ticket_format(igs, pf=print_format)
         return response
 
 gen_invitations = GenInvitationsView.as_view()

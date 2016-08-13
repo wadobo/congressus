@@ -92,6 +92,12 @@ class Invitation(models.Model, BaseExtraData):
                })
         self.set_extra_data('extra_sessions', data)
 
+    def get_price(self):
+        return self.generator.price
+
+    def get_tax(self):
+        return self.generator.tax
+
     def __str__(self):
         return self.order
 
@@ -100,6 +106,7 @@ class InvitationGenerator(models.Model):
     type = models.ForeignKey(InvitationType, verbose_name=_('type'))
     amount = models.IntegerField(_('amount'), default=1)
     price = models.IntegerField(_('price'), blank=True, null=True)
+    tax = models.IntegerField(_('tax'), null=True)
     concept = models.CharField(_('concept'), max_length=200)
     created = models.DateTimeField(_('created at'), auto_now_add=True)
 
