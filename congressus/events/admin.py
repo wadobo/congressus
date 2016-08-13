@@ -8,6 +8,7 @@ from .models import Session
 from .models import TicketField
 from .models import SeatMap, SeatLayout, Gate
 from .models import TicketTemplate
+from .models import Discount
 
 
 class InvCodeInline(admin.TabularInline):
@@ -38,6 +39,7 @@ class EventAdmin(admin.ModelAdmin):
     inlines = [SpaceInline, TicketFieldInline, InvCodeInline]
     list_display = ('name', 'active', 'sold')
     list_filter = ('active',)
+    filter_horizontal = ('discounts',)
 
     def sold(self, obj):
         return obj.sold()
@@ -93,6 +95,10 @@ class TicketTemplateAdmin(admin.ModelAdmin):
     list_display = ('name', )
 
 
+class DiscountAdmin(admin.ModelAdmin):
+    list_display = ('name', 'type', 'value')
+
+
 admin.site.register(Event, EventAdmin)
 admin.site.register(InvCode, InvCodeAdmin)
 admin.site.register(ConfirmEmail, ConfirmEmailAdmin)
@@ -105,3 +111,4 @@ admin.site.register(SeatLayout, SeatLayoutAdmin)
 admin.site.register(Gate, GateAdmin)
 
 admin.site.register(TicketTemplate, TicketTemplateAdmin)
+admin.site.register(Discount, DiscountAdmin)

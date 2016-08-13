@@ -22,6 +22,11 @@ class GenInvitationsView(UserPassesTestMixin, TemplateView):
         u = self.request.user
         return u.is_authenticated() and u.is_superuser
 
+    def get_discounts(self):
+        ev = self.kwargs['ev']
+        ev = get_object_or_404(Event, slug=ev)
+        return ev.discounts.all()
+
     def get_context_data(self, *args, **kwargs):
         ctx = super(GenInvitationsView, self).get_context_data(*args, **kwargs)
         ev = get_object_or_404(Event, slug=self.kwargs['ev'])
@@ -31,6 +36,7 @@ class GenInvitationsView(UserPassesTestMixin, TemplateView):
         ctx['menuitem'] = 'inv'
         ctx['print_formats'] = settings.PRINT_FORMATS
         ctx['default_pf'] = self.DEFAULT_PF
+        ctx['discounts'] = self.get_discounts()
         return ctx
 
     def post(self, request, ev):

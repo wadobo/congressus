@@ -65,6 +65,11 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
         w = get_object_or_404(TicketWindow, event__slug=ev, slug=w)
         return w
 
+    def get_discounts(self):
+        ev = self.kwargs['ev']
+        ev = get_object_or_404(Event, slug=ev)
+        return ev.discounts.all()
+
     def test_func(self):
         u = self.request.user
         have_access = u.groups.filter(name='window').count()
@@ -80,6 +85,7 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
         ctx['subsum'] = True
         ctx['print_formats'] = settings.PRINT_FORMATS
         ctx['default_pf'] = self.DEFAULT_PF
+        ctx['discounts'] = self.get_discounts()
         return ctx
 
     def post(self, request, *args, **kwargs):

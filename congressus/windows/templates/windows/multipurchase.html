@@ -26,6 +26,23 @@
     <div class="row window-foot">
         <div class="col-sm-2">
             <!-- TODO, add discounts here -->
+            <label>{% trans "Discount:" %}</label>
+            <td class="text-left">
+                <div class="radio">
+                  <label>
+                    <input type="radio" name="discount" value="none" checked>
+                    {% trans "None" %}
+                  </label>
+                </div>
+            {% for discount in discounts %}
+                <div class="radio">
+                  <label>
+                    <input type="radio" name="discount" value={{ discount.id }}>
+                    {{ discount }}
+                  </label>
+                </div>
+            {% endfor %}
+            </td>
             <button id="clean" class="btn btn-danger btn-block btn-lg"> {% trans "Clean" %} </button>
         </div>
         <div class="col-sm-8">

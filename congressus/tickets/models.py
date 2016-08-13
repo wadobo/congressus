@@ -17,6 +17,7 @@ from django.core.urlresolvers import reverse
 
 from events.models import Event, InvCode
 from events.models import Session
+from events.models import Discount
 from events.models import SeatLayout
 from tickets.utils import generate_pdf
 from tickets.utils import concat_pdf
@@ -194,6 +195,8 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
     confirmed_date = models.DateTimeField(_('confirmed at'), blank=True, null=True)
     confirmed = models.BooleanField(_('confirmed'), default=False)
     confirm_sent = models.BooleanField(_('confirmation sent'), default=False)
+    discount = models.ForeignKey(Discount, related_name='mps', verbose_name=_('discount'),
+            blank=True, null=True)
 
     # Form Fields
     email = models.EmailField(_('email'))
@@ -224,7 +227,10 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
         return self.ev
 
     def get_price(self):
-        return sum(i.get_price() for i in self.tickets.all())
+        total = sum(i.get_price() for i in self.tickets.all())
+        if self.discount:
+            total = self.discount.apply_to(total)
+        return total
 
     def get_window_price(self):
         return sum(i.get_window_price() for i in self.tickets.all())

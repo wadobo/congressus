@@ -38,6 +38,30 @@ DIRECTIONS = (
     ('d', _('Down')),
 )
 
+DISCOUNT_TYPES = (
+    ('percent', _('Percent')),
+    ('amount', _('Amount')),
+)
+
+
+class Discount(models.Model):
+    name = models.CharField(_('name'), max_length=200, unique=True)
+    type = models.CharField(_('type'), max_length=8, choices=DISCOUNT_TYPES, default='percent')
+    value = models.IntegerField(_('value'), default=0)
+
+    def apply_to(self, t):
+        if not self.value:
+            return t
+        res = t
+        if self.type == 'percent':
+            res -= res*(self.value/100.0)
+        elif self.type == 'amount':
+            res += self.value
+        return res
+
+    def __str__(self):
+        return '%s: %s %s' % (self.name, self.value, '%' if self.type == 'percent' else '')
+
 
 class Event(models.Model):
     name = models.CharField(_('name'), max_length=200, unique=True)
@@ -46,6 +70,9 @@ class Event(models.Model):
     info = models.TextField(_('info'), blank=True, null=True)
     active = models.BooleanField(_('active'), default=False)
     admin = models.EmailField(_('admin email'), blank=True, null=True)
+    discounts = models.ManyToManyField(Discount, related_name='events',
+                                      blank=True,
+                                      verbose_name=_('discounts'))
 
     class Meta:
         verbose_name = _('event')
