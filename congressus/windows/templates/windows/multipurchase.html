@@ -30,14 +30,16 @@
             <td class="text-left">
                 <div class="radio">
                   <label>
-                    <input type="radio" name="discount" value="none" checked>
+                    <input type="radio" name="discount" value="none" checked
+                              data-type="none" data-value=0>
                     {% trans "None" %}
                   </label>
                 </div>
             {% for discount in discounts %}
                 <div class="radio">
                   <label>
-                    <input type="radio" name="discount" value={{ discount.id }}>
+                      <input type="radio" name="discount" value={{ discount.id }}
+                              data-type={{ discount.type }} data-value={{ discount.value }}>
                     {{ discount }}
                   </label>
                 </div>

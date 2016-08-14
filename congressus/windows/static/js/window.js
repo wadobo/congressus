@@ -30,6 +30,23 @@ function calcChange() {
     }
 }
 
+function apply_discount(total) {
+    var rcheck = $("input[name=discount]:checked");
+    var type = rcheck.attr("data-type");
+    var value = (rcheck.attr("data-value"));
+    if (type == 'none') {
+        res = total;
+    } else if (type == 'percent') {
+        res = total - total * (value / 100);
+    } else if (type == 'amount') {
+        res -= value;
+    } else {
+        res = total;
+    }
+    return res;
+
+}
+
 function recalcTotal() {
     var sum = 0;
     $(".sessioninput").each(function() {
@@ -37,6 +54,7 @@ function recalcTotal() {
         var price = parseFloat($(this).data("price"));
         sum += price * n;
     });
+    sum = apply_discount(sum);
     $("#total").val(sum);
 }
 
@@ -59,6 +77,9 @@ $(document).ready(function() {
     $("#payed").keyup(calcChange);
 
     $('.sessioninput').change(function() {
+        recalcTotal();
+    });
+    $("input[name=discount]:radio").change(function() {
         recalcTotal();
     });
     recalcTotal();
