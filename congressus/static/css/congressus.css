@@ -42,7 +42,6 @@ form.btn-download {
 }
 
 label#print-format {
-    margin-top: 10%;
     margin-bottom: 0;
     text-align: center;
     width: 100%;
@@ -52,6 +51,7 @@ select#print-format {
     width: 75%;
     display: block;
     margin: 0 auto;
+    margin-bottom: 25%;
     text-align: center;
     text-align-last: center;
 }
