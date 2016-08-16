@@ -30,7 +30,12 @@ python manage.py runserver
 
 Al ser una aplicación django, podemos ver toda la información de traducciones en el siguiente enlace:
 
- https://docs.djangoproject.com/en/1.8/topics/i18n/translation/
+ https://docs.djangoproject.com/en/1.10/topics/i18n/translation/
+
+```
+./manage.py makemessages -a # Update .po files
+./manage.py compilemessages # Compile .po files
+```
 
 
 ## Instrucciones detalladas para un despliegue:
