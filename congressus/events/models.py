@@ -56,7 +56,7 @@ class Discount(models.Model):
         if self.type == 'percent':
             res -= res*(self.value/100.0)
         elif self.type == 'amount':
-            res += self.value
+            res -= self.value
         return res
 
     def __str__(self):
