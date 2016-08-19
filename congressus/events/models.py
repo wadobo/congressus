@@ -308,9 +308,11 @@ class Session(models.Model):
         return holds.exists()
 
 
-    def seats_reserved(self):
-        n = self.tickets.filter(confirmed=True,
-                                seat__isnull=False)
+    def seats_reserved(self, layout=None):
+        if layout:
+            n = self.tickets.filter(confirmed=True, seat__isnull=False, seat_layout=layout)
+        else:
+            n = self.tickets.filter(confirmed=True, seat__isnull=False)
         return n
 
     def seats_holded(self, layout=None):

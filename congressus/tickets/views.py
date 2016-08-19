@@ -300,7 +300,9 @@ class AutoSeats(View):
         best_avail = None
         for layout in layouts:
             holded = session.seats_holded(layout)
-            avail = layout.contiguous_seats(amount, holded, layout.column_start_number)
+            reserved = session.seats_reserved(layout)
+            busy_seats = list(holded) + list(reserved)
+            avail = layout.contiguous_seats(amount, busy_seats, layout.column_start_number)
             if not avail:
                 continue
             if not best_avail or avail.get('row') < best_avail.get('row'):
