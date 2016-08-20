@@ -188,7 +188,7 @@ class SeatLayout(models.Model):
         if self.direction == 'd':
             return np.flipud(self.rows())
         elif self.direction == 'u':
-            return np.fliplr(self.rows())
+            return self.rows()
         elif self.direction == 'l':
             return np.transpose(self.rows())
         elif self.direction == 'r':
