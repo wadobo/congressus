@@ -81,6 +81,7 @@ class MultiPurchaseView(TemplateView):
         self.request.session['client'] = client
         ctx['client'] = client
         ctx['ws_server'] = settings.WS_SERVER
+        ctx['max_seat_by_session'] = settings.MAX_SEAT_BY_SESSION
         return ctx
 
     def post(self, request, ev=None):

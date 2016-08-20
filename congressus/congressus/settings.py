@@ -168,6 +168,8 @@ MAX_STEP_CHART = 10
 INVITATION_ORDER_START = '01'
 PRINT_FORMATS = ['A4', 'thermal', 'csv']
 
+MAX_SEAT_BY_SESSION = 15
+
 try:
     from local_settings import *
 except:
