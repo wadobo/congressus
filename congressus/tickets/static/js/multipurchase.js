@@ -1,3 +1,6 @@
+var old_session = -1;
+var old_layout = -1;
+
 function check_warning(w, sessions) {
     if (w.type == 'req') {
         var firstFound = true;
@@ -125,6 +128,12 @@ function updateBadges(session, layout) {
         badge.removeClass("label-success");
         badge.addClass("label-default");
     }
+    // Remove old badges. recursive function
+    if (old_session != -1 && (old_session != session || old_layout != layout)) {
+        updateBadges(old_session, old_layout);
+    }
+    old_session = session;
+    old_layout = layout;
 }
 
 function recalcSums(obj) {
