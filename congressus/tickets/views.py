@@ -77,8 +77,12 @@ class MultiPurchaseView(TemplateView):
         ctx = super(MultiPurchaseView, self).get_context_data(*args, **kwargs)
         ctx['ev'] = ev
         ctx['form'] = MPRegisterForm(event=ev)
-        client = ''.join(random.choice(string.hexdigits) for _ in range(20))
-        self.request.session['client'] = client
+        client = self.request.session.get('client', '')
+
+        if not client:
+            client = ''.join(random.choice(string.hexdigits) for _ in range(20))
+            self.request.session['client'] = client
+
         ctx['client'] = client
         ctx['ws_server'] = settings.WS_SERVER
         ctx['max_seat_by_session'] = settings.MAX_SEAT_BY_SESSION
