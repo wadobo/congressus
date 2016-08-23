@@ -27,6 +27,12 @@ WARNING_TYPES = (
     ('req', _('Required')),
 )
 
+SEATHOLD_TYPES = (
+    ('H', _('Holded')),
+    ('C', _('Confirming')),
+    ('R', _('Reserved')),
+)
+
 
 class BaseTicketMixing:
     '''
@@ -411,6 +417,7 @@ class TicketSeatHold(models.Model):
     layout = models.ForeignKey(SeatLayout, verbose_name=_('layout'))
     seat = models.CharField(_('seat'), max_length=20, help_text="row-col")
     date = models.DateTimeField(auto_now_add=True)
+    type = models.CharField(_('type'), max_length=2, choices=SEATHOLD_TYPES, default="H")
 
     class Meta:
         verbose_name = _('ticket seat hold')
