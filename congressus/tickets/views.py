@@ -29,6 +29,7 @@ from django.utils.translation import ugettext as _
 
 from .models import Ticket
 from .models import MultiPurchase
+from .models import TicketSeatHold
 from events.models import Session
 from events.models import Event
 from events.models import Space
@@ -266,6 +267,27 @@ class Confirm(View):
 
         tk = get_ticket_or_404(order_tpv=order_tpv)
         tk.confirm()
+
+        if isinstance(tk, Ticket):
+            all_tk = [tk]
+        else:
+            all_tk = tk.tickets.all()
+
+        # Save reserved ticket in SeatHold
+        client = self.request.session.get('client', '')
+        if not client:
+            client = ''.join(random.choice(string.hexdigits) for _ in range(20))
+            self.request.session['client'] = client
+        for t in all_tk:
+            tsh = TicketSeatHold.objects.get_or_create(
+                    session=t.session,
+                    layout=t.seat_layout,
+                    seat=t.seat
+            )
+            tsh.client = client,
+            tsh.type = 'R'
+            tsh.save()
+
         online_sale(tk)
         return HttpResponse("")
 confirm = csrf_exempt(Confirm.as_view())
@@ -304,10 +326,8 @@ class AutoSeats(View):
 
         best_avail = None
         for layout in layouts:
-            holded = session.seats_holded(layout)
-            reserved = session.seats_reserved(layout)
-            busy_seats = list(holded) + list(reserved)
-            avail = layout.contiguous_seats(amount, busy_seats, layout.column_start_number)
+            hold_seats = session.seats_holded(layout)
+            avail = layout.contiguous_seats(amount, hold_seats, layout.column_start_number)
             if not avail:
                 continue
             if not best_avail or avail.get('row') < best_avail.get('row'):

@@ -16,8 +16,9 @@ def ticket_seat_class(session, layout, seat, row, col):
     elif seat == '_':
         return 'seat-_'
 
-    if session.is_seat_holded(layout, row, col):
-        return 'seat-H'
+    holded_type = session.is_seat_holded(layout, row, col)
+    if holded_type:
+        return 'seat-' + holded_type.replace('C', 'H')
 
     if session.is_seat_available(layout, row, col):
         return 'seat-L'

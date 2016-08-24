@@ -1,6 +1,7 @@
 import datetime
 import numpy as np
 from django.db import models
+from django.db.models import Q
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -209,7 +210,7 @@ class SeatLayout(models.Model):
         layout = self.real_rows()
         for h in holded: # Changed free by holded seats before search
             r, c = h.seat.split("-")
-            layout[int(r) - 1, int(c) - col_start - 1] = 'H'
+            layout[int(r) - 1, int(c) - 1] = h.type
         nrow = 1
         for row in layout:
             free = ''.join(row).find(amount*'L')
@@ -284,43 +285,28 @@ class Session(models.Model):
         return (s + number) < self.space.capacity
 
     def is_seat_available(self, layout, row, column, client=None):
-        seat = row + '-' + column
-        exists = self.tickets.filter(confirmed=True,
-                                seat_layout=layout,
-                                seat=seat).exists()
-        avail = not exists
-        h = False
-
-        if client:
-            h = self.is_seat_holded(layout, row, column, client)
-
-        return avail and not h
+        holded = self.is_seat_holded(layout, row, column, client)
+        return not holded
 
     def is_seat_holded(self, layout, row, column, client=None):
         seat = row + '-' + column
-        # 5 minutes seconds
-        d = (timezone.now() - datetime.timedelta(seconds=5 * 60))
-        holds = self.seat_holds.filter(layout=layout,
-                                        seat=seat,
-                                        date__gt=d)
+        holds = self.seat_holds.filter(layout=layout, seat=seat)
         if client:
             holds = holds.exclude(client=client)
-        return holds.exists()
-
-
-    def seats_reserved(self, layout=None):
-        if layout:
-            n = self.tickets.filter(confirmed=True, seat__isnull=False, seat_layout=layout)
+        if holds.exists():
+            return holds[0].type
         else:
-            n = self.tickets.filter(confirmed=True, seat__isnull=False)
-        return n
+            return ''
 
-    def seats_holded(self, layout=None):
-        d = (timezone.now() - datetime.timedelta(seconds=5 * 60))
+    def seats_holded(self, layout=None, type=None, client=None):
+        query = Q()
+        if type:
+            query &= Q(type=type)
         if layout:
-            holds = self.seat_holds.filter(date__gt=d, layout=layout)
-        else:
-            holds = self.seat_holds.filter(date__gt=d)
+            query &= Q(layout=layout)
+        holds = self.seat_holds.filter(query)
+        if client:
+            holds = holds.exclude(client=client)
         return holds
 
     def places(self):
