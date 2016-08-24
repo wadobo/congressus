@@ -79,9 +79,11 @@
     {% endif %}
 </table>
 
-<div class="pull-right text-muted small">
-    {% trans "Using this button you can download/print individual tickets" %}
-    <button class="btn btn-warning btn-sm">
-        <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
-    </button>
-</div>
+{% if ticket.confirmed %}
+    <div class="pull-right text-muted small">
+        {% trans "Using this button you can download/print individual tickets" %}
+        <button class="btn btn-warning btn-sm">
+            <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+        </button>
+    </div>
+{% endif %}
