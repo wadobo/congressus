@@ -101,7 +101,6 @@
         {% block total %}
             <div class="totalinfo text-right">
                 <h2>
-                    <span id="timer-hold" class=pull-left>xx:xx</span>
                     {% trans "Total" %}
                     <span id="total" class="outputbox text-primary">0</span>
                     €
@@ -145,14 +144,9 @@
     <script src="{% static "js/websocket.js" %}"></script>
     <script src="{% static 'js/multipurchase.js' %}"></script>
     <script src="{% static "js/seat_select.js" %}"></script>
-    <script src="{% static "js/timer.js" %}"></script>
 
     <script>
         var MAX_SEAT_BY_SESSION = '{{ max_seat_by_session }}';
-        var EXPIRED_TIME = '{{ expired_time }}';
-        var obj = $('#timer-hold');
-        var btn = $('#btn-continue');
-        timerIn(EXPIRED_TIME, obj, btn);
 
         var client = '{{ client }}';
         try {

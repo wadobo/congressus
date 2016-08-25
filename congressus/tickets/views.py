@@ -99,12 +99,10 @@ class MultiPurchaseView(TemplateView):
             # Expired time reset. If not new client
             seathold_update(client, type='C')
             self.request.session.set_expiry(settings.EXPIRED_SEAT_H)
-            messages.add_message(self.request, messages.INFO, _("You should complete the proccess of select seats in less than %s minutes." % (settings.EXPIRED_SEAT_H/60)))
 
         ctx['client'] = client
         ctx['ws_server'] = settings.WS_SERVER
         ctx['max_seat_by_session'] = settings.MAX_SEAT_BY_SESSION
-        ctx['expired_time'] = settings.EXPIRED_SEAT_H
         return ctx
 
     def post(self, request, ev=None):
@@ -115,7 +113,7 @@ class MultiPurchaseView(TemplateView):
 
         client = self.request.session.get('client', '')
         if not client:
-            messages.add_message(request, messages.ERROR, _("Session has expired: you should select seats in less than %s minutes." % (settings.EXPIRED_SEAT_H/60)))
+            messages.add_message(request, messages.ERROR, _("Session has expired: you should select seats agains. Seats save for you during %s minutes." % (settings.EXPIRED_SEAT_H/60)))
             return redirect('multipurchase', ev=ev.slug)
         form = MPRegisterForm(request.POST,
                               event=ev, ids=ids, seats=seats,
