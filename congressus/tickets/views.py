@@ -319,12 +319,12 @@ class Confirm(View):
             client = ''.join(random.choice(string.hexdigits) for _ in range(20))
             self.request.session['client'] = client
         for t in all_tk:
-            tsh = TicketSeatHold.objects.get_or_create(
+            tsh, new = TicketSeatHold.objects.get_or_create(
                     session=t.session,
                     layout=t.seat_layout,
                     seat=t.seat
             )
-            tsh.client = client,
+            tsh.client = client
             tsh.type = 'R'
             tsh.save()
 

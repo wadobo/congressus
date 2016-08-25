@@ -11,6 +11,7 @@ from events.models import Session
 from events.models import Gate
 from events.models import SeatLayout
 from tickets.models import BaseExtraData
+from tickets.models import TicketSeatHold
 from tickets.utils import get_seats_by_str
 
 
@@ -165,3 +166,11 @@ class InvitationGenerator(models.Model):
             invi.gen_order()
             invi.save_extra_sessions()
             invi.save()
+            if seat_list:
+                tsh, new = TicketSeatHold.objects.get_or_create(
+                        session=invi.type.sessions.first(),
+                        layout=invi.seat_layout,
+                        seat=invi.seat
+                )
+                tsh.type = 'R'
+                tsh.save()
