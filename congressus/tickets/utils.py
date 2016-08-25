@@ -295,7 +295,7 @@ def check_free_seats(sessions, res):
     session = sessions.first()
     for k in res.keys():
         layout = SeatLayout.objects.get(name=k)
-        for v in res.get(k):
+        for v in res.get(k)[:]:
             if session.seat_holds.filter(layout=layout, seat=v).exists():
                 res[k].remove(v)
     return res
