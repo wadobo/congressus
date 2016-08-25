@@ -171,6 +171,7 @@ PRINT_FORMATS = ['A4', 'thermal', 'csv']
 MAX_SEAT_BY_SESSION = 15
 EXPIRED_SEAT_H = 5*60 # 5 minutes
 EXPIRED_SEAT_C = 15*60 # 15 minutes
+EXPIRED_SEAT_P = 35*60 # TPV expired: 35 minutes
 
 try:
     from local_settings import *

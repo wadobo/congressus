@@ -1,3 +1,5 @@
+import re
+
 from django import template
 from django.utils.translation import ugettext as _
 from django.utils.html import mark_safe
@@ -18,7 +20,7 @@ def ticket_seat_class(session, layout, seat, row, col):
 
     holded_type = session.is_seat_holded(layout, row, col)
     if holded_type:
-        return 'seat-' + holded_type.replace('C', 'H')
+        return 'seat-' + re.sub('[CP]', 'H', holded_type)
 
     if session.is_seat_available(layout, row, col):
         return 'seat-L'

@@ -5,10 +5,12 @@ import random
 import string
 import operator
 
+from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.conf import settings
+from django.contrib import messages
 from django.template import Context
 from django.template import Template
 from django.utils import timezone
@@ -70,6 +72,15 @@ class LastEventView(View):
 last_event = LastEventView.as_view()
 
 
+def seathold_update(client, type):
+    """ Update client's seats hold, change type and reset date for avoid
+    removed seat hold """
+    for tsh in TicketSeatHold.objects.filter(Q(client=client), ~Q(type='R')):
+        tsh.date = timezone.now()
+        tsh.type = type
+        tsh.save()
+
+
 class MultiPurchaseView(TemplateView):
     template_name = 'tickets/multipurchase.html'
 
@@ -83,10 +94,15 @@ class MultiPurchaseView(TemplateView):
         if not client:
             client = ''.join(random.choice(string.hexdigits) for _ in range(20))
             self.request.session['client'] = client
+            # Expired time reset. If not new client
+            seathold_update(client, type='C')
+            self.request.session.set_expiry(settings.EXPIRED_SEAT_H)
+            messages.add_message(self.request, messages.INFO, _("You should complete the proccess of select seats in less than %s minutes." % (settings.EXPIRED_SEAT_H/60)))
 
         ctx['client'] = client
         ctx['ws_server'] = settings.WS_SERVER
         ctx['max_seat_by_session'] = settings.MAX_SEAT_BY_SESSION
+        ctx['expired_time'] = settings.EXPIRED_SEAT_H
         return ctx
 
     def post(self, request, ev=None):
@@ -95,6 +111,10 @@ class MultiPurchaseView(TemplateView):
         ids = [(i[len('number_'):], request.POST[i]) for i in request.POST if i.startswith('number_')]
         seats = [(i[len('seats_'):], request.POST[i].split(',')) for i in request.POST if i.startswith('seats_')]
 
+        client = self.request.session.get('client', '')
+        if not client:
+            messages.add_message(request, messages.ERROR, _("Session has expired: you should select seats in less than %s minutes." % (settings.EXPIRED_SEAT_H/60)))
+            return redirect('multipurchase', ev=ev.slug)
         form = MPRegisterForm(request.POST,
                               event=ev, ids=ids, seats=seats,
                               client=request.session.get('client', ''))
@@ -106,6 +126,9 @@ class MultiPurchaseView(TemplateView):
                 mp.confirm()
                 online_sale(mp)
                 return redirect('thanks', order=mp.order)
+
+            # Expired time reset
+            self.request.session.set_expiry(settings.EXPIRED_SEAT_C)
             return redirect('payment', order=mp.order)
 
         ctx = self.get_context_data()
@@ -185,9 +208,7 @@ class Payment(TemplateView):
         tk = get_ticket_or_404(order=kwargs['order'])
         ctx['ticket'] = tk
         ctx['error'] = self.request.GET.get('error', '')
-
-        if not tk.confirmed and (not tk.order_tpv or ctx['error']):
-            tk.gen_order_tpv()
+        ctx['expired_time'] = settings.EXPIRED_SEAT_C
 
         amount = str(tk.get_price() * 100)
         order = tk.order_tpv
@@ -222,8 +243,27 @@ class Payment(TemplateView):
             'sig': sig,
         })
 
+        if not tk.confirmed and (not tk.order_tpv or ctx['error']):
+            tk.gen_order_tpv()
+
+        messages.add_message(self.request, messages.INFO, _("You should complete the proccess of payment in less than %s minutes." % (settings.EXPIRED_SEAT_C/60)))
+
         return ctx
-payment = Payment.as_view()
+
+    def post(self, request, order):
+        tk = get_ticket_or_404(order=order)
+        client = self.request.session.get('client', '')
+        if not client:
+            messages.add_message(request, messages.ERROR, "Session has expired: you should confirm payment in less than %s minutes. You need selected seats again." % (settings.EXPIRED_SEAT_H/60))
+            return redirect('multipurchase', ev=ev.slug)
+
+        # Expired time reset to expired_time_TPV
+        seathold_update(client, type='P')
+        self.request.session.set_expiry(settings.EXPIRED_SEAT_P)
+
+        return JsonResponse({'status': 'ok'})
+
+payment = csrf_exempt(Payment.as_view())
 
 
 class Thanks(TemplateView):

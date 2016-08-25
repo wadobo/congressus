@@ -30,6 +30,7 @@ WARNING_TYPES = (
 SEATHOLD_TYPES = (
     ('H', _('Holded')),
     ('C', _('Confirming')),
+    ('P', _('Paying')),
     ('R', _('Reserved')),
 )
 
