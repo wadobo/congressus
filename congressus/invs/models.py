@@ -8,6 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from events.models import Event
 from events.models import Session
 from events.models import Gate
+from events.models import SeatLayout
 from tickets.models import BaseExtraData
 
 
@@ -46,6 +47,10 @@ class Invitation(models.Model, BaseExtraData):
     created = models.DateTimeField(_('created at'), auto_now_add=True)
     extra_data = models.TextField(_('extra data'), blank=True, null=True)
     is_pass = models.BooleanField(_('is pass'), default=False)
+
+    # row-col
+    seat_layout = models.ForeignKey(SeatLayout, null=True, blank=True, verbose_name=_('seat layout'))
+    seat = models.CharField(_('seat'), max_length=20, null=True, blank=True)
 
     # field to control the access
     used = models.BooleanField(_('used'), default=False)
