@@ -11,7 +11,8 @@ from tickets.models import TicketSeatHold
 def clean_holds(ws):
     time_h = (timezone.now() - datetime.timedelta(seconds=settings.EXPIRED_SEAT_H))
     time_c = (timezone.now() - datetime.timedelta(seconds=settings.EXPIRED_SEAT_C))
-    query = Q(date__lt=time_h, type="H") | Q(date__lt=time_c, type="C")
+    time_p = (timezone.now() - datetime.timedelta(seconds=settings.EXPIRED_SEAT_P))
+    query = Q(date__lt=time_h, type="H") | Q(date__lt=time_c, type="C") | Q(date__lt=time_p, type="P")
     holds = TicketSeatHold.objects.filter(query)
     for hold in holds:
         ws.drop_seat(hold)
