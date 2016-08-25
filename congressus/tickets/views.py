@@ -92,8 +92,8 @@ class MultiPurchaseView(TemplateView):
         ctx['ev'] = ev
         ctx['form'] = MPRegisterForm(event=ev)
         client = self.request.session.get('client', '')
-
-        if not client:
+        authenticated_user = self.request.user.is_authenticated()
+        if not client and not authenticated_user:
             client = ''.join(random.choice(string.hexdigits) for _ in range(20))
             self.request.session['client'] = client
             # Expired time reset. If not new client
