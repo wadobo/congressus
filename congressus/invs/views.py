@@ -42,6 +42,7 @@ class GenInvitationsView(UserPassesTestMixin, TemplateView):
     def post(self, request, ev):
         ids = [(i[len('number_'):], request.POST[i]) for i in request.POST if i.startswith('number_')]
         print_format = request.POST.get('print-format', self.DEFAULT_PF)
+        seats = request.POST.get('seats', '')
 
         igs = []
         for i, v in ids:
@@ -56,6 +57,8 @@ class GenInvitationsView(UserPassesTestMixin, TemplateView):
 
             ig = InvitationGenerator(type=itype, amount=amount,
                                      price=price, concept=comment)
+            if seats:
+                ig.seats = seats
             ig.save()
             igs.append(ig)
 

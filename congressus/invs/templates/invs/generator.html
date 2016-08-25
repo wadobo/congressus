@@ -21,6 +21,9 @@
                         {% include "invs/invs_table.html" with invs=invs %}
                     </div>
                 </div>
+                <label>{% trans "Seats:" %}</label>
+                <input type="text" id="seats" name="seats" class="form-control"/>
+                <span id="span-seats"></span>
             </div>
             <div class="col-sm-6">
                 <div class="panel panel-info">
@@ -113,6 +116,31 @@
                 }
                 $(id).val(next);
                 $(id).change();
+            });
+
+            input_seat = $("#seats");
+            input_seat.keyup(function() {
+                [1,2,3].forEach(function(item) {
+                    if ($("#"+item).val() > 0) {
+                        invi_type = item;
+                        return item;
+                    }
+                });
+                value = input_seat.val();
+                $.ajax({
+                    type: "POST",
+                    data: {'invi_type': invi_type, 'string': value},
+                    dataType: 'JSON',
+                    url: "/seats/bystr/",
+                    success: function(msg) {
+                        if (msg.error) {
+                            m = msg.error;
+                        } else {
+                            m = "Total:" + msg.total + "-->" + msg.values;
+                        }
+                        $("#span-seats").text(m);
+                    }
+                });
             });
 
         });

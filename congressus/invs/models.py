@@ -137,7 +137,7 @@ class InvitationGenerator(models.Model):
         return prefix + postfix
 
     def get_seats(self):
-        return get_seats_by_str(self.seats)
+        return get_seats_by_str(self.type.sessions.all(), self.seats)
 
     def clean(self):
         super(InvitationGenerator, self).clean()
@@ -150,9 +150,9 @@ class InvitationGenerator(models.Model):
 
     def save(self, *args, **kwargs):
         super(InvitationGenerator, self).save(*args, **kwargs)
+        seat_list = []
         if self.seats:
             seats = self.get_seats()
-            seat_list = []
             for k in seats.keys():
                 layout = SeatLayout.objects.get(name=k)
                 for v in seats.get(k):
@@ -160,7 +160,7 @@ class InvitationGenerator(models.Model):
         for n in range(self.amount):
             invi = Invitation(type=self.type, generator=self,
                               is_pass=self.type.is_pass)
-            if seat_list is not None:
+            if seat_list:
                 invi.seat_layout, invi.seat = seat_list[n]
             invi.gen_order()
             invi.save_extra_sessions()
