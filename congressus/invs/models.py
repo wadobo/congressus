@@ -2,6 +2,7 @@ import string
 import random
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 from django.utils.translation import ugettext_lazy as _
 
@@ -10,6 +11,7 @@ from events.models import Session
 from events.models import Gate
 from events.models import SeatLayout
 from tickets.models import BaseExtraData
+from tickets.utils import get_seats_by_str
 
 
 class InvitationType(models.Model):
@@ -113,6 +115,8 @@ class InvitationGenerator(models.Model):
     price = models.IntegerField(_('price'), blank=True, null=True)
     tax = models.IntegerField(_('tax'), null=True)
     concept = models.CharField(_('concept'), max_length=200)
+    seats = models.CharField(_('seats'), max_length=1024, blank=True, null=True,
+            help_text="C1[1-1,1-3]; C2[2-1:2-4]")
     created = models.DateTimeField(_('created at'), auto_now_add=True)
 
     def __str__(self):
@@ -132,11 +136,32 @@ class InvitationGenerator(models.Model):
         postfix = self.created.strftime('%m%d%H%M')
         return prefix + postfix
 
+    def get_seats(self):
+        return get_seats_by_str(self.seats)
+
+    def clean(self):
+        super(InvitationGenerator, self).clean()
+        if self.seats:
+            seats = 0
+            for val in self.get_seats().values():
+                seats += len(val)
+            if seats != self.amount:
+                raise ValidationError(_("Seats number should be equal to amount"))
+
     def save(self, *args, **kwargs):
         super(InvitationGenerator, self).save(*args, **kwargs)
+        if self.seats:
+            seats = self.get_seats()
+            seat_list = []
+            for k in seats.keys():
+                layout = SeatLayout.objects.get(name=k)
+                for v in seats.get(k):
+                    seat_list.append([layout, v])
         for n in range(self.amount):
             invi = Invitation(type=self.type, generator=self,
                               is_pass=self.type.is_pass)
+            if seat_list is not None:
+                invi.seat_layout, invi.seat = seat_list[n]
             invi.gen_order()
             invi.save_extra_sessions()
             invi.save()

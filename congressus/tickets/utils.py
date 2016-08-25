@@ -22,6 +22,7 @@ from io import BytesIO
 from PyPDF2 import PdfFileMerger
 
 from events.models import TicketTemplate
+from events.models import SeatLayout
 
 
 def short_hour(dt):
@@ -288,3 +289,47 @@ def get_ticket_format(mp, pf):
     else:
         raise "Ticket format not found"
     return response
+
+def check_free_seats(sessions, res):
+    # TODO: only look fisrt session
+    session = sessions.first()
+    for k in res.keys():
+        layout = SeatLayout.objects.get(name=k)
+        for v in res.get(k):
+            if session.seat_holds.filter(layout=layout, seat=v).exists():
+                res[k].remove(v)
+    return res
+
+def get_seats_by_str(sessions, string):
+    """ String format: 'C1[1-1,1-3]; C1[2-1:2-10]; C1[]' """
+    res = {} # {'C1': ['1-1', '1-2']}, ...
+    string = string.replace(' ', '')
+    layouts = string.split(";")
+    for layout in layouts:
+        open_bracket = layout.find('[')
+        close_bracket = layout.find(']')
+        if open_bracket == -1 or close_bracket == -1:
+            raise 'invalid format'
+        lay = layout[:open_bracket]
+        seats = layout[open_bracket+1:close_bracket]
+        if seats:
+            for seat in seats.split(','):
+                if seat.find(':') == -1:
+                    col, row = seat.split('-')
+                    if not col or not row:
+                        raise 'invalid format'
+                    row_seat = [seat]
+                else:
+                    ini_seat, end_seat = seat.split(':')
+                    ini_col, ini_row = ini_seat.split('-')
+                    end_col, end_row = end_seat.split('-')
+                    row_seat = []
+                    for col in range(int(ini_col), int(end_col)+1):
+                        for row in range(int(ini_row), int(end_row)+1):
+                            row_seat.append('%s-%s' % (col, row))
+                if lay in res.keys():
+                    res[lay] += row_seat
+                else:
+                    res.update({lay: row_seat})
+    res = check_free_seats(sessions, res)
+    return res

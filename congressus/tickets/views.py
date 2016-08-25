@@ -43,6 +43,8 @@ from windows.utils import online_sale
 from .forms import RegisterForm
 from .forms import MPRegisterForm
 from tickets.utils import get_ticket_format
+from tickets.utils import get_seats_by_str
+from invs.models import InvitationType
 
 from base64 import b64encode, b64decode
 from pyDes import triple_des, CBC
@@ -477,3 +479,27 @@ class EmailConfirmPreview(UserPassesTestMixin, View):
         return response
 
 email_confirm_preview = EmailConfirmPreview.as_view()
+
+
+class SeatsByStr(View):
+    def post(self, request):
+        ctx = {}
+        invi_type_id = request.POST.get('invi_type')
+        if invi_type_id:
+            invi_type = get_object_or_404(InvitationType, id=invi_type_id)
+            sessions = invi_type.sessions.all()
+            string = request.POST.get('string', '')
+            try:
+                dic = get_seats_by_str(sessions, string)
+                total = 0
+                for val in dic.values():
+                    total += len(val)
+                ctx['total'] = total
+                ctx['values'] = dic.__str__()
+            except:
+                ctx['error'] = 'invalid'
+        else:
+            ctx['error'] = _('neccessary select invitation type')
+        return JsonResponse(ctx)
+seats_by_str = csrf_exempt(SeatsByStr.as_view())
+

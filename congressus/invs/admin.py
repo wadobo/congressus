@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from django.http import HttpResponse
@@ -39,6 +40,11 @@ class InvitationAdmin(admin.ModelAdmin):
 class InvitationGeneratorAdmin(admin.ModelAdmin):
     list_display = ('type', 'amount', 'price', 'concept', 'created')
 
+    class Media:
+        js = [
+                settings.STATIC_URL + 'js/jquery.min.js',
+                settings.STATIC_URL + 'js/invitation.js',
+        ]
 
 admin.site.register(InvitationGenerator, InvitationGeneratorAdmin)
 admin.site.register(Invitation, InvitationAdmin)
