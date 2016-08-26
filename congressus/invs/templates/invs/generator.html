@@ -10,7 +10,7 @@
         </h1>
     </div>
 
-    <form method="POST" action="" class="form">
+    <form id="form-gen" class="form" method="POST" action="">
         {% csrf_token %}
 
         <div class="row">
@@ -119,14 +119,27 @@
             });
 
             show_thu = 3;
+            var total_seats = 0;
+            show_thursday = $("#" + show_thu);
             input_seat = $("#seats");
             input_seat.hide();
-            show_thursday = $("#" + show_thu);
+
+            function check_validity() {
+                if (show_thursday.val() != total_seats) {
+                    $("#finish").attr("disabled", true);
+                } else {
+                    $("#finish").attr("disabled", false);
+                }
+            }
+
             show_thursday.on('keyup change', function() {
                 if (show_thursday.val() > 0) {
                     input_seat.show();
+                    check_validity(total_seats);
                 } else {
                     input_seat.hide();
+                    input_seat.val("");
+                    $("#finish").attr("disabled", false);
                 }
             });
 
@@ -140,8 +153,12 @@
                     success: function(msg) {
                         if (msg.error) {
                             m = msg.error;
+                            total_seats = 0;
+                            check_validity();
                         } else {
                             m = "Total:" + msg.total + "-->" + msg.values;
+                            total_seats = msg.total;
+                            check_validity();
                         }
                         $("#span-seats").text(m);
                     }

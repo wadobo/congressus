@@ -59,6 +59,7 @@ class GenInvitationsView(UserPassesTestMixin, TemplateView):
                                      price=price, concept=comment)
             if seats:
                 ig.seats = seats
+            ig.clean()
             ig.save()
             igs.append(ig)
 
