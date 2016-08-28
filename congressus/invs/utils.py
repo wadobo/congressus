@@ -13,6 +13,10 @@ def gen_csv_from_generator(ig, numbered=True, string=True):
         line = '%s, %s' % (inv.order, name)
         if numbered:
             line = ('%d,' % (i + 1)) + line
+        if inv.seat_layout and inv.seat:
+            row, col = inv.seat.split('-')
+            col = int(col) + inv.seat_layout.column_start_number - 1
+            line += ', %s, %s, %s' % (inv.seat_layout.gate, row, col)
         csv.append(line)
 
     if string:
