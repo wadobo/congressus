@@ -210,7 +210,7 @@ class SeatLayout(models.Model):
         layout = self.real_rows()
         for h in holded: # Changed free by holded seats before search
             r, c = h.seat.split("-")
-            layout[int(r) - 1, int(c) - 1] = h.type
+            layout[int(r) - 1, int(c) + 1 - self.column_start_number] = h.type
         nrow = 1
         for row in layout:
             free = ''.join(row).find(amount*'L')
