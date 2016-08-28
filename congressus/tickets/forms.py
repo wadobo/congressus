@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from .models import Ticket
 from .models import MultiPurchase
 
@@ -103,7 +104,7 @@ class MPRegisterForm(forms.ModelForm):
         for sid, number in self.ids:
             session = Session.objects.get(space__event=self.event, id=sid)
             n = int(number)
-            if n < 0 or n > 10:
+            if n < 0 or n > settings.MAX_SEAT_BY_SESSION:
                 raise forms.ValidationError(_("Sorry, you can't buy %(n)s tickets") %  {"n": n})
             if not session.have_places(n):
                 raise forms.ValidationError(_("There's no %(n)s places for %(session)s") % {"n": n, "session": session})
