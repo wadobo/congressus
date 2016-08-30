@@ -2,7 +2,7 @@
 {% trans "Ticket info" %}
 -----
 {% trans "Event" %}: {{ ticket.event }}
-{% trans "ticket number" %}: {{ ticket.order }}
+{% if not ticket.is_mp %}{% trans "ticket number" %}: {{ ticket.order }}{% endif %}
 {% trans "payment number" %}: {{ ticket.order_tpv }}
 {% trans "ticket price" %}: {{ ticket.get_price|floatformat:2 }} €
 {% trans "ticket confirmed" %}: {{ ticket.confirmed|yesno }}
