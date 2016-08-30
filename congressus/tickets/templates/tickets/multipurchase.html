@@ -40,10 +40,10 @@
     {% for space in ev.spaces.all %}
         <div class="col-sm-6">
             <div class="panel panel-info">
-                <div class="panel panel-heading">
+                <div class="panel-heading">
                     {{ space.name }}
                 </div>
-                <div class="panel panel-body">
+                <div class="panel-body">
                     <table class="table table-striped">
                         {% for session in space.sessions.all %}
                             <tr>
