@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.http import HttpResponse
 
-from .models import Invitation
 from tickets.utils import concat_pdf
 from tickets.utils import generate_pdf
 
@@ -38,9 +37,9 @@ def gen_csv_from_generators(igs):
 
 
 def gen_pdf(igs):
+    from .models import Invitation
     files = []
     for inv in Invitation.objects.filter(generator__in=igs):
-        print(inv)
         files.append(generate_pdf(inv, asbuf=True, inv=True))
     return concat_pdf(files)
 
@@ -64,3 +63,13 @@ def get_ticket_format(invs, pf):
     else:
         raise "Ticket format not found"
     return response
+
+def get_sold_invs(session):
+    from .models import InvitationType
+    from .models import Invitation
+    types = []
+    for inv_type in InvitationType.objects.all():
+        if session in inv_type.sessions.all():
+            types.append(inv_type)
+    return Invitation.objects.filter(type__in=types).count()
+

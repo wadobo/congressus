@@ -1,19 +1,18 @@
 import datetime
 import numpy as np
-from django.db import models
-from django.db.models import Q
-from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext_lazy as _
-from django.utils import timezone
-
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 from autoslug import AutoSlugField
-
-
 from django import forms
+from django.core.urlresolvers import reverse
 from django.core.validators import RegexValidator
+from django.db import models
+from django.db.models import Q
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
+
+from invs.utils import get_sold_invs
 
 
 INV_TYPES = (
@@ -281,8 +280,9 @@ class Session(models.Model):
         return sold
 
     def have_places(self, number=1):
-        s = self.sold()
-        return (s + number) < self.space.capacity
+        s_t = self.sold()
+        s_i = get_sold_invs(self)
+        return (s_t + s_i + number) < self.space.capacity
 
     def is_seat_available(self, layout, row, column, client=None):
         holded = self.is_seat_holded(layout, row, column, client)

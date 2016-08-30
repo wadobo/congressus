@@ -21,9 +21,6 @@ from reportlab.lib import colors
 from io import BytesIO
 from PyPDF2 import PdfFileMerger
 
-from events.models import TicketTemplate
-from events.models import SeatLayout
-
 
 def short_hour(dt):
     if timezone.is_aware(dt):
@@ -66,6 +63,7 @@ def get_image(path, width=3*cm):
 def generate_pdf(ticket, logo='img/logo.png', asbuf=False, inv=False):
     """ Generate ticket in pdf with the get ticket. """
 
+    from events.models import TicketTemplate
     seatinfo = ''
     if inv:
         if ticket.type.is_pass:
@@ -292,6 +290,7 @@ def get_ticket_format(mp, pf):
 
 def check_free_seats(sessions, res):
     # TODO: only look fisrt session
+    from events.models import SeatLayout
     session = sessions.first()
     for k in res.keys():
         layout = SeatLayout.objects.get(name=k)
@@ -310,6 +309,7 @@ def check_free_seats(sessions, res):
 
 def get_seats_by_str(sessions, string):
     """ String format: 'C1[1-1,1-3]; C1[2-1:2-10]; C1[]' """
+    from events.models import SeatLayout
     res = {} # {'C1': ['1-1', '1-2']}, ...
     string = string.replace(' ', '')
     layouts = string.split(";")
