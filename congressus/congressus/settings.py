@@ -153,6 +153,8 @@ ORDER_SIZE = 15
 TPV_TERMINAL = 1
 TPV_MERCHANT = 'XXXXXX'
 TPV_URL = "https://sis-t.redsys.es:25443/sis/realizarPago"
+# LANGS: Spanish - 001, English - 002
+TPV_LANG = '002'
 #TPV_URL = "https://sis.redsys.es/sis/realizarPago"
 TPV_KEY = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 FROM_EMAIL = 'congressus@us.es'

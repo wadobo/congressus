@@ -228,7 +228,7 @@ class Payment(TemplateView):
         data["DS_MERCHANT_TRANSACTIONTYPE"] = ttype
         data["DS_MERCHANT_TERMINAL"] = terminal
         data["DS_MERCHANT_MERCHANTURL"] = url
-        data["DS_MERCHANT_CONSUMERLANGUAGE"] = '002'
+        data["DS_MERCHANT_CONSUMERLANGUAGE"] = settings.TPV_LANG
         data["DS_MERCHANT_URLOK"] = settings.SITE_URL + '/ticket/%s/thanks/' % tk.order
         data["DS_MERCHANT_URLKO"] = settings.SITE_URL + '/ticket/%s/payment/?error=1' % tk.order
 
