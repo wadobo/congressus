@@ -112,7 +112,6 @@ class MultiPurchaseView(TemplateView):
         seats = [(i[len('seats_'):], request.POST[i].split(',')) for i in request.POST if i.startswith('seats_')]
 
         client = self.request.session.get('client', '')
-        messages.add_message(request, messages.ERROR, _("Session has expired: you should select seats agains. Seats save for you during %s minutes. <a href=''>Click here for restart</a>" % (settings.EXPIRED_SEAT_H/60)))
         if not client:
             messages.add_message(request, messages.ERROR, _("Session has expired: you should select seats agains. Seats save for you during %s minutes. <a href='#'>Click here for restart</a>" % (settings.EXPIRED_SEAT_H/60)))
             return redirect('multipurchase', ev=ev.slug)
