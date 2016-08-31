@@ -44,25 +44,33 @@
                     {{ space.name }}
                 </div>
                 <div class="panel-body">
-                    <table class="table table-striped">
+                    <div class="sessions-table">
                         {% for session in space.sessions.all %}
-                            <tr>
-                                <th>
-                                    <span class="session-name">{{ session.name }}</span>
-                                    <div class="text-muted text-date">{{ session.start|date:"d/m/Y" }}</div>
-                                </th>
-                                <th width="100%">
-                                    <span class="session-hour">{{ session.start.time }} h.</span>
-                                </th>
+                            <div class="row session-row {% cycle 'odd' 'even' %}">
                                 {% if session.space.numbered %}
-                                <td>
+                                <div class="col-md-4 col-xs-9">
+                                {% else %}
+                                <div class="col-md-6 col-xs-12">
+                                {% endif %}
+                                    <div class="row">
+                                        <div class="col-lg-6 col-xs-7">
+                                            <span class="session-name">{{ session.name }}</span>
+                                            <div class="text-muted text-date">{{ session.start|date:"d/m/Y" }}</div>
+                                        </div>
+                                        <div class="col-lg-6 col-xs-5">
+                                            <div class="session-hour">{{ session.start.time }} h.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if session.space.numbered %}
+                                <div class="col-md-2 col-xs-3 text-center">
                                     {% include "tickets/seat_select.html" %}
                                     <input id="seats-{{ session.id }}" class="hidden seats-input" data-session="{{ session.id }}" type="text" name="seats_{{ session.id }}"
                                        value="{% key request.POST session.id "seats_" %}"
                                     />
-                                </td>
+                                </div>
                                 {% endif %}
-                                <td class="sessioninput-td">
+                                <div class="sessioninput-td col-md-6">
                                     <div class="sessioninput-group input-group">
                                         <input id="{{ session.id }}" class="sessioninput form-control"
                                                  min='0' max='{{ max_seat_by_session }}' type="text"
@@ -81,7 +89,7 @@
                                         </span>
                                         <span class="ticket-price input-group-addon">
                                             {% if window %}{{ session.window_price }}{% else %}{{ session.price }}{% endif %}
-                                            € <span class="hidden-xs">/ {% trans "ticket" %}</span>
+                                            € <span>/ {% trans "ticket" %}</span>
                                         </span>
                                         {% if subsum %}
                                         <span class="input-group-addon">
@@ -90,11 +98,11 @@
                                         </span>
                                         {% endif %}
                                     </div>
-                                </td>
+                                </div>
 
-                            </tr>
+                            </div> <!-- endof row -->
                         {% endfor %}
-                    </table>
+                    </div>
                 </div>
             </div>
         </div>

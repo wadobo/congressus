@@ -4,6 +4,15 @@
 
 .sessioninput {
     text-align: center;
-    width: 50px !important;
+    min-width: 50px !important;
 }
 
+.session-row {
+    border-bottom: 1px solid #eee;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.session-row.odd {
+    background-color: #fafafa;
+}
