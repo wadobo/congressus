@@ -10,6 +10,7 @@ from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 from invs.utils import get_sold_invs
@@ -402,6 +403,7 @@ class TicketField(models.Model):
 
         field = types[self.type]
 
+        field.label = mark_safe(self.label)
         field.help_text = self.help_text
         if not self.required:
             field.required = False
