@@ -117,8 +117,8 @@ class TicketWarningAdmin(admin.ModelAdmin):
 
 
 class TicketSeatHoldAdmin(admin.ModelAdmin):
-    list_display = ('client', 'session',  'layout', 'seat', 'date')
-    list_filter = ('session',)
+    list_display = ('client', 'session',  'layout', 'seat', 'date', 'type')
+    list_filter = ('session', 'type')
 
 
 admin.site.register(Ticket, TicketAdmin)
