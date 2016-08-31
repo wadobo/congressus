@@ -374,7 +374,7 @@ class TicketField(models.Model):
     event = models.ForeignKey(Event, related_name='fields', verbose_name=_('event'))
     order = models.IntegerField(_('order'), default=0)
     type = models.CharField(_('type'), max_length=100, choices=FIELD_TYPES, default='text')
-    label = models.CharField(_('label'), max_length=300)
+    label = models.CharField(_('label'), max_length=500)
     help_text = models.CharField(_('help text'), max_length=1000, blank=True, null=True)
     required = models.BooleanField(_('required'), default=False)
     options = models.CharField(_('options'), max_length=500,

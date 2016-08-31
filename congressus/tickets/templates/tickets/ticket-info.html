@@ -51,7 +51,7 @@
     <!-- todo add custom fields -->
     {% for d in ticket.get_extras %}
     <tr>
-        <th>{{ d.field.label }}</th>
+        <th>{{ d.field.label|safe }}</th>
         {% if d.field.type == 'check' %}
             <td>{{ d.value|yesno }}</td>
         {% else %}
