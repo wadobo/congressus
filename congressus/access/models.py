@@ -14,6 +14,7 @@ class AccessControl(models.Model):
     slug = AutoSlugField(populate_from='name')
 
     location = models.CharField(_('location'), max_length=500, blank=True, null=True)
+    mark_used = models.BooleanField(_('mark used'), default=True)
 
     class Meta:
         verbose_name = _('access control point')

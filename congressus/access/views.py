@@ -121,7 +121,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
         return HttpResponse(json.dumps(data), content_type="application/json")
 
     def get_ticket(self, order):
-        return obj.objects.get(order=order, confirmed=True)
+        return Ticket.objects.get(order=order, confirmed=True)
 
     def check_extra_session(self, ticket, s):
         extra = ticket.get_extra_session(s)
@@ -152,7 +152,8 @@ class AccessView(UserPassesTestMixin, TemplateView):
             return 'wrong', msg
 
         if not hasattr(ticket, 'is_pass') or not ticket.is_pass:
-            ticket.set_extra_session_to_used(s)
+            if self.get_ac().mark_used:
+                ticket.set_extra_session_to_used(s)
             ticket.save()
 
         return 'right', _('Extra session: %(session)s') % { 'session': session.short() }
@@ -183,8 +184,9 @@ class AccessView(UserPassesTestMixin, TemplateView):
         # if we're here, everything is ok
         #  * If is a valid inv and it's not a pass, mark as used
         if not inv.is_pass:
-            inv.used = True
-            inv.used_date = timezone.now()
+            if self.get_ac().mark_used:
+                inv.used = True
+                inv.used_date = timezone.now()
             inv.save()
 
         msg = _("Ok: %(session)s") % { 'session': session.short() }
@@ -204,8 +206,9 @@ class AccessView(UserPassesTestMixin, TemplateView):
             return ret
 
         # if we're here, everything is ok
-        ticket.used = True
-        ticket.used_date = timezone.now()
+        if self.get_ac().mark_used:
+            ticket.used = True
+            ticket.used_date = timezone.now()
         ticket.save()
         msg = _("Ok: %(session)s") % { 'session': ticket.session.short() }
         return self.response_json(msg, msg2=ticket.order)

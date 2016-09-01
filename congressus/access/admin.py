@@ -6,7 +6,7 @@ from .models import LogAccessControl
 
 
 class AccessControlAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'event', 'location')
+    list_display = ('name', 'slug', 'event', 'location', 'mark_used')
     list_filter = ('event', 'location')
     search_fields = ('name', 'slug', 'event__name')
 
