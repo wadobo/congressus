@@ -52,14 +52,10 @@
                                 {% else %}
                                 <div class="col-md-6 col-xs-12">
                                 {% endif %}
-                                    <div class="row">
-                                        <div class="col-lg-6 col-xs-7">
-                                            <span class="session-name">{{ session.name }}</span>
-                                            <div class="text-muted text-date">{{ session.start|date:"d/m/Y" }}</div>
-                                        </div>
-                                        <div class="col-lg-6 col-xs-5 text-right">
-                                            <div class="session-hour">{{ session.start.time }} h.</div>
-                                        </div>
+                                    <span class="session-name">{{ session.name }}</span>
+                                    <div class="text-muted text-date">
+                                        {{ session.start|date:"d/m/Y" }}
+                                        <span class="session-hour">({{ session.start.time }} h.)</span>
                                     </div>
                                 </div>
                                 {% if session.space.numbered %}
@@ -88,8 +84,12 @@
                                             </button>
                                         </span>
                                         <span class="ticket-price input-group-addon">
-                                            {% if window %}{{ session.window_price }}{% else %}{{ session.price }}{% endif %}
-                                            € <span>/ {% trans "ticket" %}</span>
+                                            {% if window %}
+                                                x{{ session.window_price }} €
+                                            {% else %}
+                                                {{ session.price }} €
+                                                <span>/ {% trans "ticket" %}</span>
+                                            {% endif %}
                                         </span>
                                         {% if subsum %}
                                         <span class="input-group-addon">
