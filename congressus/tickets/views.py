@@ -113,7 +113,7 @@ class MultiPurchaseView(TemplateView):
 
         client = self.request.session.get('client', '')
         if not client:
-            messages.add_message(request, messages.ERROR, _("Session has expired: you should select seats agains. Seats save for you during %s minutes. <a href='#'>Click here for restart</a>" % (settings.EXPIRED_SEAT_H/60)))
+            messages.add_message(request, messages.ERROR, _("Session has expired: you should select seats again. Seats save for you during %s minutes. <a href='#'>Click here for restart</a>" % (settings.EXPIRED_SEAT_H/60)))
             return redirect('multipurchase', ev=ev.slug)
         form = MPRegisterForm(request.POST,
                               event=ev, ids=ids, seats=seats,

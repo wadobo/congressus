@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-01 13:16+0200\n"
-"PO-Revision-Date: 2016-09-01 13:17+0100\n"
+"POT-Creation-Date: 2016-09-01 17:19+0200\n"
+"PO-Revision-Date: 2016-09-01 17:19+0100\n"
 "Last-Translator: Victor Ramirez <virako@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
 "Language: es\n"
@@ -30,7 +30,7 @@ msgstr "Control de acceso"
 msgid "event"
 msgstr "evento"
 
-#: access/models.py:13 access/templates/access/list.html:31
+#: access/models.py:13 access/templates/access/list.html:33
 #: dashboard/models.py:33 events/models.py:49 events/models.py:68
 #: events/models.py:105 events/models.py:143 events/models.py:155
 #: events/models.py:225 events/models.py:245 events/models.py:423
@@ -39,7 +39,7 @@ msgstr "evento"
 msgid "name"
 msgstr "nombre"
 
-#: access/models.py:16 access/templates/access/list.html:32
+#: access/models.py:16 access/templates/access/list.html:34
 #: windows/models.py:37
 msgid "location"
 msgstr "localización"
@@ -93,76 +93,76 @@ msgstr "log de punto de control de acceso"
 msgid "access control point logs"
 msgstr "logs de punto de control de acceso"
 
-#: access/templates/access/access.html:21
+#: access/templates/access/access.html:22
 msgid "Gate"
 msgstr "Puerta"
 
-#: access/templates/access/access.html:26 adminmenu/templates/menu.html:43
-#: windows/templates/windows/multipurchase.html:17
+#: access/templates/access/access.html:27 adminmenu/templates/menu.html:43
+#: windows/templates/windows/multipurchase.html:36
 msgid "logout"
 msgstr "salir"
 
-#: access/templates/access/access.html:34
+#: access/templates/access/access.html:36
 msgid "ticket order"
 msgstr "código de entrada"
 
-#: access/templates/access/list.html:10
+#: access/templates/access/list.html:11
 msgid "Access control admin"
 msgstr "Administración de control de acceso"
 
-#: access/templates/access/list.html:33
+#: access/templates/access/list.html:35
 msgid "today"
 msgstr "hoy"
 
-#: access/templates/access/list.html:34
+#: access/templates/access/list.html:36
 msgid "today ok"
 msgstr "válido hoy"
 
-#: access/templates/access/list.html:35
+#: access/templates/access/list.html:37
 msgid "today wrong"
 msgstr "no válido hoy"
 
-#: access/templates/access/list.html:36
+#: access/templates/access/list.html:38
 msgid "today used"
 msgstr "usado hoy"
 
-#: access/templates/access/list.html:37
+#: access/templates/access/list.html:39
 msgid "today maybe"
 msgstr "quizás hoy"
 
-#: access/templates/access/login.html:18
+#: access/templates/access/login.html:20
 #: windows/templates/windows/login.html:18
 msgid "Please sign in"
 msgstr "Por favor, accede"
 
-#: access/templates/access/login.html:20 access/templates/access/login.html:21
+#: access/templates/access/login.html:22 access/templates/access/login.html:23
 #: windows/templates/windows/login.html:20
 #: windows/templates/windows/login.html:21
 msgid "username"
 msgstr "nombre de usuario"
 
-#: access/templates/access/login.html:23 access/templates/access/login.html:24
+#: access/templates/access/login.html:25 access/templates/access/login.html:26
 #: windows/templates/windows/login.html:23
 #: windows/templates/windows/login.html:24
 msgid "password"
 msgstr "contraseña"
 
-#: access/templates/access/login.html:26 events/models.py:261
+#: access/templates/access/login.html:28 events/models.py:261
 #: tickets/models.py:419
 msgid "session"
 msgstr "sesión"
 
-#: access/templates/access/login.html:33 events/models.py:146
+#: access/templates/access/login.html:35 events/models.py:146
 #: events/models.py:165
 msgid "gate"
 msgstr "puerta"
 
-#: access/templates/access/login.html:35 invs/templates/invs/generator.html:46
-#: windows/templates/windows/multipurchase.html:35
+#: access/templates/access/login.html:37 invs/templates/invs/generator.html:48
+#: windows/templates/windows/multipurchase.html:55
 msgid "None"
 msgstr "Nada"
 
-#: access/templates/access/login.html:41
+#: access/templates/access/login.html:43
 #: windows/templates/windows/login.html:26
 msgid "sign in"
 msgstr "entrar"
@@ -652,7 +652,7 @@ msgstr "plantillas de entrada"
 msgid "Download csv"
 msgstr "Descargar csv"
 
-#: invs/apps.py:7 invs/templates/invs/generator.html:19
+#: invs/apps.py:7 invs/templates/invs/generator.html:21
 msgid "Invitations"
 msgstr "Invitaciones"
 
@@ -734,44 +734,44 @@ msgstr "generador de invitaciones y pases"
 msgid "Seats number should be equal to amount"
 msgstr "El número de asientos debería ser igual a la cantidad seleccionada"
 
-#: invs/templates/invs/generator.html:9
+#: invs/templates/invs/generator.html:10
 msgid "Invitation and passes generator"
 msgstr "Generador de invitaciones y pases"
 
-#: invs/templates/invs/generator.html:25
+#: invs/templates/invs/generator.html:27
 msgid "Show Thursday seats"
 msgstr "Asientos Espectáculo Jueves"
 
-#: invs/templates/invs/generator.html:30
+#: invs/templates/invs/generator.html:32
 msgid "Passes"
 msgstr "Pases"
 
-#: invs/templates/invs/generator.html:41
-#: windows/templates/windows/multipurchase.html:29
+#: invs/templates/invs/generator.html:43
+#: windows/templates/windows/multipurchase.html:49
 msgid "Discount:"
 msgstr "Descuento:"
 
-#: invs/templates/invs/generator.html:57
-#: windows/templates/windows/multipurchase.html:48
+#: invs/templates/invs/generator.html:59
+#: windows/templates/windows/multipurchase.html:68
 msgid "Clean"
 msgstr "Limpiar"
 
-#: invs/templates/invs/generator.html:62
+#: invs/templates/invs/generator.html:64
 #: tickets/templates/emails/ticket-detail.txt:8
 msgid "Price"
 msgstr "Precio"
 
-#: invs/templates/invs/generator.html:63
+#: invs/templates/invs/generator.html:65
 msgid "Comment"
 msgstr "Comentario"
 
-#: invs/templates/invs/generator.html:72
-#: windows/templates/windows/multipurchase.html:81
+#: invs/templates/invs/generator.html:74
+#: windows/templates/windows/multipurchase.html:101
 msgid "Print format"
 msgstr "Formato de impresión"
 
-#: invs/templates/invs/generator.html:79
-#: windows/templates/windows/multipurchase.html:89
+#: invs/templates/invs/generator.html:81
+#: windows/templates/windows/multipurchase.html:109
 msgid "Finish"
 msgstr "Terminar"
 
@@ -1062,7 +1062,7 @@ msgid "Loading..."
 msgstr "Cargando..."
 
 #: tickets/templates/tickets/multipurchase.html:115
-#: windows/templates/windows/multipurchase.html:53
+#: windows/templates/windows/multipurchase.html:73
 msgid "Total"
 msgstr "Total"
 
@@ -1197,7 +1197,7 @@ msgstr "Colaboradores"
 #: tickets/views.py:116
 #, python-format
 msgid ""
-"Session has expired: you should select seats agains. Seats save for you "
+"Session has expired: you should select seats again. Seats save for you "
 "during %s minutes. <a href='#'>Click here for restart</a>"
 msgstr ""
 "La sesión ha expirado: debes seleccionar los asientos de nuevo. Los asientos "
@@ -1323,7 +1323,7 @@ msgid "today card"
 msgstr "tarjeta hoy"
 
 #: windows/templates/windows/list.html:38
-#: windows/templates/windows/multipurchase.html:65
+#: windows/templates/windows/multipurchase.html:85
 msgid "cash"
 msgstr "efectivo"
 
@@ -1331,24 +1331,24 @@ msgstr "efectivo"
 msgid "add / remove"
 msgstr "añadir / eliminar"
 
-#: windows/templates/windows/multipurchase.html:54
+#: windows/templates/windows/multipurchase.html:74
 msgid "Payment"
 msgstr "Forma de pago"
 
-#: windows/templates/windows/multipurchase.html:55
+#: windows/templates/windows/multipurchase.html:75
 msgid "Payed"
 msgstr "Pagado"
 
 #. Translators: change for the ticket window cash payment process
-#: windows/templates/windows/multipurchase.html:57
+#: windows/templates/windows/multipurchase.html:77
 msgid "Change"
 msgstr "Cambio"
 
-#: windows/templates/windows/multipurchase.html:71
+#: windows/templates/windows/multipurchase.html:91
 msgid "credit card"
 msgstr "tarjeta de crédito"
 
-#: windows/templates/windows/multipurchase.html:88
+#: windows/templates/windows/multipurchase.html:108
 msgid "The ticket will be purchased, are you sure?"
 msgstr "La entrada va a ser comprada, ¿estás seguro?"
 
