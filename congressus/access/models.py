@@ -37,6 +37,7 @@ class AccessControl(models.Model):
 AC_TYPES = (
     ('ok', _('ok')),
     ('wrong', _('wrong')),
+    ('incorrect', _('incorrect')),
     ('used', _('used')),
     ('maybe', _('maybe')),
 )

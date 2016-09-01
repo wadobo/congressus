@@ -17,6 +17,11 @@ body.maybe {
     background: #0000ff;
 }
 
+.incorrect .content,
+body.incorrect {
+    background: #ff4444;
+}
+
 #extra {
     text-align: center;
     font-weight: bold;

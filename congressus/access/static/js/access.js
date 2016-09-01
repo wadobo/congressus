@@ -5,6 +5,7 @@ function gonormal() {
     $("body").removeClass("wrong");
     $("body").removeClass("right");
     $("body").removeClass("maybe");
+    $("body").removeClass("incorrect");
 }
 
 function notify(what) {
