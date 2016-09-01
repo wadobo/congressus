@@ -88,6 +88,9 @@
         $(document).ready(function() {
             $("#clean").click(function() {
                 $(".invinput").val("0");
+                $("#seats").val("");
+                $("#seats").hide();
+                $("[value=none]").click();
                 $("#price").val("0");
                 $("#comment").val("");
                 return false;

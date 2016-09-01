@@ -3,19 +3,20 @@ function clean() {
         $(this).click();
     });
 
-    $("input[type=number]").each(function() {
+    $("input.sessioninput").each(function() {
         if ($(this).attr("type") == 'number') {
             $(this).val("0");
             $(this).change();
         } else {
-            $(this).val("");
+            $(this).val("0");
         }
     });
 
+    $("[value=none]").click();
     $("[value=cash]").click();
     $("#total").val(0);
     $("#change").val(0);
-    $("#payed").val(0);
+    $("#payed").val("");
 
     return false;
 }
