@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base-admin.html" %}
 {% load i18n %}
 {% load staticfiles %}
 
@@ -10,7 +10,9 @@
 
 {% block content %}
 <div class="page-header">
-    <h1> {{ ac.name }} <small>{{ ac.event.name }}</small> </h1>
+    {% block pretitle %}
+    <h1 class="inline"> {{ ac.name }} <small>{{ ac.event.name }}</small> </h1>
+    {% endblock %}
 </div>
 
 <form class="form-signin" method="POST">

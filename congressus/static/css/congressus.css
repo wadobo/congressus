@@ -55,3 +55,7 @@ select#print-format {
     text-align: center;
     text-align-last: center;
 }
+
+h1.inline {
+    display: inline;
+}

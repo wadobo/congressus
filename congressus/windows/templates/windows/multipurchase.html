@@ -2,6 +2,24 @@
 {% load i18n %}
 {% load staticfiles %}
 
+<!-- LIKE CANNOT extends two html, base-admin.html should be applied here -->
+{% block head %}
+<!-- empty -->
+{% endblock %}
+
+{% block translation %}
+<!-- empty -->
+{% endblock %}
+
+{% block foot %}
+<!-- empty -->
+{% endblock %}
+<!--END -->
+
+{% block ticket_info %}
+<!-- empty -->
+{% endblock %}
+
 {% block personal_info %}
 {% endblock %}
 
@@ -9,7 +27,8 @@
 {% endblock %}
 
 {% block header %}
-    <h1> {{ window.name }} /
+    {% block pretitle %}
+    <h1 class="inline"> {{ window.name }} /
     <small class="text-danger">{{ request.user.username }}</small> /
     <small>{{ ev }}</small>
     <small class="text-info pull-right">
@@ -18,6 +37,7 @@
         </a>
     </small>
     </h1>
+    {% endblock %}
 {% endblock %}
 
 {% block extraform %}target="_blank"{% endblock %}
