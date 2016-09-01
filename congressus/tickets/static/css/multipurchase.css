@@ -8,9 +8,8 @@
 }
 
 .session-row {
-    border-bottom: 1px solid #eee;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
 }
 
 .session-row.odd {
