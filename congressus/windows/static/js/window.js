@@ -76,6 +76,9 @@ $(document).ready(function() {
 
     $("#clean").click(clean);
     $("#payed").keyup(calcChange);
+    $("#payed").click(function() {
+        $(this).select();
+    });
 
     $('.sessioninput').change(function() {
         recalcTotal();
