@@ -107,14 +107,16 @@ class BaseTicketMixing:
 
         # email to user
         e = self.event().get_email()
+
+        extra = json.loads(self.extra_data)
         if e:
-            subject = Template(e.subject).render(Context({'ticket': self}))
-            body = Template(e.body).render(Context({'ticket': self}))
+            subject = Template(e.subject).render(Context({'ticket': self, 'extra': extra}))
+            body = Template(e.body).render(Context({'ticket': self, 'extra': extra}))
         else:
             tmpl = get_template('emails/subject-confirm-user.txt')
-            subject = tmpl.render({'ticket': self})
+            subject = tmpl.render({'ticket': self, 'extra': extra})
             tmpl = get_template('emails/confirm-user.txt')
-            body = tmpl.render({'ticket': self})
+            body = tmpl.render({'ticket': self, 'extra': extra})
 
         body = body.replace('TICKETID', self.order)
 

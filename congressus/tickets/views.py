@@ -465,8 +465,9 @@ class EmailConfirmPreview(UserPassesTestMixin, View):
                               start=timezone.now(),
                               end=timezone.now())
 
-            subject = Template(event.email.subject).render(Context({'ticket': ticket}))
-            body = Template(event.email.body).render(Context({'ticket': ticket}))
+            extra = json.loads(ticket.extra_data)
+            subject = Template(event.email.subject).render(Context({'ticket': ticket, 'extra': extra}))
+            body = Template(event.email.body).render(Context({'ticket': ticket, 'extra': extra}))
             sname = _("SUBJECT")
             bname = _("BODY")
             email = "%s:\n%s\n\n%s:\n%s" % (sname, subject, bname, body)
