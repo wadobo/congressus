@@ -19,6 +19,11 @@
     };
 
     ws.send = function(msg) {
-        ws.socket.send(msg);
+        try {
+            ws.socket.send(msg);
+        } catch (e) {
+            // no websocket, continuing anyway
+            console.log("Can't send messasge to websocket");
+        }
     };
 }).call(this);
