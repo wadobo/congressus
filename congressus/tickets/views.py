@@ -113,7 +113,7 @@ class MultiPurchaseView(TemplateView):
 
         client = self.request.session.get('client', '')
         if not client:
-            messages.add_message(request, messages.ERROR, _("Session has expired: you should select seats again. Seats save for you during %s minutes. <a href='#'>Click here for restart</a>" % (settings.EXPIRED_SEAT_H/60)))
+            messages.add_message(request, messages.ERROR, _("Session has expired: you should select seats again. Seats save for you during %s minutes. <a href='#'>Click here for restart</a>") % (settings.EXPIRED_SEAT_H/60))
             return redirect('multipurchase', ev=ev.slug)
         form = MPRegisterForm(request.POST,
                               event=ev, ids=ids, seats=seats,
@@ -246,7 +246,7 @@ class Payment(TemplateView):
         if not tk.confirmed and (not tk.order_tpv or ctx['error']):
             tk.gen_order_tpv()
 
-        messages.add_message(self.request, messages.INFO, _("You should complete the proccess of payment in less than %s minutes." % (settings.EXPIRED_SEAT_C/60)))
+        messages.add_message(self.request, messages.INFO, _("You should complete the proccess of payment in less than %s minutes.") % (settings.EXPIRED_SEAT_C/60))
 
         return ctx
 
@@ -254,7 +254,7 @@ class Payment(TemplateView):
         tk = get_ticket_or_404(order=order)
         client = self.request.session.get('client', '')
         if not client:
-            messages.add_message(request, messages.ERROR, _("Session has expired: you should confirm payment in less than %s minutes. You need selected seats again." % (settings.EXPIRED_SEAT_H/60)))
+            messages.add_message(request, messages.ERROR, _("Session has expired: you should confirm payment in less than %s minutes. You need selected seats again.") % (settings.EXPIRED_SEAT_H/60))
             return redirect('multipurchase', ev=ev.slug)
 
         # Expired time reset to expired_time_TPV
