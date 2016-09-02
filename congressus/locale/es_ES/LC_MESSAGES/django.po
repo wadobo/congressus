@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-02 10:50+0200\n"
-"PO-Revision-Date: 2016-09-02 10:50+0200\n"
+"POT-Creation-Date: 2016-09-02 12:02+0200\n"
+"PO-Revision-Date: 2016-09-02 12:02+0200\n"
 "Last-Translator: Daniel Garcia Moreno <danigm@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
 "Language: es\n"
@@ -918,7 +918,6 @@ msgid "ticket used date"
 msgstr "fecha de uso de entrada"
 
 #: tickets/models.py:313 tickets/templates/emails/ticket-detail.txt:2
-#: tickets/templates/tickets/multipurchase.html:91
 msgid "ticket"
 msgstr "entrada"
 
@@ -1060,6 +1059,10 @@ msgstr "Escenario"
 #: tickets/templates/tickets/map.html:35
 msgid "Loading..."
 msgstr "Cargando..."
+
+#: tickets/templates/tickets/multipurchase.html:91
+msgid "u"
+msgstr "ud"
 
 #: tickets/templates/tickets/multipurchase.html:115
 #: windows/templates/windows/multipurchase.html:73
@@ -1355,6 +1358,9 @@ msgstr "La entrada va a ser comprada, ¿estás seguro?"
 #: windows/views.py:49
 msgid "This user can't access in this ticket window"
 msgstr "Este usuario no puede acceder a esta taquilla"
+
+#~ msgid "U."
+#~ msgstr "UD."
 
 #~ msgid ""
 #~ "Session has expired: you should select seats again. Seats save for you "

@@ -48,9 +48,9 @@
                         {% for session in space.sessions.all %}
                             <div class="row session-row {% cycle 'odd' 'even' %}">
                                 {% if session.space.numbered %}
-                                <div class="col-md-4 col-xs-9">
+                                <div class="col-md-5 col-xs-9">
                                 {% else %}
-                                <div class="col-md-6 col-xs-12">
+                                <div class="col-md-7 col-xs-12">
                                 {% endif %}
                                     <span class="session-name">{{ session.name }}</span>
                                     <div class="text-muted text-date">
@@ -66,7 +66,7 @@
                                     />
                                 </div>
                                 {% endif %}
-                                <div class="sessioninput-td col-md-6">
+                                <div class="sessioninput-td col-md-5">
                                     <div class="sessioninput-group input-group">
                                         <input id="{{ session.id }}" class="sessioninput form-control"
                                                  min='0' max='{{ max_seat_by_session }}' type="text"
@@ -88,7 +88,7 @@
                                                 x{{ session.window_price }} €
                                             {% else %}
                                                 {{ session.price }} €
-                                                <span>/ {% trans "ticket" %}</span>
+                                                <span>/ {% trans "u" %}</span>
                                             {% endif %}
                                         </span>
                                         {% if subsum %}
