@@ -55,7 +55,7 @@
                                     <span class="session-name">{{ session.name }}</span>
                                     <div class="text-muted text-date">
                                         {{ session.start|date:"d/m/Y" }}
-                                        <span class="session-hour">({{ session.start.time }} h.)</span>
+                                        <span class="session-hour">({{ session.start|date:"H:i" }})</span>
                                     </div>
                                 </div>
                                 {% if session.space.numbered %}
