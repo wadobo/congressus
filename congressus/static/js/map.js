@@ -8,6 +8,9 @@
         var display = '.display-' + session + '-' + layoutid;
         parentObj.find('.display').hide();
         parentObj.find(display).show();
+        try {
+            parentObj.find(display + ':visible')[0].scrollIntoViewIfNeeded();
+        } catch (e) {};
     },
 
     map.clickSeat = function(obj) {
@@ -73,11 +76,11 @@
                 map.clickSeat($(this));
             });
 
-            // binding show for the next click
-            obj.unbind("click").click(function() {
-                map.showLayout(parentObj, obj);
-            });
+        });
 
+        // binding show for the next click
+        obj.unbind("click").click(function() {
+            map.showLayout(parentObj, obj);
         });
     },
 

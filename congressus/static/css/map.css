@@ -43,6 +43,10 @@
     width: 100%;
 }
 
+.map {
+    overflow: auto;
+}
+
 .seat-layout {
     border-collapse: separate;
     border-spacing: 5px;
