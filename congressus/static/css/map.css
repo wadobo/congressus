@@ -12,6 +12,11 @@
     cursor: pointer;
 }
 
+.layout.l0 {
+    background-color: #ffa9a7;
+    cursor: not-allowed;
+}
+
 #display {
 }
 

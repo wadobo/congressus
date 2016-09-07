@@ -205,6 +205,11 @@ class SeatLayout(models.Model):
     def free(self):
         return self.layout.count('L')
 
+    def free_seats(self, session):
+        from tickets.models import TicketSeatHold
+        n = TicketSeatHold.objects.filter(session=session, layout=self).count()
+        return self.free() - n
+
     def contiguous_seats(self, amount, holded, col_start):
         """ Free contiguous seats in a row. """
         layout = self.real_rows()

@@ -8,12 +8,13 @@
                 {% if c == 'scene' %}
                     {% scene_span session map %}
                 {% elif c %}
-                    <td class="layout layout-{{ session.id }}-{{ c.id }}"
+                    {% free_seats c session as free %}
+                    <td class="layout layout-{{ session.id }}-{{ c.id }} l{{ free }}"
                     data-session="{{ session.id }}" data-id="{{ c.id }}"
                     data-name="{{ c.name }}" data-layout="{{ c.layout }}"
                     data-dir="{{ c.direction }}"
                     data-glyph="{{ c.glyph }}">
-                        <span id="badge-{{ session.id }}-{{ c.id }}" class="label label-default">0</span> {{ c }} / {{ c.free }}
+                        <span id="badge-{{ session.id }}-{{ c.id }}" class="label label-default">0</span> {{ c }} / {{ free }}
                         <span class="glyphicon {{ c.glyph }}" aria-hidden="true"></span>
                     </td>
                 {% else %}

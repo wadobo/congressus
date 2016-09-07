@@ -49,3 +49,8 @@ def key(data, key, prefix="", default=''):
     if prefix:
         k = prefix + str(key)
     return data.get(k, default)
+
+
+@register.simple_tag
+def free_seats(layout, session):
+    return layout.free_seats(session)
