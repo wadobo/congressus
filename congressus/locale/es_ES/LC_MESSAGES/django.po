@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-02 12:02+0200\n"
-"PO-Revision-Date: 2016-09-02 12:02+0200\n"
+"POT-Creation-Date: 2016-09-08 11:33+0200\n"
+"PO-Revision-Date: 2016-09-08 11:34+0200\n"
 "Last-Translator: Daniel Garcia Moreno <danigm@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
 "Language: es\n"
@@ -23,8 +23,8 @@ msgid "Access"
 msgstr "Control de acceso"
 
 #: access/models.py:11 dashboard/models.py:32 events/models.py:79
-#: events/models.py:142 events/models.py:224 events/models.py:333
-#: events/models.py:359 events/models.py:374 invs/models.py:23
+#: events/models.py:142 events/models.py:229 events/models.py:338
+#: events/models.py:364 events/models.py:379 invs/models.py:23
 #: tickets/models.py:198 tickets/models.py:273 tickets/models.py:397
 #: windows/models.py:30
 msgid "event"
@@ -33,7 +33,7 @@ msgstr "evento"
 #: access/models.py:13 access/templates/access/list.html:33
 #: dashboard/models.py:33 events/models.py:49 events/models.py:68
 #: events/models.py:105 events/models.py:143 events/models.py:155
-#: events/models.py:225 events/models.py:245 events/models.py:423
+#: events/models.py:230 events/models.py:250 events/models.py:428
 #: invs/models.py:19 windows/models.py:32
 #: windows/templates/windows/list.html:32
 msgid "name"
@@ -68,7 +68,7 @@ msgstr "incorrecto"
 msgid "incorrect"
 msgstr "incorrecto"
 
-#: access/models.py:41 events/models.py:322 events/models.py:362
+#: access/models.py:41 events/models.py:327 events/models.py:367
 #: invs/models.py:59 tickets/models.py:308
 msgid "used"
 msgstr "usado"
@@ -147,7 +147,7 @@ msgstr "nombre de usuario"
 msgid "password"
 msgstr "contraseña"
 
-#: access/templates/access/login.html:28 events/models.py:261
+#: access/templates/access/login.html:28 events/models.py:266
 #: tickets/models.py:419
 msgid "session"
 msgstr "sesión"
@@ -285,8 +285,8 @@ msgstr "por horas"
 msgid "each minute"
 msgstr "cada minuto"
 
-#: dashboard/models.py:23 events/models.py:50 events/models.py:363
-#: events/models.py:376 invs/models.py:114 tickets/models.py:401
+#: dashboard/models.py:23 events/models.py:50 events/models.py:368
+#: events/models.py:381 invs/models.py:114 tickets/models.py:401
 #: tickets/models.py:423 windows/models.py:104
 msgid "type"
 msgstr "tipo"
@@ -463,188 +463,188 @@ msgstr "disposición de asientos"
 msgid "seat Layouts"
 msgstr "disposiciones de asientos"
 
-#: events/models.py:228
+#: events/models.py:233
 msgid "capacity"
 msgstr "capacidad"
 
-#: events/models.py:229
+#: events/models.py:234
 msgid "numbered"
 msgstr "numerado"
 
-#: events/models.py:230
+#: events/models.py:235
 msgid "seat map"
 msgstr "graderio"
 
-#: events/models.py:232 events/models.py:375 invs/models.py:49
+#: events/models.py:237 events/models.py:380 invs/models.py:49
 #: tickets/models.py:200 tickets/models.py:277
 msgid "order"
 msgstr "orden"
 
-#: events/models.py:236 events/models.py:244
+#: events/models.py:241 events/models.py:249
 msgid "space"
 msgstr "espacio"
 
-#: events/models.py:237
+#: events/models.py:242
 msgid "spaces"
 msgstr "espacios"
 
-#: events/models.py:248 invs/models.py:31 tickets/models.py:302
+#: events/models.py:253 invs/models.py:31 tickets/models.py:302
 msgid "start date"
 msgstr "fecha llegada"
 
-#: events/models.py:249 invs/models.py:32 tickets/models.py:303
+#: events/models.py:254 invs/models.py:32 tickets/models.py:303
 msgid "end date"
 msgstr "fecha salida"
 
-#: events/models.py:251 tickets/templates/emails/ticket-info.txt:7
+#: events/models.py:256 tickets/templates/emails/ticket-info.txt:7
 msgid "ticket price"
 msgstr "precio de entrada"
 
-#: events/models.py:252
+#: events/models.py:257
 msgid "price in the ticket window"
 msgstr "precio en taquilla"
 
-#: events/models.py:253
+#: events/models.py:258
 msgid "ticket tax percentage"
 msgstr "porcentaje de impuestos"
 
-#: events/models.py:255
+#: events/models.py:260
 msgid "template"
 msgstr "plantilla"
 
-#: events/models.py:256
+#: events/models.py:261
 msgid "autoseat mode"
 msgstr "modo auto-asiento"
 
-#: events/models.py:262 invs/models.py:26
+#: events/models.py:267 invs/models.py:26
 msgid "sessions"
 msgstr "sesiones"
 
-#: events/models.py:318
+#: events/models.py:323
 msgid "orig"
 msgstr "original"
 
-#: events/models.py:319
+#: events/models.py:324
 msgid "extra"
 msgstr "extra"
 
-#: events/models.py:320
+#: events/models.py:325
 msgid "Start at"
 msgstr "Comienzo"
 
-#: events/models.py:321
+#: events/models.py:326
 msgid "End at"
 msgstr "Fin"
 
-#: events/models.py:325
+#: events/models.py:330
 msgid "extra session"
 msgstr "sesión extra"
 
-#: events/models.py:326
+#: events/models.py:331
 msgid "extra sessions"
 msgstr "sesiones extra"
 
-#: events/models.py:334
+#: events/models.py:339
 msgid "subject"
 msgstr "asunto"
 
-#: events/models.py:335
+#: events/models.py:340
 msgid "body"
 msgstr "cuerpo"
 
-#: events/models.py:338
+#: events/models.py:343
 msgid "confirm email"
 msgstr "email de confirmación"
 
-#: events/models.py:339
+#: events/models.py:344
 msgid "confirm emails"
 msgstr "emails de confirmación"
 
-#: events/models.py:350 tickets/models.py:211 tickets/models.py:291
+#: events/models.py:355 tickets/models.py:211 tickets/models.py:291
 msgid "email"
 msgstr "correo electrónico"
 
-#: events/models.py:351
+#: events/models.py:356
 msgid "attach"
 msgstr "adjunto"
 
-#: events/models.py:354
+#: events/models.py:359
 msgid "email attachment"
 msgstr "adjunto de email"
 
-#: events/models.py:355
+#: events/models.py:360
 msgid "email attachments"
 msgstr "adjuntos de emails"
 
-#: events/models.py:360 windows/models.py:34
+#: events/models.py:365 windows/models.py:34
 msgid "code"
 msgstr "código"
 
-#: events/models.py:361
+#: events/models.py:366
 msgid "for person"
 msgstr "para persona"
 
-#: events/models.py:366 tickets/models.py:275
+#: events/models.py:371 tickets/models.py:275
 msgid "invitation code"
 msgstr "código de invitación"
 
-#: events/models.py:367
+#: events/models.py:372
 msgid "invitation codes"
 msgstr "códigos de invitación"
 
-#: events/models.py:377
+#: events/models.py:382
 msgid "label"
 msgstr "etiqueta"
 
-#: events/models.py:378
+#: events/models.py:383
 msgid "help text"
 msgstr "texto de ayuda"
 
-#: events/models.py:379
+#: events/models.py:384
 msgid "required"
 msgstr "obligatorio"
 
-#: events/models.py:380
+#: events/models.py:385
 msgid "options"
 msgstr "opciones"
 
-#: events/models.py:386
+#: events/models.py:391
 msgid "ticket field"
 msgstr "campo de entrada"
 
-#: events/models.py:387
+#: events/models.py:392
 msgid "ticket fields"
 msgstr "campos de entrada"
 
-#: events/models.py:400
+#: events/models.py:405
 msgid "Enter a valid phone"
 msgstr "Introduce un teléfono válido"
 
-#: events/models.py:424
+#: events/models.py:429
 msgid "header"
 msgstr "cabecera"
 
-#: events/models.py:425
+#: events/models.py:430
 msgid "sponsors"
 msgstr "patrocinadores"
 
-#: events/models.py:426
+#: events/models.py:431
 msgid "contributors"
 msgstr "colaboradores"
 
-#: events/models.py:427
+#: events/models.py:432
 msgid "links"
 msgstr "enlaces"
 
-#: events/models.py:428
+#: events/models.py:433
 msgid "info text"
 msgstr "texto informativo"
 
-#: events/models.py:431
+#: events/models.py:436
 msgid "ticket template"
 msgstr "plantilla de entrada"
 
-#: events/models.py:432
+#: events/models.py:437
 msgid "ticket templates"
 msgstr "plantillas de entrada"
 
@@ -1056,7 +1056,7 @@ msgstr "Información personal"
 msgid "Scene"
 msgstr "Escenario"
 
-#: tickets/templates/tickets/map.html:35
+#: tickets/templates/tickets/map.html:38
 msgid "Loading..."
 msgstr "Cargando..."
 
@@ -1197,22 +1197,21 @@ msgstr "Patrocinadores"
 msgid "Contributors"
 msgstr "Colaboradores"
 
-#: tickets/views.py:116
+#: tickets/views.py:119
 #, python-format
 msgid ""
 "Session has expired: you should select seats again. Seats save for you "
-"during %s minutes. <a href=\"\">Click here for restart</a>"
+"during %s minutes."
 msgstr ""
 "La sesión ha expirado: debes seleccionar los asientos de nuevo. Los asientos "
-"se guardan durante %s minutos. <a href=\"\">Pincha aquí para reiniciar el "
-"proceso de selección.</a>"
+"se guardan durante %s minutos."
 
-#: tickets/views.py:249
+#: tickets/views.py:252
 #, python-format
 msgid "You should complete the proccess of payment in less than %s minutes."
 msgstr "Deberías de completar el proceso  de pago en menos de %s minutos."
 
-#: tickets/views.py:257
+#: tickets/views.py:260
 #, python-format
 msgid ""
 "Session has expired: you should confirm payment in less than %s minutes. You "
@@ -1221,19 +1220,19 @@ msgstr ""
 "La sesión ha expirado: debes confirmar el pago en menos de %s minutos. "
 "Necesitas seleccionar los asientos de nuevo."
 
-#: tickets/views.py:471
+#: tickets/views.py:474
 msgid "SUBJECT"
 msgstr "ASUNTO"
 
-#: tickets/views.py:472
+#: tickets/views.py:475
 msgid "BODY"
 msgstr "CUERPO"
 
-#: tickets/views.py:475
+#: tickets/views.py:478
 msgid "You should assing this email_confirm to some events."
 msgstr "Tienes que asignar este email_confirm a algún evento."
 
-#: tickets/views.py:501
+#: tickets/views.py:504
 msgid "neccessary select invitation type"
 msgstr "necesario seleccionar tipo de invitación"
 
@@ -1359,6 +1358,14 @@ msgstr "La entrada va a ser comprada, ¿estás seguro?"
 msgid "This user can't access in this ticket window"
 msgstr "Este usuario no puede acceder a esta taquilla"
 
+#~ msgid ""
+#~ "Session has expired: you should select seats again. Seats save for you "
+#~ "during %s minutes. <a href=\"\">Click here for restart</a>"
+#~ msgstr ""
+#~ "La sesión ha expirado: debes seleccionar los asientos de nuevo. Los "
+#~ "asientos se guardan durante %s minutos. <a href=\"\">Pincha aquí para "
+#~ "reiniciar el proceso de selección.</a>"
+
 #~ msgid "U."
 #~ msgstr "UD."
 
@@ -1369,13 +1376,6 @@ msgstr "Este usuario no puede acceder a esta taquilla"
 #~ "La sesión ha expirado: debes seleccionar los asientos de nuevo. Los "
 #~ "asientos se guardan durante %s minutos. <a href=\"\">Pincha aquí para "
 #~ "reiniciar el proceso de selección.</a>"
-
-#~ msgid ""
-#~ "Session has expired: you should select seats again. Seats save for you "
-#~ "during time limit"
-#~ msgstr ""
-#~ "La sesión ha expirado: debes seleccionar los asientos de nuevo. Los "
-#~ "asientos se guardan durante un tiempo limitado."
 
 #~ msgid "Generate Invitations"
 #~ msgstr "Generar invitaciones"

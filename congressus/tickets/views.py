@@ -92,12 +92,15 @@ class MultiPurchaseView(TemplateView):
         ctx['ev'] = ev
         ctx['form'] = MPRegisterForm(event=ev)
         client = self.request.session.get('client', '')
-        authenticated_user = self.request.user.is_authenticated()
-        if not client and not authenticated_user:
+
+        if not client:
             client = ''.join(random.choice(string.hexdigits) for _ in range(20))
             self.request.session['client'] = client
+
+        authenticated_user = self.request.user.is_authenticated()
+        if not authenticated_user:
             # Expired time reset. If not new client
-            seathold_update(client, type='C')
+            seathold_update(client, type='H')
             self.request.session.set_expiry(settings.EXPIRED_SEAT_H)
 
         ctx['client'] = client
@@ -113,7 +116,7 @@ class MultiPurchaseView(TemplateView):
 
         client = self.request.session.get('client', '')
         if not client:
-            messages.error(request, _('Session has expired: you should select seats again. Seats save for you during %s minutes. <a href="">Click here for restart</a>') % (settings.EXPIRED_SEAT_H/60))
+            messages.error(request, _('Session has expired: you should select seats again. Seats save for you during %s minutes.') % (settings.EXPIRED_SEAT_H/60))
             return redirect('multipurchase', ev=ev.slug)
         form = MPRegisterForm(request.POST,
                               event=ev, ids=ids, seats=seats,
