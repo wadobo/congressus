@@ -134,9 +134,47 @@ class BaseTicketMixing:
     def get_absolute_url(self):
         return reverse('payment', kwargs={'order': self.order})
 
+    def is_mp(self):
+        return False
+
+    def hold_seats(self):
+        all_tk = []
+        if self.is_mp():
+            all_tk = self.tickets.filter(session__space__numbered=True)
+        elif self.session.space.numbered:
+            all_tk = [self]
+
+        # Save reserved ticket in SeatHold
+        for t in all_tk:
+            tsh, created = TicketSeatHold.objects.get_or_create(
+                session=t.session,
+                layout=t.seat_layout,
+                seat=t.seat,
+                type='R'
+            )
+            tsh.client='CONFIRMED'
+            tsh.save()
+
+    def remove_hold_seats(self):
+        all_tk = []
+        if self.is_mp():
+            all_tk = self.tickets.filter(session__space__numbered=True)
+        elif self.session.space.numbered:
+            all_tk = [self]
+
+        # Save reserved ticket in SeatHold
+        for t in all_tk:
+            TicketSeatHold.objects.filter(
+                    session=t.session,
+                    layout=t.seat_layout,
+                    type='R',
+                    seat=t.seat
+            ).delete()
+
     def confirm(self):
         self.confirmed = True
         self.save()
+        self.hold_seats()
 
 
 class BaseExtraData:
@@ -243,10 +281,6 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
 
     def get_window_price(self):
         return sum(i.get_window_price() for i in self.tickets.all())
-
-    def confirm(self):
-        self.confirmed = True
-        self.save()
 
     def is_mp(self):
         return True

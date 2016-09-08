@@ -10,14 +10,14 @@ from admin_csv import CSVMixin
 
 def confirm(modeladmin, request, queryset):
     for i in queryset:
-        i.confirmed = True
-        i.save()
+        i.confirm()
 confirm.short_description = _("Manual confirm")
 
 
 def unconfirm(modeladmin, request, queryset):
     for i in queryset:
         i.confirmed = False
+        i.remove_hold_seats()
         i.save()
 unconfirm.short_description = _("Manual unconfirm")
 

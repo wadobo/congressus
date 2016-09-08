@@ -115,12 +115,17 @@ class MultiPurchaseView(TemplateView):
         seats = [(i[len('seats_'):], request.POST[i].split(',')) for i in request.POST if i.startswith('seats_')]
 
         client = self.request.session.get('client', '')
-        if not client:
-            messages.error(request, _('Session has expired: you should select seats again. Seats save for you during %s minutes.') % (settings.EXPIRED_SEAT_H/60))
-            return redirect('multipurchase', ev=ev.slug)
+
         form = MPRegisterForm(request.POST,
                               event=ev, ids=ids, seats=seats,
-                              client=request.session.get('client', ''))
+                              client=client)
+
+        if not client:
+            messages.error(request, _('Session has expired: you should select seats again. Seats save for you during %s minutes.') % (settings.EXPIRED_SEAT_H/60))
+            ctx = self.get_context_data()
+            ctx['form'] = form
+            return render(request, self.template_name, ctx)
+
         if form.is_valid():
             mp = form.save()
             mp.send_reg_email()
@@ -131,6 +136,7 @@ class MultiPurchaseView(TemplateView):
                 return redirect('thanks', order=mp.order)
 
             # Expired time reset
+            seathold_update(client, type='C')
             self.request.session.set_expiry(settings.EXPIRED_SEAT_C)
             return redirect('payment', order=mp.order)
 
@@ -310,26 +316,6 @@ class Confirm(View):
 
         tk = get_ticket_or_404(order_tpv=order_tpv)
         tk.confirm()
-
-        if isinstance(tk, Ticket):
-            all_tk = [tk]
-        else:
-            all_tk = tk.tickets.all()
-
-        # Save reserved ticket in SeatHold
-        client = self.request.session.get('client', '')
-        if not client:
-            client = ''.join(random.choice(string.hexdigits) for _ in range(20))
-            self.request.session['client'] = client
-        for t in all_tk:
-            tsh, new = TicketSeatHold.objects.get_or_create(
-                    session=t.session,
-                    layout=t.seat_layout,
-                    seat=t.seat
-            )
-            tsh.client = client
-            tsh.type = 'R'
-            tsh.save()
 
         online_sale(tk)
         return HttpResponse("")
