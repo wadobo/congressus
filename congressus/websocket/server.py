@@ -54,20 +54,24 @@ class WSServer:
         self.server.run_forever()
 
     def drop_seat(self, hold):
+        session = hold.session
+        layout = hold.layout
+
         row, col = hold.seat.split('-')
         data = {
             'action': 'drop',
-            'session': hold.session.id,
-            'layout': hold.layout.id,
+            'session': session.id,
+            'layout': layout.id,
             'row': row,
             'col': col,
         }
 
-        confirmed = not hold.session.is_seat_available(hold.layout, row, col)
+        hold.delete()
+
+        confirmed = not session.is_seat_available(layout, row, col)
         if confirmed:
             data['action'] = 'confirm'
 
-        hold.delete()
         self.server.send_message_to_all(json.dumps(data))
 
     # Protocol definitions
