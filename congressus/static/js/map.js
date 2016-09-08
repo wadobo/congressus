@@ -8,9 +8,7 @@
         var display = '.display-' + session + '-' + layoutid;
         parentObj.find('.display').hide();
         parentObj.find(display).show();
-        try {
-            parentObj.find(display + ':visible')[0].scrollIntoViewIfNeeded();
-        } catch (e) {};
+        try { $("#separator")[0].scrollIntoView(true); } catch (e) {};
     },
 
     map.clickSeat = function(obj) {
@@ -87,6 +85,7 @@
     map.bindLayout = function(obj) {
         obj.find(".layout").unbind("click").click(function() {
             map.loadLayout(obj, $(this));
+            try { $("#separator")[0].scrollIntoView(true); } catch (e) {};
         });
 
         obj.find('.display').hide();
