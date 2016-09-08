@@ -14,8 +14,16 @@
             }
         };
         ws.socket.onopen = function (ev) { ws.cbs.fire('open', ev); };
-        ws.socket.onclose = function (ev) { ws.cbs.fire('close', ev); };
-        ws.socket.onerror = function (ev) { ws.cbs.fire('error', ev); };
+        ws.socket.onclose = function (ev) {
+            console.log("websocket closed");
+            console.log(ev);
+            ws.cbs.fire('close', ev);
+        };
+        ws.socket.onerror = function (ev) {
+            console.log("websocket error");
+            console.log(ev);
+            ws.cbs.fire('error', ev);
+        };
     };
 
     ws.send = function(msg) {

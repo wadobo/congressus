@@ -1,6 +1,8 @@
 import json
 from django.core import serializers
 
+from threading import Timer
+
 from websocket_server import WebsocketServer
 from access.models import AccessControl
 from access.models import LogAccessControl
@@ -17,6 +19,13 @@ class WSServer:
         self.server.set_fn_new_client(self.on_connect)
         self.server.set_fn_message_received(self.on_msg)
         self.server.set_fn_client_left(self.on_disconnect)
+
+    def ping(self):
+        self.server.send_message_to_all(json.dumps({'action': 'ping'}))
+
+        # pinging every 50 seconds to avoid disconnection
+        t = Timer(50, self.ping)
+        t.start()
 
     def on_connect(self, client, server):
         #server.send_message_to_all("Hey all, a new client has joined us")
@@ -41,6 +50,7 @@ class WSServer:
             print("Error: ", e)
 
     def run(self):
+        self.ping()
         self.server.run_forever()
 
     def drop_seat(self, hold):
