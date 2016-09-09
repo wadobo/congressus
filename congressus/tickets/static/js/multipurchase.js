@@ -1,6 +1,14 @@
 var old_session = -1;
 var old_layout = -1;
 
+var delay = (function () {
+    var timer = 0;
+    return function (callback, ms) {
+        clearTimeout(timer);
+        timer = setTimeout(callback, ms);
+    };
+})();
+
 function check_warning(w, sessions) {
     if (w.type == 'req') {
         var firstFound = true;
@@ -214,16 +222,19 @@ function autoSelectSeat(s, n) {
     });
 }
 
-function seatsChange() {
-    // this should be a .sessioninput
-    recalcSums($(this));
+function seatsChange(obj) {
+    // obj should be a .sessioninput
+    if (!obj) {
+        obj = $(this);
+    }
+    recalcSums(obj);
     recalcTotal();
 
     // if no name in the input, it's a numbered session
     // we do here the seat auto selection
-    if (!$(this).attr("name")) {
-        var val = $(this).val();
-        var s = $(this).data('session');
+    if (!obj.attr("name")) {
+        var val = obj.val();
+        var s = obj.data('session');
         var v = $("#seats-"+s).val();
         if (!v) {
             autoSelectSeat(s, val);
@@ -301,8 +312,14 @@ $(document).ready(function() {
     });
 
     // calculating sums
-    $('.sessioninput').change(seatsChange);
-    $('.sessioninput').keyup(seatsChange);
+    $('.sessioninput').change(function() {
+        var obj = $(this);
+        delay(function() { seatsChange(obj) }, 500);
+    });
+    $('.sessioninput').keyup(function() {
+        var obj = $(this);
+        delay(function() { seatsChange(obj) }, 500);
+    });
     recalcTotal();
 
     $('.sessioninput').each(function() {
