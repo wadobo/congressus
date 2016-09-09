@@ -395,7 +395,7 @@ class AutoSeats(View):
         if seats:
             ctx['seats'] = seats
         else:
-            ctx['error'] = "Not found contiguous seats"
+            ctx['error'] = _("Not found contiguous seats, please, select manually using the green button")
 
         return HttpResponse(json.dumps(ctx), content_type="application/json")
 autoseats = csrf_exempt(AutoSeats.as_view())

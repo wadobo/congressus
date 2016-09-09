@@ -6,7 +6,11 @@ function autoSeats(session, amount_seats) {
         dataType: 'JSON',
         url: "/seats/auto/",
         success: function(msg){
-            deferred.resolve(msg["seats"]);
+            if (msg.error) {
+                deferred.reject(msg.error);
+            } else {
+                deferred.resolve(msg["seats"]);
+            }
         }
     });
     return deferred.promise();

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-08 11:33+0200\n"
-"PO-Revision-Date: 2016-09-08 11:34+0200\n"
+"POT-Creation-Date: 2016-09-09 14:05+0200\n"
+"PO-Revision-Date: 2016-09-09 14:08+0200\n"
 "Last-Translator: Daniel Garcia Moreno <danigm@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
 "Language: es\n"
@@ -22,25 +22,21 @@ msgstr ""
 msgid "Access"
 msgstr "Control de acceso"
 
-#: access/models.py:11 dashboard/models.py:32 events/models.py:79
-#: events/models.py:142 events/models.py:229 events/models.py:338
-#: events/models.py:364 events/models.py:379 invs/models.py:23
-#: tickets/models.py:198 tickets/models.py:273 tickets/models.py:397
+#: access/models.py:11 dashboard/models.py:32 events/models.py:79 events/models.py:142
+#: events/models.py:230 events/models.py:339 events/models.py:365 events/models.py:380
+#: invs/models.py:23 tickets/models.py:236 tickets/models.py:307 tickets/models.py:431
 #: windows/models.py:30
 msgid "event"
 msgstr "evento"
 
-#: access/models.py:13 access/templates/access/list.html:33
-#: dashboard/models.py:33 events/models.py:49 events/models.py:68
-#: events/models.py:105 events/models.py:143 events/models.py:155
-#: events/models.py:230 events/models.py:250 events/models.py:428
-#: invs/models.py:19 windows/models.py:32
-#: windows/templates/windows/list.html:32
+#: access/models.py:13 access/templates/access/list.html:33 dashboard/models.py:33
+#: events/models.py:49 events/models.py:68 events/models.py:105 events/models.py:143
+#: events/models.py:155 events/models.py:231 events/models.py:251 events/models.py:429
+#: invs/models.py:19 windows/models.py:32 windows/templates/windows/list.html:32
 msgid "name"
 msgstr "nombre"
 
-#: access/models.py:16 access/templates/access/list.html:34
-#: windows/models.py:37
+#: access/models.py:16 access/templates/access/list.html:34 windows/models.py:37
 msgid "location"
 msgstr "localización"
 
@@ -68,8 +64,8 @@ msgstr "incorrecto"
 msgid "incorrect"
 msgstr "incorrecto"
 
-#: access/models.py:41 events/models.py:327 events/models.py:367
-#: invs/models.py:59 tickets/models.py:308
+#: access/models.py:41 events/models.py:328 events/models.py:368 invs/models.py:59
+#: tickets/models.py:342
 msgid "used"
 msgstr "usado"
 
@@ -130,30 +126,25 @@ msgstr "usado hoy"
 msgid "today maybe"
 msgstr "quizás hoy"
 
-#: access/templates/access/login.html:20
-#: windows/templates/windows/login.html:18
+#: access/templates/access/login.html:20 windows/templates/windows/login.html:18
 msgid "Please sign in"
 msgstr "Por favor, accede"
 
 #: access/templates/access/login.html:22 access/templates/access/login.html:23
-#: windows/templates/windows/login.html:20
-#: windows/templates/windows/login.html:21
+#: windows/templates/windows/login.html:20 windows/templates/windows/login.html:21
 msgid "username"
 msgstr "nombre de usuario"
 
 #: access/templates/access/login.html:25 access/templates/access/login.html:26
-#: windows/templates/windows/login.html:23
-#: windows/templates/windows/login.html:24
+#: windows/templates/windows/login.html:23 windows/templates/windows/login.html:24
 msgid "password"
 msgstr "contraseña"
 
-#: access/templates/access/login.html:28 events/models.py:266
-#: tickets/models.py:419
+#: access/templates/access/login.html:28 events/models.py:267 tickets/models.py:453
 msgid "session"
 msgstr "sesión"
 
-#: access/templates/access/login.html:35 events/models.py:146
-#: events/models.py:165
+#: access/templates/access/login.html:35 events/models.py:146 events/models.py:165
 msgid "gate"
 msgstr "puerta"
 
@@ -162,8 +153,7 @@ msgstr "puerta"
 msgid "None"
 msgstr "Nada"
 
-#: access/templates/access/login.html:43
-#: windows/templates/windows/login.html:26
+#: access/templates/access/login.html:43 windows/templates/windows/login.html:26
 msgid "sign in"
 msgstr "entrar"
 
@@ -285,9 +275,8 @@ msgstr "por horas"
 msgid "each minute"
 msgstr "cada minuto"
 
-#: dashboard/models.py:23 events/models.py:50 events/models.py:368
-#: events/models.py:381 invs/models.py:114 tickets/models.py:401
-#: tickets/models.py:423 windows/models.py:104
+#: dashboard/models.py:23 events/models.py:50 events/models.py:369 events/models.py:382
+#: invs/models.py:114 tickets/models.py:435 tickets/models.py:457 windows/models.py:104
 msgid "type"
 msgstr "tipo"
 
@@ -445,11 +434,10 @@ msgid "seats layout"
 msgstr "disposición de asientos"
 
 #: events/models.py:160
-msgid ""
-"the layout to select the numbered seat. L = Free, _ = Space, R = Reserved"
+msgid "the layout to select the numbered seat. L = Free, _ = Space, R = Reserved"
 msgstr ""
-"la disposición para seleccionar los asientos numerados. L = Libre, _ = Sin "
-"Asiento, R = Reservado"
+"la disposición para seleccionar los asientos numerados. L = Libre, _ = Sin Asiento, R = "
+"Reservado"
 
 #: events/models.py:164
 msgid "column start number"
@@ -463,188 +451,192 @@ msgstr "disposición de asientos"
 msgid "seat Layouts"
 msgstr "disposiciones de asientos"
 
-#: events/models.py:233
+#: events/models.py:234
 msgid "capacity"
 msgstr "capacidad"
 
-#: events/models.py:234
+#: events/models.py:235
 msgid "numbered"
 msgstr "numerado"
 
-#: events/models.py:235
+#: events/models.py:236
 msgid "seat map"
 msgstr "graderio"
 
-#: events/models.py:237 events/models.py:380 invs/models.py:49
-#: tickets/models.py:200 tickets/models.py:277
+#: events/models.py:238 events/models.py:381 invs/models.py:49 tickets/models.py:238
+#: tickets/models.py:311
 msgid "order"
 msgstr "orden"
 
-#: events/models.py:241 events/models.py:249
+#: events/models.py:242 events/models.py:250
 msgid "space"
 msgstr "espacio"
 
-#: events/models.py:242
+#: events/models.py:243
 msgid "spaces"
 msgstr "espacios"
 
-#: events/models.py:253 invs/models.py:31 tickets/models.py:302
+#: events/models.py:254 invs/models.py:31 tickets/models.py:336
 msgid "start date"
 msgstr "fecha llegada"
 
-#: events/models.py:254 invs/models.py:32 tickets/models.py:303
+#: events/models.py:255 invs/models.py:32 tickets/models.py:337
 msgid "end date"
 msgstr "fecha salida"
 
-#: events/models.py:256 tickets/templates/emails/ticket-info.txt:7
+#: events/models.py:257 tickets/templates/emails/ticket-info.txt:7
 msgid "ticket price"
 msgstr "precio de entrada"
 
-#: events/models.py:257
+#: events/models.py:258
 msgid "price in the ticket window"
 msgstr "precio en taquilla"
 
-#: events/models.py:258
+#: events/models.py:259
 msgid "ticket tax percentage"
 msgstr "porcentaje de impuestos"
 
-#: events/models.py:260
+#: events/models.py:261
 msgid "template"
 msgstr "plantilla"
 
-#: events/models.py:261
+#: events/models.py:262
 msgid "autoseat mode"
 msgstr "modo auto-asiento"
 
-#: events/models.py:267 invs/models.py:26
+#: events/models.py:268 invs/models.py:26
 msgid "sessions"
 msgstr "sesiones"
 
-#: events/models.py:323
+#: events/models.py:324
 msgid "orig"
 msgstr "original"
 
-#: events/models.py:324
+#: events/models.py:325
 msgid "extra"
 msgstr "extra"
 
-#: events/models.py:325
+#: events/models.py:326
 msgid "Start at"
 msgstr "Comienzo"
 
-#: events/models.py:326
+#: events/models.py:327
 msgid "End at"
 msgstr "Fin"
 
-#: events/models.py:330
+#: events/models.py:331
 msgid "extra session"
 msgstr "sesión extra"
 
-#: events/models.py:331
+#: events/models.py:332
 msgid "extra sessions"
 msgstr "sesiones extra"
 
-#: events/models.py:339
+#: events/models.py:340
 msgid "subject"
 msgstr "asunto"
 
-#: events/models.py:340
+#: events/models.py:341
 msgid "body"
 msgstr "cuerpo"
 
-#: events/models.py:343
+#: events/models.py:344
 msgid "confirm email"
 msgstr "email de confirmación"
 
-#: events/models.py:344
+#: events/models.py:345
 msgid "confirm emails"
 msgstr "emails de confirmación"
 
-#: events/models.py:355 tickets/models.py:211 tickets/models.py:291
+#: events/models.py:356 tickets/models.py:249 tickets/models.py:325
 msgid "email"
 msgstr "correo electrónico"
 
-#: events/models.py:356
+#: events/models.py:357
 msgid "attach"
 msgstr "adjunto"
 
-#: events/models.py:359
+#: events/models.py:360
 msgid "email attachment"
 msgstr "adjunto de email"
 
-#: events/models.py:360
+#: events/models.py:361
 msgid "email attachments"
 msgstr "adjuntos de emails"
 
-#: events/models.py:365 windows/models.py:34
+#: events/models.py:366 windows/models.py:34
 msgid "code"
 msgstr "código"
 
-#: events/models.py:366
+#: events/models.py:367
 msgid "for person"
 msgstr "para persona"
 
-#: events/models.py:371 tickets/models.py:275
+#: events/models.py:372 tickets/models.py:309
 msgid "invitation code"
 msgstr "código de invitación"
 
-#: events/models.py:372
+#: events/models.py:373
 msgid "invitation codes"
 msgstr "códigos de invitación"
 
-#: events/models.py:382
+#: events/models.py:383
 msgid "label"
 msgstr "etiqueta"
 
-#: events/models.py:383
+#: events/models.py:384
 msgid "help text"
 msgstr "texto de ayuda"
 
-#: events/models.py:384
+#: events/models.py:385
 msgid "required"
 msgstr "obligatorio"
 
-#: events/models.py:385
+#: events/models.py:386
 msgid "options"
 msgstr "opciones"
 
-#: events/models.py:391
+#: events/models.py:392
 msgid "ticket field"
 msgstr "campo de entrada"
 
-#: events/models.py:392
+#: events/models.py:393
 msgid "ticket fields"
 msgstr "campos de entrada"
 
-#: events/models.py:405
+#: events/models.py:406
 msgid "Enter a valid phone"
 msgstr "Introduce un teléfono válido"
 
-#: events/models.py:429
+#: events/models.py:430
 msgid "header"
 msgstr "cabecera"
 
-#: events/models.py:430
+#: events/models.py:431
 msgid "sponsors"
 msgstr "patrocinadores"
 
-#: events/models.py:431
+#: events/models.py:432
 msgid "contributors"
 msgstr "colaboradores"
 
-#: events/models.py:432
+#: events/models.py:433
 msgid "links"
 msgstr "enlaces"
 
-#: events/models.py:433
+#: events/models.py:434
 msgid "info text"
 msgstr "texto informativo"
 
-#: events/models.py:436
+#: events/models.py:435
+msgid "note"
+msgstr "nota"
+
+#: events/models.py:438
 msgid "ticket template"
 msgstr "plantilla de entrada"
 
-#: events/models.py:437
+#: events/models.py:439
 msgid "ticket templates"
 msgstr "plantillas de entrada"
 
@@ -672,20 +664,19 @@ msgstr "tipos de invitación"
 msgid "generator"
 msgstr "generador"
 
-#: invs/models.py:50 invs/models.py:121 tickets/models.py:203
-#: tickets/models.py:280
+#: invs/models.py:50 invs/models.py:121 tickets/models.py:241 tickets/models.py:314
 msgid "created at"
 msgstr "creado el"
 
-#: invs/models.py:51 tickets/models.py:213 tickets/models.py:292
+#: invs/models.py:51 tickets/models.py:251 tickets/models.py:326
 msgid "extra data"
 msgstr "datos extra"
 
-#: invs/models.py:55 tickets/models.py:288
+#: invs/models.py:55 tickets/models.py:322
 msgid "seat layout"
 msgstr "disposición de asientos"
 
-#: invs/models.py:56 tickets/models.py:287 tickets/models.py:421
+#: invs/models.py:56 tickets/models.py:321 tickets/models.py:455
 msgid "seat"
 msgstr "asiento"
 
@@ -705,12 +696,11 @@ msgstr "invitaciones"
 msgid "amount"
 msgstr "cantidad"
 
-#: invs/models.py:116 tickets/admin.py:104 tickets/models.py:300
-#: windows/models.py:84
+#: invs/models.py:116 tickets/admin.py:104 tickets/models.py:334 windows/models.py:84
 msgid "price"
 msgstr "precio"
 
-#: invs/models.py:117 tickets/models.py:301
+#: invs/models.py:117 tickets/models.py:335
 msgid "tax"
 msgstr "impuestos"
 
@@ -746,18 +736,15 @@ msgstr "Asientos Espectáculo Jueves"
 msgid "Passes"
 msgstr "Pases"
 
-#: invs/templates/invs/generator.html:43
-#: windows/templates/windows/multipurchase.html:49
+#: invs/templates/invs/generator.html:43 windows/templates/windows/multipurchase.html:49
 msgid "Discount:"
 msgstr "Descuento:"
 
-#: invs/templates/invs/generator.html:59
-#: windows/templates/windows/multipurchase.html:68
+#: invs/templates/invs/generator.html:59 windows/templates/windows/multipurchase.html:68
 msgid "Clean"
 msgstr "Limpiar"
 
-#: invs/templates/invs/generator.html:64
-#: tickets/templates/emails/ticket-detail.txt:8
+#: invs/templates/invs/generator.html:64 tickets/templates/emails/ticket-detail.txt:8
 msgid "Price"
 msgstr "Precio"
 
@@ -765,17 +752,15 @@ msgstr "Precio"
 msgid "Comment"
 msgstr "Comentario"
 
-#: invs/templates/invs/generator.html:74
-#: windows/templates/windows/multipurchase.html:101
+#: invs/templates/invs/generator.html:74 windows/templates/windows/multipurchase.html:101
 msgid "Print format"
 msgstr "Formato de impresión"
 
-#: invs/templates/invs/generator.html:81
-#: windows/templates/windows/multipurchase.html:109
+#: invs/templates/invs/generator.html:81 windows/templates/windows/multipurchase.html:109
 msgid "Finish"
 msgstr "Terminar"
 
-#: tickets/admin.py:15
+#: tickets/admin.py:14
 msgid "Manual confirm"
 msgstr "Confirmación manual"
 
@@ -861,108 +846,108 @@ msgstr "Nuevo Registro / %s"
 msgid "Confirmed / %s"
 msgstr "Confirmado / %s"
 
-#: tickets/models.py:201 tickets/models.py:278
+#: tickets/models.py:239 tickets/models.py:312
 msgid "order TPV"
 msgstr "código TPV"
 
-#: tickets/models.py:204 tickets/models.py:281
+#: tickets/models.py:242 tickets/models.py:315
 msgid "confirmed at"
 msgstr "confirmado el"
 
-#: tickets/models.py:205 tickets/models.py:282
+#: tickets/models.py:243 tickets/models.py:316
 msgid "confirmed"
 msgstr "confirmado"
 
-#: tickets/models.py:206 tickets/models.py:283
+#: tickets/models.py:244 tickets/models.py:317
 msgid "confirmation sent"
 msgstr "confirmación enviada"
 
-#: tickets/models.py:207
+#: tickets/models.py:245
 msgid "discount"
 msgstr "descuento"
 
-#: tickets/models.py:265 tickets/models.py:294 windows/models.py:82
+#: tickets/models.py:299 tickets/models.py:328 windows/models.py:82
 msgid "multipurchase"
 msgstr "compra múltiple"
 
-#: tickets/models.py:266
+#: tickets/models.py:300
 msgid "multipurchases"
 msgstr "compras múltiples"
 
-#: tickets/models.py:284
+#: tickets/models.py:318
 msgid "sold in window"
 msgstr "vendido en taquilla"
 
-#: tickets/models.py:297
+#: tickets/models.py:331
 msgid "session name"
 msgstr "nombre de sesión"
 
-#: tickets/models.py:298
+#: tickets/models.py:332
 msgid "space name"
 msgstr "nombre de usuario"
 
-#: tickets/models.py:299
+#: tickets/models.py:333
 msgid "event name"
 msgstr "nombre de evento"
 
-#: tickets/models.py:304
+#: tickets/models.py:338
 msgid "seat layout name"
 msgstr "nombre de disposición de asientos"
 
-#: tickets/models.py:305
+#: tickets/models.py:339
 msgid "gate name"
 msgstr "nombre de puerta"
 
-#: tickets/models.py:309
+#: tickets/models.py:343
 msgid "ticket used date"
 msgstr "fecha de uso de entrada"
 
-#: tickets/models.py:313 tickets/templates/emails/ticket-detail.txt:2
+#: tickets/models.py:347 tickets/templates/emails/ticket-detail.txt:2
 msgid "ticket"
 msgstr "entrada"
 
-#: tickets/models.py:314
+#: tickets/models.py:348
 msgid "tickets"
 msgstr "entrada"
 
-#: tickets/models.py:338
+#: tickets/models.py:372
 #, python-format
 msgid "L%(layout)s-R%(row)s-C%(col)s"
 msgstr "L%(layout)s-F%(row)s-C%(col)s"
 
-#: tickets/models.py:398
+#: tickets/models.py:432
 msgid "sessions1"
 msgstr "sesiones1"
 
-#: tickets/models.py:399
+#: tickets/models.py:433
 msgid "sessions2"
 msgstr "sesiones2"
 
-#: tickets/models.py:400
+#: tickets/models.py:434
 msgid "message"
 msgstr "mensaje"
 
-#: tickets/models.py:404
+#: tickets/models.py:438
 msgid "ticket warning"
 msgstr "alerta para entradas"
 
-#: tickets/models.py:405
+#: tickets/models.py:439
 msgid "ticket warnings"
 msgstr "alertas para entradas"
 
-#: tickets/models.py:418
+#: tickets/models.py:452
 msgid "client"
 msgstr "cliente"
 
-#: tickets/models.py:420
+#: tickets/models.py:454
 msgid "layout"
 msgstr "disposición de asientos"
 
-#: tickets/models.py:426
+#: tickets/models.py:460
 msgid "ticket seat hold"
 msgstr "reserva de asiento"
 
-#: tickets/models.py:427
+#: tickets/models.py:461
 msgid "ticket seat holds"
 msgstr "reservas de asientos"
 
@@ -986,8 +971,7 @@ msgstr "Registrarse"
 msgid "Your ticket have been confirmed:"
 msgstr "Tu entrada ha sido confirmada:"
 
-#: tickets/templates/emails/confirm-user.txt:6
-#: tickets/templates/tickets/thanks.html:4
+#: tickets/templates/emails/confirm-user.txt:6 tickets/templates/tickets/thanks.html:4
 #: tickets/templates/tickets/thanks.html:10
 msgid "Thank you"
 msgstr "Muchas gracias"
@@ -1021,13 +1005,11 @@ msgstr "Asiento"
 msgid " Section: %(layout)s, Row: %(row)s, Seat: %(column)s "
 msgstr " Sector: %(layout)s, Fila: %(row)s, Asiento: %(column)s "
 
-#: tickets/templates/emails/ticket-info.txt:2
-#: tickets/templates/tickets/ticket-info.html:7
+#: tickets/templates/emails/ticket-info.txt:2 tickets/templates/tickets/ticket-info.html:7
 msgid "Ticket info"
 msgstr "Información de entrada"
 
-#: tickets/templates/emails/ticket-info.txt:4
-#: tickets/templates/tickets/ticket-info.html:13
+#: tickets/templates/emails/ticket-info.txt:4 tickets/templates/tickets/ticket-info.html:13
 msgid "Event"
 msgstr "Evento"
 
@@ -1044,15 +1026,13 @@ msgid "ticket confirmed"
 msgstr "Entrada confirmada"
 
 #: tickets/templates/emails/ticket-info.txt:10
-#: tickets/templates/tickets/multipurchase.html:127
+#: tickets/templates/tickets/multipurchase.html:131
 #: tickets/templates/tickets/ticket-info.html:41
 msgid "Personal info"
 msgstr "Información personal"
 
-#: tickets/templates/tickets/layout.html:9
-#: tickets/templates/tickets/layout.html:15
-#: tickets/templates/tickets/layout.html:86
-#: tickets/templates/tickets/layout.html:92
+#: tickets/templates/tickets/layout.html:9 tickets/templates/tickets/layout.html:15
+#: tickets/templates/tickets/layout.html:86 tickets/templates/tickets/layout.html:92
 msgid "Scene"
 msgstr "Escenario"
 
@@ -1064,18 +1044,17 @@ msgstr "Cargando..."
 msgid "u"
 msgstr "ud"
 
-#: tickets/templates/tickets/multipurchase.html:115
+#: tickets/templates/tickets/multipurchase.html:119
 #: windows/templates/windows/multipurchase.html:73
 msgid "Total"
 msgstr "Total"
 
-#: tickets/templates/tickets/multipurchase.html:135
+#: tickets/templates/tickets/multipurchase.html:139
 #: tickets/templates/tickets/seat_select.html:24
 msgid "Continue"
 msgstr "Continuar"
 
-#: tickets/templates/tickets/payment.html:5
-#: tickets/templates/tickets/ticket_form.html:28
+#: tickets/templates/tickets/payment.html:5 tickets/templates/tickets/ticket_form.html:28
 msgid "Confirm"
 msgstr "Confirmar"
 
@@ -1090,11 +1069,11 @@ msgstr "Verificar datos y realizar el pago"
 #: tickets/templates/tickets/payment.html:19
 #, python-format
 msgid ""
-"There was an error in the payment. Try again and if the problem continue, "
-"contact with the admin: %(admin)s"
+"There was an error in the payment. Try again and if the problem continue, contact with the "
+"admin: %(admin)s"
 msgstr ""
-"Ha ocurrido un error en el pago. Prueba otra vez y si el problema continua, "
-"contacta con el administrador: %(admin)s"
+"Ha ocurrido un error en el pago. Prueba otra vez y si el problema continua, contacta con el "
+"administrador: %(admin)s"
 
 #: tickets/templates/tickets/payment.html:25
 msgid "Make payment"
@@ -1141,9 +1120,7 @@ msgstr "DESCARGAR TODAS LA ENTRADAS"
 
 #: tickets/templates/tickets/ticket-info.html:84
 msgid "Using this button you can download/print individual tickets"
-msgstr ""
-"Usando este botón puedes descargar/imprimir las entradas de forma "
-"independiente"
+msgstr "Usando este botón puedes descargar/imprimir las entradas de forma independiente"
 
 #: tickets/templates/tickets/ticket_form.html:16
 msgid "Price:"
@@ -1174,12 +1151,9 @@ msgstr "Entrada %(space)s %(session)s"
 
 #: tickets/utils.py:109
 #, python-format
-msgid ""
-"SECTOR: %(layout)s &nbsp;&nbsp;&nbsp; ROW: %(row)s &nbsp;&nbsp;&nbsp; SEAT: "
-"%(col)s"
+msgid "SECTOR: %(layout)s &nbsp;&nbsp;&nbsp; ROW: %(row)s &nbsp;&nbsp;&nbsp; SEAT: %(col)s"
 msgstr ""
-"SECTOR: %(layout)s &nbsp;&nbsp;&nbsp; FILA: %(row)s &nbsp;&nbsp;&nbsp; "
-"ASIENTO: %(col)s"
+"SECTOR: %(layout)s &nbsp;&nbsp;&nbsp; FILA: %(row)s &nbsp;&nbsp;&nbsp; ASIENTO: %(col)s"
 
 #: tickets/utils.py:113
 msgid "TAX INC."
@@ -1189,50 +1163,51 @@ msgstr "IVA INC."
 msgid "PRINT AND BRING THIS TICKET WITH YOU"
 msgstr "IMPRIME Y LLEVA ESTA ENTRADA CONTIGO"
 
-#: tickets/utils.py:219
+#: tickets/utils.py:221
 msgid "Sponsors"
 msgstr "Patrocinadores"
 
-#: tickets/utils.py:240
+#: tickets/utils.py:242
 msgid "Contributors"
 msgstr "Colaboradores"
 
-#: tickets/views.py:119
-#, python-format
+#: tickets/views.py:125
 msgid ""
-"Session has expired: you should select seats again. Seats save for you "
-"during %s minutes."
+"Session has expired: you should select seats again. Seats save for you during {:d} minutes."
 msgstr ""
-"La sesión ha expirado: debes seleccionar los asientos de nuevo. Los asientos "
-"se guardan durante %s minutos."
+"La sesión ha expirado: debes seleccionar los asientos de nuevo. Los asientos seleccionados "
+"se guardan durante {:d} minutos."
 
-#: tickets/views.py:252
-#, python-format
-msgid "You should complete the proccess of payment in less than %s minutes."
-msgstr "Deberías de completar el proceso  de pago en menos de %s minutos."
+#: tickets/views.py:263
+msgid "You should complete the proccess of payment in less than {:d} minutes"
+msgstr "Debes completar el proceso de pago en menos de {:d} minutos"
 
-#: tickets/views.py:260
-#, python-format
+#: tickets/views.py:273
 msgid ""
-"Session has expired: you should confirm payment in less than %s minutes. You "
-"need selected seats again."
+"Session has expired: you should confirm payment in less than {:d} minutes. You need to "
+"select seats again."
 msgstr ""
-"La sesión ha expirado: debes confirmar el pago en menos de %s minutos. "
-"Necesitas seleccionar los asientos de nuevo."
+"La sesión ha expirado: debes confirmar el pago en menos de {:d} minutos. Necesitas "
+"seleccionar los asientos de nuevo."
 
-#: tickets/views.py:474
+#: tickets/views.py:398
+msgid "Not found contiguous seats, please, select manually using the green button"
+msgstr ""
+"No se encuentran asientos contiguos, por favor, selecciona manualmente usando el botón verde"
+
+#: tickets/views.py:470
 msgid "SUBJECT"
 msgstr "ASUNTO"
 
-#: tickets/views.py:475
+#: tickets/views.py:471
 msgid "BODY"
 msgstr "CUERPO"
 
-#: tickets/views.py:478
+#: tickets/views.py:474
 msgid "You should assing this email_confirm to some events."
 msgstr "Tienes que asignar este email_confirm a algún evento."
 
-#: tickets/views.py:504
+#: tickets/views.py:500
 msgid "neccessary select invitation type"
 msgstr "necesario seleccionar tipo de invitación"
 
@@ -1324,8 +1299,7 @@ msgstr "efectivo hoy"
 msgid "today card"
 msgstr "tarjeta hoy"
 
-#: windows/templates/windows/list.html:38
-#: windows/templates/windows/multipurchase.html:85
+#: windows/templates/windows/list.html:38 windows/templates/windows/multipurchase.html:85
 msgid "cash"
 msgstr "efectivo"
 
@@ -1359,23 +1333,21 @@ msgid "This user can't access in this ticket window"
 msgstr "Este usuario no puede acceder a esta taquilla"
 
 #~ msgid ""
-#~ "Session has expired: you should select seats again. Seats save for you "
-#~ "during %s minutes. <a href=\"\">Click here for restart</a>"
+#~ "Session has expired: you should select seats again. Seats save for you during %s "
+#~ "minutes. <a href=\"\">Click here for restart</a>"
 #~ msgstr ""
-#~ "La sesión ha expirado: debes seleccionar los asientos de nuevo. Los "
-#~ "asientos se guardan durante %s minutos. <a href=\"\">Pincha aquí para "
-#~ "reiniciar el proceso de selección.</a>"
+#~ "La sesión ha expirado: debes seleccionar los asientos de nuevo. Los asientos se guardan "
+#~ "durante %s minutos. <a href=\"\">Pincha aquí para reiniciar el proceso de selección.</a>"
 
 #~ msgid "U."
 #~ msgstr "UD."
 
 #~ msgid ""
-#~ "Session has expired: you should select seats again. Seats save for you "
-#~ "during %s minutes. <a href=''>Click here for restart</a>"
+#~ "Session has expired: you should select seats again. Seats save for you during %s "
+#~ "minutes. <a href=''>Click here for restart</a>"
 #~ msgstr ""
-#~ "La sesión ha expirado: debes seleccionar los asientos de nuevo. Los "
-#~ "asientos se guardan durante %s minutos. <a href=\"\">Pincha aquí para "
-#~ "reiniciar el proceso de selección.</a>"
+#~ "La sesión ha expirado: debes seleccionar los asientos de nuevo. Los asientos se guardan "
+#~ "durante %s minutos. <a href=\"\">Pincha aquí para reiniciar el proceso de selección.</a>"
 
 #~ msgid "Generate Invitations"
 #~ msgstr "Generar invitaciones"

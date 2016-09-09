@@ -114,7 +114,7 @@ function seatCB(ev, seat) {
 
     updateBadges(session, layout);
 
-    $("#"+session).change();
+    $("#"+session).keyup();
 }
 
 function updateBadges(session, layout) {
@@ -176,7 +176,7 @@ function fillSelectedSeats(obj) {
         var current = [];
         current = v.split(",");
         $("#"+session).val(current.length);
-        $("#"+session).change();
+        $("#"+session).keyup();
 
         function recursiveSelection(arr, finish) {
             var c = arr.pop();
@@ -219,6 +219,9 @@ function autoSelectSeat(s, n) {
         });
         $("#seats-"+s).val(value.join(","));
         fillSelectedSeats($("#seats-"+s));
+    }).fail(function(error) {
+        $("#"+s).val(0);
+        alert(error);
     });
 }
 
@@ -312,10 +315,6 @@ $(document).ready(function() {
     });
 
     // calculating sums
-    $('.sessioninput').change(function() {
-        var obj = $(this);
-        delay(function() { seatsChange(obj) }, 500);
-    });
     $('.sessioninput').keyup(function() {
         var obj = $(this);
         delay(function() { seatsChange(obj) }, 500);
@@ -339,7 +338,7 @@ $(document).ready(function() {
             next = max;
         }
         $(id).val(next);
-        $(id).change();
+        $(id).keyup();
 
         setTimeout(function() {
             btn.prop("disabled", false); // Enable button
@@ -355,6 +354,6 @@ $(document).ready(function() {
             next = min;
         }
         $(id).val(next);
-        $(id).change();
+        $(id).keyup();
     });
 });
