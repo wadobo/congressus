@@ -150,6 +150,11 @@ td.seat-selected {
     background-color: #f0ad4e;
 }
 
+.legend.seat-selected {
+    background-color: #337ab7;
+    color: white;
+}
+
 #separator {
     font-size: small;
     border: 1px solid #eee;
