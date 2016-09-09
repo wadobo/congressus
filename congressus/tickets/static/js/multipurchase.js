@@ -139,6 +139,13 @@ function updateBadges(session, layout) {
 function recalcSums(obj) {
     var session = obj.attr("id");
     var val = parseInt(obj.val(), 10);
+
+    var max = parseInt(obj.attr('max') || 500, 10);
+    if (val > max) {
+        val = max;
+        obj.val(max);
+    }
+
     var price = parseFloat(obj.data("price"));
     $("#"+session+"-subtotal-price").html(val * price);
 }
@@ -306,7 +313,6 @@ $(document).ready(function() {
     $(".plus").click(function() {
         btn = $(this);
         btn.prop("disabled", true); // Disable button
-        var max = parseInt($(id).attr('max') || 500, 10);
         var id = '#' + $(this).data("id");
         var max = parseInt($(id).attr('max') || 500, 10);
         var current = parseInt($(id).val(), 10);
