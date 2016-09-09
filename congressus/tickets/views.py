@@ -121,7 +121,11 @@ class MultiPurchaseView(TemplateView):
                               client=client)
 
         if not client:
-            messages.error(request, _('Session has expired: you should select seats again. Seats save for you during %s minutes.') % (settings.EXPIRED_SEAT_H/60))
+            expired = int(settings.EXPIRED_SEAT_H / 60)
+            messages.error(request, _('Session has expired: you should'
+                                      ' select seats again. Seats save'
+                                      ' for you during {:d}'
+                                      ' minutes.').format(expired))
             ctx = self.get_context_data()
             ctx['form'] = form
             return render(request, self.template_name, ctx)
@@ -255,15 +259,21 @@ class Payment(TemplateView):
         if not tk.confirmed and (not tk.order_tpv or ctx['error']):
             tk.gen_order_tpv()
 
-        messages.add_message(self.request, messages.INFO, _("You should complete the proccess of payment in less than %s minutes.") % (settings.EXPIRED_SEAT_C/60))
-
+        expired = int(settings.EXPIRED_SEAT_C / 60)
+        messages.info(self.request, _('You should complete the proccess'
+                                      ' of payment in less than {:d}'
+                                      ' minutes').format(expired))
         return ctx
 
     def post(self, request, order):
         tk = get_ticket_or_404(order=order)
         client = self.request.session.get('client', '')
         if not client:
-            messages.add_message(request, messages.ERROR, _("Session has expired: you should confirm payment in less than %s minutes. You need selected seats again.") % (settings.EXPIRED_SEAT_H/60))
+            expired = int(settings.EXPIRED_SEAT_C / 60)
+            messages.error(request, _('Session has expired: you should'
+                                      ' confirm payment in less than'
+                                      ' {:d} minutes. You need to select'
+                                      ' seats again.').format(expired))
             return redirect('multipurchase', ev=ev.slug)
 
         # Expired time reset to expired_time_TPV
