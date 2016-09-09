@@ -212,10 +212,11 @@ class SeatLayout(models.Model):
 
     def contiguous_seats(self, amount, holded, col_start):
         """ Free contiguous seats in a row. """
+
         layout = self.real_rows()
         for h in holded: # Changed free by holded seats before search
             r, c = h.seat.split("-")
-            layout[int(r) - 1, int(c) + 1 - self.column_start_number] = h.type
+            layout[int(r) - 1, int(c) - self.column_start_number] = h.type
         nrow = 1
         for row in layout:
             free = ''.join(row).find(amount*'L')
