@@ -105,9 +105,13 @@
                     </div>
                 </div>
             </div>
+            {% block space_extra %}
+            {% endblock %}
         </div>
     {% endfor %}
     </div>
+
+    {% block after_sessions %}{% endblock %}
 
         {% block total %}
             <div class="totalinfo text-right">

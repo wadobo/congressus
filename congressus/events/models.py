@@ -432,6 +432,7 @@ class TicketTemplate(models.Model):
     contributors = models.ImageField(_('contributors'), upload_to='templcontributors', blank=True, null=True)
     links = models.CharField(_('links'), max_length=200, blank=True, null=True)
     info = models.TextField(_('info text'), blank=True, null=True)
+    note = models.CharField(_('note'), max_length=200, blank=True, null=True)
 
     class Meta:
         verbose_name = _('ticket template')
