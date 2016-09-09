@@ -13,8 +13,14 @@
 }
 
 .layout.l0 {
-    background-color: #ffa9a7;
+    background-color: #d9534f;
+    color: black;
     cursor: not-allowed;
+}
+
+.layout.l0 .label {
+    background-color: white;
+    color: black;
 }
 
 #display {
@@ -126,4 +132,26 @@ td.seat-selected {
 
 .loader-inner > div {
   background: black !important;
+}
+
+.legend {
+    padding: 5px;
+}
+
+.legend.seat-L {
+    background-color: #5cb85c;
+}
+
+.legend.seat-R {
+    background-color: #d9534f;
+}
+
+.legend.seat-H {
+    background-color: #f0ad4e;
+}
+
+#separator {
+    font-size: small;
+    border: 1px solid #eee;
+    padding: 10px;
 }
