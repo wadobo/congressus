@@ -5,6 +5,13 @@
 {% block title %}{% trans "Confirm" %}{% endblock %}
 
 {% block content %}
+    {% if ticket.is_mp %}
+        {% url 'multipurchase' ticket.event.slug as cancel_url %}
+    {% else %}
+        {% url 'register' ticket.event.slug ticket.space.slug ticket.session.slug as cancel_url %}
+    {% endif %}
+
+
     <div class="page-header">
         <h1>
             {% trans "Ticket payment" %}
@@ -18,35 +25,34 @@
                 <div class="alert alert-danger" role="alert">
                     {% blocktrans with admin=ticket.event.admin %}There was an error in the payment. Try again and if the problem continue, contact with the admin: {{ admin }}{% endblocktrans %}
                 </div>
+
+                <a href="{{ cancel_url }}" class="btn btn-lg btn-success btn-block">
+                    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+                    {% trans "Go to purchase" %}
+                </a>
+            {% else %}
+                <button id="make-payment" class="btn btn-lg btn-warning btn-block">
+                    <span class="glyphicon glyphicon-credit-card" aria-hidden="true"></span>
+                    {% trans "Make payment" %}
+                    <span id="timer-confirm" class="pull-right">xx:xx</span>
+                </button>
+                <div class="text-muted text-center">
+                    {% block payment_help_text %}
+                    {% trans '"Make payment" will redirect to' %} {{ tpv_url }}
+                    {% endblock %}
+                </div>
+                <form id="go-pay" method="POST" action="{{ tpv_url }}">
+                    <input type="hidden" name="Ds_SignatureVersion" value="HMAC_SHA256_V1"/>
+                    <input type="hidden" name="Ds_MerchantParameters" value="{{ mdata }}"/>
+                    <input type="hidden" name="Ds_Signature" value="{{ sig }}"/>
+                </form>
             {% endif %}
-
-            <button id="make-payment" class="btn btn-lg btn-warning btn-block">
-                <span class="glyphicon glyphicon-credit-card" aria-hidden="true"></span>
-                {% trans "Make payment" %}
-                <span id="timer-confirm" class="pull-right">xx:xx</span>
-            </button>
-            <div class="text-muted text-center">
-                {% block payment_help_text %}
-                {% trans '"Make payment" will redirect to' %} {{ tpv_url }}
-                {% endblock %}
-            </div>
-
-            <form id="go-pay" method="POST" action="{{ tpv_url }}">
-                <input type="hidden" name="Ds_SignatureVersion" value="HMAC_SHA256_V1"/>
-                <input type="hidden" name="Ds_MerchantParameters" value="{{ mdata }}"/>
-                <input type="hidden" name="Ds_Signature" value="{{ sig }}"/>
-            </form>
 
             <br/>
 
             {% include "tickets/ticket-info.html" %}
 
-            {% if ticket.is_mp %}
-                <a href="{% url 'multipurchase' ticket.event.slug %}" class="btn btn-lg btn-warning btn-block">
-            {% else %}
-                <a href="{% url 'register' ticket.event.slug ticket.space.slug ticket.session.slug %}" class="btn btn-lg btn-warning btn-block">
-            {% endif %}
-
+            <a href="{{ cancel_url }}" class="btn btn-lg btn-warning btn-block">
                 <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
                 {% trans "Cancel payment" %}
             </a>

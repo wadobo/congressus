@@ -260,10 +260,11 @@ class Payment(TemplateView):
         if not tk.confirmed and (not tk.order_tpv or ctx['error']):
             tk.gen_order_tpv()
 
-        expired = int(settings.EXPIRED_SEAT_C / 60)
-        messages.info(self.request, _('You should complete the proccess'
-                                      ' of payment in less than {:d}'
-                                      ' minutes').format(expired))
+        if not ctx['error']:
+            expired = int(settings.EXPIRED_SEAT_C / 60)
+            messages.info(self.request, _('You should complete the proccess'
+                                          ' of payment in less than {:d}'
+                                          ' minutes').format(expired))
         return ctx
 
     def post(self, request, order):
