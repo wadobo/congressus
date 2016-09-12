@@ -164,6 +164,7 @@
         var MAX_SEAT_BY_SESSION = '{{ max_seat_by_session }}';
 
         var client = '{{ client }}';
+        var session_expired = {% if session_expired %}true{% else %}false{% endif %};
         try {
             ws.init("{{ ws_server }}");
         } catch (e) {

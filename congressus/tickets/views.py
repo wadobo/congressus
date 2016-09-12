@@ -128,6 +128,7 @@ class MultiPurchaseView(TemplateView):
                                       ' minutes.').format(expired))
             ctx = self.get_context_data()
             ctx['form'] = form
+            ctx['session_expired'] = True
             return render(request, self.template_name, ctx)
 
         if form.is_valid():

@@ -310,6 +310,11 @@ $(document).ready(function() {
     SeatMap.cbs.add(seatCB);
     ws.cbs.add(websocketCB);
 
+    if (session_expired) {
+        $(".sessioninput").val("0");
+        $(".seats-input").val("");
+    }
+
     $(".seats-input").each(function() {
         fillSelectedSeats($(this));
     });
