@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-09 14:28+0200\n"
-"PO-Revision-Date: 2016-09-09 14:29+0200\n"
+"POT-Creation-Date: 2016-09-12 15:44+0200\n"
+"PO-Revision-Date: 2016-09-12 15:44+0200\n"
 "Last-Translator: Daniel Garcia Moreno <danigm@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
 "Language: es\n"
@@ -1095,15 +1095,15 @@ msgstr "Continuar"
 msgid "Confirm"
 msgstr "Confirmar"
 
-#: tickets/templates/tickets/payment.html:10
+#: tickets/templates/tickets/payment.html:17
 msgid "Ticket payment"
 msgstr "Pago de entrada"
 
-#: tickets/templates/tickets/payment.html:11
+#: tickets/templates/tickets/payment.html:18
 msgid "Verify the data and make the payment"
 msgstr "Verificar datos y realizar el pago"
 
-#: tickets/templates/tickets/payment.html:19
+#: tickets/templates/tickets/payment.html:26
 #, python-format
 msgid ""
 "There was an error in the payment. Try again and if the problem continue, "
@@ -1112,15 +1112,19 @@ msgstr ""
 "Ha ocurrido un error en el pago. Prueba otra vez y si el problema continua, "
 "contacta con el administrador: %(admin)s"
 
-#: tickets/templates/tickets/payment.html:25
+#: tickets/templates/tickets/payment.html:31
+msgid "Go to purchase"
+msgstr "Ir a la compra"
+
+#: tickets/templates/tickets/payment.html:36
 msgid "Make payment"
 msgstr "Realizar pago"
 
-#: tickets/templates/tickets/payment.html:30
+#: tickets/templates/tickets/payment.html:41
 msgid "\"Make payment\" will redirect to"
 msgstr "\"Realizar pago\" redirigirá a "
 
-#: tickets/templates/tickets/payment.html:50
+#: tickets/templates/tickets/payment.html:57
 msgid "Cancel payment"
 msgstr "Cancelar pago"
 
@@ -1221,11 +1225,11 @@ msgstr ""
 "La sesión ha expirado: debes seleccionar los asientos de nuevo. Los asientos "
 "seleccionados se guardan durante {:d} minutos."
 
-#: tickets/views.py:263
+#: tickets/views.py:265
 msgid "You should complete the proccess of payment in less than {:d} minutes"
 msgstr "Debes completar el proceso de pago en menos de {:d} minutos"
 
-#: tickets/views.py:273
+#: tickets/views.py:275
 msgid ""
 "Session has expired: you should confirm payment in less than {:d} minutes. "
 "You need to select seats again."
@@ -1233,26 +1237,26 @@ msgstr ""
 "La sesión ha expirado: debes confirmar el pago en menos de {:d} minutos. "
 "Necesitas seleccionar los asientos de nuevo."
 
-#: tickets/views.py:398
+#: tickets/views.py:400
 msgid ""
 "Not found contiguous seats, please, select manually using the green button"
 msgstr ""
 "No se encuentran asientos contiguos, por favor, selecciona manualmente "
 "usando el botón verde"
 
-#: tickets/views.py:470
+#: tickets/views.py:472
 msgid "SUBJECT"
 msgstr "ASUNTO"
 
-#: tickets/views.py:471
+#: tickets/views.py:473
 msgid "BODY"
 msgstr "CUERPO"
 
-#: tickets/views.py:474
+#: tickets/views.py:476
 msgid "You should assing this email_confirm to some events."
 msgstr "Tienes que asignar este email_confirm a algún evento."
 
-#: tickets/views.py:500
+#: tickets/views.py:502
 msgid "neccessary select invitation type"
 msgstr "necesario seleccionar tipo de invitación"
 
