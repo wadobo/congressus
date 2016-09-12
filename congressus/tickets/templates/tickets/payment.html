@@ -40,6 +40,7 @@
             <br/>
 
             {% include "tickets/ticket-info.html" %}
+
             {% if ticket.is_mp %}
                 <a href="{% url 'multipurchase' ticket.event.slug %}" class="btn btn-lg btn-warning btn-block">
             {% else %}
