@@ -221,6 +221,11 @@ function autoSelectSeat(s, n) {
         fillSelectedSeats($("#seats-"+s));
     }).fail(function(error) {
         $("#"+s).val(0);
+        var layouts = $('#modal-'+s+' .layout');
+        layouts.each(function() {
+            var id = $(this).data('id');
+            updateBadges(s, id);
+        });
         alert(error);
     });
 }
