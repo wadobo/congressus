@@ -318,15 +318,19 @@ class Confirm(View):
         if not order_tpv:
             raise Http404
 
+        tk = get_ticket_or_404(order_tpv=order_tpv)
+
         if error or resp != '0000':
             # payment error
+            err1 = '{}: {}'.format(resp, redsystpv.ERROR_CODES[int(resp)])
+            err2 = '{}: {}'.format(error, redsystpv.SIS_CODES[error])
+            tk.set_error(err1, err2)
             raise Http404
 
         sig2 = tpv_sig_data(mdata, order_tpv, settings.TPV_KEY, b'-_')
         if sig != sig2:
             raise Http404
 
-        tk = get_ticket_or_404(order_tpv=order_tpv)
         tk.confirm()
 
         online_sale(tk)

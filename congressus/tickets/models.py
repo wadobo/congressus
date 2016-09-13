@@ -176,6 +176,11 @@ class BaseTicketMixing:
         self.save()
         self.hold_seats()
 
+    def set_error(self, error, info):
+        self.tpv_error = error
+        self.tpv_error_info = info
+        self.save()
+
 
 class BaseExtraData:
     def get_extra_data(self, key):
@@ -237,6 +242,9 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
 
     order = models.CharField(_('order'), max_length=200, unique=True)
     order_tpv = models.CharField(_('order TPV'), max_length=12, blank=True, null=True)
+
+    tpv_error = models.CharField(_('error TPV'), max_length=200, blank=True, null=True)
+    tpv_error_info = models.CharField(_('error TPV info'), max_length=200, blank=True, null=True)
 
     created = models.DateTimeField(_('created at'), auto_now_add=True)
     confirmed_date = models.DateTimeField(_('confirmed at'), blank=True, null=True)
@@ -310,6 +318,9 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
 
     order = models.CharField(_('order'), max_length=200, unique=True)
     order_tpv = models.CharField(_('order TPV'), max_length=12, blank=True, null=True)
+
+    tpv_error = models.CharField(_('error TPV'), max_length=200, blank=True, null=True)
+    tpv_error_info = models.CharField(_('error TPV info'), max_length=200, blank=True, null=True)
 
     created = models.DateTimeField(_('created at'), auto_now_add=True)
     confirmed_date = models.DateTimeField(_('confirmed at'), blank=True, null=True)
