@@ -117,6 +117,8 @@ class TicketWarningAdmin(admin.ModelAdmin):
 
 
 class TicketSeatHoldAdmin(admin.ModelAdmin):
+    search_fields = ('client', 'layout')
+    date_hierarchy = 'date'
     list_display = ('client', 'session',  'layout', 'seat', 'date', 'type')
     list_filter = ('session', 'type')
 
