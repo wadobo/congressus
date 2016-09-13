@@ -70,5 +70,9 @@
     {% block extrabody %}{% endblock %}
 
     {% block themejs %}{% endblock %}
+
+    {% if debug %}
+        {% include "debug.html" %}
+    {% endif %}
   </body>
 </html>
