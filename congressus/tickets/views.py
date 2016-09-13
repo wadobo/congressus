@@ -5,6 +5,8 @@ import random
 import string
 import operator
 
+import redsystpv
+
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -203,6 +205,15 @@ def tpv_sig_data(mdata, order, key, alt=b'+/'):
     return sigb
 
 
+def tpv_parse_data(mdata, sig):
+    if not mdata or not sig:
+        return None
+
+    jsdata = b64decode(mdata.encode(), b'-_').decode()
+    data = json.loads(jsdata)
+    return data
+
+
 def get_ticket_or_404(**kwargs):
     try:
         tk = MultiPurchase.objects.get(**kwargs)
@@ -265,6 +276,15 @@ class Payment(TemplateView):
             messages.info(self.request, _('You should complete the proccess'
                                           ' of payment in less than {:d}'
                                           ' minutes').format(expired))
+        else:
+            mdata = self.request.GET.get('Ds_MerchantParameters', '')
+            sig = self.request.GET.get('Ds_Signature', '')
+            data = tpv_parse_data(mdata, sig)
+
+            if data and data['Ds_Response'] != '0000':
+                resp = data['Ds_Response']
+                ctx['errormsg'] = '{}: {}'.format(resp,
+                                                  redsystpv.ERROR_CODES[int(resp)])
         return ctx
 
     def post(self, request, order):
@@ -306,12 +326,11 @@ class Confirm(View):
     def post(self, request):
         mdata = request.POST.get('Ds_MerchantParameters', '')
         sig = request.POST.get('Ds_Signature', '')
+        data = tpv_parse_data(mdata, sig)
 
-        if not mdata or not sig:
+        if not data:
             raise Http404
 
-        jsdata = b64decode(mdata.encode(), b'-_').decode()
-        data = json.loads(jsdata)
         order_tpv = data.get('Ds_Order', '')
         resp = data.get('Ds_Response', '')
         error = data.get('Ds_ErrorCode', '')
@@ -322,8 +341,11 @@ class Confirm(View):
 
         if error or resp != '0000':
             # payment error
-            err1 = '{}: {}'.format(resp, redsystpv.ERROR_CODES[int(resp)])
-            err2 = '{}: {}'.format(error, redsystpv.SIS_CODES[error])
+            err1, err2 = '', ''
+            if resp != '0000':
+                err1 = '{}: {}'.format(resp, redsystpv.ERROR_CODES[int(resp)])
+            if error:
+                err2 = '{}: {}'.format(error, redsystpv.SIS_CODES[error])
             tk.set_error(err1, err2)
             raise Http404
 

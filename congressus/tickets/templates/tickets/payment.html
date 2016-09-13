@@ -23,7 +23,12 @@
         <div class="col-md-6 col-md-offset-3">
             {% if error %}
                 <div class="alert alert-danger" role="alert">
+                    {% if errormsg %}
+                    <p class="text-center"><strong>Error {{ errormsg }}</strong></p>
+                    {% endif %}
+                    <p>
                     {% blocktrans with admin=ticket.event.admin %}There was an error in the payment. Try again and if the problem continue, contact with the admin: {{ admin }}{% endblocktrans %}
+                    </p>
                 </div>
 
                 <a href="{{ cancel_url }}" class="btn btn-lg btn-success btn-block">
