@@ -117,10 +117,10 @@ class TicketWarningAdmin(admin.ModelAdmin):
 
 
 class TicketSeatHoldAdmin(admin.ModelAdmin):
-    search_fields = ('client', 'layout')
+    search_fields = ('client', )
     date_hierarchy = 'date'
     list_display = ('client', 'session',  'layout', 'seat', 'date', 'type')
-    list_filter = ('session', 'type')
+    list_filter = ('session', 'type', 'layout')
 
 
 admin.site.register(Ticket, TicketAdmin)
