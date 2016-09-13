@@ -283,8 +283,8 @@ class Payment(TemplateView):
 
             if data and data['Ds_Response'] != '0000':
                 resp = data['Ds_Response']
-                ctx['errormsg'] = '{}: {}'.format(resp,
-                                                  redsystpv.ERROR_CODES[int(resp)])
+                error = redsystpv.ERROR_CODES.get(int(resp), _('Unknown error'))
+                ctx['errormsg'] = '{}: {}'.format(resp, error)
         return ctx
 
     def post(self, request, order):
@@ -343,9 +343,11 @@ class Confirm(View):
             # payment error
             err1, err2 = '', ''
             if resp != '0000':
-                err1 = '{}: {}'.format(resp, redsystpv.ERROR_CODES[int(resp)])
+                msg = redsystpv.ERROR_CODES.get(int(resp), _('Unknown error'))
+                err1 = '{}: {}'.format(resp, msg)
             if error:
-                err2 = '{}: {}'.format(error, redsystpv.SIS_CODES[error])
+                msg = redsystpv.SIS_CODES.get(error, _('Unknown error'))
+                err2 = '{}: {}'.format(error, msg)
             tk.set_error(err1, err2)
             raise Http404
 
