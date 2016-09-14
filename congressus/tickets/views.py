@@ -417,10 +417,16 @@ class AutoSeats(View):
         return seats
 
     def post(self, request):
+        ctx = {'seats': []}
         req = request.POST
         session = req.get('session')
-        amount = int(req.get('amount_seats'))
-        ctx = {'seats': []}
+        amount = 0
+
+        try:
+            amount = int(req.get('amount_seats'))
+        except:
+            return HttpResponse(json.dumps(ctx), content_type="application/json")
+
         seats = self.search_seats(session, amount)
         if seats:
             ctx['seats'] = seats

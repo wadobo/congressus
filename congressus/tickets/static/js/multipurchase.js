@@ -148,6 +148,11 @@ function recalcSums(obj) {
     var session = obj.attr("id");
     var val = parseInt(obj.val(), 10);
 
+    if (isNaN(val)) {
+        obj.val(0);
+        val = 0;
+    }
+
     var max = parseInt(obj.attr('max') || 500, 10);
     if (val > max) {
         val = max;
