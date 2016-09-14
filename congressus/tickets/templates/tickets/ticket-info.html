@@ -24,7 +24,7 @@
             <form id="download-{{ ticket.order }}" method="post" action="{% url 'thanks' ticket.order %}">
                 {% csrf_token %}
                 <input type="hidden" name="ticket" value="{{ ticket.order }}"/>
-                <button class="btn btn-lg btn-block btn-warning">
+                <button class="btn btn-lg btn-block btn-warning wrapbutton">
                     <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
                     {% block payment_download_all_text %}
                     {% trans "DOWNLOAD ALL TICKETS" %}
