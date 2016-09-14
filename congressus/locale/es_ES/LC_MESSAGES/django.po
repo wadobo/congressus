@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-14 10:58+0200\n"
-"PO-Revision-Date: 2016-09-14 10:58+0200\n"
+"POT-Creation-Date: 2016-09-14 13:25+0200\n"
+"PO-Revision-Date: 2016-09-14 13:25+0200\n"
 "Last-Translator: Daniel Garcia Moreno <danigm@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
 "Language: es\n"
@@ -1186,26 +1186,26 @@ msgstr "Precio:"
 msgid "scene"
 msgstr "escenario"
 
-#: tickets/utils.py:73 tickets/utils.py:100
+#: tickets/utils.py:73 tickets/utils.py:106
 #, python-format
 msgid "%4.2f €"
 msgstr "%4.2f €"
 
-#: tickets/utils.py:79 tickets/utils.py:90
+#: tickets/utils.py:80 tickets/utils.py:91
 #, python-format
 msgid "%(date)s (%(start)s to %(end)s)"
 msgstr "%(date)s (%(start)s a %(end)s)"
 
-#: tickets/utils.py:96
+#: tickets/utils.py:102
 msgid "T"
 msgstr "E"
 
-#: tickets/utils.py:97
+#: tickets/utils.py:103
 #, python-format
 msgid "Ticket %(space)s %(session)s"
 msgstr "Entrada %(space)s %(session)s"
 
-#: tickets/utils.py:109
+#: tickets/utils.py:115
 #, python-format
 msgid ""
 "SECTOR: %(layout)s &nbsp;&nbsp;&nbsp; ROW: %(row)s &nbsp;&nbsp;&nbsp; SEAT: "
@@ -1214,19 +1214,24 @@ msgstr ""
 "SECTOR: %(layout)s &nbsp;&nbsp;&nbsp; FILA: %(row)s &nbsp;&nbsp;&nbsp; "
 "ASIENTO: %(col)s"
 
-#: tickets/utils.py:113
+#: tickets/utils.py:119
 msgid "TAX INC."
 msgstr "IVA INC."
 
-#: tickets/utils.py:188
+#: tickets/utils.py:177
+#, python-format
+msgid "ORDER: %s"
+msgstr "LOCALIZADOR: %s"
+
+#: tickets/utils.py:199
 msgid "PRINT AND BRING THIS TICKET WITH YOU"
 msgstr "IMPRIME Y LLEVA ESTA ENTRADA CONTIGO"
 
-#: tickets/utils.py:221
+#: tickets/utils.py:232
 msgid "Sponsors"
 msgstr "Patrocinadores"
 
-#: tickets/utils.py:242
+#: tickets/utils.py:253
 msgid "Contributors"
 msgstr "Colaboradores"
 

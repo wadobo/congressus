@@ -173,9 +173,10 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False, inv=False):
         codeimg.wrap(3*cm, 3*cm)
         codeimg.drawOn(canvas, doc.width, 1.5*cm)
         # ticket order
-        pr = Paragraph(order, styleL)
-        pr.wrap(doc.width, 1*cm)
-        pr.drawOn(canvas, doc.leftMargin, 1.5*cm)
+        if order:
+            pr = Paragraph(_('ORDER: %s') % order, styleL)
+            pr.wrap(doc.width, 1*cm)
+            pr.drawOn(canvas, doc.leftMargin, 1.5*cm)
         # line
         hr = HRFlowable(width="100%", thickness=0.25, hAlign='CENTER',
                         color=colors.black, vAlign='BOTTOM', dash=None,
