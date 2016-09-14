@@ -74,6 +74,7 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False, inv=False):
         tax = ticket.get_tax()
         template = TicketTemplate.objects.last()
         wcode = 'GEN' + str(ticket.generator.id)
+        order = ''
         text = ticket.type.name
         if ticket.type.start and ticket.type.end:
             date = _('%(date)s (%(start)s to %(end)s)') % {
@@ -93,6 +94,11 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False, inv=False):
             'end': short_hour(ticket.session.end),
         }
         wcode = ticket.window_code()
+        if ticket.mp:
+            order = ticket.mp.order_tpv or ''
+        else:
+            order = ticket.order_tpv or ''
+
         initials = _('T') + space[0].upper() + session[0].upper()
         text = _('Ticket %(space)s %(session)s') % {'space': space.capitalize(), 'session': session.capitalize()}
 
@@ -166,8 +172,8 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False, inv=False):
         # qrcode
         codeimg.wrap(3*cm, 3*cm)
         codeimg.drawOn(canvas, doc.width, 1.5*cm)
-        # ticket window code
-        pr = Paragraph(wcode, styleL)
+        # ticket order
+        pr = Paragraph(order, styleL)
         pr.wrap(doc.width, 1*cm)
         pr.drawOn(canvas, doc.leftMargin, 1.5*cm)
         # line
@@ -176,10 +182,14 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False, inv=False):
                         spaceAfter=5)
         hr.wrap(doc.width, 1*cm)
         hr.drawOn(canvas, doc.leftMargin, 1.5*cm)
+        # ticket window code
+        pr = Paragraph(wcode, styleL)
+        pr.wrap(doc.width, 1*cm)
+        pr.drawOn(canvas, doc.leftMargin, 1.0*cm)
         # code
         pr = Paragraph(code, styleL)
         pr.wrap(doc.width, 1*cm)
-        pr.drawOn(canvas, doc.leftMargin, 1.0*cm)
+        pr.drawOn(canvas, doc.width, 1.0*cm)
 
         canvas.restoreState()
 
