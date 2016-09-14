@@ -147,6 +147,8 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
 
+CSRF_FAILURE_VIEW = 'tickets.views.csrf_failure'
+
 INTERNAL_IPS = ['127.0.0.1']
 
 # CUSTOM SETTINGS

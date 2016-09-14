@@ -531,3 +531,7 @@ class SeatsByStr(View):
         return JsonResponse(ctx)
 seats_by_str = csrf_exempt(SeatsByStr.as_view())
 
+
+def csrf_failure(request, reason=""):
+    messages.error(request, _('Session error, send again the form'))
+    return redirect(request.path or 'last_event')
