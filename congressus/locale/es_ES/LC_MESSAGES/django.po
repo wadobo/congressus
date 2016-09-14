@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-14 10:42+0200\n"
-"PO-Revision-Date: 2016-09-14 10:42+0200\n"
+"POT-Creation-Date: 2016-09-14 10:58+0200\n"
+"PO-Revision-Date: 2016-09-14 10:58+0200\n"
 "Last-Translator: Daniel Garcia Moreno <danigm@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
 "Language: es\n"
@@ -1148,7 +1148,12 @@ msgstr "Aquí puede ver la información de su entrada"
 msgid "Download this ticket"
 msgstr "Descarga esta entrada"
 
-#: tickets/templates/tickets/ticket-detail.html:24
+#: tickets/templates/tickets/ticket-detail.html:17
+#, python-format
+msgid "Ticket %(idx)s"
+msgstr "Entrada %(idx)s"
+
+#: tickets/templates/tickets/ticket-detail.html:26
 #, python-format
 msgid ""
 "\n"
@@ -1249,30 +1254,30 @@ msgstr ""
 "La sesión ha expirado: debes confirmar el pago en menos de {:d} minutos. "
 "Necesitas seleccionar los asientos de nuevo."
 
-#: tickets/views.py:428
+#: tickets/views.py:434
 msgid ""
 "Not found contiguous seats, please, select manually using the green button"
 msgstr ""
 "No se encuentran asientos contiguos, por favor, selecciona manualmente "
 "usando el botón verde"
 
-#: tickets/views.py:500
+#: tickets/views.py:506
 msgid "SUBJECT"
 msgstr "ASUNTO"
 
-#: tickets/views.py:501
+#: tickets/views.py:507
 msgid "BODY"
 msgstr "CUERPO"
 
-#: tickets/views.py:504
+#: tickets/views.py:510
 msgid "You should assing this email_confirm to some events."
 msgstr "Tienes que asignar este email_confirm a algún evento."
 
-#: tickets/views.py:530
+#: tickets/views.py:536
 msgid "neccessary select invitation type"
 msgstr "necesario seleccionar tipo de invitación"
 
-#: tickets/views.py:536
+#: tickets/views.py:542
 msgid "Session error, send again the form"
 msgstr "Error de sesión, envía de nuevo el formulario"
 
