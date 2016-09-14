@@ -223,7 +223,7 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False, inv=False):
     t.setStyle(tstyle)
     Story.append(t)
     if template.note:
-        Story.append(Paragraph('<font size=6><b>' + template.note + '</b></font>', styleN))
+        Story.append(Paragraph('<font size=6><b>' + template.note + '</b></font>', styleR))
 
     if template:
         # sponsors
