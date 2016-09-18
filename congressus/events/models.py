@@ -274,10 +274,10 @@ class Session(models.Model):
         return '%s - %s' % (self.space.name, self.name)
 
     def price_without_tax(self):
-        return self.price * (self.tax / 100)
+        return self.price / (1 + self.tax / 100.0)
 
     def window_price_without_tax(self):
-        return self.window_price * (self.tax / 100)
+        return self.window_price / (1 + self.tax / 100.0)
 
     def event(self):
         return self.space.event
