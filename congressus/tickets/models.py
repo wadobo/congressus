@@ -342,7 +342,7 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
     session_name = models.CharField(_('session name'), max_length=200, null=True, blank=True)
     space_name = models.CharField(_('space name'), max_length=200, null=True, blank=True)
     event_name = models.CharField(_('event name'), max_length=200, null=True, blank=True)
-    price = models.IntegerField(_('price'), null=True)
+    price = models.FloatField(_('price'), null=True)
     tax = models.IntegerField(_('tax'), null=True)
     start = models.DateTimeField(_('start date'), null=True)
     end = models.DateTimeField(_('end date'), null=True)

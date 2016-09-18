@@ -254,8 +254,8 @@ class Session(models.Model):
     start = models.DateTimeField(_('start date'))
     end = models.DateTimeField(_('end date'))
 
-    price = models.IntegerField(_('ticket price'), default=10)
-    window_price = models.IntegerField(_('price in the ticket window'), default=10)
+    price = models.FloatField(_('ticket price'), default=10)
+    window_price = models.FloatField(_('price in the ticket window'), default=10)
     tax = models.IntegerField(_('ticket tax percentage'), default=21)
 
     template = models.ForeignKey("TicketTemplate", blank=True, null=True, verbose_name=_('template'))
