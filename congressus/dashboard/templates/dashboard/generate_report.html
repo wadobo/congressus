@@ -16,47 +16,73 @@
     </div>
 
     <form method="POST">
-        <input type="submit" value="General">
         <input name="type" type="hidden" value="general">
         <input name="ev" type="hidden" value="{{ ev }}">
+        <div class="row">
+            <div class="col-md-12 center-block">
+                <input type="submit" class="btn btn-success btn-block" value="General">
+            </div>
+        </div>
     </form>
     <br>
 
     <form method="POST">
-        <input type="submit" value="Taquilla">
         <input name="type" type="hidden" value="window_sale">
         <input name="ev" type="hidden" value="{{ ev }}">
+        <div class="row">
+            <div class="col-md-12 center-block">
+                <input type="submit" class="btn btn-success btn-block" value="Taquilla">
+            </div>
+        </div>
     </form>
     <br>
 
     <form method="POST">
-        <input type="submit" value="Online">
-        <input name="type" type="hidden" value="online">
-        <input name="ev" type="hidden" value="{{ ev }}">
-        <label for="start-date">Start date</label>
-        <input name="start-date" type="date" data-date="" data-date-format="DD MMMM YYYY" value="2016-01-01">
-        <label for="end-date">End date</label>
-        <input name="end-date" type="date" data-date="" data-date-format="DD MMMM YYYY" value="2016-01-01">
+        <div class="row">
+            <div class="col-md-12 center">
+                <input name="type" type="hidden" value="online">
+                <input name="ev" type="hidden" value="{{ ev }}">
+                <label for="start-date">Start date</label>
+                <input name="start-date" type="date" data-date="" data-date-format="DD MMMM YYYY" value="2016-01-01">
+                <label for="end-date">End date</label>
+                <input name="end-date" type="date" data-date="" data-date-format="DD MMMM YYYY" value="2016-01-01">
+            </div>
+            <div class="col-md-12 center-block">
+                <input type="submit" class="btn btn-success btn-block" value="Online">
+            </div>
+        </div>
     </form>
     <br>
 
     <form method="POST">
-        <input type="submit" value="Arqueo">
-        <input name="type" type="hidden" value="arqueo">
-        <input name="ev" type="hidden" value="{{ ev }}">
-        <div>
-            {% for session in sessions %}
-                <input type="checkbox" name="scheck-{{ forloop.counter0 }}" value="{{ session.name }}">
-                {{ session.name }}<br>
-            {% endfor %}
-        </div>
-        <div>
-            {% for window in windows %}
-                <input type="checkbox" name="wcheck-{{ forloop.counter0 }}" value="{{ window.name }}">
-                {{ window.name }}<br>
-            {% endfor %}
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-3 center">
+                <h3>Sessions</h3>
+                <input name="type" type="hidden" value="arqueo">
+                <input name="ev" type="hidden" value="{{ ev }}">
+                <div>
+                    {% for session in sessions %}
+                        <input type="checkbox" name="scheck-{{ forloop.counter0 }}" value="{{ session.name }}">
+                        {{ session.name }}<br>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-md-3 center">
+                <h3>Ticket windows</h3>
+                <div>
+                    {% for window in windows %}
+                        <input type="checkbox" name="wcheck-{{ forloop.counter0 }}" value="{{ window.name }}">
+                        {{ window.name }}<br>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-md-3"></div>
+            <div class="col-md-12 center-block">
+                <input type="submit" class="btn btn-success btn-block" value="Arqueo">
+            </div>
         </div>
     </form>
-
+    <hr>
     {% include "dashboard/report.html" %}
 {% endblock %}
