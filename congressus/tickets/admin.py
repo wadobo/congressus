@@ -11,6 +11,7 @@ from .models import TicketSeatHold
 from admin_csv import CSVMixin
 
 from .filters import TicketWindowFilter
+from windows.models import TicketWindowSale
 
 
 def confirm(modeladmin, request, queryset):
@@ -57,7 +58,6 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
         return obj.get_price()
 
     def twin(self, obj):
-        from windows.models import TicketWindowSale
         try:
             tws = TicketWindowSale.objects.get(purchase__tickets=obj)
         except:
@@ -112,7 +112,7 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
     readonly_fields = (
         'order_tpv', 'order', 'ev',
         'confirmed', 'confirmed_date',
-        'ntickets', 'price',
+        'ntickets', 'price', 'payment',
         'formated_extra_data',
     )
 
@@ -125,16 +125,24 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
         }),
         (_('Extra info'), {
             'fields': (('confirmed', 'confirmed_date'),
-                       ('ntickets', 'price'), 'discount')
+                       ('ntickets', 'price'),
+                       'discount', 'payment')
         }),
     )
+
+    def payment(self, obj):
+        try:
+            tws = TicketWindowSale.objects.get(purchase=obj)
+        except:
+            return '-'
+        return tws.get_payment_display()
+    payment.short_description = _('payment')
 
     def ntickets(self, obj):
         return obj.tickets.count()
     ntickets.short_description = _('ntickets')
 
     def twin(self, obj):
-        from windows.models import TicketWindowSale
         try:
             tws = TicketWindowSale.objects.get(purchase=obj)
         except:
