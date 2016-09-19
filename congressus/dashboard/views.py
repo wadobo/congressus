@@ -323,7 +323,7 @@ class ReportView(TemplateView):
         if report_type == 'window_sale':
             return None
         tickets = Ticket.objects.filter(confirmed=True, sold_in_window=False, session__in=sessions)
-        return tickets.values('session__name', 'session__tax', 'session__space__name')\
+        return tickets.values('session__name', 'session__space__name')\
                 .annotate(
                         amount=Count('pk'),
                         total_price=Sum('price'),
@@ -334,29 +334,12 @@ class ReportView(TemplateView):
         if report_type == 'online':
             return None
         tickets = Ticket.objects.filter(confirmed=True, sold_in_window=True)
-        return tickets.values('session__name', 'session__tax', 'session__space__name')\
+        return tickets.values('session__name', 'session__space__name')\
                 .annotate(
                         amount=Count('pk'),
                         total_price=Sum('price'),
                         price_without_iva=Sum(F('price')/(1+F('tax')/100.0), output_field=FloatField()))\
                 .order_by('session__start')
-
-    def get_arqueo(self, request):
-        sessions = [1,2]
-        window_sales = [1,2]
-        tickets = Ticket.objects.filter(confirmed=True, sold_in_window=True, session__in=sessions)
-        truncate_date = connection.ops.date_trunc_sql('day', 'created')
-        qs = tickets.extra({'day': truncate_date})
-        # Django 1.10
-        # qs = tickets.annotate(day=TruncDay('created'))
-        res =  qs.values('day', 'session__name', 'session__tax', 'session__space__name')\
-                .annotate(
-                        amount=Count('pk'),
-                        total_price=Sum('price'),
-                        price_without_iva=Sum(F('price')/(1+F('tax')/100.0), output_field=FloatField()))\
-                .order_by('day')
-
-        tws = TicketWindowSale.objects.get(purchase__tickets=self)
 
     def get_datas(self, window_sales, onlines, sessions, report_type):
         general_table = []
@@ -414,15 +397,31 @@ class ReportView(TemplateView):
                     del row[1]
 
         return general_table, specific_tables
+    
+    def get_arqueo(self, sessions, window_sales):
+        mps = TicketWindowSale.objects.filter(window__in=window_sales).values_list('purchase', flat=True)
+        tickets = Ticket.objects.filter(confirmed=True, sold_in_window=True, session__in=sessions, mp__in=mps)
+        return tickets.values('session__name', 'session__space__name')\
+                .annotate(
+                        amount=Count('pk'),
+                        total_price=Sum('price'),
+                        price_without_iva=Sum(F('price')/(1+F('tax')/100.0), output_field=FloatField()))\
+                .order_by('session__start')
+
+    def gen_arqueo_table(self, datas):
+        table = []
+        table.append(['', '', 'total'])
+        for col in datas:
+            table.append([col.get('session__name'), '#', col.get('amount')])
+            table.append(['€ / € sin IVA', '%.2f / %.2f' % (col.get('total_price'), col.get('price_without_iva'))])
+        return table
 
     def post(self, request, ev):
         event = get_object_or_404(Event, slug=ev)
         ctx = {}
-
         ctx['ev'] = get_object_or_404(Event, slug=ev)
         ctx['sessions'] = Session.objects.all()
         ctx['windows'] = TicketWindow.objects.all()
-
         report_type = request.POST.get('type')
         ctx['report_type'] = report_type
 
@@ -434,7 +433,12 @@ class ReportView(TemplateView):
             ctx['general_table'] = gtable
             ctx['specific_tables'] = stables
         else:
-            arqueo_table = self.get_arqueo(request)
+            sessions = request.POST.getlist('scheck')
+            window_sales = request.POST.getlist('wcheck')
+            sessions = map(int, sessions)
+            window_sales = map(int, window_sales)
+            datas = self.get_arqueo(sessions, window_sales)
+            arqueo_table = self.gen_arqueo_table(datas)
             ctx['arqueo_table'] = arqueo_table
 
         return render(request, self.template_name, ctx)

@@ -42,23 +42,37 @@
                     {% endif %}
                 {% endfor %}
                 </tr>
-                {% endfor %}
+            {% endfor %}
             </tr>
         </table>
     {% endfor %}
 
 {% elif arqueo_table %}
     <table class="table-bordered">
-        <caption>Por dias</caption>
-        {% for row in day_table %}
+        <caption>Arqueo</caption>
+        {% for row in arqueo_table %}
             <tr>
             {% for col in row %}
-                {% if forloop.first or forloop.parentloop.first %}<th>{% else %}<td>{% endif %}
+                {% if forloop.parentloop.first %}
+                    <th>
+                {% elif forloop.first %}
+                    {% if forloop.parentloop.counter|divisibleby:"2" %}
+                        <th rowspan="2">
+                    {% else %}
+                        <td>
+                    {% endif %}
+                {% else %}
+                    <td>
+                {% endif %}
                     {{ col }}
-                {% if forloop.first or forloop.parentloop.first %}</th>{% else %}</td>{% endif %}
+                {% if forloop.first or forloop.parentloop.first %}
+                    </th>
+                {% else %}
+                    </td>
+                {% endif %}
             {% endfor %}
             </tr>
-            {% endfor %}
+        {% endfor %}
         </tr>
     </table>
 {% else %}

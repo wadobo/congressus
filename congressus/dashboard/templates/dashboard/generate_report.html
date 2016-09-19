@@ -63,7 +63,7 @@
                 <input name="ev" type="hidden" value="{{ ev }}">
                 <div>
                     {% for session in sessions %}
-                        <input type="checkbox" name="scheck-{{ forloop.counter0 }}" value="{{ session.name }}">
+                        <input type="checkbox" name="scheck" value="{{ session.pk }}">
                         {{ session.name }}<br>
                     {% endfor %}
                 </div>
@@ -72,7 +72,7 @@
                 <h3>Ticket windows</h3>
                 <div>
                     {% for window in windows %}
-                        <input type="checkbox" name="wcheck-{{ forloop.counter0 }}" value="{{ window.name }}">
+                        <input type="checkbox" name="wcheck" value="{{ window.pk }}">
                         {{ window.name }}<br>
                     {% endfor %}
                 </div>
