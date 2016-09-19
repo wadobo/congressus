@@ -1,80 +1,66 @@
-{% extends "base-admin.html" %}
-{% load i18n %}
-{% load staticfiles %}
+<h2>{{ report_type }}</h2>
 
-{% block extrahead %}
-    <link href="{% static "css/report.css" %}?v=4.0" rel="stylesheet">
-{% endblock %}
+{% if general_table and specific_tables %}
+    <table class="table-bordered">
+        <caption>General</caption>
+        {% for row in general_table %}
+            <tr>
+            {% for col in row %}
+                {% if forloop.first or forloop.parentloop.first %}<th>{% else %}<td>{% endif %}
+                    {{ col }}
+                {% if forloop.first or forloop.parentloop.first %}</th>{% else %}</td>{% endif %}
+            {% endfor %}
+            </tr>
+            {% endfor %}
+        </tr>
+    </table>
 
-{% block content %}
+    <hr>
 
-    <div class="page-header">
-        {% block pretitle %}
-        <h1 class="inline"> Report <small>{{ report_type }}</small> </h1>
-        {% endblock %}
-    </div>
-
-    {% if report_type != 'arqueo' %}
+    {% for spec in specific_tables %}
         <table class="table-bordered">
-            <caption>General</caption>
-            {% for row in general_table %}
+            <caption>{{ spec.title }}</caption>
+            {% for row in spec.datas %}
                 <tr>
                 {% for col in row %}
-                    {% if forloop.first or forloop.parentloop.first %}<th>{% else %}<td>{% endif %}
-                        {{ col }}
-                    {% if forloop.first or forloop.parentloop.first %}</th>{% else %}</td>{% endif %}
-                {% endfor %}
-                </tr>
-                {% endfor %}
-            </tr>
-        </table>
-
-        <hr>
-
-        {% for spec in specific_tables %}
-            <table class="table-bordered">
-                <caption>{{ spec.title }}</caption>
-                {% for row in spec.datas %}
-                    <tr>
-                    {% for col in row %}
-                        {% if forloop.parentloop.first %}
-                            <th>
-                        {% elif forloop.first %}
-                            {% if forloop.parentloop.counter|divisibleby:"2" %}
-                                <th rowspan="2">
-                            {% else %}
-                                <td>
-                            {% endif %}
+                    {% if forloop.parentloop.first %}
+                        <th>
+                    {% elif forloop.first %}
+                        {% if forloop.parentloop.counter|divisibleby:"2" %}
+                            <th rowspan="2">
                         {% else %}
                             <td>
                         {% endif %}
-                            {{ col }}
-                        {% if forloop.first or forloop.parentloop.first %}
-                            </th>
-                        {% else %}
-                            </td>
-                        {% endif %}
-                    {% endfor %}
-                    </tr>
-                    {% endfor %}
-                </tr>
-            </table>
-        {% endfor %}
-
-    {% else %}
-        <table class="table-bordered">
-            <caption>Por dias</caption>
-            {% for row in day_table %}
-                <tr>
-                {% for col in row %}
-                    {% if forloop.first or forloop.parentloop.first %}<th>{% else %}<td>{% endif %}
+                    {% else %}
+                        <td>
+                    {% endif %}
                         {{ col }}
-                    {% if forloop.first or forloop.parentloop.first %}</th>{% else %}</td>{% endif %}
+                    {% if forloop.first or forloop.parentloop.first %}
+                        </th>
+                    {% else %}
+                        </td>
+                    {% endif %}
                 {% endfor %}
                 </tr>
                 {% endfor %}
             </tr>
         </table>
-    {% endif %}
+    {% endfor %}
 
-{% endblock %}
+{% elif arqueo_table %}
+    <table class="table-bordered">
+        <caption>Por dias</caption>
+        {% for row in day_table %}
+            <tr>
+            {% for col in row %}
+                {% if forloop.first or forloop.parentloop.first %}<th>{% else %}<td>{% endif %}
+                    {{ col }}
+                {% if forloop.first or forloop.parentloop.first %}</th>{% else %}</td>{% endif %}
+            {% endfor %}
+            </tr>
+            {% endfor %}
+        </tr>
+    </table>
+{% else %}
+    ...
+{% endif %}

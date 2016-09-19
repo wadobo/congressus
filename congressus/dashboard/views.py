@@ -416,9 +416,13 @@ class ReportView(TemplateView):
         return general_table, specific_tables
 
     def post(self, request, ev):
-        template_name = 'dashboard/report.html'
         event = get_object_or_404(Event, slug=ev)
         ctx = {}
+
+        ctx['ev'] = get_object_or_404(Event, slug=ev)
+        ctx['sessions'] = Session.objects.all()
+        ctx['windows'] = TicketWindow.objects.all()
+
         report_type = request.POST.get('type')
         ctx['report_type'] = report_type
 
@@ -433,6 +437,6 @@ class ReportView(TemplateView):
             arqueo_table = self.get_arqueo(request)
             ctx['arqueo_table'] = arqueo_table
 
-        return render(request, 'dashboard/report.html', ctx)
+        return render(request, self.template_name, ctx)
 
 report = csrf_exempt(staff_member_required(ReportView.as_view()))

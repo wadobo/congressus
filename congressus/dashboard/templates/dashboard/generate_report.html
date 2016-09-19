@@ -2,6 +2,10 @@
 {% load i18n %}
 {% load staticfiles %}
 
+{% block extrahead %}
+    <link href="{% static "css/report.css" %}?v=4.0" rel="stylesheet">
+{% endblock %}
+
 {% block title %} Informes {% endblock %}
 
 {% block content %}
@@ -53,4 +57,6 @@
             {% endfor %}
         </div>
     </form>
+
+    {% include "dashboard/report.html" %}
 {% endblock %}
