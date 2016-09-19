@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^window/', include('windows.urls')),
     url(r'^access/', include('access.urls')),
     url(r'^dashboard/', include('dashboard.urls')),
+    url(r'^report/', include('dashboard.urls_report')),
     url(r'^invs/', include('invs.urls')),
     url(r'', include('tickets.urls')),
 ]

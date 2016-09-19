@@ -1,8 +1,18 @@
 from copy import deepcopy
 from datetime import timedelta
+from datetime import datetime
 from django.conf import settings
 from django.contrib.admin.models import LogEntry, CHANGE
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.contenttypes.models import ContentType
+# Django 1.10: instead .extra (deprecated soon)
+#from django.db.models.functions import TruncDay
+from django.db import connection
+from django.db.models import Count
+from django.db.models import F
+from django.db.models import FloatField
+from django.db.models import Sum
+from django.db.models import Value
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
@@ -284,3 +294,145 @@ class GeneralView(TemplateView):
             ctx['charts'].append(self.get_chart(chart.type, chart.timestep, chart.max_steps))
         return JsonResponse(ctx)
 general = csrf_exempt(GeneralView.as_view())
+
+
+class ReportView(TemplateView):
+    template_name = 'dashboard/generate_report.html'
+
+    def get_context_data(self, *args, **kwargs):
+        ctx = super(ReportView, self).get_context_data(*args, **kwargs)
+        ctx['ws_server'] = settings.WS_SERVER
+        ev = self.kwargs['ev']
+        ctx['ev'] = get_object_or_404(Event, slug=ev)
+        ctx['sessions'] = Session.objects.all()
+        ctx['windows'] = TicketWindow.objects.all()
+        return ctx
+
+    def get_sessions(self, request, report_type):
+        if report_type == 'online':
+            start_date = request.POST.get('start-date')
+            start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+            end_date = request.POST.get('end-date')
+            end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+            sessions = Session.objects.filter(start__range=(start_date, end_date))
+        else:
+            sessions = Session.objects.all()
+        return sessions
+
+    def get_online_datas(self, sessions, report_type):
+        if report_type == 'window_sale':
+            return None
+        tickets = Ticket.objects.filter(confirmed=True, sold_in_window=False, session__in=sessions)
+        return tickets.values('session__name', 'session__tax', 'session__space__name')\
+                .annotate(
+                        amount=Count('pk'),
+                        total_price=Sum('price'),
+                        price_without_iva=Sum(F('price')/(1+F('tax')/100.0), output_field=FloatField()))\
+                .order_by('session__start')
+
+    def get_window_sale_datas(self, report_type):
+        if report_type == 'online':
+            return None
+        tickets = Ticket.objects.filter(confirmed=True, sold_in_window=True)
+        return tickets.values('session__name', 'session__tax', 'session__space__name')\
+                .annotate(
+                        amount=Count('pk'),
+                        total_price=Sum('price'),
+                        price_without_iva=Sum(F('price')/(1+F('tax')/100.0), output_field=FloatField()))\
+                .order_by('session__start')
+
+    def get_arqueo(self, request):
+        sessions = [1,2]
+        window_sales = [1,2]
+        tickets = Ticket.objects.filter(confirmed=True, sold_in_window=True, session__in=sessions)
+        truncate_date = connection.ops.date_trunc_sql('day', 'created')
+        qs = tickets.extra({'day': truncate_date})
+        # Django 1.10
+        # qs = tickets.annotate(day=TruncDay('created'))
+        res =  qs.values('day', 'session__name', 'session__tax', 'session__space__name')\
+                .annotate(
+                        amount=Count('pk'),
+                        total_price=Sum('price'),
+                        price_without_iva=Sum(F('price')/(1+F('tax')/100.0), output_field=FloatField()))\
+                .order_by('day')
+
+        tws = TicketWindowSale.objects.get(purchase__tickets=self)
+
+    def get_datas(self, window_sales, onlines, sessions, report_type):
+        general_table = []
+        specific_tables = []
+        general = {
+                'online': {'amount': 0, 'p_iva': 0, 'p_noiva': 0},
+                'window_sale': {'amount': 0, 'p_iva': 0, 'p_noiva': 0},
+        }
+
+        if report_type in ['online', 'general']:
+            specific_tables.append({'title': 'Online', 'datas': []})
+            last_spec_table = specific_tables[-1]['datas']
+            last_spec_table.append(['tickets of', '', 'total'])
+            for o in onlines:
+                general['online']['p_iva'] += o.get('total_price')
+                general['online']['p_noiva'] += o.get('price_without_iva')
+                general['online']['amount'] += o.get('amount')
+                last_spec_table.append([o.get('session__name'), '#', o.get('amount')])
+                last_spec_table.append(['€ / € sin IVA', '%.2f / %.2f' % (o.get('total_price'), o.get('price_without_iva'))])
+
+        if report_type in ['window_sale', 'general']:
+            specific_tables.append({'title': 'Window sale', 'datas': []})
+            last_spec_table = specific_tables[-1]['datas']
+            last_spec_table.append(['tickets of', '', 'total'])
+            for w in window_sales:
+                general['window_sale']['p_iva'] += w.get('total_price')
+                general['window_sale']['p_noiva'] += w.get('price_without_iva')
+                general['window_sale']['amount'] += w.get('amount')
+                last_spec_table.append([w.get('session__name'), '#', w.get('amount')])
+                last_spec_table.append(['€ / € sin IVA', '%.2f / %.2f' % (w.get('total_price'), w.get('price_without_iva'))])
+
+        general_table = [
+                ['', 'Online', 'Window sale', 'Total'],
+                [
+                    '#',
+                    general['online']['amount'],
+                    general['window_sale']['amount'],
+                    general['online']['amount'] + general['window_sale']['amount']
+                ],
+                [
+                    '€/€ sin IVA',
+                    '%.2f / %.2f' % (general['online']['p_iva'], general['online']['p_noiva']),
+                    '%.2f / %.2f' % (general['window_sale']['p_iva'], general['window_sale']['p_noiva']),
+                    '%.2f / %.2f' % (general['online']['p_iva'] + general['window_sale']['p_iva'],
+                                 general['online']['p_noiva'] + general['window_sale']['p_noiva'])
+                ]
+        ]
+        # Removed some datas if not neccesary
+        if report_type in ['online', 'window_sale']:
+            for row in general_table:
+                del row[-1] # Total
+                if report_type == 'online':
+                    del row[2]
+                else:
+                    del row[1]
+
+        return general_table, specific_tables
+
+    def post(self, request, ev):
+        template_name = 'dashboard/report.html'
+        event = get_object_or_404(Event, slug=ev)
+        ctx = {}
+        report_type = request.POST.get('type')
+        ctx['report_type'] = report_type
+
+        if report_type != 'arqueo':
+            window_sales = self.get_window_sale_datas(report_type)
+            sessions = self.get_sessions(request, report_type)
+            onlines = self.get_online_datas(sessions, report_type)
+            gtable, stables = self.get_datas(window_sales, onlines, sessions, report_type)
+            ctx['general_table'] = gtable
+            ctx['specific_tables'] = stables
+        else:
+            arqueo_table = self.get_arqueo(request)
+            ctx['arqueo_table'] = arqueo_table
+
+        return render(request, 'dashboard/report.html', ctx)
+
+report = csrf_exempt(staff_member_required(ReportView.as_view()))

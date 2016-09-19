@@ -1,0 +1,56 @@
+{% extends "base-admin.html" %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block title %} Informes {% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        {% block pretitle %}
+        <h1 class="inline"> Reports</h1>
+        {% endblock %}
+    </div>
+
+    <form method="POST">
+        <input type="submit" value="General">
+        <input name="type" type="hidden" value="general">
+        <input name="ev" type="hidden" value="{{ ev }}">
+    </form>
+    <br>
+
+    <form method="POST">
+        <input type="submit" value="Taquilla">
+        <input name="type" type="hidden" value="window_sale">
+        <input name="ev" type="hidden" value="{{ ev }}">
+    </form>
+    <br>
+
+    <form method="POST">
+        <input type="submit" value="Online">
+        <input name="type" type="hidden" value="online">
+        <input name="ev" type="hidden" value="{{ ev }}">
+        <label for="start-date">Start date</label>
+        <input name="start-date" type="date" data-date="" data-date-format="DD MMMM YYYY" value="2016-01-01">
+        <label for="end-date">End date</label>
+        <input name="end-date" type="date" data-date="" data-date-format="DD MMMM YYYY" value="2016-01-01">
+    </form>
+    <br>
+
+    <form method="POST">
+        <input type="submit" value="Arqueo">
+        <input name="type" type="hidden" value="arqueo">
+        <input name="ev" type="hidden" value="{{ ev }}">
+        <div>
+            {% for session in sessions %}
+                <input type="checkbox" name="scheck-{{ forloop.counter0 }}" value="{{ session.name }}">
+                {{ session.name }}<br>
+            {% endfor %}
+        </div>
+        <div>
+            {% for window in windows %}
+                <input type="checkbox" name="wcheck-{{ forloop.counter0 }}" value="{{ window.name }}">
+                {{ window.name }}<br>
+            {% endfor %}
+        </div>
+    </form>
+{% endblock %}
