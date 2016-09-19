@@ -1,11 +1,16 @@
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
+from django.utils.safestring import mark_safe
+from django.core.urlresolvers import reverse
+
 from .models import Ticket
 from .models import MultiPurchase
 from .models import TicketWarning
 from .models import TicketSeatHold
 from admin_csv import CSVMixin
+
+from .filters import TicketWindowFilter
 
 
 def confirm(modeladmin, request, queryset):
@@ -62,12 +67,31 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
     twin.short_description = _('ticket window')
 
 
+class TicketInline(admin.TabularInline):
+    model = Ticket
+    fields = ('link_order', 'session', 'price', 'seat_layout', 'seat')
+    readonly_fields = fields
+
+    def link_order(self, obj):
+        url = reverse('admin:tickets_ticket_change', args=(obj.id,))
+        html = '<a href="' + url + '">' + obj.order + '</a>'
+        return mark_safe(html)
+    link_order.short_description = _('order')
+
+    def has_delete_permission(self, request, obj):
+        return False
+
+    def has_add_permission(self, request):
+        return False
+
+
 class MPAdmin(CSVMixin, admin.ModelAdmin):
-    list_display = ('order', 'order_tpv', 'ev', 'confirmed', 'email', 'price', 'ntickets', 'twin')
-    list_filter = ('confirmed', 'ev')
-    search_fields = ('order', 'order_tpv', 'email')
+    list_display = ('order_tpv', 'twin', 'created', 'confirmed', 'email', 'ntickets', 'price', 'event')
+    list_filter = ('confirmed', TicketWindowFilter, 'ev')
+    search_fields = ('order', 'order_tpv', 'email', 'extra_data')
     date_hierarchy = 'created'
     actions = [confirm, unconfirm]
+    inlines = [TicketInline, ]
     csv_fields = [
         'email',
 
@@ -84,6 +108,26 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
         'ev',
         'created',
     ]
+
+    readonly_fields = (
+        'order_tpv', 'order', 'ev',
+        'confirmed', 'confirmed_date',
+        'ntickets', 'price',
+        'formated_extra_data',
+    )
+
+    fieldsets = (
+        (None, {
+            'fields': ('order_tpv', 'order', 'ev')
+        }),
+        (_('Personal info'), {
+            'fields': (('email', 'confirm_sent'), 'formated_extra_data')
+        }),
+        (_('Extra info'), {
+            'fields': (('confirmed', 'confirmed_date'),
+                       ('ntickets', 'price'), 'discount')
+        }),
+    )
 
     def ntickets(self, obj):
         return obj.tickets.count()
@@ -102,6 +146,15 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
     def price(self, obj):
         return obj.get_price()
     price.short_description = _('price')
+
+    def formated_extra_data(self, obj):
+        extras = obj.get_extras_dict()
+        html = '<table>'
+        for k in sorted(extras.keys()):
+            html += '<tr><th style="width: 20%">' + k + '</th><td>' + str(extras[k]) + '</td></tr>'
+        html += '</table>'
+        return mark_safe(html)
+    formated_extra_data.short_description = _('extra data')
 
 
 class TicketWarningAdmin(admin.ModelAdmin):

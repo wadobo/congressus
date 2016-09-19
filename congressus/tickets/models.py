@@ -196,6 +196,12 @@ class BaseExtraData:
         data[key] = value
         self.extra_data = json.dumps(data)
 
+    def get_extras_dict(self):
+        extras = {}
+        for field in self.event().fields.all():
+            extras[field.label] = self.get_extra_data(field.label)
+        return extras
+
     def get_extras(self):
         extras = []
         for field in self.event().fields.all():
