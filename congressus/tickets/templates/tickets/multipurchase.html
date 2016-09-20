@@ -85,9 +85,9 @@
                                         </span>
                                         <span class="ticket-price input-group-addon">
                                             {% if window %}
-                                                x{{ session.window_price }} €
+                                                x{{ session.window_price|floatformat:"-2" }} €
                                             {% else %}
-                                                {{ session.price }} €
+                                                {{ session.price|floatformat:"-2" }} €
                                                 <span>/ {% trans "u" %}</span>
                                             {% endif %}
                                         </span>

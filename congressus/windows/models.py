@@ -32,7 +32,7 @@ class TicketWindow(models.Model):
     name = models.CharField(_('name'), max_length=200)
     slug = AutoSlugField(populate_from='name')
     code = models.CharField(_('code'), max_length=5, help_text=_('code to show in tickets'))
-    cash = models.IntegerField(_('cash in the ticket window'), default=0)
+    cash = models.FloatField(_('cash in the ticket window'), default=0)
 
     location = models.CharField(_('location'), max_length=500, blank=True, null=True)
     online = models.BooleanField(_('online'), default=False)
@@ -81,9 +81,9 @@ class TicketWindowSale(models.Model):
     user = models.ForeignKey(User, related_name='sales', verbose_name=_('user'), blank=True, null=True)
     purchase = models.ForeignKey(MultiPurchase, related_name='sales', verbose_name=_('multipurchase'))
 
-    price = models.PositiveIntegerField(_('price'), default=0)
-    payed = models.PositiveIntegerField(_('payed'), default=0)
-    change = models.PositiveIntegerField(_('change'), default=0)
+    price = models.FloatField(_('price'), default=0)
+    payed = models.FloatField(_('payed'), default=0)
+    change = models.FloatField(_('change'), default=0)
     payment = models.CharField(_('payment'), max_length=10, choices=PAYMENT_TYPES, default='cash')
 
     date = models.DateTimeField(auto_now_add=True)
@@ -102,7 +102,7 @@ class TicketWindowSale(models.Model):
 class TicketWindowCashMovement(models.Model):
     window = models.ForeignKey(TicketWindow, related_name='movements', verbose_name=_('window'))
     type = models.CharField(_('type'), max_length=10, choices=CASH_MOVEMENT_TYPES, default='add')
-    amount = models.PositiveIntegerField(_('amount'), default=0)
+    amount = models.FloatField(_('amount'), default=0)
 
     date = models.DateTimeField(auto_now_add=True)
 
@@ -125,7 +125,7 @@ def update_window_cash(sender, instance, created, raw, using, update_fields, **k
                 amount = instance.amount
             else:
                 amount = -instance.amount
-        instance.window.cash += int(amount)
+        instance.window.cash += amount
         instance.window.save()
 
 post_save.connect(update_window_cash, TicketWindowCashMovement)

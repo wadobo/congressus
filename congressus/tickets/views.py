@@ -235,7 +235,7 @@ class Payment(TemplateView):
         ctx['error'] = self.request.GET.get('error', '')
         ctx['expired_time'] = settings.EXPIRED_SEAT_C
 
-        amount = str(tk.get_price() * 100)
+        amount = str(int(tk.get_price() * 100))
         order = tk.order_tpv
         merchant = settings.TPV_MERCHANT
         currency = '978'
