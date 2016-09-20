@@ -387,6 +387,7 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
             return None
         row, column = self.seat.split('-')
         return _('L%(layout)s-R%(row)s-C%(col)s') % {'layout': self.seat_layout.name, 'row': row, 'col': column}
+    cseat.short_description = _('seat')
 
     def seat_row(self):
         if not self.seat:

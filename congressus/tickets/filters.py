@@ -21,3 +21,14 @@ class TicketWindowFilter(admin.SimpleListFilter):
             return queryset.filter(sales__window__id=self.value())
         else:
             return queryset.filter(sales__window=None)
+
+
+class SingleTicketWindowFilter(TicketWindowFilter):
+    def queryset(self, request, queryset):
+        if not self.value():
+            return queryset
+
+        if self.value() != '--':
+            return queryset.filter(mp__sales__window__id=self.value())
+        else:
+            return queryset.filter(mp__sales__window=None)

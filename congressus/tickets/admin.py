@@ -4,6 +4,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse
 
+from django.utils import timezone
+from django.utils.formats import date_format
+
 from .models import Ticket
 from .models import MultiPurchase
 from .models import TicketWarning
@@ -11,6 +14,7 @@ from .models import TicketSeatHold
 from admin_csv import CSVMixin
 
 from .filters import TicketWindowFilter
+from .filters import SingleTicketWindowFilter
 from windows.models import TicketWindowSale
 
 
@@ -29,8 +33,10 @@ unconfirm.short_description = _("Manual unconfirm")
 
 
 class TicketAdmin(CSVMixin, admin.ModelAdmin):
-    list_display = ('order', 'order_tpv', 'event_name', 'confirmed', 'used', 'email', 'session', 'price', 'cseat', 'mp', 'twin')
-    list_filter = ('confirmed', 'event_name')
+    list_display = ('order', 'order_tpv2', 'session2', 'cseat', 'twin',
+                    'created2', 'confirmed', 'used',
+                    'email', 'payment', 'price2', 'event')
+    list_filter = ('confirmed', SingleTicketWindowFilter, 'event_name')
     search_fields = ('order', 'order_tpv', 'email', 'mp__order', 'mp__order_tpv')
     date_hierarchy = 'created'
     actions = [confirm, unconfirm]
@@ -43,7 +49,7 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
         'confirmed',
         'confirmed_date',
 
-        'price',
+        'price2',
         'cseat',
         'mp',
         'twin',
@@ -54,8 +60,51 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
         'created',
     ]
 
-    def price(self, obj):
+    readonly_fields = (
+        'order_tpv_linked', 'order', 'event_name', 'session2', 'cseat',
+        'confirmed', 'confirmed_date', 'price', 'tax',
+        'email', 'formated_extra_data',
+        'used', 'used_date', 'gate_name',
+        'start', 'end',
+    )
+
+    fieldsets = (
+        (None, {
+            'fields': ('order', 'order_tpv_linked', 'event_name',
+                       'session2', 'cseat')
+        }),
+        (_('Personal info'), {
+            'fields': ('email', 'formated_extra_data')
+        }),
+        (_('Extra info'), {
+            'fields': (('confirmed', 'confirmed_date'),
+                       ('price', 'tax'),
+                       ('used', 'used_date', 'gate_name'),
+                       'start', 'end')
+        }),
+    )
+
+    def formated_extra_data(self, obj):
+        extras = obj.get_extras_dict()
+        html = '<table>'
+        for k in sorted(extras.keys()):
+            html += '<tr><th style="width: 20%">' + k + '</th><td>' + str(extras[k]) + '</td></tr>'
+        html += '</table>'
+        return mark_safe(html)
+    formated_extra_data.short_description = _('extra data')
+
+    def order_tpv_linked(self, obj):
+        if not obj.mp:
+            return obj.order_tpv
+
+        url = reverse('admin:tickets_multipurchase_change', args=(obj.mp.id,))
+        html = '<a href="' + url + '">' + obj.mp.order_tpv + '</a>'
+        return mark_safe(html)
+    order_tpv_linked.short_description = _('order TPV')
+
+    def price2(self, obj):
         return obj.get_price()
+    price2.short_description = _('price')
 
     def twin(self, obj):
         try:
@@ -65,6 +114,33 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
         prefix = tws.window.code
         return prefix
     twin.short_description = _('ticket window')
+
+    def order_tpv2(self, obj):
+        if obj.mp:
+            return obj.mp.order_tpv
+        else:
+            return obj.order_tpv
+    order_tpv2.short_description = _('order TPV')
+
+    def session2(self, obj):
+        return obj.session.short()
+    session2.short_description = _('session')
+
+    def payment(self, obj):
+        if not obj.mp:
+            return '-'
+        try:
+            tws = TicketWindowSale.objects.get(purchase=obj.mp)
+        except:
+            return '-'
+        return tws.get_payment_display()
+    payment.short_description = _('payment')
+
+    def created2(self, obj):
+        fmt='d/m/y H:i:s'
+        d1 = timezone.localtime(obj.created)
+        return date_format(d1, fmt)
+    created2.short_description = _('date')
 
 
 class TicketInline(admin.TabularInline):
