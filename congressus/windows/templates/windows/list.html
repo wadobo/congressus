@@ -6,10 +6,12 @@
 
 {% block content %}
     <div class="page-header">
-        <h1>
+        {% block pretitle %}
+        <h1 class="inline">
             {{ ev }} <small>{% trans "Window ticket admin" %}</small>
             <small class="pull-right"> {{ date|date:"l j F Y" }} </small>
         </h1>
+        {% endblock %}
     </div>
 
     <div class="text-center">
