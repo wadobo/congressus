@@ -59,6 +59,11 @@ function recalcTotal() {
         sum += price * n;
     });
     sum = apply_discount(sum);
+    if (sum > 0) {
+        $("#finish")[0].disabled = false;
+    } else {
+        $("#finish")[0].disabled = true;
+    }
     $("#total").val(sum);
 }
 

@@ -104,7 +104,7 @@
                     <option value="{{ pf }}" {% if pf == default_pf %} selected{% endif %}>{{ pf }}</option>
                 {% endfor %}
             </select>
-            <button id="finish" class="btn btn-success btn-block btn-lg"
+            <button id="finish" class="btn btn-success btn-block btn-lg" disabled
                 data-msg="{% trans "The ticket will be purchased, are you sure?" %}">
                 {% trans "Finish" %}
             </button>
