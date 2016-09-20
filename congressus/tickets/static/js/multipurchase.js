@@ -342,8 +342,6 @@ $(document).ready(function() {
     });
 
     $(".plus").click(function() {
-        btn = $(this);
-        btn.prop("disabled", true); // Disable button
         var id = '#' + $(this).data("id");
         var max = parseInt($(id).attr('max') || 500, 10);
         var current = parseInt($(id).val(), 10);
@@ -354,10 +352,6 @@ $(document).ready(function() {
         }
         $(id).val(next);
         $(id).keyup();
-
-        setTimeout(function() {
-            btn.prop("disabled", false); // Enable button
-        }, 600);
     });
     $(".minus").click(function() {
         var id = '#' + $(this).data("id");
