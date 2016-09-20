@@ -17,6 +17,9 @@ function clean() {
     $("#total").val(0);
     $("#change").val(0);
     $("#payed").val("");
+    $(".subtotal").each(function() {
+        $(this).html(0);
+    });
 
     return false;
 }
