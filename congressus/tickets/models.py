@@ -132,7 +132,13 @@ class BaseTicketMixing:
         email.send(fail_silently=False)
 
     def get_absolute_url(self):
-        return reverse('payment', kwargs={'order': self.order})
+        url = 'payment' if not self.confirmed else 'thanks'
+
+        order = self.order
+        if hasattr(self, 'mp') and self.mp:
+            order = self.mp.order
+
+        return reverse(url, kwargs={'order': order})
 
     def is_mp(self):
         return False
