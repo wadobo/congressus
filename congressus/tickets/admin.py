@@ -190,6 +190,7 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
         'confirmed', 'confirmed_date',
         'ntickets', 'price', 'payment',
         'formated_extra_data',
+        'tpv_error', 'tpv_error_info',
     )
 
     fieldsets = (
@@ -202,7 +203,9 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
         (_('Extra info'), {
             'fields': (('confirmed', 'confirmed_date'),
                        ('ntickets', 'price'),
-                       'discount', 'payment')
+                       'discount', 'payment',
+                       'tpv_error', 'tpv_error_info',
+                      )
         }),
     )
 
