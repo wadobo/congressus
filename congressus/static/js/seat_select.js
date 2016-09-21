@@ -7,7 +7,7 @@ function autoSeats(session, amount_seats) {
         url: "/seats/auto/",
         success: function(msg){
             if (msg.error) {
-                deferred.reject(msg.error);
+                deferred.reject(msg);
             } else {
                 deferred.resolve(msg["seats"]);
             }

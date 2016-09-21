@@ -224,14 +224,16 @@ function autoSelectSeat(s, n) {
         });
         $("#seats-"+s).val(value.join(","));
         fillSelectedSeats($("#seats-"+s));
-    }).fail(function(error) {
+    }).fail(function(data) {
         $("#"+s).val(0);
         var layouts = $('#modal-'+s+' .layout');
         layouts.each(function() {
             var id = $(this).data('id');
             updateBadges(s, id);
         });
-        alert(error);
+        if (!data.fail_silently) {
+            alert(data.error);
+        }
     });
 }
 
@@ -333,6 +335,10 @@ $(document).ready(function() {
     $('.sessioninput').keyup(function() {
         var obj = $(this);
         delay(function() { seatsChange(obj) }, 500);
+        var s = obj.data('session');
+        if (!$("#modal-"+s+":visible").length) {
+            $("#tooltip-"+s).tooltip('show');
+        }
     });
     recalcTotal();
 
