@@ -1,3 +1,11 @@
+// Fix to make startsWith work in IE 11
+if (!String.prototype.startsWith) {
+    String.prototype.startsWith = function(searchString, position) {
+        position = position || 0;
+        return this.substr(position, searchString.length) === searchString;
+    };
+}
+
 var old_session = -1;
 var old_layout = -1;
 
