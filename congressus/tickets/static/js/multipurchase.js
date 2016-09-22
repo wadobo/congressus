@@ -335,10 +335,6 @@ $(document).ready(function() {
     $('.sessioninput').keyup(function() {
         var obj = $(this);
         delay(function() { seatsChange(obj) }, 500);
-        var s = obj.data('session');
-        if (!$("#modal-"+s+":visible").length) {
-            $("#tooltip-"+s).tooltip('show');
-        }
     });
     recalcTotal();
 

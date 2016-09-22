@@ -72,9 +72,15 @@
                                                  min='0' max='{{ max_seat_by_session }}' type="text"
                                             data-session="{{ session.id }}"
                                             data-price="{% if window %}{{ session.window_price }}{% else %}{{ session.price }}{% endif %}"
-                                            {% if not session.space.numbered %}name="number_{{ session.id }}"{% endif %}
+                                            {% if not session.space.numbered %}
+                                            name="number_{{ session.id }}"
+                                            {% elif not window %}
+                                            readonly
+                                            {% endif %}
                                             value="{% key request.POST session.id "number_" "0" %}"
                                         />
+                                        {% if not window and session.space.numbered %}
+                                        {% else %}
                                         <span class="buttons input-group-btn">
                                             <button data-id="{{ session.id }}" class="plus btn btn-default" type="button">
                                                 <span class="glyphicon glyphicon-plus" ahire-hidden="true"></span>
@@ -83,6 +89,7 @@
                                                 <span class="glyphicon glyphicon-minus" ahire-hidden="true"></span>
                                             </button>
                                         </span>
+                                        {% endif %}
                                         <span class="ticket-price input-group-addon">
                                             {% if window %}
                                                 x{{ session.window_price|floatformat:"-2" }} €
