@@ -1,6 +1,12 @@
 {% load i18n %}
 {% load tickets %}
 <div class="map">
+    <div id="maphelp">
+        {% trans "To choose your seats:" %}<br/>
+        {% trans "Step 1: Select the stand zone." %}<br/>
+        {% trans "Step 2: Select the seats." %}<br/>
+    </div>
+
     <table class="table-bordered table">
         {% for r in map.get_table %}
             <tr>
@@ -14,8 +20,21 @@
                     data-name="{{ c.name }}" data-layout="{{ c.layout }}"
                     data-dir="{{ c.direction }}"
                     data-glyph="{{ c.glyph }}">
-                        <span id="badge-{{ session.id }}-{{ c.id }}" class="label label-default">0</span> {{ c }} / {{ free }}
-                        <span class="glyphicon {{ c.glyph }}" aria-hidden="true"></span>
+
+                        <div class="layout-zone-name">
+                            {{ c }}
+                        </div>
+                        <div class="layout-zone-selection hidden-xs">
+                            {% trans "Selected:" %}
+                            <span id="badge-{{ session.id }}-{{ c.id }}" class="label label-default">0</span>
+                        </div>
+                        <div class="layout-zone-free hidden-xs">
+                            {% trans "Free:" %} {{ free }}
+                        </div>
+
+                        <div class="visible-xs">
+                            <span id="badge-{{ session.id }}-{{ c.id }}" class="label label-default">0</span> {{ free }}
+                        </div>
                     </td>
                 {% else %}
                     <td class="empty">{{ c }}</td>
@@ -27,10 +46,10 @@
 </div>
 
 <div id="separator">
-    <span class="legend seat-L">12</span> {% trans "Available" %}
-    <span class="legend seat-R">12</span> {% trans "Reserved" %}
-    <span class="legend seat-H">12</span> {% trans "In reserve process" %}
-    <span class="legend seat-selected">12</span> {% trans "Selected" %}
+    <span class="legend seat-L"></span> {% trans "Available" %}
+    <span class="legend seat-R"></span> {% trans "Reserved" %}
+    <span class="legend seat-H"></span> {% trans "In reserve process" %}
+    <span class="legend seat-selected"></span> {% trans "Selected" %}
 </div>
 
 {% for r in map.get_table %}
