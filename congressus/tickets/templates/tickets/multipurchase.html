@@ -50,7 +50,7 @@
                                 {% if session.space.numbered %}
                                 <div class="col-md-5 col-xs-9">
                                 {% else %}
-                                <div class="col-md-7 col-xs-12">
+                                <div class="col-md-6 col-xs-12">
                                 {% endif %}
                                     <span class="session-name">{{ session.name }}</span>
                                     <div class="text-muted text-date">
@@ -59,14 +59,14 @@
                                     </div>
                                 </div>
                                 {% if session.space.numbered %}
-                                <div class="col-md-2 col-xs-3 text-center">
+                                <div class="col-md-1 col-xs-3 text-center">
                                     {% include "tickets/seat_select.html" %}
                                     <input id="seats-{{ session.id }}" class="hidden seats-input" data-session="{{ session.id }}" type="text" name="seats_{{ session.id }}"
                                        value="{% key request.POST session.id "seats_" %}"
                                     />
                                 </div>
                                 {% endif %}
-                                <div class="sessioninput-td col-md-5 col-xs-12">
+                                <div class="sessioninput-td col-md-6 col-xs-12">
                                     <div class="sessioninput-group input-group">
                                         <input id="{{ session.id }}" class="sessioninput form-control"
                                                  min='0' max='{{ max_seat_by_session }}' type="text"
