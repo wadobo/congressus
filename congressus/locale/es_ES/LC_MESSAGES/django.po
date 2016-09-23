@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-22 18:29+0200\n"
-"PO-Revision-Date: 2016-09-22 18:30+0200\n"
-"Last-Translator: Daniel Garcia Moreno <danigm@wadobo.com>\n"
+"POT-Creation-Date: 2016-09-23 11:37+0200\n"
+"PO-Revision-Date: 2016-09-23 11:38+0100\n"
+"Last-Translator: Victor Ramirez <virako@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
-"X-Generator: Poedit 1.8.8\n"
+"X-Generator: Poedit 1.6.10\n"
 
 #: access/apps.py:7 access/templates/access/access.html:5
 msgid "Access"
@@ -148,7 +148,7 @@ msgid "password"
 msgstr "contraseña"
 
 #: access/templates/access/login.html:28 events/models.py:267
-#: tickets/admin.py:127 tickets/models.py:477
+#: tickets/admin.py:144 tickets/models.py:477
 msgid "session"
 msgstr "sesión"
 
@@ -476,7 +476,7 @@ msgid "seat map"
 msgstr "graderio"
 
 #: events/models.py:238 events/models.py:381 invs/models.py:49
-#: tickets/admin.py:155 tickets/models.py:255 tickets/models.py:331
+#: tickets/admin.py:172 tickets/models.py:255 tickets/models.py:331
 msgid "order"
 msgstr "orden"
 
@@ -681,7 +681,7 @@ msgstr "generador"
 msgid "created at"
 msgstr "creado el"
 
-#: invs/models.py:51 tickets/admin.py:94 tickets/admin.py:244
+#: invs/models.py:51 tickets/admin.py:111 tickets/admin.py:261
 #: tickets/models.py:271 tickets/models.py:349
 msgid "extra data"
 msgstr "datos extra"
@@ -711,7 +711,7 @@ msgstr "invitaciones"
 msgid "amount"
 msgstr "cantidad"
 
-#: invs/models.py:116 tickets/admin.py:107 tickets/admin.py:235
+#: invs/models.py:116 tickets/admin.py:124 tickets/admin.py:252
 #: tickets/models.py:357 windows/models.py:84
 msgid "price"
 msgstr "precio"
@@ -789,35 +789,43 @@ msgstr "Confirmación manual"
 msgid "Manual unconfirm"
 msgstr "Des-confirmación manual"
 
-#: tickets/admin.py:76 tickets/admin.py:200
+#: tickets/admin.py:41
+msgid "Mark like used"
+msgstr "Marcar como usado"
+
+#: tickets/admin.py:49
+msgid "Mark like no used"
+msgstr "Marcar como no usado"
+
+#: tickets/admin.py:93 tickets/admin.py:217
 #: tickets/templates/emails/ticket-info.txt:10
 #: tickets/templates/tickets/multipurchase.html:138
 #: tickets/templates/tickets/ticket-info.html:41
 msgid "Personal info"
 msgstr "Información personal"
 
-#: tickets/admin.py:79 tickets/admin.py:203
+#: tickets/admin.py:96 tickets/admin.py:220
 msgid "Extra info"
 msgstr "Información extra"
 
-#: tickets/admin.py:103 tickets/admin.py:123 tickets/models.py:256
+#: tickets/admin.py:120 tickets/admin.py:140 tickets/models.py:256
 #: tickets/models.py:332
 msgid "order TPV"
 msgstr "código TPV"
 
-#: tickets/admin.py:116 tickets/admin.py:231 windows/models.py:41
+#: tickets/admin.py:133 tickets/admin.py:248 windows/models.py:41
 msgid "ticket window"
 msgstr "taquilla"
 
-#: tickets/admin.py:137 tickets/admin.py:218 windows/models.py:87
+#: tickets/admin.py:154 tickets/admin.py:235 windows/models.py:87
 msgid "payment"
 msgstr "forma de pago"
 
-#: tickets/admin.py:143
+#: tickets/admin.py:160
 msgid "date"
 msgstr "fecha"
 
-#: tickets/admin.py:222
+#: tickets/admin.py:239
 msgid "ntickets"
 msgstr "nentradas"
 

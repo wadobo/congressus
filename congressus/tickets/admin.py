@@ -32,6 +32,23 @@ def unconfirm(modeladmin, request, queryset):
 unconfirm.short_description = _("Manual unconfirm")
 
 
+def mark_used(modeladmin, request, queryset):
+    now = timezone.now()
+    for i in queryset:
+        i.used = True
+        i.used_date = now
+        i.save()
+mark_used.short_description = _("Mark like used")
+
+
+def mark_no_used(modeladmin, request, queryset):
+    for i in queryset:
+        i.used = False
+        i.used_date = None
+        i.save()
+mark_no_used.short_description = _("Mark like no used")
+
+
 class TicketAdmin(CSVMixin, admin.ModelAdmin):
     list_display = ('order', 'order_tpv2', 'session2', 'cseat', 'twin',
                     'created2', 'confirmed', 'used',
@@ -39,7 +56,7 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
     list_filter = ('confirmed', SingleTicketWindowFilter, 'event_name')
     search_fields = ('order', 'order_tpv', 'email', 'mp__order', 'mp__order_tpv')
     date_hierarchy = 'created'
-    actions = [confirm, unconfirm]
+    actions = [confirm, unconfirm, mark_used, mark_no_used]
     csv_fields = [
         'email',
 
