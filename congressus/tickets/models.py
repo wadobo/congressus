@@ -385,6 +385,11 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
 
         if confirm and self.confirmed:
             self.confirmed_date = timezone.now()
+        if orig.used != self.used:
+            if self.used:
+                self.used_date = timezone.now()
+            else:
+                self.used_date = None
 
         super(Ticket, self).save(*args, **kw)
 

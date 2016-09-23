@@ -81,7 +81,7 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
         'order_tpv_linked', 'order', 'event_name', 'session2', 'cseat',
         'confirmed', 'confirmed_date', 'price', 'tax',
         'email', 'formated_extra_data',
-        'used', 'used_date', 'gate_name',
+        'used_date', 'gate_name',
         'start', 'end',
     )
 
