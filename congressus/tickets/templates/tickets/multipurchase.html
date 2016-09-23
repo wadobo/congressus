@@ -48,9 +48,9 @@
                         {% for session in space.sessions.all %}
                             <div class="row session-row {% cycle 'odd' 'even' %}">
                                 {% if session.space.numbered %}
-                                <div class="col-md-5 col-xs-9">
+                                {% block col-session-num-1 %}<div class="col-md-5 col-xs-9">{% endblock %}
                                 {% else %}
-                                <div class="col-md-6 col-xs-12">
+                                {% block col-session %}<div class="col-md-6 col-xs-12">{% endblock %}
                                 {% endif %}
                                     <span class="session-name">{{ session.name }}</span>
                                     <div class="text-muted text-date">
@@ -59,14 +59,14 @@
                                     </div>
                                 </div>
                                 {% if session.space.numbered %}
-                                <div class="col-md-1 col-xs-3 text-center">
+                                {% block col-session-num-2 %}<div class="col-md-1 col-xs-3 text-center">{% endblock %}
                                     {% include "tickets/seat_select.html" %}
                                     <input id="seats-{{ session.id }}" class="hidden seats-input" data-session="{{ session.id }}" type="text" name="seats_{{ session.id }}"
                                        value="{% key request.POST session.id "seats_" %}"
                                     />
                                 </div>
                                 {% endif %}
-                                <div class="sessioninput-td col-md-6 col-xs-12">
+                                {% block col-input %}<div class="sessioninput-td col-md-6 col-xs-12">{% endblock %}
                                     <div class="sessioninput-group input-group">
                                         <input id="{{ session.id }}" class="sessioninput form-control"
                                                  min='0' max='{{ max_seat_by_session }}' type="text"
