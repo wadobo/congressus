@@ -118,9 +118,14 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
                 tk.price = tk.get_window_price()
                 tk.save()
 
-            price = data.get('price', 0)
+            price = float(data.get('price', 0))
             payed = data.get('payed', 0)
-            change = data.get('change', 0)
+            if payed:
+                payed = float(payed)
+            else:
+                payed = 0
+
+            change = float(data.get('change', 0))
             payment = data.get('payment', 'cash')
             sale = TicketWindowSale(purchase=mp, window=w, user=request.user,
                                     price=price, payed=payed,
