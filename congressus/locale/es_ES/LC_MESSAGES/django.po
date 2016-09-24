@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-23 11:37+0200\n"
-"PO-Revision-Date: 2016-09-23 11:38+0100\n"
+"POT-Creation-Date: 2016-09-24 10:27+0200\n"
+"PO-Revision-Date: 2016-09-24 10:27+0100\n"
 "Last-Translator: Victor Ramirez <virako@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
 "Language: es\n"
@@ -25,7 +25,7 @@ msgstr "Control de acceso"
 #: access/models.py:11 dashboard/models.py:32 events/models.py:79
 #: events/models.py:142 events/models.py:230 events/models.py:339
 #: events/models.py:365 events/models.py:380 invs/models.py:23
-#: tickets/models.py:253 tickets/models.py:327 tickets/models.py:455
+#: tickets/models.py:253 tickets/models.py:327 tickets/models.py:460
 #: windows/models.py:30
 msgid "event"
 msgstr "evento"
@@ -98,7 +98,7 @@ msgid "Gate"
 msgstr "Puerta"
 
 #: access/templates/access/access.html:27 adminmenu/templates/menu.html:43
-#: windows/templates/windows/multipurchase.html:36
+#: windows/templates/windows/multipurchase.html:41
 msgid "logout"
 msgstr "salir"
 
@@ -148,7 +148,7 @@ msgid "password"
 msgstr "contraseña"
 
 #: access/templates/access/login.html:28 events/models.py:267
-#: tickets/admin.py:144 tickets/models.py:477
+#: tickets/admin.py:144 tickets/models.py:482
 msgid "session"
 msgstr "sesión"
 
@@ -158,7 +158,7 @@ msgid "gate"
 msgstr "puerta"
 
 #: access/templates/access/login.html:37 invs/templates/invs/generator.html:48
-#: windows/templates/windows/multipurchase.html:55
+#: windows/templates/windows/multipurchase.html:67
 msgid "None"
 msgstr "Nada"
 
@@ -286,8 +286,8 @@ msgid "each minute"
 msgstr "cada minuto"
 
 #: dashboard/models.py:23 events/models.py:50 events/models.py:369
-#: events/models.py:382 invs/models.py:114 tickets/models.py:459
-#: tickets/models.py:481 windows/models.py:104
+#: events/models.py:382 invs/models.py:114 tickets/models.py:464
+#: tickets/models.py:486 windows/models.py:104
 msgid "type"
 msgstr "tipo"
 
@@ -690,8 +690,8 @@ msgstr "datos extra"
 msgid "seat layout"
 msgstr "disposición de asientos"
 
-#: invs/models.py:56 tickets/models.py:344 tickets/models.py:396
-#: tickets/models.py:479
+#: invs/models.py:56 tickets/models.py:344 tickets/models.py:401
+#: tickets/models.py:484
 msgid "seat"
 msgstr "asiento"
 
@@ -753,12 +753,12 @@ msgid "Passes"
 msgstr "Pases"
 
 #: invs/templates/invs/generator.html:43
-#: windows/templates/windows/multipurchase.html:49
+#: windows/templates/windows/multipurchase.html:61
 msgid "Discount:"
 msgstr "Descuento:"
 
 #: invs/templates/invs/generator.html:59
-#: windows/templates/windows/multipurchase.html:68
+#: windows/templates/windows/multipurchase.html:80
 msgid "Clean"
 msgstr "Limpiar"
 
@@ -772,12 +772,12 @@ msgid "Comment"
 msgstr "Comentario"
 
 #: invs/templates/invs/generator.html:74
-#: windows/templates/windows/multipurchase.html:101
+#: windows/templates/windows/multipurchase.html:113
 msgid "Print format"
 msgstr "Formato de impresión"
 
 #: invs/templates/invs/generator.html:81
-#: windows/templates/windows/multipurchase.html:109
+#: windows/templates/windows/multipurchase.html:123
 msgid "Finish"
 msgstr "Terminar"
 
@@ -975,44 +975,44 @@ msgstr "entrada"
 msgid "tickets"
 msgstr "entrada"
 
-#: tickets/models.py:395
+#: tickets/models.py:400
 #, python-format
 msgid "L%(layout)s-R%(row)s-C%(col)s"
 msgstr "L%(layout)s-F%(row)s-C%(col)s"
 
-#: tickets/models.py:456
+#: tickets/models.py:461
 msgid "sessions1"
 msgstr "sesiones1"
 
-#: tickets/models.py:457
+#: tickets/models.py:462
 msgid "sessions2"
 msgstr "sesiones2"
 
-#: tickets/models.py:458
+#: tickets/models.py:463
 msgid "message"
 msgstr "mensaje"
 
-#: tickets/models.py:462
+#: tickets/models.py:467
 msgid "ticket warning"
 msgstr "alerta para entradas"
 
-#: tickets/models.py:463
+#: tickets/models.py:468
 msgid "ticket warnings"
 msgstr "alertas para entradas"
 
-#: tickets/models.py:476
+#: tickets/models.py:481
 msgid "client"
 msgstr "cliente"
 
-#: tickets/models.py:478
+#: tickets/models.py:483
 msgid "layout"
 msgstr "disposición de asientos"
 
-#: tickets/models.py:484
+#: tickets/models.py:489
 msgid "ticket seat hold"
 msgstr "reserva de asiento"
 
-#: tickets/models.py:485
+#: tickets/models.py:490
 msgid "ticket seat holds"
 msgstr "reservas de asientos"
 
@@ -1141,7 +1141,7 @@ msgid "u"
 msgstr "ud"
 
 #: tickets/templates/tickets/multipurchase.html:126
-#: windows/templates/windows/multipurchase.html:73
+#: windows/templates/windows/multipurchase.html:85
 msgid "Total"
 msgstr "Total"
 
@@ -1423,7 +1423,7 @@ msgid "today card"
 msgstr "tarjeta hoy"
 
 #: windows/templates/windows/list.html:40
-#: windows/templates/windows/multipurchase.html:85
+#: windows/templates/windows/multipurchase.html:97
 msgid "cash"
 msgstr "efectivo"
 
@@ -1431,24 +1431,32 @@ msgstr "efectivo"
 msgid "add / remove"
 msgstr "añadir / eliminar"
 
-#: windows/templates/windows/multipurchase.html:74
+#: windows/templates/windows/multipurchase.html:86
 msgid "Payment"
 msgstr "Forma de pago"
 
-#: windows/templates/windows/multipurchase.html:75
+#: windows/templates/windows/multipurchase.html:87
 msgid "Payed"
 msgstr "Pagado"
 
 #. Translators: change for the ticket window cash payment process
-#: windows/templates/windows/multipurchase.html:77
+#: windows/templates/windows/multipurchase.html:89
 msgid "Change"
 msgstr "Cambio"
 
-#: windows/templates/windows/multipurchase.html:91
+#: windows/templates/windows/multipurchase.html:103
 msgid "credit card"
 msgstr "tarjeta de crédito"
 
-#: windows/templates/windows/multipurchase.html:108
+#: windows/templates/windows/multipurchase.html:120
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: windows/templates/windows/multipurchase.html:121
+msgid "Accept"
+msgstr "Aceptar"
+
+#: windows/templates/windows/multipurchase.html:122
 msgid "The ticket will be purchased, are you sure?"
 msgstr "La entrada va a ser comprada, ¿estás seguro?"
 
