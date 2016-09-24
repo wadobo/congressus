@@ -68,18 +68,26 @@ function recalcTotal() {
 }
 
 $(document).ready(function() {
-    $("form").submit(function() {
+
+    $("#finish").click(function() {
         var msg = $("#finish").data("msg");
-        var ret = confirm(msg);
-        if (ret) {
-            args = ' ' + window.windows;
-            args += ' ' + moment().format('YYYY-MM-DDThh:mm:ss.SSSSSSZ');
-            args += ' ' + $('input[name=payment]:checked').val();
-            args += ' ' + $(".seat-selected").length;
-            ws.send('add_sale' + args);
-            setTimeout(clean, 1000);
-        }
-        return ret;
+        var btn_cancel = $("#finish").data("cancel");
+        var btn_ok = $("#finish").data("ok");
+        alertify.set({ labels: {
+            cancel: btn_cancel,
+            ok: btn_ok
+        } });
+        alertify.confirm(msg, function(e) {
+            if (e) {
+                args = ' ' + window.windows;
+                args += ' ' + moment().format('YYYY-MM-DDThh:mm:ss.SSSSSSZ');
+                args += ' ' + $('input[name=payment]:checked').val();
+                args += ' ' + $(".seat-selected").length;
+                ws.send('add_sale' + args);
+                setTimeout(clean, 1000);
+                $("form").submit();
+            }
+        });
     });
 
     $("#clean").click(clean);

@@ -20,6 +20,10 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
+    <!-- Alertify -->
+    <link rel="stylesheet" href="{% static "css/alertify.core.css" %}" />
+    <link rel="stylesheet" href="{% static "css/alertify.bootstrap.css" %}" />
+
     <link href="{% static "css/congressus.css" %}" rel="stylesheet">
     {% block themecss %}{% endblock %}
 
@@ -61,6 +65,8 @@
     <script src="{{ STATIC_URL }}js/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>
+    <!-- Alertify -->
+    <script src="{{ STATIC_URL }}js/alertify.min.js"></script>
 
     <script>
     // auto tooltip
