@@ -21,8 +21,9 @@ PAYMENT_TYPES = (
 
 
 CASH_MOVEMENT_TYPES = (
-    ('add', _('Add')),
-    ('remove', _('Remove')),
+    ('change', _('Change')),
+    ('preturn', _('Parcial return')),
+    ('return', _('Final return')),
 )
 
 
@@ -101,14 +102,17 @@ class TicketWindowSale(models.Model):
 
 class TicketWindowCashMovement(models.Model):
     window = models.ForeignKey(TicketWindow, related_name='movements', verbose_name=_('window'))
-    type = models.CharField(_('type'), max_length=10, choices=CASH_MOVEMENT_TYPES, default='add')
+    type = models.CharField(_('type'), max_length=10, choices=CASH_MOVEMENT_TYPES, default='change')
     amount = models.FloatField(_('amount'), default=0)
+
+    note = models.TextField(_('Note'), blank=True, null=True)
 
     date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = _('ticket window cash movement')
         verbose_name_plural = _('ticket window cash movements')
+        ordering = ['-id']
 
     def __str__(self):
         return "%s - %s - %s" % (self.window, self.type, self.amount)
@@ -121,7 +125,7 @@ def update_window_cash(sender, instance, created, raw, using, update_fields, **k
             if instance.payment == 'cash':
                 amount = instance.price
         elif isinstance(instance, TicketWindowCashMovement):
-            if instance.type == 'add':
+            if instance.type == 'change':
                 amount = instance.amount
             else:
                 amount = -instance.amount

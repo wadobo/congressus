@@ -54,6 +54,9 @@ INSTALLED_APPS = (
     'access',
     'dashboard',
     'invs',
+
+    # 3rd party, here to override templates
+    'extended_filters',
 )
 
 SITE_ID = 1
