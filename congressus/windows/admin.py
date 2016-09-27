@@ -32,6 +32,15 @@ class TicketWindowCashMovementAdmin(admin.ModelAdmin):
     search_fields = ('window__name', )
     date_hierarchy = 'date'
 
+    readonly_fields = ('date', 'id', 'day')
+
+    fieldsets = (
+        (None, {
+            'fields': ('id', ('date', 'day'),
+                       'window', 'amount', 'type', 'note')
+        }),
+    )
+
     def day(self, obj):
         d1 = timezone.localtime(obj.date)
         return date_format(d1, 'l')
