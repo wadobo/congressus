@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-24 10:27+0200\n"
-"PO-Revision-Date: 2016-09-24 10:27+0100\n"
-"Last-Translator: Victor Ramirez <virako@wadobo.com>\n"
+"POT-Creation-Date: 2016-09-27 17:16+0200\n"
+"PO-Revision-Date: 2016-09-27 17:06+0200\n"
+"Last-Translator: Daniel Garcia Moreno <danigm@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
-"X-Generator: Poedit 1.6.10\n"
+"X-Generator: Poedit 1.8.8\n"
 
 #: access/apps.py:7 access/templates/access/access.html:5
 msgid "Access"
@@ -26,7 +26,7 @@ msgstr "Control de acceso"
 #: events/models.py:142 events/models.py:230 events/models.py:339
 #: events/models.py:365 events/models.py:380 invs/models.py:23
 #: tickets/models.py:253 tickets/models.py:327 tickets/models.py:460
-#: windows/models.py:30
+#: windows/models.py:31
 msgid "event"
 msgstr "evento"
 
@@ -34,13 +34,13 @@ msgstr "evento"
 #: dashboard/models.py:33 events/models.py:49 events/models.py:68
 #: events/models.py:105 events/models.py:143 events/models.py:155
 #: events/models.py:231 events/models.py:251 events/models.py:429
-#: invs/models.py:19 windows/models.py:32
+#: invs/models.py:19 windows/models.py:33
 #: windows/templates/windows/list.html:34
 msgid "name"
 msgstr "nombre"
 
 #: access/models.py:16 access/templates/access/list.html:34
-#: windows/models.py:37
+#: windows/models.py:38
 msgid "location"
 msgstr "localización"
 
@@ -229,11 +229,11 @@ msgstr "Alternar navegación"
 msgid "dashboard"
 msgstr "panel de control"
 
-#: adminmenu/templates/menu.html:27 windows/models.py:38
+#: adminmenu/templates/menu.html:27 windows/models.py:39
 msgid "online"
 msgstr "online"
 
-#: adminmenu/templates/menu.html:30 windows/models.py:42
+#: adminmenu/templates/menu.html:30 windows/models.py:43
 msgid "ticket windows"
 msgstr "taquillas"
 
@@ -287,7 +287,7 @@ msgstr "cada minuto"
 
 #: dashboard/models.py:23 events/models.py:50 events/models.py:369
 #: events/models.py:382 invs/models.py:114 tickets/models.py:464
-#: tickets/models.py:486 windows/models.py:104
+#: tickets/models.py:486 windows/models.py:105
 msgid "type"
 msgstr "tipo"
 
@@ -576,7 +576,7 @@ msgstr "adjunto de email"
 msgid "email attachments"
 msgstr "adjuntos de emails"
 
-#: events/models.py:366 windows/models.py:34
+#: events/models.py:366 windows/models.py:35
 msgid "code"
 msgstr "código"
 
@@ -707,12 +707,12 @@ msgstr "invitación"
 msgid "invitations"
 msgstr "invitaciones"
 
-#: invs/models.py:115 windows/models.py:105
+#: invs/models.py:115 windows/admin.py:60 windows/models.py:106
 msgid "amount"
 msgstr "cantidad"
 
 #: invs/models.py:116 tickets/admin.py:124 tickets/admin.py:252
-#: tickets/models.py:357 windows/models.py:84
+#: tickets/models.py:357 windows/models.py:85
 msgid "price"
 msgstr "precio"
 
@@ -813,11 +813,11 @@ msgstr "Información extra"
 msgid "order TPV"
 msgstr "código TPV"
 
-#: tickets/admin.py:133 tickets/admin.py:248 windows/models.py:41
+#: tickets/admin.py:133 tickets/admin.py:248 windows/models.py:42
 msgid "ticket window"
 msgstr "taquilla"
 
-#: tickets/admin.py:154 tickets/admin.py:235 windows/models.py:87
+#: tickets/admin.py:154 tickets/admin.py:235 windows/models.py:88
 msgid "payment"
 msgstr "forma de pago"
 
@@ -931,7 +931,7 @@ msgstr "confirmación enviada"
 msgid "discount"
 msgstr "descuento"
 
-#: tickets/models.py:319 tickets/models.py:351 windows/models.py:82
+#: tickets/models.py:319 tickets/models.py:351 windows/models.py:83
 msgid "multipurchase"
 msgstr "compra múltiple"
 
@@ -1092,6 +1092,21 @@ msgstr "Localizador"
 #: tickets/templates/emails/ticket-info.txt:8
 msgid "ticket confirmed"
 msgstr "Entrada confirmada"
+
+#: tickets/templates/extended_filters/checkbox_filters.html:12
+#: tickets/templates/extended_filters/date_range_filter.html:31
+msgid "Search"
+msgstr "Buscar"
+
+#: tickets/templates/extended_filters/checkbox_filters.html:13
+#: tickets/templates/extended_filters/date_range_filter.html:32
+msgid "Clear"
+msgstr "Limpiar"
+
+#: tickets/templates/extended_filters/date_range_filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr "Por %(filter_title)s "
 
 #: tickets/templates/tickets/layout.html:9
 #: tickets/templates/tickets/layout.html:15
@@ -1338,6 +1353,10 @@ msgstr "necesario seleccionar tipo de invitación"
 msgid "Session error, send again the form"
 msgstr "Error de sesión, envía de nuevo el formulario"
 
+#: windows/admin.py:47
+msgid "day"
+msgstr "día"
+
 #: windows/apps.py:7
 msgid "Windows"
 msgstr "Taquillas"
@@ -1350,51 +1369,60 @@ msgstr "Efectivo"
 msgid "Credit Card"
 msgstr "Tarjeta de crédito"
 
-#: windows/models.py:24
-msgid "Add"
-msgstr "Añadir"
+#. Translators: change for the ticket window cash payment process
+#: windows/models.py:24 windows/templates/windows/multipurchase.html:89
+msgid "Change"
+msgstr "Cambio"
 
 #: windows/models.py:25
-msgid "Remove"
-msgstr "Eliminar"
+msgid "Parcial return"
+msgstr "Entrega parcial"
 
-#: windows/models.py:34
+#: windows/models.py:26
+msgid "Final return"
+msgstr "Entrega final"
+
+#: windows/models.py:35
 msgid "code to show in tickets"
 msgstr "código a mostrar en la entrada"
 
-#: windows/models.py:35
+#: windows/models.py:36
 msgid "cash in the ticket window"
 msgstr "dinero en taquilla"
 
-#: windows/models.py:80 windows/models.py:103
+#: windows/models.py:81 windows/models.py:104
 msgid "window"
 msgstr "taquilla"
 
-#: windows/models.py:81
+#: windows/models.py:82
 msgid "user"
 msgstr "usuario"
 
-#: windows/models.py:85
+#: windows/models.py:86
 msgid "payed"
 msgstr "pagado"
 
-#: windows/models.py:86
+#: windows/models.py:87
 msgid "change"
 msgstr "cambio"
 
-#: windows/models.py:92
+#: windows/models.py:93
 msgid "ticket window sale"
 msgstr "venta en taquilla"
 
-#: windows/models.py:93
+#: windows/models.py:94
 msgid "ticket window sales"
 msgstr "ventas en taquilla"
 
-#: windows/models.py:110
+#: windows/models.py:108
+msgid "Note"
+msgstr "Nota"
+
+#: windows/models.py:113
 msgid "ticket window cash movement"
 msgstr "movimiento en taquilla"
 
-#: windows/models.py:111
+#: windows/models.py:114
 msgid "ticket window cash movements"
 msgstr "movimientos en taquilla"
 
@@ -1439,11 +1467,6 @@ msgstr "Forma de pago"
 msgid "Payed"
 msgstr "Pagado"
 
-#. Translators: change for the ticket window cash payment process
-#: windows/templates/windows/multipurchase.html:89
-msgid "Change"
-msgstr "Cambio"
-
 #: windows/templates/windows/multipurchase.html:103
 msgid "credit card"
 msgstr "tarjeta de crédito"
@@ -1463,6 +1486,12 @@ msgstr "La entrada va a ser comprada, ¿estás seguro?"
 #: windows/views.py:49
 msgid "This user can't access in this ticket window"
 msgstr "Este usuario no puede acceder a esta taquilla"
+
+#~ msgid "Add"
+#~ msgstr "Añadir"
+
+#~ msgid "Remove"
+#~ msgstr "Eliminar"
 
 #~ msgid ""
 #~ "Session has expired: you should select seats again. Seats save for you "
