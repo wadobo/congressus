@@ -240,7 +240,7 @@ function autoSelectSeat(s, n) {
             updateBadges(s, id);
         });
         if (!data.fail_silently) {
-            alert(data.error);
+            alertify.alert(data.error);
         }
     });
 }
@@ -312,7 +312,13 @@ $(document).ready(function() {
         for(var i=0; i<warnings.length; i++) {
             var w = warnings[i];
             if (check_warning(w, sessions)) {
-                return confirm(w.message);
+                alertify.confirm(w.message, function(e) {
+                    if (e) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
             }
         }
 

@@ -100,7 +100,7 @@ function enableQrCode() {
         $('#reader').html5_qrcode(
             function(data){
                 $("#order").val(data);
-                alert(data);
+                alertify.alert(data);
                 makeReq();
             },
             function(error){

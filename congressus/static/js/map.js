@@ -21,7 +21,7 @@
             id = seat.data("session");
             selected_seat = $('#'+id).val();
             if (selected_seat >= Number(window.MAX_SEAT_BY_SESSION)) {
-                alert("No se pueden seleccionar más de " + window.MAX_SEAT_BY_SESSION + " asientos.")
+                alertify.alert("No se pueden seleccionar más de " + window.MAX_SEAT_BY_SESSION + " asientos.")
             } else {
                 map.cbs.fire("select", seat);
                 obj.addClass("seat-selected");
