@@ -314,6 +314,10 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
     def all_tickets(self):
         return self.tickets.all().order_by('session__start')
 
+    def delete(self, *args, **kwargs):
+        self.remove_hold_seats()
+        super(MultiPurchase, self).delete(*args, **kwargs)
+
     class Meta:
         ordering = ['-created']
         verbose_name = _('multipurchase')
@@ -392,6 +396,10 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
             self.confirmed_date = timezone.now()
 
         super(Ticket, self).save(*args, **kw)
+
+    def delete(self, *args, **kwargs):
+        self.remove_hold_seats()
+        super(Ticket, self).delete(*args, **kwargs)
 
     def cseat(self):
         if not self.seat:

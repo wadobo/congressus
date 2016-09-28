@@ -49,6 +49,11 @@ def mark_no_used(modeladmin, request, queryset):
 mark_no_used.short_description = _("Mark like no used")
 
 
+def delete_selected(modeladmin, request, queryset):
+    for obj in queryset:
+        obj.delete()
+delete_selected.short_description = _("Remove")
+
 class TicketAdmin(CSVMixin, admin.ModelAdmin):
     list_display = ('order', 'order_tpv2', 'session2', 'cseat', 'twin',
                     'created2', 'confirmed', 'used',
@@ -56,7 +61,7 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
     list_filter = ('confirmed', SingleTicketWindowFilter, 'event_name')
     search_fields = ('order', 'order_tpv', 'email', 'mp__order', 'mp__order_tpv')
     date_hierarchy = 'created'
-    actions = [confirm, unconfirm, mark_used, mark_no_used]
+    actions = [delete_selected, confirm, unconfirm, mark_used, mark_no_used]
     csv_fields = [
         'email',
 
@@ -183,7 +188,7 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
     list_filter = ('confirmed', TicketWindowFilter, 'ev')
     search_fields = ('order', 'order_tpv', 'email', 'extra_data')
     date_hierarchy = 'created'
-    actions = [confirm, unconfirm]
+    actions = [delete_selected, confirm, unconfirm]
     inlines = [TicketInline, ]
     csv_fields = [
         'email',
