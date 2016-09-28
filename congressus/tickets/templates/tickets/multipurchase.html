@@ -78,6 +78,8 @@
                                             readonly
                                             {% endif %}
                                             value="{% key request.POST session.id "number_" "0" %}"
+                                            {% if forloop.first and forloop.parentloop.first %}onfocus="this.select()" autofocus{% endif %}
+                                            data-index="{{ forloop.parentloop.counter0 }},{{ forloop.counter0 }}"
                                         />
                                         {% if not window and session.space.numbered %}
                                         {% else %}

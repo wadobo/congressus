@@ -20,6 +20,7 @@ function clean() {
     $(".subtotal").each(function() {
         $(this).html(0);
     });
+    $("input[autofocus]").trigger('focus');
 
     return false;
 }
@@ -69,7 +70,18 @@ function recalcTotal() {
 
 $(document).ready(function() {
 
-    $("#finish").click(function() {
+    // Define tabindex
+    $('.sessioninput').each(function(i) {
+        $(this).attr('tabindex', i + 1);
+    });
+    index = $('.sessioninput').length + 1;
+    //$("input[name=discount]").attr('tabindex', index++);
+    $("input[name=payment]").attr('tabindex', index++);
+    $("input[name=payed]").attr('tabindex', index++);
+    $("#finish").attr('tabindex', index++);
+    // End Define tabindex
+
+    function confirmMsg() {
         var msg = $("#finish").data("msg");
         var btn_cancel = $("#finish").data("cancel");
         var btn_ok = $("#finish").data("ok");
@@ -88,7 +100,18 @@ $(document).ready(function() {
                 $("form").submit();
             }
         });
+    }
+
+    $(document).keypress(function(key) {
+        if (key.which == 13) {
+            if ($("#alertify").length > 0 && ! $("#alertify").hasClass('alertify-hidden')) {
+                return;
+            }
+            confirmMsg();
+        }
     });
+
+    $("#finish").click(confirmMsg);
 
     $("#clean").click(clean);
     $("#payed").keyup(calcChange);
