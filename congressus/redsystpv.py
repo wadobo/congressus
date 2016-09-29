@@ -1,6 +1,7 @@
 ERROR_CODES = {
     101: 'Tarjeta caducada',
     102: 'Tarjeta en excepción transitoria o bajo sospecha de fraude',
+    104: 'No se ha podido realizar la compra. Inténtelo más tarde',
     106: 'Intentos de PIN excedidos',
     125: 'Tarjeta no efectiva',
     129: 'Código de seguridad (CVV2/CVC2) incorrecto',
@@ -150,6 +151,7 @@ SIS_CODES = {
     'SIS0261': 'Operación detenida por superar el control de restricciones en la entrada al SIS',
     'SIS0270': 'El comercio no puede realizar autorizaciones en diferido',
     'SIS0274': 'Tipo de operación desconocida o no permitida por esta entrada al SIS',
+    'SIS0283': 'Posible bloqueo IP usuario - Por múltiples intentos o pagos desde misma IP',
     'SIS0429': 'Error en la versión enviada por el comercio en el parámetro Ds_SignatureVersion',
     'SIS0430': 'Error al decodificar el parámetro Ds_MerchantParameters',
     'SIS0431': 'Error del objeto JSON que se envía codificado en el parámetro Ds_MerchantParameters',
