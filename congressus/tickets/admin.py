@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
@@ -184,8 +185,8 @@ class TicketInline(admin.TabularInline):
 
 
 class MPAdmin(CSVMixin, admin.ModelAdmin):
-    list_display = ('order_tpv', 'twin', 'created', 'confirmed', 'email', 'ntickets', 'price', 'event')
-    list_filter = ('confirmed', TicketWindowFilter, 'ev')
+    list_display = ('order_tpv', 'twin', 'created', 'confirmed2', 'email', 'ntickets', 'price', 'event')
+    list_filter = ('confirmed', TicketWindowFilter, 'ev', 'tpv_error')
     search_fields = ('order', 'order_tpv', 'email', 'extra_data')
     date_hierarchy = 'created'
     actions = [delete_selected, confirm, unconfirm]
@@ -230,6 +231,17 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
                       )
         }),
     )
+
+    def confirmed2(self, obj):
+        icon = 'icon-no.svg'
+        if obj.confirmed:
+            icon = 'icon-yes.svg'
+        elif obj.tpv_error:
+            icon = 'icon-alert.svg'
+        html = '<img src="{}/admin/img/{}"/>'.format(settings.STATIC_URL, icon)
+        return mark_safe(html)
+    confirmed2.short_description = _('confirmed')
+
 
     def payment(self, obj):
         try:
