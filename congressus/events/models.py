@@ -237,6 +237,10 @@ class Space(models.Model):
 
     order = models.IntegerField(_('order'), default=0)
 
+    def get_next_sessions(self):
+        now = timezone.now()
+        return self.sessions.filter(end__gte=now)
+
     class Meta:
         ordering = ['order']
         verbose_name = _('space')

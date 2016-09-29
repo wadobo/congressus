@@ -45,7 +45,7 @@
                 </div>
                 <div class="panel-body">
                     <div class="sessions-table">
-                        {% for session in space.sessions.all %}
+                        {% for session in space.get_next_sessions %}
                             <div class="row session-row {% cycle 'odd' 'even' %}">
                                 {% if session.space.numbered %}
                                 {% block col-session-num-1 %}<div class="col-md-5 col-xs-9">{% endblock %}
