@@ -107,6 +107,9 @@ $(document).ready(function() {
             if ($("#alertify").length > 0 && ! $("#alertify").hasClass('alertify-hidden')) {
                 return;
             }
+            if ($("#finish")[0].disabled) {
+                return;
+            }
             confirmMsg();
         }
     });

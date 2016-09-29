@@ -9,14 +9,6 @@ if (!String.prototype.startsWith) {
 var old_session = -1;
 var old_layout = -1;
 
-var delay = (function () {
-    var timer = 0;
-    return function (callback, ms) {
-        clearTimeout(timer);
-        timer = setTimeout(callback, ms);
-    };
-})();
-
 function check_warning(w, sessions) {
     if (w.type == 'req') {
         var firstFound = true;
@@ -233,7 +225,10 @@ function autoSelectSeat(s, n) {
         $("#seats-"+s).val(value.join(","));
         fillSelectedSeats($("#seats-"+s));
     }).fail(function(data) {
-        $("#"+s).val(0);
+        if ($("#"+s).val() != 0) {
+            $("#"+s).val(0);
+            $("#"+s).select();
+        }
         var layouts = $('#modal-'+s+' .layout');
         layouts.each(function() {
             var id = $(this).data('id');
@@ -348,7 +343,7 @@ $(document).ready(function() {
     // calculating sums
     $('.sessioninput').keyup(function() {
         var obj = $(this);
-        delay(function() { seatsChange(obj) }, 500);
+        seatsChange(obj);
     });
     recalcTotal();
 
