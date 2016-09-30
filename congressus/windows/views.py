@@ -15,7 +15,9 @@ from .models import TicketWindowSale
 from tickets.views import MultiPurchaseView
 from tickets.views import get_ticket_or_404
 from events.models import Event
+from events.models import Session
 from tickets.forms import MPRegisterForm
+from tickets.models import Ticket
 from tickets.utils import get_ticket_format
 
 from django.contrib.auth import logout as auth_logout
@@ -172,13 +174,12 @@ class WindowList(UserPassesTestMixin, TemplateView):
             date = datetime.datetime(*map(int, d.split('-')))
             ctx['date'] = date
 
-        days = []
-        d = timezone.now() - datetime.timedelta(10)
-        d1 = timezone.now() + datetime.timedelta(10)
-        while d < d1:
-            days.append(d)
-            d = d + datetime.timedelta(1)
-        ctx['days'] = days
+        q = Ticket.objects.extra({"created_date": "date(created)"}).filter(event_name=ev.name)
+        days_online = q.values_list('created_date', flat=True).distinct().order_by('created_date')
+
+        q = Session.objects.extra({"start_date": "date(start)"}).filter(space__event=ev)
+        days_sessions = q.values_list('start_date', flat=True).distinct().order_by('start_date')
+        ctx['days'] = sorted(set(days_online) | set(days_sessions))
         ctx['today'] = timezone.now()
         ctx['menuitem'] = 'windows'
 

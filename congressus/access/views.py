@@ -282,12 +282,8 @@ class AccessList(UserPassesTestMixin, TemplateView):
             date = datetime(*map(int, d.split('-')))
             ctx['date'] = date
 
-        days = []
-        d = timezone.now() - timedelta(10)
-        d1 = timezone.now() + timedelta(10)
-        while d < d1:
-            days.append(d)
-            d = d + timedelta(1)
+        q = Session.objects.extra({"start_date": "date(start)"}).filter(space__event=ev)
+        days = q.values_list('start_date', flat=True).distinct().order_by('start_date')
         ctx['days'] = days
         ctx['today'] = timezone.now()
         ctx['menuitem'] = 'access'
