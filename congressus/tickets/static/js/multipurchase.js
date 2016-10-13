@@ -9,6 +9,14 @@ if (!String.prototype.startsWith) {
 var old_session = -1;
 var old_layout = -1;
 
+var delay = (function () {
+    var timer = 0;
+    return function (callback, ms) {
+        clearTimeout(timer);
+        timer = setTimeout(callback, ms);
+    };
+})();
+
 function check_warning(w, sessions) {
     if (w.type == 'req') {
         var firstFound = true;
@@ -343,7 +351,7 @@ $(document).ready(function() {
     // calculating sums
     $('.sessioninput').keyup(function() {
         var obj = $(this);
-        seatsChange(obj);
+        delay(function() { seatsChange(obj) }, 300);
     });
     recalcTotal();
 
