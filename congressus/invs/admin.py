@@ -29,11 +29,14 @@ class InvitationAdmin(admin.ModelAdmin):
     list_display = ('order', 'type', 'is_pass', 'created', 'used', 'concept')
     list_filter = ('is_pass', 'type')
     date_hierarchy = 'created'
+    search_fields = ('order',)
 
     # TODO, add get_A4 and get_thermal
     actions = [get_csv, ]
 
     def concept(self, obj):
+        if not obj.generator:
+            return '-'
         return obj.generator.concept or '-'
 
 
