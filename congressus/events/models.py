@@ -255,6 +255,8 @@ class Session(models.Model):
     name = models.CharField(_('name'), max_length=300)
     slug = AutoSlugField(populate_from='name')
 
+    short_name = models.CharField(_('short name'), max_length=3, blank=True, null=True)
+
     start = models.DateTimeField(_('start date'))
     end = models.DateTimeField(_('end date'))
 

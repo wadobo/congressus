@@ -99,7 +99,10 @@ def generate_pdf(ticket, logo='img/logo.png', asbuf=False, inv=False):
         else:
             order = ticket.order_tpv or ''
 
-        initials = _('T') + space[0].upper() + session[0].upper()
+        if ticket.session.short_name:
+            initials = ticket.session.short_name
+        else:
+            initials = _('T') + space[0].upper() + session[0].upper()
         text = _('Ticket %(space)s %(session)s') % {'space': space.capitalize(), 'session': session.capitalize()}
 
 
