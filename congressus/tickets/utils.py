@@ -60,6 +60,43 @@ def get_image(path, width=3*cm):
     return Image(path, width=width, height=(width * aspect))
 
 
+def generate_thermal(ticket, logo='img/logo.png', asbuf=False, inv=False):
+    buffer = BytesIO()
+    pagesize = (1795, 815)
+
+    template = ticket.session.thermal_template
+    if template:
+        pagesize = (template.width, template.height)
+
+    doc = SimpleDocTemplate(buffer, pagesize=pagesize, topMargin=0,
+                            leftMargin=0, bottomMargin=0, rightMargin=0)
+    Story = []
+
+    def ticketPage(canvas, doc):
+        if template:
+            header = get_image(template.header.path, width=doc.width)
+            foot = get_image(template.sponsors.path, width=doc.width)
+            bg = get_image(template.background.path, width=doc.width)
+
+            canvas.saveState()
+            bg.drawOn(canvas, 0, 0)
+            header.drawOn(canvas, 0, doc.height - header._height)
+            foot.drawOn(canvas, 0, 0)
+            canvas.restoreState()
+
+    Story.append(Spacer(width=1, height=1*cm))
+
+    doc.build(Story, onFirstPage=ticketPage, onLaterPages=ticketPage)
+
+    if not asbuf:
+        pdf = buffer.getvalue()
+        buffer.close()
+        return pdf
+    else:
+        buffer.seek(0)
+        return buffer
+
+
 def generate_pdf(ticket, logo='img/logo.png', asbuf=False, inv=False):
     """ Generate ticket in pdf with the get ticket. """
 
@@ -291,7 +328,7 @@ def get_ticket_format(mp, pf):
         response['Content-Disposition'] = 'filename="invs.csv"'
         response.write('\n'.join(csv))
     elif pf == 'thermal':
-        pdf = mp.gen_pdf()
+        pdf = mp.gen_thermal()
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'filename="tickets.pdf"'
         response.write(pdf)

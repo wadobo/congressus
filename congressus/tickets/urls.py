@@ -12,6 +12,7 @@ urlpatterns = [
     url(r'^ticket/confirm/$', views.confirm, name='confirm'),
 
     url(r'^ticket/template/(?P<id>\d+)/preview/$', views.template_preview, name='template_preview'),
+    url(r'^ticket/thermal/template/(?P<id>\d+)/preview/$', views.thermal_template_preview, name='thermal_template_preview'),
     url(r'^ticket/email-confirm/(?P<id>\d+)/preview/$', views.email_confirm_preview, name='email_confirm_preview'),
 
     url(r'^(?P<ev>[\w-]+)/$', views.multipurchase, name='multipurchase'),

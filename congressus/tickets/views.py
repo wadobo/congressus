@@ -480,6 +480,28 @@ class TicketTemplatePreview(UserPassesTestMixin, View):
 template_preview = TicketTemplatePreview.as_view()
 
 
+class ThermalTicketTemplatePreview(TicketTemplatePreview):
+    def get(self, request, id):
+        from events.models import ThermalTicketTemplate
+        template = get_object_or_404(ThermalTicketTemplate, pk=id)
+
+        # fake ticket
+        ticket = Ticket(email='test@email.com', price=12, tax=21, confirm_sent=True)
+        ticket.gen_order(save=False)
+        ticket.created = timezone.now()
+
+        ticket.session = Session(
+                          name=formats.date_format(timezone.now(), "l"),
+                          thermal_template=template,
+                          space=random.choice(list(Space.objects.all())),
+                          start=timezone.now(),
+                          end=timezone.now())
+
+        response = get_ticket_format(ticket, pf='thermal')
+        return response
+thermal_template_preview = ThermalTicketTemplatePreview.as_view()
+
+
 class EmailConfirmPreview(UserPassesTestMixin, View):
     def test_func(self):
         u = self.request.user

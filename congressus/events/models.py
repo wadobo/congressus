@@ -265,6 +265,7 @@ class Session(models.Model):
     tax = models.IntegerField(_('ticket tax percentage'), default=21)
 
     template = models.ForeignKey("TicketTemplate", blank=True, null=True, verbose_name=_('template'))
+    thermal_template = models.ForeignKey("ThermalTicketTemplate", blank=True, null=True, verbose_name=_('thermal template'))
     autoseat_mode = models.CharField(_('autoseat mode'), max_length=300, default='ASC',
             help_text="ASC, DESC, RANDOM or LIST: layout_name1,layout_name2")
 
@@ -446,6 +447,26 @@ class TicketTemplate(models.Model):
 
     def get_absolute_url(self):
         return reverse('template_preview', kwargs={'id': self.id})
+
+    def __str__(self):
+        return self.name
+
+
+class ThermalTicketTemplate(models.Model):
+    name = models.CharField(_('name'), max_length=200, unique=True)
+    header = models.ImageField(_('header'), upload_to='templheader', blank=True, null=True)
+    sponsors = models.ImageField(_('sponsors'), upload_to='templsponsors', blank=True, null=True)
+    background = models.ImageField(_('background'), upload_to='templsback', blank=True, null=True)
+
+    width = models.IntegerField(_('width'), default=1795)
+    height = models.IntegerField(_('height'), default=815)
+
+    class Meta:
+        verbose_name = _('thermal ticket template')
+        verbose_name_plural = _('thermal ticket templates')
+
+    def get_absolute_url(self):
+        return reverse('thermal_template_preview', kwargs={'id': self.id})
 
     def __str__(self):
         return self.name

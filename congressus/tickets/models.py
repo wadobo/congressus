@@ -20,6 +20,7 @@ from events.models import Session
 from events.models import Discount
 from events.models import SeatLayout
 from tickets.utils import generate_pdf
+from tickets.utils import generate_thermal
 from tickets.utils import concat_pdf
 
 
@@ -311,6 +312,12 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
             files.append(generate_pdf(ticket, asbuf=True))
         return concat_pdf(files)
 
+    def gen_thermal(self):
+        files = []
+        for ticket in self.all_tickets():
+            files.append(generate_thermal(ticket, asbuf=True))
+        return concat_pdf(files)
+
     def all_tickets(self):
         return self.tickets.all().order_by('session__start')
 
@@ -446,6 +453,9 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
 
     def gen_pdf(self):
         return generate_pdf(self)
+
+    def gen_thermal(self):
+        return generate_thermal(self)
 
     def window_code(self):
         '''
