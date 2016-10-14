@@ -28,6 +28,18 @@ def short_hour(dt):
     return formats.date_format(dt, 'H:i')
 
 
+class TTR(Flowable): #TableTextRotate
+    '''Rotates a tex in a table cell.'''
+    def __init__(self, text):
+        Flowable.__init__(self)
+        self.text=text
+
+    def draw(self):
+        canvas = self.canv
+        canvas.rotate(-90)
+        canvas.drawString(8, -1, self.text)
+
+
 class QRFlowable(Flowable):
     def __init__(self, qr_value):
         # init and store rendering value
@@ -52,255 +64,15 @@ class QRFlowable(Flowable):
         renderPDF.draw(d, self.canv, 0, 0)
 
 
-def get_image(path, width=3*cm):
-    path = path.encode('utf8')
-    img = utils.ImageReader(path)
-    iw, ih = img.getSize()
-    aspect = ih / float(iw)
-    return Image(path, width=width, height=(width * aspect))
+def generate_thermal(ticket, asbuf=False, inv=False):
+    pdf = TicketPDF(ticket, inv)
+    return pdf.thermal(asbuf=asbuf)
 
 
-def generate_thermal(ticket, logo='img/logo.png', asbuf=False, inv=False):
-    buffer = BytesIO()
-    pagesize = (1795, 815)
+def generate_pdf(ticket, asbuf=False, inv=False):
+    pdf = TicketPDF(ticket, inv)
+    return pdf.A4(asbuf=asbuf)
 
-    template = ticket.session.thermal_template
-    if template:
-        pagesize = (template.width, template.height)
-
-    doc = SimpleDocTemplate(buffer, pagesize=pagesize, topMargin=0,
-                            leftMargin=0, bottomMargin=0, rightMargin=0)
-    Story = []
-
-    def ticketPage(canvas, doc):
-        if template:
-            header = get_image(template.header.path, width=doc.width)
-            foot = get_image(template.sponsors.path, width=doc.width)
-            bg = get_image(template.background.path, width=doc.width)
-
-            canvas.saveState()
-            bg.drawOn(canvas, 0, 0)
-            header.drawOn(canvas, 0, doc.height - header._height)
-            foot.drawOn(canvas, 0, 0)
-            canvas.restoreState()
-
-    Story.append(Spacer(width=1, height=1*cm))
-
-    doc.build(Story, onFirstPage=ticketPage, onLaterPages=ticketPage)
-
-    if not asbuf:
-        pdf = buffer.getvalue()
-        buffer.close()
-        return pdf
-    else:
-        buffer.seek(0)
-        return buffer
-
-
-def generate_pdf(ticket, logo='img/logo.png', asbuf=False, inv=False):
-    """ Generate ticket in pdf with the get ticket. """
-
-    from events.models import TicketTemplate
-    seatinfo = ''
-    if inv:
-        if ticket.type.is_pass:
-            initials = "PAS"
-        else:
-            initials = "INV"
-        price = _('%4.2f €') % ticket.get_price()
-        tax = ticket.get_tax()
-        template = TicketTemplate.objects.last()
-        wcode = 'GEN' + str(ticket.generator.id)
-        order = ''
-        text = ticket.type.name
-        if ticket.type.start and ticket.type.end:
-            date = _('%(date)s (%(start)s to %(end)s)') % {
-                'date': formats.date_format(ticket.type.start, "l d/m/Y"),
-                'start': short_hour(ticket.type.start),
-                'end': short_hour(ticket.type.end),
-            }
-        else:
-            date = ''
-    else:
-        space = ticket.session.space.name
-        session = ticket.session.name
-        start = formats.date_format(ticket.session.start, "l d/m/Y")
-        date = _('%(date)s (%(start)s to %(end)s)') % {
-            'date': start,
-            'start': short_hour(ticket.session.start),
-            'end': short_hour(ticket.session.end),
-        }
-        wcode = ticket.window_code()
-        if ticket.mp:
-            order = ticket.mp.order_tpv or ''
-        else:
-            order = ticket.order_tpv or ''
-
-        if ticket.session.short_name:
-            initials = ticket.session.short_name
-        else:
-            initials = _('T') + space[0].upper() + session[0].upper()
-        text = _('Ticket %(space)s %(session)s') % {'space': space.capitalize(), 'session': session.capitalize()}
-
-
-        price = _('%4.2f €') % ticket.price
-        tax = ticket.tax
-        seatinfo = ''
-        if ticket.seat:
-            seatdata = {
-                'layout': ticket.seat_layout.name,
-                'row': ticket.seat_row(),
-                'col': ticket.seat_column()
-            }
-            seatinfo = _('SECTOR: %(layout)s &nbsp;&nbsp;&nbsp; ROW: %(row)s &nbsp;&nbsp;&nbsp; SEAT: %(col)s') % seatdata
-            seatinfo = '<font size=11><b>'+ seatinfo +'</b></font><br/>'
-        template = ticket.session.template
-
-    taxtext = _('TAX INC.')
-    price = '<font size=14>%s</font>   <font size=8>%s%% %s</font>' % (price, tax, taxtext)
-    code = ticket.order
-    if settings.QRCODE:
-        codeimg = QRFlowable(code)
-    else:
-        codeimg = code128.Code128(code, barWidth= 0.01 * inch, barHeight= .5 * inch)
-
-    PAGE_HEIGHT= 11 * inch
-    PAGE_WIDTH= 8.5 * inch
-    styles = getSampleStyleSheet()
-
-    buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer)
-    doc.topMargin = 3.1*cm
-    Story = []
-    styleN = styles["Normal"]
-    styleH = styles['Heading1']
-
-    styleR = ParagraphStyle(name="rightStyle", fontSize=8, alignment=TA_RIGHT)
-    styleL = ParagraphStyle(name="leftStyle", fontSize=8, alignment=TA_LEFT)
-    styleLinks = ParagraphStyle(name="links", fontSize=14,
-                                alignment=TA_CENTER, textColor=colors.gray)
-    styleInfo = ParagraphStyle(name="info", alignment=TA_JUSTIFY, fontSize=7,
-                               textColor=colors.gray)
-
-    def add_full_width_image(header, img):
-        pstyle = ParagraphStyle(name="leftStyle", fontSize=8,
-                                alignment=TA_LEFT, textColor=colors.gray)
-        Story.append(Spacer(width=1, height=8))
-        Story.append(Paragraph(header, pstyle))
-        Story.append(HRFlowable(width="100%", thickness=1, hAlign='CENTER',
-                                vAlign='BOTTOM', dash=None, spaceAfter=5))
-        img = get_image(img, width=doc.width - 8)
-        Story.append(img)
-
-    def ticketPage(canvas, doc):
-        if logo and not template:
-            img = get_image(os.path.join(settings.MEDIA_ROOT, logo), width=2*cm)
-            canvas.saveState()
-            img.drawOn(canvas, doc.width, doc.height + doc.topMargin)
-            canvas.restoreState()
-        elif template:
-            header = template.header
-            header = get_image(header.path, width=doc.width)
-
-            canvas.saveState()
-            header.drawOn(canvas, doc.leftMargin, doc.height + doc.topMargin - 1*cm)
-            canvas.restoreState()
-
-        # drawing the footer
-        canvas.saveState()
-
-        # qrcode
-        codeimg.wrap(3*cm, 3*cm)
-        codeimg.drawOn(canvas, doc.width, 1.5*cm)
-        # ticket order
-        if order:
-            pr = Paragraph(_('ORDER: %s') % order, styleL)
-            pr.wrap(doc.width, 1*cm)
-            pr.drawOn(canvas, doc.leftMargin, 1.5*cm)
-        # line
-        hr = HRFlowable(width="100%", thickness=0.25, hAlign='CENTER',
-                        color=colors.black, vAlign='BOTTOM', dash=None,
-                        spaceAfter=5)
-        hr.wrap(doc.width, 1*cm)
-        hr.drawOn(canvas, doc.leftMargin, 1.5*cm)
-        # ticket window code
-        pr = Paragraph(wcode, styleL)
-        pr.wrap(doc.width, 1*cm)
-        pr.drawOn(canvas, doc.leftMargin, 1.0*cm)
-        # code
-        pr = Paragraph(code, styleL)
-        pr.wrap(doc.width, 1*cm)
-        pr.drawOn(canvas, doc.width, 1.0*cm)
-
-        canvas.restoreState()
-
-    # heading notice
-    t = Table([
-        [Paragraph(_("PRINT AND BRING THIS TICKET WITH YOU"), styleL),
-         Paragraph("PRINT AND BRING THIS TICKET WITH YOU", styleR)]
-    ], colWidths='*')
-    tstyle_list = [ ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ]
-    tstyle = TableStyle(tstyle_list)
-    t.setStyle(tstyle)
-    Story.append(t)
-
-    # ticket information table
-    t = Table([
-        [codeimg, Paragraph('<font size=60>'+initials+'</font>', styleN), Paragraph(price, styleN)],
-        ['',      Paragraph(text, styleN), ''],
-        ['',      Paragraph(date, styleN), ''],
-        ['',      Paragraph(seatinfo, styleN), ''],
-        [code, '']
-    ], colWidths=[5*cm, '*', 2.5*cm], rowHeights=[2.5*cm, 0.5*cm, 0.5*cm, 0.5*cm, 0.5*cm])
-    tstyle_list = [
-        ('VALIGN', (0,0), (0, 1), 'MIDDLE'),
-        ('VALIGN', (0,0), (1,-1), 'TOP'),
-        ('VALIGN', (-1,0), (-1,0), 'TOP'),
-        ('ALIGN', (0,0), (0,-1), 'CENTER'),
-        ('BOX', (0,0), (-1,-1), 0.25, colors.black),
-        ('SPAN', (0, 0), (0, 3)),
-    ]
-    tstyle = TableStyle(tstyle_list)
-    t.setStyle(tstyle)
-    Story.append(t)
-    if template.note:
-        Story.append(Paragraph('<font size=6><b>' + template.note + '</b></font>', styleR))
-
-    if template:
-        # sponsors
-        if template.sponsors:
-            add_full_width_image(_("Sponsors"), template.sponsors.path)
-
-        # info text
-        Story.append(Spacer(width=1, height=1*cm))
-
-        t = Table([
-            [Paragraph(template.links, styleLinks)],
-            [Paragraph(template.info.replace('\n', '<br/>'), styleInfo)]
-        ], colWidths=['*'], rowHeights=[1*cm, None])
-        tstyle_list = [
-            ('BOX', (0,0), (-1,-1), 0.25, colors.black),
-            ('VALIGN', (0,0), (-1,-1), 'TOP'),
-        ]
-        tstyle = TableStyle(tstyle_list)
-        t.setStyle(tstyle)
-        Story.append(t)
-
-        Story.append(Spacer(width=1, height=1*cm))
-
-        # contributors
-        if template.contributors:
-            add_full_width_image(_("Contributors"), template.contributors.path)
-
-    doc.build(Story, onFirstPage=ticketPage, onLaterPages=ticketPage)
-
-    if not asbuf:
-        pdf = buffer.getvalue()
-        buffer.close()
-        return pdf
-    else:
-        buffer.seek(0)
-        return buffer
 
 def concat_pdf(files):
     buffer = BytesIO()
@@ -330,7 +102,7 @@ def get_ticket_format(mp, pf):
     elif pf == 'thermal':
         pdf = mp.gen_thermal()
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'filename="tickets.pdf"'
+        response['Content-Disposition'] = 'attachment; filename="tickets.pdf"'
         response.write(pdf)
     elif pf == 'A4':
         pdf = mp.gen_pdf()
@@ -401,3 +173,395 @@ def get_seats_by_str(sessions, string):
                     res.update({lay: row_seat})
     res = check_free_seats(sessions, res)
     return res
+
+
+class TicketPDF:
+    def __init__(self, ticket, inv=False):
+        self.ticket = ticket
+        self.code = ticket.order
+        self.inv = inv
+
+        self.story = []
+
+        # reportlab common styles
+        self.init_styles()
+
+    def init_styles(self):
+        styles = getSampleStyleSheet()
+        self.styleN = styles["Normal"]
+        self.styleH = styles['Heading1']
+        self.styleR = ParagraphStyle(name="rightStyle", fontSize=8,
+                            alignment=TA_RIGHT)
+        self.styleL = ParagraphStyle(name="leftStyle", fontSize=8,
+                            alignment=TA_LEFT)
+        self.styleLinks = ParagraphStyle(name="links", fontSize=14,
+                            alignment=TA_CENTER, textColor=colors.gray)
+        self.styleInfo = ParagraphStyle(name="info",
+                            alignment=TA_JUSTIFY, fontSize=7,
+                            textColor=colors.gray)
+
+        self.pstyle = ParagraphStyle(name="leftStyle", fontSize=8,
+                            alignment=TA_LEFT, textColor=colors.gray)
+
+    def A4_page_foot(self, canvas, doc):
+        canvas.saveState()
+
+        # qrcode
+        qrcode = self.codeimg
+        qrcode.wrap(3*cm, 3*cm)
+        qrcode.drawOn(canvas, doc.width, 1.5*cm)
+        # ticket order
+        if self.order:
+            pr = Paragraph(_('ORDER: %s') % self.order, self.styleL)
+            pr.wrap(doc.width, 1*cm)
+            pr.drawOn(canvas, doc.leftMargin, 1.5*cm)
+        # line
+        hr = HRFlowable(width="100%", thickness=0.25, hAlign='CENTER',
+                        color=colors.black, vAlign='BOTTOM', dash=None,
+                        spaceAfter=5)
+        hr.wrap(doc.width, 1*cm)
+        hr.drawOn(canvas, doc.leftMargin, 1.5*cm)
+        # ticket window code
+        pr = Paragraph(self.wcode, self.styleL)
+        pr.wrap(doc.width, 1*cm)
+        pr.drawOn(canvas, doc.leftMargin, 1.0*cm)
+        # code
+        pr = Paragraph(self.code, self.styleL)
+        pr.wrap(doc.width, 1*cm)
+        pr.drawOn(canvas, doc.width, 1.0*cm)
+
+        canvas.restoreState()
+
+    def A4_page(self, canvas, doc):
+        if self.logo and not self.template:
+            img = self.get_image(os.path.join(settings.MEDIA_ROOT, self.logo), width=2*cm)
+
+            canvas.saveState()
+            img.drawOn(canvas, doc.width, doc.height + doc.topMargin)
+            canvas.restoreState()
+
+        elif self.template:
+            header = self.template.header
+            header = self.get_image(header.path, width=doc.width)
+
+            canvas.saveState()
+            header.drawOn(canvas, doc.leftMargin, doc.height + doc.topMargin - 1*cm)
+            canvas.restoreState()
+
+        # drawing the footer
+        self.A4_page_foot(canvas, doc)
+
+    def thermal_page(self, canvas, doc):
+        if not self.thermal_template:
+            return
+
+        t = self.thermal_template
+        header = self.get_image(t.header.path, width=doc.width)
+        foot = self.get_image(t.sponsors.path, width=doc.width)
+        bg = self.get_image(t.background.path, width=doc.width)
+
+        canvas.saveState()
+
+        bg.drawOn(canvas, 0, 0)
+        header.drawOn(canvas, 0, doc.height - header._height)
+        foot.drawOn(canvas, 0, 0)
+
+        canvas.restoreState()
+
+    def thermal_ticket_info(self):
+        initials = Paragraph('<font size=60>'+ self.initials +'</font>', self.styleN)
+        price = Paragraph(self.price, self.styleN)
+        t = Table([
+            [self.codeimg, TTR(self.code), initials, price, self.codeimg],
+            ['', '', Paragraph(self.text, self.styleN), '', ''],
+            ['', '', Paragraph(self.date, self.styleN), '', ''],
+            ['', '', Paragraph(self.seatinfo, self.styleN), '', ''],
+            ['', '', '', '', self.wcode],
+        ], colWidths=[5*cm, 0.5*cm, '*', 2.5*cm, 5*cm],
+           rowHeights=[2.5*cm, 0.5*cm, 0.5*cm, 0.5*cm, 0.5*cm])
+        tstyle_list = [
+            ('VALIGN', (0,0), (0, 1), 'MIDDLE'),
+            ('VALIGN', (-1,0), (-1, 1), 'MIDDLE'),
+            ('VALIGN', (0,0), (2,-1), 'TOP'),
+            ('VALIGN', (-2,0), (-2,0), 'TOP'),
+            ('ALIGN', (0,0), (0,-1), 'CENTER'),
+            ('ALIGN', (-1,0), (-1, 1), 'CENTER'),
+            ('ALIGN', (-1,-1), (-1, -1), 'CENTER'),
+            ('SPAN', (1, 0), (1, -1)),
+            ('SPAN', (0, 0), (0, 3)),
+            ('SPAN', (2, 1), (3, 1)),
+            ('SPAN', (2, 2), (3, 2)),
+            ('SPAN', (2, 3), (3, 3)),
+            ('SPAN', (-1, 0), (-1, 3)),
+        ]
+        tstyle = TableStyle(tstyle_list)
+        t.setStyle(tstyle)
+        self.story.append(t)
+
+    def ticket_info(self):
+        initials = Paragraph('<font size=60>'+ self.initials +'</font>', self.styleN)
+        price = Paragraph(self.price, self.styleN)
+        t = Table([
+            [self.codeimg, initials, price],
+            ['', Paragraph(self.text, self.styleN), ''],
+            ['', Paragraph(self.date, self.styleN), ''],
+            ['', Paragraph(self.seatinfo, self.styleN), ''],
+            [self.code, '']
+        ], colWidths=[5*cm, '*', 2.5*cm],
+           rowHeights=[2.5*cm, 0.5*cm, 0.5*cm, 0.5*cm, 0.5*cm])
+        tstyle_list = [
+            ('VALIGN', (0,0), (0, 1), 'MIDDLE'),
+            ('VALIGN', (0,0), (1,-1), 'TOP'),
+            ('VALIGN', (-1,0), (-1,0), 'TOP'),
+            ('ALIGN', (0,0), (0,-1), 'CENTER'),
+            ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+            ('SPAN', (0, 0), (0, 3)),
+        ]
+        tstyle = TableStyle(tstyle_list)
+        t.setStyle(tstyle)
+        self.story.append(t)
+
+    def heading_notice(self):
+        t = Table([
+            [Paragraph(_("PRINT AND BRING THIS TICKET WITH YOU"), self.styleL),
+             Paragraph("PRINT AND BRING THIS TICKET WITH YOU", self.styleR)]
+        ], colWidths='*')
+        tstyle_list = [ ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ]
+        tstyle = TableStyle(tstyle_list)
+        t.setStyle(tstyle)
+        self.story.append(t)
+
+
+    def note(self):
+        if not self.template or not self.template.note:
+            return
+
+        self.story.append(Paragraph('<font size=6><b>' + self.template.note + '</b></font>', self.styleR))
+
+    def sponsors(self):
+        if not self.template or not self.template.sponsors:
+            return
+        self.add_full_width_image(_("Sponsors"), self.template.sponsors.path)
+
+    def infotext(self):
+        if not self.template or not self.template.info:
+            return
+        self.story.append(Spacer(width=1, height=1*cm))
+
+        t = Table([
+            [Paragraph(self.template.links, self.styleLinks)],
+            [Paragraph(self.template.info.replace('\n', '<br/>'), self.styleInfo)]
+        ], colWidths=['*'], rowHeights=[1*cm, None])
+        tstyle_list = [
+            ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+            ('VALIGN', (0,0), (-1,-1), 'TOP'),
+        ]
+        tstyle = TableStyle(tstyle_list)
+        t.setStyle(tstyle)
+        self.story.append(t)
+
+        self.story.append(Spacer(width=1, height=1*cm))
+
+    def contributors(self):
+        if not self.template or not self.template.contributors:
+            return
+        self.add_full_width_image(_("Contributors"), self.template.contributors.path)
+
+
+    def A4(self, asbuf=False):
+        self.logo='img/logo.png'
+
+        buffer = BytesIO()
+        self.doc = SimpleDocTemplate(buffer)
+        self.doc.topMargin = 3.1*cm
+
+        self.heading_notice()
+        self.ticket_info()
+        self.note()
+        self.sponsors()
+        self.infotext()
+        self.contributors()
+
+        self.doc.build(self.story, onFirstPage=self.A4_page,
+                                   onLaterPages=self.A4_page)
+
+        if not asbuf:
+            pdf = buffer.getvalue()
+            buffer.close()
+            return pdf
+        else:
+            buffer.seek(0)
+            return buffer
+
+    def thermal(self, asbuf=False):
+        buffer = BytesIO()
+        w = 500
+        h = 815 * w / 1795
+        self.pagesize = (w, h)
+
+        if self.thermal_template:
+            self.pagesize = (self.thermal_template.width,
+                             self.thermal_template.height)
+
+        self.doc = SimpleDocTemplate(buffer,
+                            pagesize=self.pagesize, topMargin=0,
+                            leftMargin=0, bottomMargin=0,
+                            rightMargin=0)
+
+        self.story.append(Spacer(width=1, height=50))
+        self.thermal_ticket_info()
+
+        self.doc.build(self.story, onFirstPage=self.thermal_page,
+                                   onLaterPages=self.thermal_page)
+
+        if not asbuf:
+            pdf = buffer.getvalue()
+            buffer.close()
+            return pdf
+        else:
+            buffer.seek(0)
+            return buffer
+
+    def add_full_width_image(self, header, img):
+        self.story.append(Spacer(width=1, height=8))
+        self.story.append(Paragraph(header, self.pstyle))
+        self.story.append(HRFlowable(width="100%", thickness=1,
+                                     hAlign='CENTER', vAlign='BOTTOM',
+                                     dash=None, spaceAfter=5))
+        img = self.get_image(img, width=self.doc.width - 8)
+        self.story.append(img)
+
+    def get_image(self, path, width=3*cm):
+        path = path.encode('utf8')
+        img = utils.ImageReader(path)
+        iw, ih = img.getSize()
+        aspect = ih / float(iw)
+        return Image(path, width=width, height=(width * aspect))
+
+    @property
+    def codeimg(self):
+        if settings.QRCODE:
+            codeimg = QRFlowable(self.code)
+        else:
+            codeimg = code128.Code128(self.code, barWidth= 0.01 * inch, barHeight= .5 * inch)
+
+        return codeimg
+
+    @property
+    def initials(self):
+        ticket = self.ticket
+
+        if self.inv:
+            if ticket.type.is_pass:
+                return "PAS"
+            else:
+                return "INV"
+
+        space = ticket.session.space.name
+        session = ticket.session.name
+
+        if ticket.session.short_name:
+            initials = ticket.session.short_name
+        else:
+            initials = _('T') + space[0].upper() + session[0].upper()
+        return initials
+
+    @property
+    def text(self):
+        if self.inv:
+            return self.ticket.type.name
+
+        space = self.ticket.session.space.name
+        session = self.ticket.session.name
+        text = _('Ticket %(space)s %(session)s') % {'space': space.capitalize(), 'session': session.capitalize()}
+        return text
+
+    @property
+    def date(self):
+        ticket = self.ticket
+
+        if self.inv:
+            sstart = ticket.type.start
+            send = ticket.type.end
+
+            if not sstart or not ssend:
+                return ''
+        else:
+            sstart = ticket.session.start
+            send = ticket.session.end
+
+        start = formats.date_format(sstart, "l d/m/Y")
+        date = _('%(date)s (%(start)s to %(end)s)') % {
+            'date': start,
+            'start': short_hour(sstart),
+            'end': short_hour(send),
+        }
+
+        return date
+
+    @property
+    def wcode(self):
+        ticket = self.ticket
+
+        if self.inv:
+            return 'GEN' + str(ticket.generator.id)
+
+        wcode = ticket.window_code()
+        return wcode
+
+    @property
+    def order(self):
+        if self.inv:
+            return ''
+
+        if self.ticket.mp:
+            order = self.ticket.mp.order_tpv or ''
+        else:
+            order = self.ticket.order_tpv or ''
+
+        return order
+
+    @property
+    def seatinfo(self):
+        ticket = self.ticket
+        seatinfo = ''
+        if ticket.seat:
+            seatdata = {
+                'layout': ticket.seat_layout.name,
+                'row': ticket.seat_row(),
+                'col': ticket.seat_column()
+            }
+            seatinfo = _('SECTOR: %(layout)s &nbsp;&nbsp;&nbsp; ROW: %(row)s &nbsp;&nbsp;&nbsp; SEAT: %(col)s') % seatdata
+            seatinfo = '<font size=11><b>'+ seatinfo +'</b></font><br/>'
+        return seatinfo
+
+    @property
+    def price(self):
+        ticket = self.ticket
+
+        if self.inv:
+            price = _('%4.2f €') % ticket.get_price()
+            tax = ticket.get_tax()
+        else:
+            price = _('%4.2f €') % ticket.price
+            tax = ticket.tax
+
+        taxtext = _('TAX INC.')
+        price = '<font size=14>%s</font>   <font size=8>%s%% %s</font>' % (price, tax, taxtext)
+        return price
+
+    @property
+    def template(self):
+        if self.inv:
+            from events.models import TicketTemplate
+            return TicketTemplate.objects.last()
+
+        return self.ticket.session.template
+
+    @property
+    def thermal_template(self):
+        if self.inv:
+            from events.models import ThermalTicketTemplate
+            return ThermalTicketTemplate.objects.last()
+
+        return self.ticket.session.thermal_template
