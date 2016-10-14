@@ -256,15 +256,18 @@ class TicketPDF:
             return
 
         t = self.thermal_template
-        header = self.get_image(t.header.path, width=doc.width)
-        foot = self.get_image(t.sponsors.path, width=doc.width)
-        bg = self.get_image(t.background.path, width=doc.width)
 
         canvas.saveState()
 
-        bg.drawOn(canvas, 0, 0)
-        header.drawOn(canvas, 0, doc.height - header._height)
-        foot.drawOn(canvas, 0, 0)
+        if t.header:
+            header = self.get_image(t.header.path, width=doc.width)
+            header.drawOn(canvas, 0, doc.height - header._height)
+        if t.sponsors:
+            foot = self.get_image(t.sponsors.path, width=doc.width)
+            foot.drawOn(canvas, 0, 0)
+        if t.background:
+            bg = self.get_image(t.background.path, width=doc.width)
+            bg.drawOn(canvas, 0, 0)
 
         canvas.restoreState()
 
