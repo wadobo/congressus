@@ -29,3 +29,7 @@ urlpatterns = [
 
 if 'theme' in settings.INSTALLED_APPS:
     urlpatterns += url(r'^custom/', include('theme.urls')),
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += url(r'^debug/', include(debug_toolbar.urls)),
