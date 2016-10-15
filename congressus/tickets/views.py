@@ -7,6 +7,7 @@ import operator
 
 import redsystpv
 
+from django.db.models import Count
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -92,6 +93,17 @@ class MultiPurchaseView(TemplateView):
         ev = get_object_or_404(Event, active=True, slug=self.kwargs['ev'])
         ctx = super(MultiPurchaseView, self).get_context_data(*args, **kwargs)
         ctx['ev'] = ev
+        seat_maps = ev.spaces.exclude(seat_map=None).values_list("seat_map", flat=True).distinct()
+        ctx['seat_maps_table'] = {}
+        for seat_map in seat_maps:
+            s = SeatMap.objects.get(pk=seat_map)
+            ctx['seat_maps_table'].update({seat_map: s.get_table()})
+
+        ctx['free_seats'] = {}
+        for s, l, b in TicketSeatHold.objects.annotate(busy=Count('pk')).values_list("session", "layout", "busy"):
+            layout = SeatLayout.objects.get(pk=l)
+            ctx['free_seats'].update({(s, l): layout.free() - b})
+
         ctx['form'] = MPRegisterForm(event=ev)
         client = self.request.session.get('client', '')
 

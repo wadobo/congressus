@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load tickets %}
+
 <div class="map">
     <div id="maphelp">
         {% trans "To choose your seats:" %}<br/>
@@ -8,13 +9,13 @@
     </div>
 
     <table class="table-bordered table">
-        {% for r in map.get_table %}
+        {% for r in mtable %}
             <tr>
             {% for c in r %}
                 {% if c == 'scene' %}
                     {% scene_span session map %}
                 {% elif c %}
-                    {% free_seats c session as free %}
+                    {% get_free_seats free_seats session.id c as free %}
                     <td class="layout layout-{{ session.id }}-{{ c.id }} l{{ free }}"
                     data-session="{{ session.id }}" data-id="{{ c.id }}"
                     data-name="{{ c.name }}" data-layout="{{ c.layout }}"
@@ -52,7 +53,7 @@
     <span class="legend seat-selected"></span> {% trans "Selected" %}
 </div>
 
-{% for r in map.get_table %}
+{% for r in mtable %}
     {% for c in r %}
         {% if c and c != 'scene' %}
             <div class="display display-{{ session.id }}-{{ c.id }} ajax-layout"

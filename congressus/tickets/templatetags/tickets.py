@@ -52,5 +52,17 @@ def key(data, key, prefix="", default=''):
 
 
 @register.simple_tag
-def free_seats(layout, session):
-    return layout.free_seats(session)
+def get_value(dic, key):
+    if not isinstance(dic, dict):
+        return
+    return dic.get(key)
+
+
+@register.simple_tag
+def get_free_seats(dic, session_id, layout):
+    if not isinstance(dic, dict):
+        return
+    free = dic.get((session_id, layout.id))
+    if not free:
+        free =  layout.free()
+    return free

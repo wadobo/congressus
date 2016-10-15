@@ -38,6 +38,7 @@
     {% csrf_token %}
     <div class="row">
     {% for space in ev.spaces.all %}
+        {% get_value seat_maps_table space.seat_map.id as seat_map_table %}
         <div class="col-sm-6">
             <div class="panel panel-info">
                 <div class="panel-heading">

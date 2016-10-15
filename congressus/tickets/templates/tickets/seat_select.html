@@ -17,7 +17,7 @@
       </div>
       <div class="modal-body">
             <div class="seatmap" data-session="{{ session.id }}">
-            {% include "tickets/map.html" with map=session.space.seat_map %}
+            {% include "tickets/map.html" with map=space.seat_map mtable=seat_map_table %}
             </div>
       </div>
       <div class="modal-footer">
