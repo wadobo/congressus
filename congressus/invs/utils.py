@@ -67,9 +67,6 @@ def get_ticket_format(invs, pf):
 def get_sold_invs(session):
     from .models import InvitationType
     from .models import Invitation
-    types = []
-    for inv_type in InvitationType.objects.all():
-        if session in inv_type.sessions.all():
-            types.append(inv_type)
+    types = InvitationType.objects.filter(sessions__in=[session])
     return Invitation.objects.filter(type__in=types).count()
 
