@@ -70,16 +70,17 @@ function recalcTotal() {
 
 $(document).ready(function() {
 
-    // Define tabindex
-    $('.sessioninput').each(function(i) {
-        $(this).attr('tabindex', i + 1);
-    });
-    index = $('.sessioninput').length + 1;
-    //$("input[name=discount]").attr('tabindex', index++);
-    $("input[name=payment]").attr('tabindex', index++);
-    $("input[name=payed]").attr('tabindex', index++);
-    $("#finish").attr('tabindex', index++);
-    // End Define tabindex
+    // Define tabindex: only for window sale
+    if (window.location.pathname.startsWith("/window/")) {
+        $('.sessioninput').each(function(i) {
+            $(this).attr('tabindex', i + 1);
+        });
+        index = $('.sessioninput').length + 1;
+        //$("input[name=discount]").attr('tabindex', index++);
+        $("input[name=payment]").attr('tabindex', index++);
+        $("input[name=payed]").attr('tabindex', index++);
+        $("#finish").attr('tabindex', index++);
+    }
 
     function confirmMsg() {
         var msg = $("#finish").data("msg");

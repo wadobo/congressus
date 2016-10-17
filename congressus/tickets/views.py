@@ -120,6 +120,7 @@ class MultiPurchaseView(TemplateView):
         ctx['client'] = client
         ctx['ws_server'] = settings.WS_SERVER
         ctx['max_seat_by_session'] = settings.MAX_SEAT_BY_SESSION
+        ctx['is_windowsale'] = True if self.template_name != 'tickets/multipurchase.html' else False
         return ctx
 
     def post(self, request, ev=None):
