@@ -63,6 +63,6 @@ def get_free_seats(dic, session_id, layout):
     if not isinstance(dic, dict):
         return
     free = dic.get((session_id, layout.id))
-    if not free:
+    if free is None:
         free =  layout.free()
     return free
