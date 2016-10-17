@@ -95,11 +95,8 @@ class MultiPurchaseView(TemplateView):
         ctx['ev'] = ev
 
         # preloading seat layout data
-        seat_maps = ev.spaces.exclude(seat_map=None).values_list("seat_map", flat=True).distinct()
-        ctx['seat_maps_table'] = {}
-        for seat_map in seat_maps:
-            s = SeatMap.objects.get(pk=seat_map)
-            ctx['seat_maps_table'].update({seat_map: s.get_table()})
+        seat_maps = SeatMap.objects.filter(spaces__event=ev)
+        ctx['seat_maps_table'] = {s.pk: s.get_table() for s in seat_maps}
 
         # preloading seat layout free seats number
         ctx['free_seats'] = {}
