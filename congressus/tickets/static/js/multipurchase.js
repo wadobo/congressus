@@ -349,9 +349,13 @@ $(document).ready(function() {
     });
 
     // calculating sums
-    $('.sessioninput').keyup(function() {
+    $('.sessioninput').keydown(function(e) {
         var obj = $(this);
-        delay(function() { seatsChange(obj) }, 300);
+        if (e.keyCode == 9 || e.keyCode == 16) {
+            seatsChange(obj);
+        } else {
+            delay(function() { seatsChange(obj) }, 500);
+        }
     });
     recalcTotal();
 
