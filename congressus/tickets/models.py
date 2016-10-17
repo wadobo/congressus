@@ -88,7 +88,8 @@ class BaseTicketMixing:
         tmpl = get_template('emails/reg.txt')
         body = tmpl.render({'ticket': self})
         email = EmailMessage(_('New Register / %s') % self.event(),
-                             body, settings.FROM_EMAIL, [self.event().admin])
+                             body, settings.FROM_EMAIL,
+                             [self.event().admin], reply_to=[self.email])
         email.send(fail_silently=False)
 
     def send_confirm_email(self):
@@ -103,7 +104,8 @@ class BaseTicketMixing:
         tmpl = get_template('emails/confirm.txt')
         body = tmpl.render({'ticket': self})
         email = EmailMessage(_('Confirmed / %s') % self.event(),
-                             body, settings.FROM_EMAIL, [self.event().admin])
+                             body, settings.FROM_EMAIL,
+                             [self.event().admin], reply_to=[self.email])
         email.send(fail_silently=False)
 
         # email to user
