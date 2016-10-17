@@ -103,10 +103,12 @@ class MultiPurchaseView(TemplateView):
 
         # preloading seat layout free seats number
         ctx['free_seats'] = {}
-        q = TicketSeatHold.objects.values('session', 'layout').annotate(busy=Count('pk')).values_list("session", "layout", "busy")
-        for s, l, b in q:
-            layout = SeatLayout.objects.get(pk=l)
-            ctx['free_seats'].update({(s, l): layout.free() - b})
+        q = TicketSeatHold.objects.values('session', 'layout')
+        q = q.annotate(busy=Count('pk'))
+        q = q.values_list("session", "layout", "layout__layout", "busy")
+        for s, l, layout, b in q:
+            free = layout.count('L')
+            ctx['free_seats'].update({(s, l): free - b})
 
         ctx['form'] = MPRegisterForm(event=ev)
         client = self.request.session.get('client', '')
