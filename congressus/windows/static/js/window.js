@@ -86,6 +86,21 @@ $(document).ready(function() {
         $("#finish").attr('tabindex', index++);
     }
 
+    function preConfirmMsg() {
+        confirms = preSubmit();
+        if (confirms) {
+            alertify.confirm(confirms, function(e) {
+                if (e) {
+                    confirmMsg();
+                } else {
+                    return false;
+                }
+            });
+        } else {
+            confirmMsg();
+        }
+    }
+
     function confirmMsg() {
         var msg = $("#finish").data("msg");
         var btn_cancel = $("#finish").data("cancel");
@@ -115,11 +130,11 @@ $(document).ready(function() {
             if ($("#finish")[0].disabled) {
                 return;
             }
-            confirmMsg();
+            preConfirmMsg();
         }
     });
 
-    $("#finish").click(confirmMsg);
+    $("#finish").click(preConfirmMsg);
 
     $("#clean").click(clean);
     $("#payed").keyup(calcChange);

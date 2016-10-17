@@ -289,43 +289,53 @@ function seatsChange(obj) {
     }
 }
 
-$(document).ready(function() {
-    $("form").submit(function() {
-        var warnings = [];
-        var sessions = [];
+function preSubmit() {
+    var warnings = [];
+    var sessions = [];
 
-        $('.sessioninput').each(function() {
-            val = parseInt($(this).val(), 10);
-            id = $(this).attr("id");
-            if (val) {
-                sessions.push(id);
-            }
-        });
-
-        $('.warning').each(function() {
-            var warning = {};
-            warning.name = $(this).data('name');
-            warning.sessions1 = String($(this).data('sessions1')).split(',');
-            warning.sessions2 = String($(this).data('sessions2')).split(',');
-            warning.type = $(this).data('type');
-            warning.message = $(this).data('message');
-            warnings.push(warning);
-        });
-
-        for(var i=0; i<warnings.length; i++) {
-            var w = warnings[i];
-            if (check_warning(w, sessions)) {
-                alertify.confirm(w.message, function(e) {
-                    if (e) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                });
-            }
+    $('.sessioninput').each(function() {
+        val = parseInt($(this).val(), 10);
+        id = $(this).attr("id");
+        if (val) {
+            sessions.push(id);
         }
+    });
 
-        return true;
+    $('.warning').each(function() {
+        var warning = {};
+        warning.name = $(this).data('name');
+        warning.sessions1 = String($(this).data('sessions1')).split(',');
+        warning.sessions2 = String($(this).data('sessions2')).split(',');
+        warning.type = $(this).data('type');
+        warning.message = $(this).data('message');
+        warnings.push(warning);
+    });
+
+    confirms = ""
+    for(var i=0; i<warnings.length; i++) {
+        var w = warnings[i];
+        if (check_warning(w, sessions)) {
+            confirms += w.message + "\n\n";
+        }
+    }
+    return confirms;
+}
+
+$(document).ready(function() {
+
+    $("#btn-continue").click(function() {
+        confirms = preSubmit();
+        if (confirms) {
+            alertify.confirm(confirms, function(e) {
+                if (e) {
+                    $("form").submit();
+                } else {
+                    return false;
+                }
+            });
+        } else {
+            $("form").submit();
+        }
     });
 
     $('.withtooltip').tooltip();
