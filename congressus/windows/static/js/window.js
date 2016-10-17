@@ -25,6 +25,10 @@ function clean() {
     return false;
 }
 
+function reload() {
+    location.reload();
+}
+
 function calcChange() {
     var total = parseFloat($("#total").val());
     var payed = parseFloat($("#payed").val());
@@ -97,7 +101,7 @@ $(document).ready(function() {
                 args += ' ' + $('input[name=payment]:checked').val();
                 args += ' ' + $(".seat-selected").length;
                 ws.send('add_sale' + args);
-                setTimeout(clean, 1000);
+                setTimeout(reload, 1000);
                 $("form").submit();
             }
         });
