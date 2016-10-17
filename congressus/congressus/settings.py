@@ -201,6 +201,8 @@ DEBUG_TOOLBAR_PANELS = [
     'debug_toolbar_line_profiler.panel.ProfilingPanel',
 ]
 
+SHOW_TOOLBAR_CALLBACK = False
+
 try:
     from local_settings import *
 except:
