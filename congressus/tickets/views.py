@@ -4,6 +4,8 @@ import uuid
 import random
 import string
 import operator
+import re
+import numpy as np
 
 import redsystpv
 
@@ -459,12 +461,112 @@ autoseats = csrf_exempt(AutoSeats.as_view())
 class AjaxLayout(TemplateView):
     template_name = 'tickets/layout.html'
 
+    def ticket_seat_class(self, session, layout, seat, row, col):
+        if seat == 'R':
+            return 'seat-R'
+        elif seat == '_':
+            return 'seat-_'
+
+        row = str(row)
+        col = str(col)
+
+        holded_type = session.is_seat_holded(layout, row, col)
+        if holded_type:
+            return 'seat-' + re.sub('[CP]', 'H', holded_type)
+        else:
+            return 'seat-L'
+        return 'seat-R'
+
+    def update_layout_with_hold(self, session, layout):
+        """ Create new layout: copy current layout and update with hold seats """
+        res_layout = layout.real_rows()
+        holds = TicketSeatHold.objects.values("seat", "type").filter(session=session, layout=layout)
+        for h in holds:
+            row, col = h.get('seat').split('-')
+            res_layout[int(row) - 1][int(col) - layout.column_start_number] = h.get('type')
+        if layout.direction == 'd':
+            res_layout = np.flipud(res_layout)
+        elif layout.direction == 'l':
+            res_layout = np.transpose(res_layout)
+        elif layout.direction == 'r':
+            res_layout = np.fliplr(np.rot90(res_layout))
+        return res_layout
+
+    def get_seat(self, session, layout, seat, row, col):
+        sres = '<td class="seat seat-{0}"'.format(seat)
+        sres += ' id="{0}_{1}_{2}_{3}"'.format(session.id, layout.id, row, col)
+        sres += ' data-session="{0}" data-layout="{1}"'.format(session.id, layout.id)
+        sres += ' data-row="{0}" data-col="{1}">'.format(row, col)
+        if seat != '_':
+            sres += '{:0>2}'.format(col)
+        sres += '</td>'
+        return sres
+
+    def get_layout_table(self, layout, session):
+        col_start = layout.column_start_number
+        lay_cols = len(layout.rows()[0])
+
+        res = '<tr>'
+        if layout.direction == 'u':
+            for n in range(col_start, col_start + lay_cols):
+                res += '<th>{0}</th>'.format(n)
+        elif layout.direction == 'l':
+            res += '<th></th>'
+            for n in range(lay_cols):
+                res += '<th>{0}</th>'.format(n + 1)
+        res += '</tr>'
+
+        layout_seat = self.update_layout_with_hold(session, layout)
+        lay_rows = len(layout.rows())
+        for nrow in range(lay_rows):
+            res += '<tr>'
+            if layout.direction == 'd':
+                res += '<th>{0}</th>'.format(lay_rows - nrow)
+            elif layout.direction == 'l':
+                res += '<th>{0}</th>'.format(nrow + 1)
+
+            for ncol in range(lay_cols):
+                if layout.direction == 'r':
+                    row = lay_cols - ncol
+                    col = lay_rows - nrow + col_start - 1
+                elif layout.direction == 'u':
+                    row = nrow + 1
+                    col = ncol + col_start
+                elif layout.direction == 'l':
+                    row = ncol + 1
+                    col = nrow + col_start
+                elif layout.direction == 'd':
+                    row = lay_rows - nrow + 1
+                    col = ncol + col_start
+                else:
+                    continue
+                seat = layout_seat[nrow][ncol]
+                res += self.get_seat(session, layout, seat, row, col)
+
+            if layout.direction == 'r':
+                res += '<th>{0}</th>'.format(lay_rows - nrow + col_start)
+            elif layout.direction == 'u':
+                res += '<th>{0}</th>'.format(nrow + 1)
+            res += '</tr>'
+
+        res += '<tr>'
+        if layout.direction == 'r':
+            for n in reversed(range(0, lay_cols)):
+                res += '<th>{0}</th>'.format(n + 1)
+        elif layout.direction == 'd':
+            res += '<th></th>'
+            for n in range(col_start, col_start + lay_cols):
+                res += '<th>{0}</th>'.format(n)
+        res += '</tr>'
+        return res
+
     def get_context_data(self, session, layout, **kwargs):
         ctx = super(AjaxLayout, self).get_context_data(**kwargs)
         layout = get_object_or_404(SeatLayout, id=layout)
         session = get_object_or_404(Session, id=session)
         ctx['layout'] = layout
         ctx['session'] = session
+        ctx['layout_table'] = self.get_layout_table(layout, session)
         return ctx
 ajax_layout = AjaxLayout.as_view()
 

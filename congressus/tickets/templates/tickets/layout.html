@@ -20,63 +20,8 @@
 
             <!-- layout -->
             <table class="seat-layout table notranslate">
-                <tr>
-                    {% if layout.direction == 'u' %}
-                        {% for c in layout.rows.0 %}
-                            <th>{{ forloop.counter0|add:layout.column_start_number }}</th>
-                        {% endfor %}
-                    {% elif layout.direction == 'l' %}
-                        <th></th>
-                        {% for c in layout.rows.0 %}
-                            <th>{{ forloop.counter }}</th>
-                        {% endfor %}
-                    {% endif %}
-                </tr>
-                {% for row in layout.rows %}
-                <tr>
-                    {% if layout.direction == 'd' %}
-                        <th>{{ forloop.revcounter }}</th>
-                    {% elif layout.direction == 'l' %}
-                        <th>{{ forloop.counter }}</th>
-                    {% endif %}
-
-                    {% if layout.direction == 'r' %}
-                        {% for seat in row %}
-                            {% include "tickets/layout_seat.html" with row=forloop.revcounter col=forloop.parentloop.revcounter0|add:layout.column_start_number %}
-                        {% endfor %}
-                    {% elif layout.direction == 'u' %}
-                        {% for seat in row %}
-                            {% include "tickets/layout_seat.html" with row=forloop.parentloop.counter col=forloop.counter0|add:layout.column_start_number %}
-                        {% endfor %}
-                    {% elif layout.direction == 'l' %}
-                        {% for seat in row %}
-                            {% include "tickets/layout_seat.html" with row=forloop.counter col=forloop.parentloop.counter0|add:layout.column_start_number %}
-                        {% endfor %}
-                    {% elif layout.direction == 'd' %}
-                        {% for seat in row %}
-                            {% include "tickets/layout_seat.html" with row=forloop.parentloop.revcounter col=forloop.counter0|add:layout.column_start_number %}
-                        {% endfor %}
-                    {% endif %}
-
-                    {% if layout.direction == 'r' %}
-                        <th>{{ forloop.revcounter0|add:layout.column_start_number }}</th>
-                    {% elif layout.direction == 'u' %}
-                        <th>{{ forloop.counter }}</th>
-                    {% endif %}
-                </tr>
-                {% endfor %}
-                <tr>
-                    {% if layout.direction == 'r' %}
-                        {% for c in layout.rows.0 %}
-                            <th>{{ forloop.revcounter }}</th>
-                        {% endfor %}
-                    {% elif layout.direction == 'd' %}
-                        <th></th>
-                        {% for c in layout.rows.0 %}
-                            <th>{{ forloop.counter0|add:layout.column_start_number }}</th>
-                        {% endfor %}
-                    {% endif %}
-                </tr>
+                <!-- Generate html from frontend, better performance. -->
+                {{ layout_table|safe }}
             </table>
 
             </td>
