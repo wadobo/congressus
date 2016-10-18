@@ -9,13 +9,7 @@ if (!String.prototype.startsWith) {
 var old_session = -1;
 var old_layout = -1;
 
-var delay = (function () {
-    var timer = 0;
-    return function (callback, ms) {
-        clearTimeout(timer);
-        timer = setTimeout(callback, ms);
-    };
-})();
+delays = {};
 
 function check_warning(w, sessions) {
     if (w.type == 'req') {
@@ -359,12 +353,17 @@ $(document).ready(function() {
     });
 
     // calculating sums
-    $('.sessioninput').keydown(function(e) {
+    $('.sessioninput').keyup(function(e) {
         var obj = $(this);
+        var id = obj.attr('id');
         if (e.keyCode == 9 || e.keyCode == 16) {
             seatsChange(obj);
+            clearTimeout(delays[id]);
         } else {
-            delay(function() { seatsChange(obj) }, 500);
+            clearTimeout(delays[id]);
+            delays[id] = setTimeout(function() {
+                seatsChange(obj);
+            }, 500);
         }
     });
     recalcTotal();
