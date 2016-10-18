@@ -32,4 +32,7 @@ if 'theme' in settings.INSTALLED_APPS:
 
 if settings.DEBUG:
     import debug_toolbar
-    urlpatterns += url(r'^debug/', include(debug_toolbar.urls)),
+    urlpatterns += [
+        url(r'^debug/', include(debug_toolbar.urls)),
+        url(r'^silk/', include('silk.urls', namespace='silk'))
+    ]

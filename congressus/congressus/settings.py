@@ -209,11 +209,16 @@ if DEBUG:
     INSTALLED_APPS = (
         'debug_toolbar',
         'debug_toolbar_line_profiler',
+        'silk',
     ) + INSTALLED_APPS
 
     MIDDLEWARE_CLASSES = (
         'debug_toolbar.middleware.DebugToolbarMiddleware',
+        'silk.middleware.SilkyMiddleware',
     ) + MIDDLEWARE_CLASSES
+
+    SILKY_PYTHON_PROFILER = True
+    #SILKY_PYTHON_PROFILER_BINARY = True # crate file for view with snakeviz
 
     for tmpl in TEMPLATES:
         tmpl['OPTIONS']['context_processors'] = ['django.template.context_processors.debug'] + tmpl['OPTIONS']['context_processors']
