@@ -10,6 +10,7 @@ var old_session = -1;
 var old_layout = -1;
 
 delays = {};
+selected_seats = {};
 
 function check_warning(w, sessions) {
     if (w.type == 'req') {
@@ -247,6 +248,13 @@ function seatsChange(obj) {
     if (!obj) {
         obj = $(this);
     }
+    // Only recalcTotal and autoseats if seats are changed
+    if (selected_seats[obj.attr('id')] ==  obj.val()) {
+        return;
+    } else {
+        selected_seats[obj.attr('id')] =  obj.val();
+    }
+
     recalcSums(obj);
     recalcTotal();
 
@@ -369,6 +377,7 @@ $(document).ready(function() {
     recalcTotal();
 
     $('.sessioninput').each(function() {
+        selected_seats[$(this).attr('id')] = $(this).val();
         recalcSums($(this));
         $(this).click(function() { $(this).select(); });
     });
