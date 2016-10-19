@@ -468,8 +468,7 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
         postfix = self.created.strftime('%m%d%H%M')
         if self.sold_in_window:
             from windows.models import TicketWindowSale
-            tws = TicketWindowSale.objects.get(purchase__tickets=self)
-            prefix = tws.window.code
+            prefix = TicketWindowSale.objects.values_list("window__code", flat=True).get(purchase__tickets=self)
 
         return prefix + postfix
 
