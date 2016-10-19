@@ -149,7 +149,7 @@ class BaseTicketMixing:
     def hold_seats(self):
         all_tk = []
         if self.is_mp():
-            all_tk = self.tickets.filter(session__space__numbered=True)
+            all_tk = self.tickets.only("session", "seat_layout", "seat").filter(session__space__numbered=True)
         elif self.session.space.numbered:
             all_tk = [self]
 

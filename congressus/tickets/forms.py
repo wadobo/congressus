@@ -102,8 +102,10 @@ class MPRegisterForm(forms.ModelForm):
             raise forms.ValidationError(_("Select at least one ticket"))
 
         for sid, number in self.ids:
-            session = Session.objects.get(space__event=self.event, id=sid)
             n = int(number)
+            if not n:
+                continue
+            session = Session.objects.get(id=sid)
             if n < 0 or n > settings.MAX_SEAT_BY_SESSION:
                 raise forms.ValidationError(_("Sorry, you can't buy %(n)s tickets") %  {"n": n})
             if not session.have_places(n):
@@ -111,7 +113,9 @@ class MPRegisterForm(forms.ModelForm):
 
         for sid, seats in self.seats:
             seats = list(filter(None, seats))
-            session = Session.objects.get(space__event=self.event, id=sid)
+            if not seats:
+                continue
+            session = Session.objects.get(id=sid)
             for seat in seats:
                 layout, row, column = seat.split('_')
                 layout = session.space.seat_map.layouts.get(pk=layout)
@@ -125,7 +129,9 @@ class MPRegisterForm(forms.ModelForm):
         # tickets with seat
         for sid, seats in self.seats:
             seats = list(filter(None, seats))
-            session = Session.objects.get(space__event=self.event, id=sid)
+            if not seats:
+                continue
+            session = Session.objects.defer("space").get(id=sid)
             for seat in seats:
                 layout, row, column = seat.split('_')
                 layout = session.space.seat_map.layouts.get(pk=layout)
@@ -141,8 +147,10 @@ class MPRegisterForm(forms.ModelForm):
     def save_normal_tickets(self, mp):
         # tickets without seat
         for sid, number in self.ids:
-            session = Session.objects.get(space__event=self.event, id=sid)
             n = int(number)
+            if not n:
+                continue
+            session = Session.objects.get(id=sid)
             for i in range(n):
                 # confirm_sent should be true to avoid multiple emails for
                 # the same purchase
