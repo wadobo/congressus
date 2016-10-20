@@ -1,0 +1,23 @@
+{% extends "base-admin.html" %}
+{% load i18n %}
+
+{% block title %}{{ ev }}{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        {% block pretitle %}
+        <h1 class="inline">
+            {{ ev }} <small>{% trans "Dashboards" %}</small>
+        </h1>
+        {% endblock %}
+    </div>
+
+    <ul>
+        {% for d in dashs %}
+            <li><a href="{% url 'dashboard_general' ev.slug d.slug %}">{{ d.name }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+{% block foot %}
+{% endblock %}

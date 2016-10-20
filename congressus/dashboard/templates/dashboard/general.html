@@ -1,6 +1,8 @@
-{% extends "base.html" %}
+{% extends "base-admin.html" %}
 {% load i18n %}
 {% load staticfiles %}
+
+{% block title %}{{ ev }}{% endblock %}
 
 {% block extraclasses %}access{% endblock %}
 

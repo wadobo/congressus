@@ -35,6 +35,21 @@ from windows.models import TicketWindow
 from windows.models import TicketWindowSale
 
 
+class DashboardsView(TemplateView):
+    template_name = 'dashboard/list.html'
+
+    def get_context_data(self, *args, **kwargs):
+        ctx = super().get_context_data(*args, **kwargs)
+
+        ev = get_object_or_404(Event, slug=kwargs.get('ev', ''))
+        dashs = ev.dashboard_set.all()
+
+        ctx['ev'] = ev
+        ctx['dashs'] = dashs
+        return ctx
+dlist = staff_member_required(DashboardsView.as_view())
+
+
 class GeneralView(TemplateView):
     template_name = 'dashboard/general.html'
     DEFAULT_LINE_DATASET = {
@@ -264,6 +279,11 @@ class GeneralView(TemplateView):
         return ctx
 
     def get_chart(self, type_chart, timestep=settings.TIMESTEP_CHART, max=settings.MAX_STEP_CHART):
+        title = ''
+        for k, v in CHARTS:
+            if k == type_chart:
+                title = str(v)
+
         if type_chart == 'os_c':
             chart = self.get_sales_online(timestep, max)
         elif type_chart == 'ws_c':
@@ -282,6 +302,7 @@ class GeneralView(TemplateView):
         return {
                 'data': chart,
                 'type_data': tdata,
+                'title': title,
                 'type_chart': tchart
         }
 

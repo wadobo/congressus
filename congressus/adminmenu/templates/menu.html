@@ -21,7 +21,7 @@
       <ul class="nav navbar-nav">
         {% if ev.slug %}
             <li {% if menuitem == 'dashboard' %}class="active"{% endif %}>
-                <a href="#">{% trans "dashboard" %}</a>
+                <a href="{% url 'dashboard_list' ev.slug %}">{% trans "dashboard" %}</a>
             </li>
             <li {% if menuitem == 'online' %}class="active"{% endif %}>
                 <a href="{% url 'multipurchase' ev.slug %}">{% trans "online" %}</a>

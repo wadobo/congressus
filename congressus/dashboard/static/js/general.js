@@ -24,14 +24,26 @@ function fill_charts() {
         type_chart = charts[c].type_chart;
         type_data = charts[c].type_data;
         id = type_data + String(c);
-        var canvas = $('<canvas id="'+id+'" width="200" height="200"></canvas>');
+        var canvas = $('<canvas id="'+id+'" width="400" height="200"></canvas>');
         //var html = '<div class="row">';
         //html += '<div class="col-md-12">';
         //html += canvas;
         //html += '</div>';
         //html += '</div>';
 
-        $("#charts").append(canvas);
+        console.log(charts);
+        var title = charts[c].title;
+        var container = $('<div class="col-sm-12"></div>');
+        var panel = $('<div class="panel panel-default"></div>');
+        var head = $('<div class="panel-heading">'+ title +'</div>');
+        var body = $('<div class="panel-body"></div>');
+
+        body.append(canvas);
+        panel.append(head);
+        panel.append(body);
+        container.append(panel)
+
+        $("#charts").append(container);
         var ctx = canvas.get(0).getContext("2d");
         if (type_chart == 'p') {
             type = 'doughnut';
