@@ -1,0 +1,58 @@
+{% extends "base-admin.html" %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block extrahead %}
+    <link href="{% static "css/report.css" %}?v=4.0" rel="stylesheet">
+    <link href="{% static "datepicker/css/datepicker.css" %}" rel="stylesheet">
+    <link href="{% static "bootstrap-toggle-master/css/bootstrap-toggle.min.css" %}" rel="stylesheet">
+{% endblock %}
+
+{% block extrabody %}
+    <script src="{% static "datepicker/js/bootstrap-datepicker.js" %}"></script>
+    <script src="{% static "bootstrap-toggle-master/js/bootstrap-toggle.min.js" %}"></script>
+    <script>
+        $('.datepicker').datepicker();
+    </script>
+{% endblock %}
+
+{% block title %} {% trans "Reports" %} {% endblock %}
+
+{% block content %}
+    {% include "dashboard/report.html" %}
+
+    <hr/>
+
+    <form method="GET" action="">
+        <div class="row">
+            <div class="col-md-6 text-center">
+                <h3>{% trans "Sessions" %}</h3>
+                {% for space in spaces %}
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">{{ space.name }}</div>
+                        <div class="panel-body toggle-inputs">
+                            {% for session in space.sessions.all %}
+                                <input data-toggle="toggle"
+                                       data-off="{{ session.name }}"
+                                       data-on="<span class='glyphicon glyphicon-ok'></span> {{ session.name }}"
+                                       type="checkbox" name="scheck" value="{{ session.pk }}"/>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="col-md-6 text-center">
+                <h3>{% trans "Windows" %}</h3>
+                <div class="toggle-inputs">
+                    {% for window in windows %}
+                        <input data-toggle="toggle"
+                               data-off="{{ window.name }}"
+                               data-on="<span class='glyphicon glyphicon-ok'></span> {{ window.name }}"
+                               type="checkbox" name="wcheck" value="{{ window.pk }}"/>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <input type="submit" class="btn btn-success btn-block" value="Arqueo">
+    </form>
+{% endblock %}

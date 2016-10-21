@@ -46,6 +46,7 @@ class DashboardsView(TemplateView):
 
         ctx['ev'] = ev
         ctx['dashs'] = dashs
+        ctx['menuitem'] = 'dashboard'
         return ctx
 dlist = staff_member_required(DashboardsView.as_view())
 
@@ -322,27 +323,20 @@ class ReportView(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         ctx = super(ReportView, self).get_context_data(*args, **kwargs)
-        ctx['ws_server'] = settings.WS_SERVER
         ev = self.kwargs['ev']
-        ctx['ev'] = get_object_or_404(Event, slug=ev)
-        ctx['sessions'] = Session.objects.all()
-        ctx['windows'] = TicketWindow.objects.all()
+        self.ev = get_object_or_404(Event, slug=ev)
+        self.windows = self.ev.windows.all()
+        self.sessions = self.ev.get_sessions()
+
+        ctx['ws_server'] = settings.WS_SERVER
+        ctx['ev'] = self.ev
+        ctx['sessions'] = self.sessions
+        ctx['windows'] = self.windows
+        ctx['menuitem'] = 'report'
+
         return ctx
 
-    def get_sessions(self, request, report_type):
-        if report_type == 'online':
-            start_date = request.POST.get('start-date')
-            start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
-            end_date = request.POST.get('end-date')
-            end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
-            sessions = Session.objects.filter(start__range=(start_date, end_date))
-        else:
-            sessions = Session.objects.all()
-        return sessions
-
     def get_online_datas(self, sessions, report_type):
-        if report_type == 'window_sale':
-            return None
         tickets = Ticket.objects.filter(confirmed=True, sold_in_window=False, session__in=sessions)
         return tickets.values('session__name', 'session__space__name')\
                 .annotate(
@@ -351,10 +345,9 @@ class ReportView(TemplateView):
                         price_without_iva=Sum(F('price')/(1+F('tax')/100.0), output_field=FloatField()))\
                 .order_by('session__start')
 
-    def get_window_sale_datas(self, report_type):
-        if report_type == 'online':
-            return None
+    def get_window_sale_datas(self, sessions, report_type):
         tickets = Ticket.objects.filter(confirmed=True, sold_in_window=True)
+        tickets = tickets.filter(session__in=sessions)
         return tickets.values('session__name', 'session__space__name')\
                 .annotate(
                         amount=Count('pk'),
@@ -418,7 +411,7 @@ class ReportView(TemplateView):
                     del row[1]
 
         return general_table, specific_tables
-    
+
     def get_arqueo(self, sessions, window_sales):
         mps = TicketWindowSale.objects.filter(window__in=window_sales).values_list('purchase', flat=True)
         tickets = Ticket.objects.filter(confirmed=True, sold_in_window=True, session__in=sessions, mp__in=mps)
@@ -465,3 +458,96 @@ class ReportView(TemplateView):
         return render(request, self.template_name, ctx)
 
 report = csrf_exempt(staff_member_required(ReportView.as_view()))
+
+
+class GeneralReportView(ReportView):
+    template_name = 'dashboard/general_report.html'
+
+    def get_context_data(self, *args, **kwargs):
+        ctx = super().get_context_data(*args, **kwargs)
+        report_type = 'general'
+        ctx['report_type'] = report_type
+
+        window_sales = self.get_window_sale_datas(self.sessions, report_type)
+        onlines = self.get_online_datas(self.sessions, report_type)
+        gtable, stables = self.get_datas(window_sales, onlines, self.sessions, report_type)
+        ctx['general_table'] = gtable
+        ctx['specific_tables'] = stables
+
+        return ctx
+report_general = staff_member_required(GeneralReportView.as_view())
+
+class WindowReportView(ReportView):
+    template_name = 'dashboard/general_report.html'
+
+    def get_context_data(self, *args, **kwargs):
+        ctx = super().get_context_data(*args, **kwargs)
+        report_type = 'window_sale'
+        ctx['report_type'] = report_type
+
+        window_sales = self.get_window_sale_datas(self.sessions, report_type)
+        onlines = None
+        gtable, stables = self.get_datas(window_sales, onlines, self.sessions, report_type)
+        ctx['general_table'] = gtable
+        ctx['specific_tables'] = stables
+
+        return ctx
+report_window = staff_member_required(WindowReportView.as_view())
+
+class OnlineReportView(ReportView):
+    template_name = 'dashboard/online_report.html'
+
+    def get_context_data(self, *args, **kwargs):
+        ctx = super().get_context_data(*args, **kwargs)
+        report_type = 'online'
+        ctx['report_type'] = report_type
+
+        start_date = self.request.GET.get('start-date')
+        end_date = self.request.GET.get('end-date')
+
+        if start_date and end_date:
+            start_date = datetime.strptime(start_date, "%d-%m-%Y").date()
+            end_date = datetime.strptime(end_date, "%d-%m-%Y").date()
+            self.sessions = self.sessions.filter(start__range=(start_date, end_date))
+
+        window_sales = None
+        onlines = self.get_online_datas(self.sessions, report_type)
+        gtable, stables = self.get_datas(window_sales, onlines, self.sessions, report_type)
+        ctx['general_table'] = gtable
+        ctx['specific_tables'] = stables
+
+        return ctx
+report_online = staff_member_required(OnlineReportView.as_view())
+
+class CountReportView(ReportView):
+    template_name = 'dashboard/count_report.html'
+
+    def get_context_data(self, *args, **kwargs):
+        ctx = super().get_context_data(*args, **kwargs)
+        report_type = 'arqueo'
+        ctx['report_type'] = report_type
+        ctx['spaces'] = self.ev.spaces.all()
+
+        request = self.request
+        sessions = request.GET.getlist('scheck')
+        window_sales = request.GET.getlist('wcheck')
+        sessions = map(int, sessions)
+        window_sales = map(int, window_sales)
+        datas = self.get_arqueo(sessions, window_sales)
+        arqueo_table = self.gen_arqueo_table(datas)
+        ctx['arqueo_table'] = arqueo_table
+
+        return ctx
+report_count = staff_member_required(CountReportView.as_view())
+
+
+class ReportListView(TemplateView):
+    template_name = 'dashboard/list_report.html'
+
+    def get_context_data(self, *args, **kwargs):
+        ctx = super().get_context_data(*args, **kwargs)
+        ev = get_object_or_404(Event, slug=kwargs.get('ev', ''))
+        ctx['ev'] = ev
+        return ctx
+
+report_list = staff_member_required(ReportListView.as_view())

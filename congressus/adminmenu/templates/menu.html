@@ -20,6 +20,9 @@
     <div class="collapse navbar-collapse" id="navbar-collapse-1">
       <ul class="nav navbar-nav">
         {% if ev.slug %}
+            <li {% if menuitem == 'report' %}class="active"{% endif %}>
+                <a href="{% url 'report' ev.slug %}">{% trans "report" %}</a>
+            </li>
             <li {% if menuitem == 'dashboard' %}class="active"{% endif %}>
                 <a href="{% url 'dashboard_list' ev.slug %}">{% trans "dashboard" %}</a>
             </li>

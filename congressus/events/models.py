@@ -92,10 +92,7 @@ class Event(models.Model):
             return None
 
     def get_sessions(self):
-        sessions = []
-        for space in self.spaces.all():
-            sessions += list(space.sessions.all())
-        return sessions
+        return Session.objects.filter(space__event=self)
 
     def sold(self):
         return sum(i.sold() for i in self.get_sessions())
