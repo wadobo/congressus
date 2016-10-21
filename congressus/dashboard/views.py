@@ -327,9 +327,11 @@ class ReportView(TemplateView):
         self.ev = get_object_or_404(Event, slug=ev)
         self.windows = self.ev.windows.all()
         self.sessions = self.ev.get_sessions()
+        self.spaces = self.ev.spaces.all()
 
         ctx['ws_server'] = settings.WS_SERVER
         ctx['ev'] = self.ev
+        ctx['spaces'] = self.spaces
         ctx['sessions'] = self.sessions
         ctx['windows'] = self.windows
         ctx['menuitem'] = 'report'
@@ -462,45 +464,42 @@ report = csrf_exempt(staff_member_required(ReportView.as_view()))
 
 class GeneralReportView(ReportView):
     template_name = 'dashboard/general_report.html'
+    window = False
 
     def get_context_data(self, *args, **kwargs):
         ctx = super().get_context_data(*args, **kwargs)
-        report_type = 'general'
-        ctx['report_type'] = report_type
+        ctx['online_windows'] = TicketWindow.objects.filter(event=self.ev, online=True)
+        ctx['local_windows'] = TicketWindow.objects.filter(event=self.ev, online=False)
 
-        window_sales = self.get_window_sale_datas(self.sessions, report_type)
-        onlines = self.get_online_datas(self.sessions, report_type)
-        gtable, stables = self.get_datas(window_sales, onlines, self.sessions, report_type)
-        ctx['general_table'] = gtable
-        ctx['specific_tables'] = stables
+        days = set()
+        q = self.sessions.extra({'date':"date(start)"}).values('date')
+        for d in q:
+            args = d['date'].split('-')
+            args = map(int, args)
+            day = timezone.make_aware(datetime(*args))
+            days.add(day)
+        days = sorted(list(days))
+        delta = timedelta(days=1)
+
+        ctx['session_days'] = [(d, d+delta) for d in days]
+        ctx['window'] = self.window
 
         return ctx
 report_general = staff_member_required(GeneralReportView.as_view())
 
-class WindowReportView(ReportView):
-    template_name = 'dashboard/general_report.html'
 
-    def get_context_data(self, *args, **kwargs):
-        ctx = super().get_context_data(*args, **kwargs)
-        report_type = 'window_sale'
-        ctx['report_type'] = report_type
-
-        window_sales = self.get_window_sale_datas(self.sessions, report_type)
-        onlines = None
-        gtable, stables = self.get_datas(window_sales, onlines, self.sessions, report_type)
-        ctx['general_table'] = gtable
-        ctx['specific_tables'] = stables
-
-        return ctx
+class WindowReportView(GeneralReportView):
+    window = True
 report_window = staff_member_required(WindowReportView.as_view())
+
 
 class OnlineReportView(ReportView):
     template_name = 'dashboard/online_report.html'
 
     def get_context_data(self, *args, **kwargs):
         ctx = super().get_context_data(*args, **kwargs)
-        report_type = 'online'
-        ctx['report_type'] = report_type
+        ctx['online_windows'] = TicketWindow.objects.filter(event=self.ev, online=True)
+        ctx['local_windows'] = TicketWindow.objects.filter(event=self.ev, online=False)
 
         start_date = self.request.GET.get('start-date')
         end_date = self.request.GET.get('end-date')
@@ -509,15 +508,24 @@ class OnlineReportView(ReportView):
             start_date = datetime.strptime(start_date, "%d-%m-%Y").date()
             end_date = datetime.strptime(end_date, "%d-%m-%Y").date()
             self.sessions = self.sessions.filter(start__range=(start_date, end_date))
+            ctx['sdate'] = start_date
+            ctx['edate'] = end_date
 
-        window_sales = None
-        onlines = self.get_online_datas(self.sessions, report_type)
-        gtable, stables = self.get_datas(window_sales, onlines, self.sessions, report_type)
-        ctx['general_table'] = gtable
-        ctx['specific_tables'] = stables
+        days = set()
+        q = self.sessions.extra({'date':"date(start)"}).values('date')
+        for d in q:
+            args = d['date'].split('-')
+            args = map(int, args)
+            day = timezone.make_aware(datetime(*args))
+            days.add(day)
+        days = sorted(list(days))
+        delta = timedelta(days=1)
+
+        ctx['session_days'] = [(d, self.sessions.filter(start__range=(d, d+delta))) for d in days]
 
         return ctx
 report_online = staff_member_required(OnlineReportView.as_view())
+
 
 class CountReportView(ReportView):
     template_name = 'dashboard/count_report.html'
@@ -526,7 +534,6 @@ class CountReportView(ReportView):
         ctx = super().get_context_data(*args, **kwargs)
         report_type = 'arqueo'
         ctx['report_type'] = report_type
-        ctx['spaces'] = self.ev.spaces.all()
 
         request = self.request
         sessions = request.GET.getlist('scheck')

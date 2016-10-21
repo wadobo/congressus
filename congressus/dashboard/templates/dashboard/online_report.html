@@ -14,11 +14,11 @@
     </script>
 {% endblock %}
 
-{% block title %} {% trans "Reports" %} {% endblock %}
+{% block title %} {% trans "Online Report" %} {% endblock %}
 
 {% block content %}
-    {% include "dashboard/report.html" %}
-    <hr/>
+    <h1>{% trans "Online Report" %}</h1>
+
     <form method="GET" action="">
         <div class="row">
             <div class="col-md-4 center">
@@ -34,4 +34,23 @@
             </div>
         </div>
     </form>
+
+    <!-- online report -->
+    <h4>{% trans "Online" %}</h4>
+    {% include "dashboard/report_table.html" with sessions="" windows=online_windows sdate=sdate edate=edate %}
+
+    <!-- by days -->
+    {% for day, sessions in session_days %}
+        <h4>
+            {{ day|date:"l" }} /
+            <small>
+                {{ day|date }} /
+                {% trans "Sessions" %}:
+                {% for s in sessions %}
+                    {{ s.short }}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            </small>
+        </h4>
+        {% include "dashboard/report_table.html" with sessions=sessions windows=online_windows sdate=sdate edate=edate %}
+    {% endfor %}
 {% endblock %}

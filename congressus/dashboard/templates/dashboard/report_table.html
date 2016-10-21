@@ -1,0 +1,32 @@
+{% load i18n %}
+{% load dashboard %}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th></th>
+            <th></th>
+            {% for space in spaces %}
+                <th>{{ space.name }}</th>
+            {% endfor %}
+            <th>{% trans "Total" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td rowspan="2">{% trans "Total" %}</td>
+            <td width="200px">{% trans "# of tickets" %}</td>
+            {% for space in spaces %}
+                <td>{% db_count ev space=space sessions=sessions windows=windows sdate=sdate edate=edate %}</td>
+            {% endfor %}
+            <td>{% db_count ev sessions=sessions windows=windows sdate=sdate edate=edate %}</td>
+        </tr>
+        <tr>
+            <td>{% trans "€ with TAX / without TAX" %}</td>
+            {% for space in spaces %}
+                <td>{% db_prices ev space=space sessions=sessions windows=windows sdate=sdate edate=edate %}</td>
+            {% endfor %}
+            <td>{% db_prices ev sessions=sessions windows=windows sdate=sdate edate=edate %}</td>
+        </tr>
+    </tbody>
+</table>

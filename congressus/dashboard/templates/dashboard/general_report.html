@@ -1,13 +1,45 @@
 {% extends "base-admin.html" %}
 {% load i18n %}
 {% load staticfiles %}
+{% load dashboard %}
 
 {% block extrahead %}
     <link href="{% static "css/report.css" %}?v=4.0" rel="stylesheet">
 {% endblock %}
 
-{% block title %} {% trans "Reports" %} {% endblock %}
+{% block title %}
+    {% if window %}
+        {% trans "Window General Report" %}
+    {% else %}
+        {% trans "General Report" %}
+    {% endif %}
+{% endblock %}
 
 {% block content %}
-    {% include "dashboard/report.html" %}
+    <!-- global table -->
+    {% if window %}
+        <h1>{% trans "Window General Report" %}</h1>
+        {% include "dashboard/report_table.html" with sessions="" windows=local_windows sdate="" edate="" %}
+        <hr/>
+    {% else %}
+        <h1>{% trans "General Report" %}</h1>
+        {% include "dashboard/report_table.html" with sessions="" windows="" sdate="" edate="" %}
+        <hr/>
+        <!-- online report -->
+        <h4>{% trans "Online" %}</h4>
+        {% include "dashboard/report_table.html" with sessions="" windows=online_windows sdate="" edate="" %}
+    {% endif %}
+
+    <!-- by days -->
+    <h4>{% trans "Ticket windows" %}</h4>
+    {% for day, next in session_days %}
+        <h5>
+            {{ day|date:"l" }} /
+            <small>
+                {% trans "sold on" %}: {{ day|date }}
+            </small>
+        </h5>
+        {% include "dashboard/report_table.html" with sessions="" windows=local_windows sdate=day edate=next %}
+    {% endfor %}
+
 {% endblock %}
