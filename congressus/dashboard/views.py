@@ -325,8 +325,12 @@ class ReportView(TemplateView):
         days = set()
         q = self.sessions.extra({'date':"date(start)"}).values('date')
         for d in q:
-            args = d['date'].split('-')
-            args = map(int, args)
+            if type(d) == str:
+                args = d['date'].split('-')
+                args = map(int, args)
+            else:
+                d1 = d['date']
+                args = (d1.year, d1.month, d1.day)
             day = timezone.make_aware(datetime(*args))
             days.add(day)
         days = sorted(list(days))
