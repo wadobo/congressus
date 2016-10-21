@@ -59,7 +59,7 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
     list_display = ('order', 'order_tpv2', 'session2', 'cseat', 'twin',
                     'created2', 'confirmed', 'used',
                     'email', 'payment', 'price2', 'event')
-    list_filter = ('confirmed', SingleTicketWindowFilter, 'event_name')
+    list_filter = ('confirmed', SingleTicketWindowFilter, 'event_name', 'session__space')
     search_fields = ('order', 'order_tpv', 'email', 'mp__order', 'mp__order_tpv')
     date_hierarchy = 'created'
     actions = [delete_selected, confirm, unconfirm, mark_used, mark_no_used]

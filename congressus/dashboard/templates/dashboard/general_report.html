@@ -23,7 +23,7 @@
         <hr/>
     {% else %}
         <h1>{% trans "General Report" %}</h1>
-        {% include "dashboard/report_table.html" with sessions="" windows="" sdate="" edate="" %}
+        {% include "dashboard/report_table.html" with sessions="" windows=all_windows sdate="" edate="" %}
         <hr/>
         <!-- online report -->
         <h4>{% trans "Online" %}</h4>

@@ -380,6 +380,7 @@ class GeneralReportView(ReportView):
         ctx = super().get_context_data(*args, **kwargs)
         ctx['online_windows'] = TicketWindow.objects.filter(event=self.ev, online=True)
         ctx['local_windows'] = TicketWindow.objects.filter(event=self.ev, online=False)
+        ctx['all_windows'] = TicketWindow.objects.filter(event=self.ev)
 
         days = self.get_days()
         delta = timedelta(days=1)
