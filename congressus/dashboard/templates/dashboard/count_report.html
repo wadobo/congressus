@@ -1,6 +1,7 @@
 {% extends "base-admin.html" %}
 {% load i18n %}
 {% load staticfiles %}
+{% load dashboard %}
 
 {% block extrahead %}
     <link href="{% static "css/report.css" %}?v=4.0" rel="stylesheet">
@@ -13,20 +14,125 @@
     <script src="{% static "bootstrap-toggle-master/js/bootstrap-toggle.min.js" %}"></script>
     <script>
         $('.datepicker').datepicker();
+        $(document).ready(function() {
+            $("#allsessions").click(function() {
+                $('.sessioncheck').bootstrapToggle('on');
+                return false;
+            });
+            $("#allwindows").click(function() {
+                $('.wcheck').bootstrapToggle('on');
+                return false;
+            });
+        });
     </script>
 {% endblock %}
 
-{% block title %} {% trans "Reports" %} {% endblock %}
+{% block title %} {% trans "Count Report" %} {% endblock %}
 
 {% block content %}
-    {% include "dashboard/report.html" %}
+    <h1>{% trans "Count Report" %}</h1>
 
+    {% if query %}
+        <h3>{% trans "# of tickets" %}</h3>
+        <table class="table table-bordered">
+            <tr>
+                <th></th>
+                {% for d, _ in session_days %}
+                    <th>{{ d|date:"l" }}</th>
+                {% endfor %}
+                <th>{% trans "TOTAL" %}</th>
+            </tr>
+            {% for s in spaces %}
+                <tr>
+                    <td>{{ s.name }}</td>
+                    {% for d, sessions in session_days %}
+                        <td>{% db_count ev space=s sessions=sessions windows=selected_windows %}</td>
+                    {% endfor %}
+                    <td>{% db_count ev windows=selected_windows space=s sessions=selected_sessions %}</td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td>{% trans "TOTAL" %}</td>
+                {% for d, sessions in session_days %}
+                    <td>{% db_count ev sessions=sessions windows=selected_windows %}</td>
+                {% endfor %}
+                <td>{% db_count ev windows=selected_windows sessions=selected_sessions %}</td>
+            </tr>
+        </table>
+
+        <h3>{% trans "€ with TAX / without TAX" %}</h3>
+        <table class="table table-bordered">
+            <tr>
+                <th></th>
+                {% for d, _ in session_days %}
+                    <th>{{ d|date:"l" }}</th>
+                {% endfor %}
+                <th>{% trans "TOTAL" %}</th>
+            </tr>
+            {% for s in spaces %}
+                <tr>
+                    <td>{{ s.name }}</td>
+                    {% for d, sessions in session_days %}
+                        <td>{% db_prices ev space=s sessions=sessions windows=selected_windows %}</td>
+                    {% endfor %}
+                    <td>{% db_prices ev windows=selected_windows space=s sessions=selected_sessions %}</td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td>{% trans "TOTAL" %}</td>
+                {% for d, sessions in session_days %}
+                    <td>{% db_prices ev sessions=sessions windows=selected_windows %}</td>
+                {% endfor %}
+                <td>{% db_prices ev windows=selected_windows sessions=selected_sessions %}</td>
+            </tr>
+        </table>
+
+        <hr/>
+
+        {% if selected_windows|length == 1 %}
+        <h3>{% trans "Window Count" %}</h3>
+        <table class="table table-bordered">
+            <tr class="bg-success">
+                {% db_window_total ev windows=selected_windows sessions=selected_sessions as total %}
+                <th>{% trans "Total amount, (cash + credit card)" %}</th>
+                <td>{{ total|floatformat:2 }}</td>
+            </tr>
+            <tr>
+                <th colspan="2" class="text-center bg-primary">{% trans "Cash balance" %}</th>
+            </tr>
+            {% db_window_movements windows.0 days=count_days as movements %}
+            {% for mov in movements %}
+            <tr {% if mov.type == 'change' %}class="bg-danger"{% endif %} >
+                <th>{{ mov.get_type_display }}</th>
+                <td>{% if mov.type == 'change' %}-{% else %}+{% endif %}{{ mov.amount|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+            <tr class="bg-success">
+                {% db_window_movements_total movements as mtotal %}
+                <th>{% trans "total" %}</th>
+                <td>{{ mtotal|floatformat:2 }}</td>
+            </tr>
+            <tr>
+                <th colspan="2" class="text-center bg-primary">{% trans "Window total balance" %}</th>
+            </tr>
+            <tr>
+                {% db_window_count_total total mtotal as count_total %}
+                <th>{% trans "total" %}</th>
+                <th>{{ count_total|floatformat:2 }}</th>
+            </tr>
+        </table>
+        {% endif %}
+
+    {% endif %}
     <hr/>
 
     <form method="GET" action="">
         <div class="row">
             <div class="col-md-6 text-center">
-                <h3>{% trans "Sessions" %}</h3>
+                <h3>
+                    {% trans "Sessions" %}
+                    <button class="btn btn-primary" id="allsessions">{% trans "All" %}</button>
+                </h3>
                 {% for space in spaces %}
                     <div class="panel panel-primary">
                         <div class="panel-heading">{{ space.name }}</div>
@@ -35,24 +141,31 @@
                                 <input data-toggle="toggle"
                                        data-off="{{ session.name }}"
                                        data-on="<span class='glyphicon glyphicon-ok'></span> {{ session.name }}"
-                                       type="checkbox" name="scheck" value="{{ session.pk }}"/>
+                                       type="checkbox" name="scheck"
+                                       {% if session in selected_sessions %}checked{% endif %}
+                                       class="sessioncheck" value="{{ session.pk }}"/>
                             {% endfor %}
                         </div>
                     </div>
                 {% endfor %}
             </div>
             <div class="col-md-6 text-center">
-                <h3>{% trans "Windows" %}</h3>
+                <h3>
+                    {% trans "Windows" %}
+                    <button class="btn btn-primary" id="allwindows">{% trans "All" %}</button>
+                </h3>
                 <div class="toggle-inputs">
                     {% for window in windows %}
                         <input data-toggle="toggle"
                                data-off="{{ window.name }}"
                                data-on="<span class='glyphicon glyphicon-ok'></span> {{ window.name }}"
-                               type="checkbox" name="wcheck" value="{{ window.pk }}"/>
+                               {% if window in selected_windows %}checked{% endif %}
+                               type="checkbox" name="wcheck" class="wcheck" value="{{ window.pk }}"/>
                     {% endfor %}
                 </div>
             </div>
         </div>
-        <input type="submit" class="btn btn-success btn-block" value="Arqueo">
+        <button class="btn btn-success btn-block" name="query" value="on">{% trans "Count" %}</button>
     </form>
+
 {% endblock %}

@@ -321,6 +321,17 @@ general = csrf_exempt(GeneralView.as_view())
 class ReportView(TemplateView):
     template_name = 'dashboard/generate_report.html'
 
+    def get_days(self):
+        days = set()
+        q = self.sessions.extra({'date':"date(start)"}).values('date')
+        for d in q:
+            args = d['date'].split('-')
+            args = map(int, args)
+            day = timezone.make_aware(datetime(*args))
+            days.add(day)
+        days = sorted(list(days))
+        return days
+
     def get_context_data(self, *args, **kwargs):
         ctx = super(ReportView, self).get_context_data(*args, **kwargs)
         ev = self.kwargs['ev']
@@ -337,82 +348,6 @@ class ReportView(TemplateView):
         ctx['menuitem'] = 'report'
 
         return ctx
-
-    def get_online_datas(self, sessions, report_type):
-        tickets = Ticket.objects.filter(confirmed=True, sold_in_window=False, session__in=sessions)
-        return tickets.values('session__name', 'session__space__name')\
-                .annotate(
-                        amount=Count('pk'),
-                        total_price=Sum('price'),
-                        price_without_iva=Sum(F('price')/(1+F('tax')/100.0), output_field=FloatField()))\
-                .order_by('session__start')
-
-    def get_window_sale_datas(self, sessions, report_type):
-        tickets = Ticket.objects.filter(confirmed=True, sold_in_window=True)
-        tickets = tickets.filter(session__in=sessions)
-        return tickets.values('session__name', 'session__space__name')\
-                .annotate(
-                        amount=Count('pk'),
-                        total_price=Sum('price'),
-                        price_without_iva=Sum(F('price')/(1+F('tax')/100.0), output_field=FloatField()))\
-                .order_by('session__start')
-
-    def get_datas(self, window_sales, onlines, sessions, report_type):
-        general_table = []
-        specific_tables = []
-        general = {
-                'online': {'amount': 0, 'p_iva': 0, 'p_noiva': 0},
-                'window_sale': {'amount': 0, 'p_iva': 0, 'p_noiva': 0},
-        }
-
-        if report_type in ['online', 'general']:
-            specific_tables.append({'title': 'Online', 'datas': []})
-            last_spec_table = specific_tables[-1]['datas']
-            last_spec_table.append(['tickets of', '', 'total'])
-            for o in onlines:
-                general['online']['p_iva'] += o.get('total_price')
-                general['online']['p_noiva'] += o.get('price_without_iva')
-                general['online']['amount'] += o.get('amount')
-                last_spec_table.append([o.get('session__name'), '#', o.get('amount')])
-                last_spec_table.append(['€ / € sin IVA', '%.2f / %.2f' % (o.get('total_price'), o.get('price_without_iva'))])
-
-        if report_type in ['window_sale', 'general']:
-            specific_tables.append({'title': 'Window sale', 'datas': []})
-            last_spec_table = specific_tables[-1]['datas']
-            last_spec_table.append(['tickets of', '', 'total'])
-            for w in window_sales:
-                general['window_sale']['p_iva'] += w.get('total_price')
-                general['window_sale']['p_noiva'] += w.get('price_without_iva')
-                general['window_sale']['amount'] += w.get('amount')
-                last_spec_table.append([w.get('session__name'), '#', w.get('amount')])
-                last_spec_table.append(['€ / € sin IVA', '%.2f / %.2f' % (w.get('total_price'), w.get('price_without_iva'))])
-
-        general_table = [
-                ['', 'Online', 'Window sale', 'Total'],
-                [
-                    '#',
-                    general['online']['amount'],
-                    general['window_sale']['amount'],
-                    general['online']['amount'] + general['window_sale']['amount']
-                ],
-                [
-                    '€/€ sin IVA',
-                    '%.2f / %.2f' % (general['online']['p_iva'], general['online']['p_noiva']),
-                    '%.2f / %.2f' % (general['window_sale']['p_iva'], general['window_sale']['p_noiva']),
-                    '%.2f / %.2f' % (general['online']['p_iva'] + general['window_sale']['p_iva'],
-                                 general['online']['p_noiva'] + general['window_sale']['p_noiva'])
-                ]
-        ]
-        # Removed some datas if not neccesary
-        if report_type in ['online', 'window_sale']:
-            for row in general_table:
-                del row[-1] # Total
-                if report_type == 'online':
-                    del row[2]
-                else:
-                    del row[1]
-
-        return general_table, specific_tables
 
     def get_arqueo(self, sessions, window_sales):
         mps = TicketWindowSale.objects.filter(window__in=window_sales).values_list('purchase', flat=True)
@@ -432,35 +367,6 @@ class ReportView(TemplateView):
             table.append(['€ / € sin IVA', '%.2f / %.2f' % (col.get('total_price'), col.get('price_without_iva'))])
         return table
 
-    def post(self, request, ev):
-        event = get_object_or_404(Event, slug=ev)
-        ctx = {}
-        ctx['ev'] = get_object_or_404(Event, slug=ev)
-        ctx['sessions'] = Session.objects.all()
-        ctx['windows'] = TicketWindow.objects.all()
-        report_type = request.POST.get('type')
-        ctx['report_type'] = report_type
-
-        if report_type != 'arqueo':
-            window_sales = self.get_window_sale_datas(report_type)
-            sessions = self.get_sessions(request, report_type)
-            onlines = self.get_online_datas(sessions, report_type)
-            gtable, stables = self.get_datas(window_sales, onlines, sessions, report_type)
-            ctx['general_table'] = gtable
-            ctx['specific_tables'] = stables
-        else:
-            sessions = request.POST.getlist('scheck')
-            window_sales = request.POST.getlist('wcheck')
-            sessions = map(int, sessions)
-            window_sales = map(int, window_sales)
-            datas = self.get_arqueo(sessions, window_sales)
-            arqueo_table = self.gen_arqueo_table(datas)
-            ctx['arqueo_table'] = arqueo_table
-
-        return render(request, self.template_name, ctx)
-
-report = csrf_exempt(staff_member_required(ReportView.as_view()))
-
 
 class GeneralReportView(ReportView):
     template_name = 'dashboard/general_report.html'
@@ -471,14 +377,7 @@ class GeneralReportView(ReportView):
         ctx['online_windows'] = TicketWindow.objects.filter(event=self.ev, online=True)
         ctx['local_windows'] = TicketWindow.objects.filter(event=self.ev, online=False)
 
-        days = set()
-        q = self.sessions.extra({'date':"date(start)"}).values('date')
-        for d in q:
-            args = d['date'].split('-')
-            args = map(int, args)
-            day = timezone.make_aware(datetime(*args))
-            days.add(day)
-        days = sorted(list(days))
+        days = self.get_days()
         delta = timedelta(days=1)
 
         ctx['session_days'] = [(d, d+delta) for d in days]
@@ -511,14 +410,7 @@ class OnlineReportView(ReportView):
             ctx['sdate'] = start_date
             ctx['edate'] = end_date
 
-        days = set()
-        q = self.sessions.extra({'date':"date(start)"}).values('date')
-        for d in q:
-            args = d['date'].split('-')
-            args = map(int, args)
-            day = timezone.make_aware(datetime(*args))
-            days.add(day)
-        days = sorted(list(days))
+        days = self.get_days()
         delta = timedelta(days=1)
 
         ctx['session_days'] = [(d, self.sessions.filter(start__range=(d, d+delta))) for d in days]
@@ -532,17 +424,23 @@ class CountReportView(ReportView):
 
     def get_context_data(self, *args, **kwargs):
         ctx = super().get_context_data(*args, **kwargs)
-        report_type = 'arqueo'
-        ctx['report_type'] = report_type
 
-        request = self.request
-        sessions = request.GET.getlist('scheck')
-        window_sales = request.GET.getlist('wcheck')
-        sessions = map(int, sessions)
-        window_sales = map(int, window_sales)
-        datas = self.get_arqueo(sessions, window_sales)
-        arqueo_table = self.gen_arqueo_table(datas)
-        ctx['arqueo_table'] = arqueo_table
+        query = self.request.GET.get('query', '')
+        if query:
+            sessions = self.request.GET.getlist('scheck')
+            windows = self.request.GET.getlist('wcheck')
+
+            self.sessions = self.sessions.filter(pk__in=sessions)
+            self.windows = self.windows.filter(pk__in=windows)
+            ctx['selected_sessions'] = self.sessions
+            ctx['selected_windows'] = self.windows
+
+            days = self.get_days()
+            delta = timedelta(days=1)
+            ctx['session_days'] = [(d, self.sessions.filter(start__range=(d, d+delta))) for d in days]
+            ctx['count_days'] = days
+
+        ctx['query'] = query
 
         return ctx
 report_count = staff_member_required(CountReportView.as_view())
