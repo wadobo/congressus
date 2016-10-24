@@ -17,12 +17,14 @@ register = template.Library()
 
 
 def filter_tickets(event, space=None, sessions=None, windows=None,
-                   sdate=None, edate=None, days=None):
+                   sdate=None, edate=None, days=None, session=None):
     tickets = Ticket.objects.filter(confirmed=True, session__space__event=event)
     if space:
         tickets = tickets.filter(session__space=space)
     if sessions:
         tickets = tickets.filter(session__in=sessions)
+    if session:
+        tickets = tickets.filter(session=session)
     if windows:
         tickets = tickets.filter(mp__sales__window__in=windows)
     if sdate:
