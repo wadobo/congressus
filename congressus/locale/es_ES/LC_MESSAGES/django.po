@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-10-21 16:52+0200\n"
-"PO-Revision-Date: 2016-10-21 16:55+0200\n"
+"POT-Creation-Date: 2016-10-24 18:53+0200\n"
+"PO-Revision-Date: 2016-10-24 18:54+0200\n"
 "Last-Translator: Daniel Garcia Moreno <danigm@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
 "Language: es\n"
@@ -148,7 +148,7 @@ msgid "password"
 msgstr "contraseña"
 
 #: access/templates/access/login.html:28 events/models.py:271
-#: tickets/admin.py:150 tickets/models.py:501
+#: tickets/admin.py:151 tickets/models.py:501
 msgid "session"
 msgstr "sesión"
 
@@ -171,7 +171,7 @@ msgstr "entrar"
 msgid "This user can't access in this access control"
 msgstr "Este usuario no puede acceder a este punto de control de acceso"
 
-#: access/views.py:76 windows/views.py:53
+#: access/views.py:76 windows/views.py:55
 msgid "Invalid username or password"
 msgstr "Nombre de usuario o contraseña incorrectos"
 
@@ -435,7 +435,7 @@ msgstr "fecha salida"
 msgid "Total"
 msgstr "Total"
 
-#: dashboard/templatetags/dashboard.py:84
+#: dashboard/templatetags/dashboard.py:87
 msgid "Credit card sale"
 msgstr "Ventas de tarjeta de crédito"
 
@@ -616,7 +616,7 @@ msgid "seat map"
 msgstr "graderio"
 
 #: events/models.py:235 events/models.py:385 invs/models.py:49
-#: tickets/admin.py:178 tickets/models.py:258 tickets/models.py:344
+#: tickets/admin.py:179 tickets/models.py:258 tickets/models.py:344
 msgid "order"
 msgstr "orden"
 
@@ -841,7 +841,7 @@ msgstr "generador"
 msgid "created at"
 msgstr "creado el"
 
-#: invs/models.py:51 tickets/admin.py:117 tickets/admin.py:278
+#: invs/models.py:51 tickets/admin.py:118 tickets/admin.py:280
 #: tickets/models.py:274 tickets/models.py:362
 msgid "extra data"
 msgstr "datos extra"
@@ -871,7 +871,7 @@ msgstr "invitaciones"
 msgid "amount"
 msgstr "cantidad"
 
-#: invs/models.py:116 tickets/admin.py:130 tickets/admin.py:269
+#: invs/models.py:116 tickets/admin.py:131 tickets/admin.py:271
 #: tickets/models.py:370 windows/models.py:85
 msgid "price"
 msgstr "precio"
@@ -961,39 +961,39 @@ msgstr "Marcar como no usado"
 msgid "Remove"
 msgstr "Eliminar"
 
-#: tickets/admin.py:99 tickets/admin.py:223
+#: tickets/admin.py:100 tickets/admin.py:225
 #: tickets/templates/emails/ticket-info.txt:10
 #: tickets/templates/tickets/multipurchase.html:141
 #: tickets/templates/tickets/ticket-info.html:41
 msgid "Personal info"
 msgstr "Información personal"
 
-#: tickets/admin.py:102 tickets/admin.py:226
+#: tickets/admin.py:103 tickets/admin.py:228
 msgid "Extra info"
 msgstr "Información extra"
 
-#: tickets/admin.py:126 tickets/admin.py:146 tickets/models.py:259
+#: tickets/admin.py:127 tickets/admin.py:147 tickets/models.py:259
 #: tickets/models.py:345
 msgid "order TPV"
 msgstr "código TPV"
 
-#: tickets/admin.py:139 tickets/admin.py:265 windows/models.py:42
+#: tickets/admin.py:140 tickets/admin.py:267 windows/models.py:42
 msgid "ticket window"
 msgstr "taquilla"
 
-#: tickets/admin.py:160 tickets/admin.py:252 windows/models.py:88
+#: tickets/admin.py:161 tickets/admin.py:254 windows/models.py:88
 msgid "payment"
 msgstr "forma de pago"
 
-#: tickets/admin.py:166
+#: tickets/admin.py:167
 msgid "date"
 msgstr "fecha"
 
-#: tickets/admin.py:243 tickets/models.py:266 tickets/models.py:352
+#: tickets/admin.py:245 tickets/models.py:266 tickets/models.py:352
 msgid "confirmed"
 msgstr "confirmado"
 
-#: tickets/admin.py:256
+#: tickets/admin.py:258
 msgid "ntickets"
 msgstr "nentradas"
 
@@ -1412,52 +1412,48 @@ msgstr "Precio:"
 msgid "scene"
 msgstr "escenario"
 
-#: tickets/utils.py:215
+#: tickets/utils.py:221
 #, python-format
 msgid "ORDER: %s"
 msgstr "LOCALIZADOR: %s"
 
-#: tickets/utils.py:329
+#: tickets/utils.py:335
 msgid "PRINT AND BRING THIS TICKET WITH YOU"
 msgstr "IMPRIME Y LLEVA ESTA ENTRADA CONTIGO"
 
-#: tickets/utils.py:347
+#: tickets/utils.py:353
 msgid "Sponsors"
 msgstr "Patrocinadores"
 
-#: tickets/utils.py:371
+#: tickets/utils.py:377
 msgid "Contributors"
 msgstr "Colaboradores"
 
-#: tickets/utils.py:469
+#: tickets/utils.py:475
 msgid "T"
 msgstr "E"
 
-#: tickets/utils.py:479
+#: tickets/utils.py:485
 #, python-format
 msgid "Ticket %(space)s %(session)s"
 msgstr "Entrada %(space)s %(session)s"
 
-#: tickets/utils.py:497
+#: tickets/utils.py:503
 #, python-format
 msgid "%(date)s (%(start)s to %(end)s)"
 msgstr "%(date)s (%(start)s a %(end)s)"
 
-#: tickets/utils.py:537
+#: tickets/utils.py:543
 #, python-format
-msgid ""
-"SECTOR: %(layout)s &nbsp;&nbsp;&nbsp; ROW: %(row)s &nbsp;&nbsp;&nbsp; SEAT: "
-"%(col)s"
-msgstr ""
-"SECTOR: %(layout)s &nbsp;&nbsp;&nbsp; FILA: %(row)s &nbsp;&nbsp;&nbsp; "
-"ASIENTO: %(col)s"
+msgid "SECTOR: %(layout)s ROW: %(row)s SEAT: %(col)s"
+msgstr "SECTOR: %(layout)s, FILA: %(row)s, ASIENTO: %(col)s"
 
-#: tickets/utils.py:546 tickets/utils.py:549
+#: tickets/utils.py:552 tickets/utils.py:555
 #, python-format
 msgid "%4.2f €"
 msgstr "%4.2f €"
 
-#: tickets/utils.py:552
+#: tickets/utils.py:558
 msgid "TAX INC."
 msgstr "IVA INC."
 
@@ -1638,9 +1634,16 @@ msgstr "Aceptar"
 msgid "The ticket will be purchased, are you sure?"
 msgstr "La entrada va a ser comprada, ¿estás seguro?"
 
-#: windows/views.py:51
+#: windows/views.py:53
 msgid "This user can't access in this ticket window"
 msgstr "Este usuario no puede acceder a esta taquilla"
+
+#~ msgid ""
+#~ "SECTOR: %(layout)s &nbsp;&nbsp;&nbsp; ROW: %(row)s &nbsp;&nbsp;&nbsp; "
+#~ "SEAT: %(col)s"
+#~ msgstr ""
+#~ "SECTOR: %(layout)s &nbsp;&nbsp;&nbsp; FILA: %(row)s &nbsp;&nbsp;&nbsp; "
+#~ "ASIENTO: %(col)s"
 
 #~ msgid "Add"
 #~ msgstr "Añadir"
