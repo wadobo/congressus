@@ -112,7 +112,7 @@ class TicketWindowCashMovement(models.Model):
     class Meta:
         verbose_name = _('ticket window cash movement')
         verbose_name_plural = _('ticket window cash movements')
-        ordering = ['-id']
+        ordering = ['id']
 
     def __str__(self):
         return "%s - %s - %s" % (self.window, self.type, self.amount)
