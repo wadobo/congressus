@@ -17,7 +17,7 @@ register = template.Library()
 
 
 def filter_tickets(event, space=None, sessions=None, windows=None,
-                   sdate=None, edate=None):
+                   sdate=None, edate=None, days=None):
     tickets = Ticket.objects.filter(confirmed=True, session__space__event=event)
     if space:
         tickets = tickets.filter(session__space=space)
@@ -29,6 +29,8 @@ def filter_tickets(event, space=None, sessions=None, windows=None,
         tickets = tickets.filter(created__gte=sdate)
     if edate:
         tickets = tickets.filter(created__lte=edate)
+    if days:
+        tickets = tickets.filter(created__date__in=days)
 
     return tickets
 

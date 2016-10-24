@@ -46,17 +46,17 @@
                 <tr>
                     <td>{{ s.name }}</td>
                     {% for d, sessions in session_days %}
-                        <td>{% db_count ev space=s sessions=sessions windows=selected_windows %}</td>
+                        <td>{% db_count ev space=s sessions=sessions windows=selected_windows days=selected_days %}</td>
                     {% endfor %}
-                    <td>{% db_count ev windows=selected_windows space=s sessions=selected_sessions %}</td>
+                    <td>{% db_count ev windows=selected_windows space=s sessions=selected_sessions days=selected_days %}</td>
                 </tr>
             {% endfor %}
             <tr>
                 <td>{% trans "TOTAL" %}</td>
                 {% for d, sessions in session_days %}
-                    <td>{% db_count ev sessions=sessions windows=selected_windows %}</td>
+                    <td>{% db_count ev sessions=sessions windows=selected_windows days=selected_days %}</td>
                 {% endfor %}
-                <td>{% db_count ev windows=selected_windows sessions=selected_sessions %}</td>
+                <td>{% db_count ev windows=selected_windows sessions=selected_sessions days=selected_days %}</td>
             </tr>
         </table>
 
@@ -73,17 +73,17 @@
                 <tr>
                     <td>{{ s.name }}</td>
                     {% for d, sessions in session_days %}
-                        <td>{% db_prices ev space=s sessions=sessions windows=selected_windows %}</td>
+                        <td>{% db_prices ev space=s sessions=sessions windows=selected_windows days=selected_days %}</td>
                     {% endfor %}
-                    <td>{% db_prices ev windows=selected_windows space=s sessions=selected_sessions %}</td>
+                    <td>{% db_prices ev windows=selected_windows space=s sessions=selected_sessions days=selected_days %}</td>
                 </tr>
             {% endfor %}
             <tr>
                 <td>{% trans "TOTAL" %}</td>
                 {% for d, sessions in session_days %}
-                    <td>{% db_prices ev sessions=sessions windows=selected_windows %}</td>
+                    <td>{% db_prices ev sessions=sessions windows=selected_windows days=selected_days %}</td>
                 {% endfor %}
-                <td>{% db_prices ev windows=selected_windows sessions=selected_sessions %}</td>
+                <td>{% db_prices ev windows=selected_windows sessions=selected_sessions days=selected_days %}</td>
             </tr>
         </table>
 
@@ -93,7 +93,7 @@
         <h3>{% trans "Window Count" %}</h3>
         <table class="table table-bordered">
             <tr class="bg-success">
-                {% db_window_total ev windows=selected_windows sessions=selected_sessions as total %}
+                {% db_window_total ev windows=selected_windows sessions=selected_sessions days=selected_days as total %}
                 <th>{% trans "Total amount, (cash + credit card)" %}</th>
                 <td>{{ total|floatformat:2 }}</td>
             </tr>
@@ -133,21 +133,21 @@
                     {% trans "Sessions" %}
                     <button class="btn btn-primary" id="allsessions">{% trans "All" %}</button>
                 </h3>
-                {% for space in spaces %}
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">{{ space.name }}</div>
-                        <div class="panel-body toggle-inputs">
-                            {% for session in space.sessions.all %}
-                                <input data-toggle="toggle"
-                                       data-off="{{ session.name }}"
-                                       data-on="<span class='glyphicon glyphicon-ok'></span> {{ session.name }}"
-                                       type="checkbox" name="scheck"
-                                       {% if session in selected_sessions %}checked{% endif %}
-                                       class="sessioncheck" value="{{ session.pk }}"/>
-                            {% endfor %}
-                        </div>
+                <div class="panel panel-primary">
+                    <div class="panel-heading">{% trans "days" %}</div>
+                    <div class="panel-body toggle-inputs">
+                        {% for d, s in session_days %}
+                            {% with d|date:"l" as day %}
+                            <input data-toggle="toggle"
+                                   data-off="{{ day }}"
+                                   data-on="<span class='glyphicon glyphicon-ok'></span> {{ day }}"
+                                   type="checkbox" name="scheck"
+                                   {% if d in selected_days %}checked{% endif %}
+                                   class="sessioncheck" value="{{ d|date:"Y-m-d" }}"/>
+                            {% endwith %}
+                        {% endfor %}
                     </div>
-                {% endfor %}
+                </div>
             </div>
             <div class="col-md-6 text-center">
                 <h3>

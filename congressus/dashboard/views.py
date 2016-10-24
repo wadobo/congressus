@@ -432,17 +432,18 @@ class CountReportView(ReportView):
 
         query = self.request.GET.get('query', '')
         if query:
-            sessions = self.request.GET.getlist('scheck')
+            days = self.request.GET.getlist('scheck')
             windows = self.request.GET.getlist('wcheck')
 
-            self.sessions = self.sessions.filter(pk__in=sessions)
+            days = [timezone.make_aware(datetime.strptime(d, "%Y-%m-%d")) for d in days]
             self.windows = self.windows.filter(pk__in=windows)
             ctx['selected_sessions'] = self.sessions
+            ctx['selected_days'] = days
             ctx['selected_windows'] = self.windows
 
-            days = self.get_days()
+            session_days = self.get_days()
             delta = timedelta(days=1)
-            ctx['session_days'] = [(d, self.sessions.filter(start__range=(d, d+delta))) for d in days]
+            ctx['session_days'] = [(d, self.sessions.filter(start__range=(d, d+delta))) for d in session_days]
             ctx['count_days'] = days
 
         ctx['query'] = query
