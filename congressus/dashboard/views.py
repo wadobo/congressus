@@ -107,7 +107,7 @@ class GeneralView(TemplateView):
 
     def get_access(self, timestep, max):
         strftime, delta = self.get_timesteps_vars(timestep)
-        now = timezone.now()
+        now = datetime.now()
         min_date = now - delta*max
         res = deepcopy(self.DATA_LINE)
 
@@ -128,7 +128,7 @@ class GeneralView(TemplateView):
         # Fill access control
         acs = LogAccessControl.objects.filter(date__gt=min_date).order_by('date')
         for ac in acs:
-            date = ac.date.strftime(strftime)
+            date = timezone.localtime(ac.date).strftime(strftime)
             try:
                 index = res.get("labels").index(date)
             except ValueError:
@@ -167,7 +167,7 @@ class GeneralView(TemplateView):
         # Fill sales online
         mps = MultiPurchase.objects.filter(created__gt=min_date, confirmed=True).order_by('created')
         for mp in mps:
-            date = mp.created.strftime(strftime)
+            date = timezone.localtime(mp.created).strftime(strftime)
             for ticket in mp.all_tickets():
                 try:
                     index = res.get("labels").index(date)
@@ -202,7 +202,7 @@ class GeneralView(TemplateView):
         # Fill sales
         sales = TicketWindowSale.objects.filter(date__gt=min_date).order_by('date')
         for sale in sales:
-            date = sale.date.strftime(strftime)
+            date = timezone.localtime(sale.date).strftime(strftime)
             try:
                 index = res.get("labels").index(date)
             except ValueError:
