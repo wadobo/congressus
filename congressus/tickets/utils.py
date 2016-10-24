@@ -540,7 +540,7 @@ class TicketPDF:
                 'row': ticket.seat_row(),
                 'col': ticket.seat_column()
             }
-            seatinfo = _('SECTOR: %(layout)s &nbsp;&nbsp;&nbsp; ROW: %(row)s &nbsp;&nbsp;&nbsp; SEAT: %(col)s') % seatdata
+            seatinfo = _('SECTOR: %(layout)s ROW: %(row)s SEAT: %(col)s') % seatdata
             seatinfo = '<font size=11><b>'+ seatinfo +'</b></font><br/>'
         return seatinfo
 
