@@ -70,8 +70,11 @@ def db_window_movements_total(movements):
 
 @register.simple_tag
 def db_window_count_total(total, mtotal):
-    total = float(total)
-    mtotal= float(mtotal)
+    try:
+        total = float(total)
+        mtotal= float(mtotal)
+    except:
+        return '--'
     return total - mtotal
 
 @register.simple_tag
