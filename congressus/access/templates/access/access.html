@@ -66,7 +66,7 @@
     <script src="{% static "js/access.js" %}?v=7.0"></script>
 
     <script>
-        var ac = "{{ac}}";
+        var ac = "{{ac.slug}}";
         try {
             ws.init("{{ ws_server }}");
         } catch (e) {
