@@ -100,7 +100,7 @@
             <tr>
                 <th colspan="2" class="text-center bg-primary">{% trans "Cash balance" %}</th>
             </tr>
-            {% db_window_movements windows.0 days=count_days as movements %}
+            {% db_window_movements selected_windows.0 days=count_days as movements %}
             {% for mov in movements %}
             <tr {% if mov.type == 'change' %}class="bg-danger"{% endif %} >
                 <th>{{ mov.get_type_display }}</th>
