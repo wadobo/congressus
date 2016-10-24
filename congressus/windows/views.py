@@ -134,7 +134,7 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
                                     change=change, payment=payment)
             sale.save()
 
-            response = get_ticket_format(mp, pf=print_format)
+            response = get_ticket_format(mp, pf=print_format, attachment=False)
             return response
 
         ctx = self.get_context_data()

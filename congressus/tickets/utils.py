@@ -87,7 +87,7 @@ def concat_pdf(files):
     return pdf
 
 
-def get_ticket_format(mp, pf):
+def get_ticket_format(mp, pf, attachment=True):
     """ With a list of invitations or invitations,generate ticket output """
     if pf == 'csv':
         csv = []
@@ -102,12 +102,18 @@ def get_ticket_format(mp, pf):
     elif pf == 'thermal':
         pdf = mp.gen_thermal()
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="tickets.pdf"'
+        fname = 'filename="tickets.pdf"'
+        if attachment:
+            fname = 'attachment; ' + fname
+        response['Content-Disposition'] = fname
         response.write(pdf)
     elif pf == 'A4':
         pdf = mp.gen_pdf()
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="tickets.pdf"'
+        fname = 'filename="tickets.pdf"'
+        if attachment:
+            fname = 'attachment; ' + fname
+        response['Content-Disposition'] = fname
         response.write(pdf)
     else:
         raise "Ticket format not found"
