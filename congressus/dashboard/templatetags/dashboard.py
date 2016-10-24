@@ -75,7 +75,7 @@ def db_window_count_total(total, mtotal):
         mtotal= float(mtotal)
     except:
         return '--'
-    return total - mtotal
+    return mtotal - total
 
 @register.simple_tag
 def db_window_movements(window, days=None):
