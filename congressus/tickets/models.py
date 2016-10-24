@@ -465,7 +465,7 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
         '''
 
         prefix = 'ONL'
-        postfix = self.created.strftime('%m%d%H%M')
+        postfix = timezone.localtime(self.created).strftime('%m%d%H%M')
         if self.sold_in_window:
             from windows.models import TicketWindowSale
             prefix = TicketWindowSale.objects.values_list("window__code", flat=True).get(purchase__tickets=self)
