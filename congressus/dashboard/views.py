@@ -441,10 +441,11 @@ class CountReportView(ReportView):
             ctx['selected_days'] = days
             ctx['selected_windows'] = self.windows
 
-            session_days = self.get_days()
-            delta = timedelta(days=1)
-            ctx['session_days'] = [(d, self.sessions.filter(start__range=(d, d+delta))) for d in session_days]
             ctx['count_days'] = days
+
+        session_days = self.get_days()
+        delta = timedelta(days=1)
+        ctx['session_days'] = [(d, self.sessions.filter(start__range=(d, d+delta))) for d in session_days]
 
         ctx['query'] = query
 
