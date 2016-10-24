@@ -139,7 +139,7 @@ function websocketCB(ev, data) {
         toT = data.date.indexOf('T');
         date = data.date.substring(0, toT);
         for (c=0; c < window.data_charts['a'].length; c++) {
-            d = window.data_chart['a'][c];
+            d = window.data_charts['a'][c];
             if (d.config.type == 'doughnut') {
                 update_pie_charts(d, data.st);
             } else if (d.config.type == 'line') {
