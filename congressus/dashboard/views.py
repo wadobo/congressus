@@ -146,7 +146,7 @@ class GeneralView(TemplateView):
 
     def get_sales_online(self, timestep, max):
         strftime, delta = self.get_timesteps_vars(timestep)
-        now = timezone.now()
+        now = datetime.now()
         min_date = now - delta*max
         res = deepcopy(self.DATA_LINE)
 
