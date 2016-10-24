@@ -1,3 +1,13 @@
+function ajaxsend() {
+    $.post($("form").attr('action'), $("form").serialize(),
+        function(response) {
+            var pdf = window.open('data:application/pdf;base64,' + btoa(response));
+            pdf.addEventListener('load', function() { pdf.print(); }, false);
+        });
+}
+window.ajaxsend = ajaxsend;
+
+
 function clean() {
     $(".seat-selected").each(function() {
         $(this).click();
@@ -113,10 +123,12 @@ $(document).ready(function() {
                 args += ' ' + $(".seat-selected").length;
                 ws.send('add_sale' + args);
                 setTimeout(clean, 1000);
-                $("form").submit();
+                //$("form").submit();
+                ajaxsend();
             }
         });
     }
+
 
     $(document).keypress(function(key) {
         if (key.which == 13) {
