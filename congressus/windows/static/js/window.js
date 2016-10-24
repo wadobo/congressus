@@ -1,8 +1,10 @@
 function ajaxsend() {
     $.post($("form").attr('action'), $("form").serialize(),
         function(response) {
-            var pdf = window.open('data:application/pdf;base64,' + btoa(response));
-            pdf.addEventListener('load', function() { pdf.print(); }, false);
+            var pdf = window.open(response);
+            setTimeout(function() {
+                pdf.print();
+            }, 1000);
         });
 }
 window.ajaxsend = ajaxsend;

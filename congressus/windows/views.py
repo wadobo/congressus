@@ -1,3 +1,4 @@
+import json
 import datetime
 from django.utils import timezone
 from django.views.generic import TemplateView, View
@@ -18,6 +19,7 @@ from events.models import Event
 from events.models import Session
 from tickets.forms import MPRegisterForm
 from tickets.models import Ticket
+from tickets.models import MultiPurchase
 from tickets.utils import get_ticket_format
 
 from django.contrib.auth import logout as auth_logout
@@ -133,9 +135,7 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
                                     price=price, payed=payed,
                                     change=change, payment=payment)
             sale.save()
-
-            response = get_ticket_format(mp, pf=print_format, attachment=False)
-            return response
+            return HttpResponse(reverse('window_ticket', kwargs={'ev': mp.ev.slug, 'pf': print_format, 'order': mp.order}))
 
         ctx = self.get_context_data()
         ctx['form'] = form
@@ -144,6 +144,14 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
 # csrf_exempt because we use the same multipurchase form several times, we
 # use target="_blank" in the form to return the PDF
 window_multipurchase = csrf_exempt(WindowMultiPurchase.as_view())
+
+
+class WindowTicket(WindowMultiPurchase):
+    def get(self, request, ev=None, pf=None, order=None):
+        mp = get_object_or_404(MultiPurchase, order=order)
+        response = get_ticket_format(mp, pf=pf, attachment=False)
+        return response
+window_ticket = csrf_exempt(WindowTicket.as_view())
 
 
 class WindowLogout(View):
