@@ -92,7 +92,7 @@
             <tr>
                 <th></th>
                 {% for s in sessions %}
-                    <th>{{ s.name }}</th>
+                    <th>{{ s.space.name }} {{ s.name }}</th>
                 {% endfor %}
                 <th>{% trans "TOTAL" %}</th>
             </tr>
