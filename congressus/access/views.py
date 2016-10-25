@@ -144,10 +144,10 @@ class AccessView(UserPassesTestMixin, TemplateView):
         start_formatted = short_date(start)
         end_formatted = short_date(end)
 
-        if end < timezone.now():
+        if timezone.localtime(end) < timezone.now():
             msg = _("Expired, ended at %(date)s") % { 'date': end_formatted }
             return 'wrong', msg
-        elif start > timezone.now():
+        elif timezone.localtime(start) > timezone.now():
             msg = _("Too soon, wait until %(date)s") % { 'date': start_formatted }
             return 'wrong', msg
 
