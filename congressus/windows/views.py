@@ -137,7 +137,7 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
             sale.save()
             return HttpResponse(reverse('window_ticket',
                 kwargs={'ev': mp.ev.slug,
-                        'w': w,
+                        'w': w.slug,
                         'pf': print_format,
                         'order': mp.order}))
 
