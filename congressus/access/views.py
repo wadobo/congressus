@@ -31,9 +31,9 @@ def short_date(dt):
         dt = timezone.localtime(dt)
     return formats.date_format(dt, 'SHORT_DATETIME_FORMAT')
 
-def local_time(dt):
-    if timezone.is_aware(dt):
-        dt = timezone.localtime(dt)
+def make_aware(dt):
+    if not timezone.is_aware(dt):
+        dt = timezone.make_aware(dt)
     return dt
 
 
@@ -149,10 +149,10 @@ class AccessView(UserPassesTestMixin, TemplateView):
         start_formatted = short_date(start)
         end_formatted = short_date(end)
 
-        if local_time(end) < timezone.now():
+        if make_aware(end) < timezone.now():
             msg = _("Expired, ended at %(date)s") % { 'date': end_formatted }
             return 'wrong', msg
-        elif local_time(start) > timezone.now():
+        elif make_aware(start) > timezone.now():
             msg = _("Too soon, wait until %(date)s") % { 'date': start_formatted }
             return 'wrong', msg
 
