@@ -135,7 +135,11 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
                                     price=price, payed=payed,
                                     change=change, payment=payment)
             sale.save()
-            return HttpResponse(reverse('window_ticket', kwargs={'ev': mp.ev.slug, 'pf': print_format, 'order': mp.order}))
+            return HttpResponse(reverse('window_ticket',
+                kwargs={'ev': mp.ev.slug,
+                        'w': w,
+                        'pf': print_format,
+                        'order': mp.order}))
 
         ctx = self.get_context_data()
         ctx['form'] = form
