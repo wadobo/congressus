@@ -1,3 +1,4 @@
+import itertools
 from copy import deepcopy
 from datetime import timedelta
 from datetime import datetime
@@ -321,6 +322,11 @@ general = csrf_exempt(GeneralView.as_view())
 class ReportView(TemplateView):
     template_name = 'dashboard/generate_report.html'
 
+    def sessions_grouped(self, sessions):
+        g = itertools.groupby(sessions, lambda x: x.name)
+        g = [(n, list(l)) for n, l in g]
+        return g
+
     def get_days(self):
         days = set()
         q = self.sessions.extra({'date':"date(start)"}).values('date')
@@ -385,8 +391,9 @@ class GeneralReportView(ReportView):
         days = self.get_days()
         delta = timedelta(days=1)
 
-        ctx['session_days'] = [(d, d+delta) for d in days]
+        ctx['session_days'] = [(d, ) for d in days]
         ctx['window'] = self.window
+        ctx['sessions_grouped'] = self.sessions_grouped(self.sessions)
 
         return ctx
 report_general = staff_member_required(GeneralReportView.as_view())
@@ -412,13 +419,22 @@ class OnlineReportView(ReportView):
             start_date = datetime.strptime(start_date, "%d-%m-%Y").date()
             end_date = datetime.strptime(end_date, "%d-%m-%Y").date()
             self.sessions = self.sessions.filter(start__range=(start_date, end_date))
+
+            delta = timedelta(days=1)
+            d = start_date
+            days = []
+            while d <= end_date:
+                days.append(d)
+                d = d + delta
             ctx['sdate'] = start_date
             ctx['edate'] = end_date
+            ctx['days'] = days
 
         days = self.get_days()
         delta = timedelta(days=1)
 
         ctx['session_days'] = [(d, self.sessions.filter(start__range=(d, d+delta))) for d in days]
+        ctx['sessions_grouped'] = self.sessions_grouped(self.sessions)
 
         return ctx
 report_online = staff_member_required(OnlineReportView.as_view())
@@ -442,6 +458,7 @@ class CountReportView(ReportView):
             ctx['selected_windows'] = self.windows
 
             ctx['count_days'] = days
+            ctx['sessions_grouped'] = self.sessions_grouped(self.sessions)
 
         session_days = self.get_days()
         delta = timedelta(days=1)

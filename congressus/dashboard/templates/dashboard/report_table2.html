@@ -1,0 +1,52 @@
+{% load i18n %}
+{% load dashboard %}
+
+<table class="table table-bordered">
+    <tr>
+        <th></th>
+        {% for n, ss in sessions_grouped %}
+            <th>{{ n }}</th>
+        {% endfor %}
+        <th>{% trans "TOTAL" %}</th>
+    </tr>
+
+    <tr class="bg-primary">
+        <th colspan="{{ sessions_grouped|length|add:2 }}">{% trans "# of tickets" %}</th>
+    </tr>
+
+    {% for sp in spaces %}
+        <tr>
+            <td>{{ sp.name }}</td>
+            {% for n, ss in sessions_grouped %}
+                <td>{% db_count ev space=sp sessions=ss windows=windows days=days %}</td>
+            {% endfor %}
+            <td> {% db_count ev space=sp sessions=sessions windows=windows days=days %} </td>
+        </tr>
+    {% endfor %}
+
+    <tr class="bg-primary">
+        <th colspan="{{ sessions_grouped|length|add:2 }}">{% trans "€ with TAX / without TAX" %}</th>
+    </tr>
+
+    {% for sp in spaces %}
+        <tr>
+            <td>{{ sp.name }}</td>
+            {% for n, ss in sessions_grouped %}
+                <td>{% db_prices ev space=sp sessions=ss windows=windows days=days %}</td>
+            {% endfor %}
+            <td> {% db_prices ev space=sp sessions=sessions windows=windows days=days %} </td>
+        </tr>
+    {% endfor %}
+
+    <tr class="bg-primary">
+        <th colspan="{{ sessions_grouped|length|add:2 }}">{% trans "TOTAL" %}</th>
+    </tr>
+
+    <tr>
+        <th>{% trans "TOTAL" %}</th>
+        {% for n, ss in sessions_grouped %}
+            <td>{% db_count ev sessions=ss windows=windows days=days %}</td>
+        {% endfor %}
+        <td>{% db_count ev windows=windows session=s days=days %}</td>
+    </tr>
+</table>

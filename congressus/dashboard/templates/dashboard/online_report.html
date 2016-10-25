@@ -37,7 +37,7 @@
 
     <!-- online report -->
     <h4>{% trans "Online" %}</h4>
-    {% include "dashboard/report_table.html" with sessions="" windows=online_windows sdate=sdate edate=edate %}
+    {% include "dashboard/report_table2.html" with spaces=spaces sessions_grouped=sessions_grouped sessions="" windows=online_windows days=days %}
 
     <!-- by days -->
     {% for day, sessions in session_days %}
