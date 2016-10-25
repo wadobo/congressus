@@ -151,7 +151,7 @@ window_multipurchase = csrf_exempt(WindowMultiPurchase.as_view())
 
 
 class WindowTicket(WindowMultiPurchase):
-    def get(self, request, ev=None, pf=None, order=None):
+    def get(self, request, ev=None, pf=None, order=None, w=None):
         mp = get_object_or_404(MultiPurchase, order=order)
         response = get_ticket_format(mp, pf=pf, attachment=False)
         return response
