@@ -34,6 +34,7 @@ class TicketWindow(models.Model):
     slug = AutoSlugField(populate_from='name')
     code = models.CharField(_('code'), max_length=5, help_text=_('code to show in tickets'))
     cash = models.FloatField(_('cash in the ticket window'), default=0)
+    user = models.ForeignKey(User, verbose_name=_('user'), blank=True, null=True)
 
     location = models.CharField(_('location'), max_length=500, blank=True, null=True)
     online = models.BooleanField(_('online'), default=False)
