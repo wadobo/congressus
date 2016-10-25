@@ -5,7 +5,7 @@
     <tr>
         <th></th>
         {% for n, ss in sessions_grouped %}
-            <th>{{ n }}</th>
+            <th class="{{ n|slugify }}">{{ n }}</th>
         {% endfor %}
         <th>{% trans "TOTAL" %}</th>
     </tr>
@@ -18,11 +18,19 @@
         <tr>
             <td>{{ sp.name }}</td>
             {% for n, ss in sessions_grouped %}
-                <td>{% db_count ev space=sp sessions=ss windows=windows days=days %}</td>
+                <td class="{{ n|slugify }}">{% db_count ev space=sp sessions=ss windows=windows days=days %}</td>
             {% endfor %}
             <td> {% db_count ev space=sp sessions=sessions windows=windows days=days %} </td>
         </tr>
     {% endfor %}
+
+    <tr>
+        <th>{% trans "TOTAL" %}</th>
+        {% for n, ss in sessions_grouped %}
+            <td class="{{ n|slugify }}">{% db_count ev sessions=ss windows=windows days=days %}</td>
+        {% endfor %}
+        <td>{% db_count ev windows=windows session=s days=days %}</td>
+    </tr>
 
     <tr class="bg-primary">
         <th colspan="{{ sessions_grouped|length|add:2 }}">{% trans "€ with TAX / without TAX" %}</th>
@@ -32,21 +40,18 @@
         <tr>
             <td>{{ sp.name }}</td>
             {% for n, ss in sessions_grouped %}
-                <td>{% db_prices ev space=sp sessions=ss windows=windows days=days %}</td>
+                <td class="{{ n|slugify }}">{% db_prices ev space=sp sessions=ss windows=windows days=days %}</td>
             {% endfor %}
             <td> {% db_prices ev space=sp sessions=sessions windows=windows days=days %} </td>
         </tr>
     {% endfor %}
 
-    <tr class="bg-primary">
-        <th colspan="{{ sessions_grouped|length|add:2 }}">{% trans "TOTAL" %}</th>
-    </tr>
-
     <tr>
         <th>{% trans "TOTAL" %}</th>
         {% for n, ss in sessions_grouped %}
-            <td>{% db_count ev sessions=ss windows=windows days=days %}</td>
+            <td class="{{ n|slugify }}">{% db_prices ev sessions=ss windows=windows days=days %}</td>
         {% endfor %}
-        <td>{% db_count ev windows=windows session=s days=days %}</td>
+        <td>{% db_prices ev windows=windows session=s days=days %}</td>
     </tr>
+
 </table>
