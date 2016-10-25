@@ -14,7 +14,7 @@ from extended_filters.filters import DateRangeFilter
 
 
 class TicketWindowAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code', 'slug', 'event', 'location', 'online')
+    list_display = ('name', 'code', 'slug', 'event', 'location', 'online', 'user')
     list_filter = ('event', 'location')
     search_fields = ('name', 'slug', 'event__name')
 
