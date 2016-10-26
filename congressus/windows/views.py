@@ -3,11 +3,11 @@ import datetime
 from django.utils import timezone
 from django.views.generic import TemplateView, View
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _u
 from django.shortcuts import redirect, render
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.urlresolvers import reverse
@@ -148,14 +148,11 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
                         'w': w.slug,
                         'pf': print_format,
                         'order': mp.order}))
-        else:
-            errors = ''
-            for e in form.errors.get('__all__'):
-                errors += e + '\n'
-            errors += 'Recargar página (CTRL + F5) e intentar de nuevo.'
-            return JsonResponse({'errors': errors})
-# csrf_exempt because we use the same multipurchase form several times, we
-# use target="_blank" in the form to return the PDF
+        data = {"message": _u("There was an error, please try again"), "status": "ok"}
+        resp = JsonResponse(data)
+        resp.status_code = 400
+        return resp
+# csrf_exempt because we use the same multipurchase as ajax POST
 window_multipurchase = csrf_exempt(WindowMultiPurchase.as_view())
 
 

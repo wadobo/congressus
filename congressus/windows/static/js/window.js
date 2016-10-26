@@ -1,16 +1,17 @@
 function ajaxsend() {
-    $.post($("form").attr('action'), $("form").serialize(),
+    var q = $.post($("form").attr('action'), $("form").serialize(),
         function(response) {
-            if (response.errors) {
-                alertify.alert(response.errors);
-            } else {
-                var pdf = window.open(response);
-                setTimeout(function() {
-                    setTimeout(function() { pdf.close(); }, 1000);
-                    pdf.print();
-                }, 1000);
-            }
+            var pdf = window.open(response);
+            setTimeout(function() {
+                setTimeout(function() { pdf.close(); }, 1000);
+                pdf.print();
+            }, 1000);
         });
+    q.fail(function(error) {
+        alertify.confirm(error.responseJSON.message, function(e) {
+            location.reload();
+        });
+    });
 }
 window.ajaxsend = ajaxsend;
 
@@ -134,7 +135,6 @@ $(document).ready(function() {
                 args += ' ' + $(".seat-selected").length;
                 ws.send('add_sale' + args);
                 setTimeout(clean, 1000);
-                //$("form").submit();
                 ajaxsend();
             }
         });
