@@ -83,6 +83,9 @@ class BaseTicketMixing:
             total = self.mp.discount.apply_to(total)
         return total
 
+    def get_tax(self):
+        return self.session.tax
+
     def get_window_price(self):
         total = self.session.window_price
         if self.mp and self.mp.discount and self.mp.discount.unit:

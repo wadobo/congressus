@@ -7,6 +7,10 @@ from .models import InvitationGenerator
 from .models import Invitation
 from .models import InvitationType
 
+from tickets.utils import concat_pdf
+from tickets.utils import generate_pdf
+from tickets.utils import generate_thermal
+
 
 def get_csv(modeladmin, request, queryset):
     csv = []
@@ -17,6 +21,34 @@ def get_csv(modeladmin, request, queryset):
     response.write('\n'.join(csv))
     return response
 get_csv.short_description = _("Download csv")
+
+
+def get_pdf(modeladmin, request, queryset):
+    files = []
+
+    for inv in queryset:
+        files.append(generate_pdf(inv, asbuf=True, inv=True))
+    pdfs = concat_pdf(files)
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'filename="invs.pdf"'
+    response.write(pdfs)
+    return response
+get_pdf.short_description = _("Download A4")
+
+
+def get_thermal(modeladmin, request, queryset):
+    files = []
+
+    for inv in queryset:
+        files.append(generate_thermal(inv, asbuf=True, inv=True))
+    pdfs = concat_pdf(files)
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'filename="invs.pdf"'
+    response.write(pdfs)
+    return response
+get_thermal.short_description = _("Download thermal")
 
 
 class InvitationTypeAdmin(admin.ModelAdmin):
@@ -32,7 +64,7 @@ class InvitationAdmin(admin.ModelAdmin):
     search_fields = ('order',)
 
     # TODO, add get_A4 and get_thermal
-    actions = [get_csv, ]
+    actions = [get_csv, get_pdf, get_thermal]
 
     def concept(self, obj):
         if not obj.generator:

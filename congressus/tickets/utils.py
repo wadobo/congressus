@@ -493,7 +493,7 @@ class TicketPDF:
             sstart = ticket.type.start
             send = ticket.type.end
 
-            if not sstart or not ssend:
+            if not sstart or not send:
                 return ''
         else:
             sstart = ticket.session.start
@@ -506,7 +506,10 @@ class TicketPDF:
             'complete': _('%(date)s (%(start)s to %(end)s)'),
             'onlydate': _('%(date)s'),
         }
-        strdate = dateformats[ticket.session.dateformat]
+        if self.inv:
+            strdate = dateformats['start']
+        else:
+            strdate = dateformats[ticket.session.dateformat]
 
         date = strdate % {
             'date': start,
@@ -521,7 +524,10 @@ class TicketPDF:
         ticket = self.ticket
 
         if self.inv:
-            return 'GEN' + str(ticket.generator.id)
+            if ticket.generator:
+                return 'GEN' + str(ticket.generator.id)
+            else:
+                return 'INV'
 
         wcode = ticket.window_code()
         return wcode
@@ -556,12 +562,12 @@ class TicketPDF:
     def price(self):
         ticket = self.ticket
 
-        if self.inv:
-            price = _('%4.2f €') % ticket.get_price()
-            tax = ticket.get_tax()
-        else:
-            price = _('%4.2f €') % ticket.price
-            tax = ticket.tax
+        price = ticket.get_price()
+        if not price:
+            return ''
+
+        price = _('%4.2f €') % price
+        tax = ticket.get_tax()
 
         taxtext = _('TAX INC.')
         price = '<font size=14>%s</font>   <font size=8>%s%% %s</font>' % (price, tax, taxtext)

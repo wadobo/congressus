@@ -14,6 +14,9 @@ from tickets.models import BaseExtraData
 from tickets.models import TicketSeatHold
 from tickets.utils import get_seats_by_str
 
+from tickets.utils import generate_pdf
+from tickets.utils import generate_thermal
+
 
 class InvitationType(models.Model):
     name = models.CharField(_('name'), max_length=200)
@@ -101,10 +104,21 @@ class Invitation(models.Model, BaseExtraData):
         self.set_extra_data('extra_sessions', data)
 
     def get_price(self):
-        return self.generator.price
+        if self.generator:
+            return self.generator.price
+
+        return 0
 
     def get_tax(self):
-        return self.generator.tax
+        if self.generator:
+            return self.generator.tax
+        return 0
+
+    def gen_pdf(self):
+        return generate_pdf(self)
+
+    def gen_thermal(self):
+        return generate_thermal(self)
 
     def __str__(self):
         return self.order
