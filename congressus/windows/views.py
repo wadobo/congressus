@@ -15,6 +15,7 @@ from .models import TicketWindow
 from .models import TicketWindowSale
 from tickets.views import MultiPurchaseView
 from tickets.views import get_ticket_or_404
+from events.models import Discount
 from events.models import Event
 from events.models import Session
 from tickets.forms import MPRegisterForm
@@ -98,6 +99,9 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
         ids = [(i[len('number_'):], request.POST[i]) for i in request.POST if i.startswith('number_')]
         seats = [(i[len('seats_'):], request.POST[i].split(',')) for i in request.POST if i.startswith('seats_')]
         print_format = request.POST.get('print-format', self.DEFAULT_PF)
+        discount = request.POST.get('discount', '')
+        if discount:
+            discount = Discount.objects.get(id=discount)
 
         data = request.POST.copy()
         data['email'] = settings.FROM_EMAIL
@@ -116,6 +120,9 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
 
         if form.is_valid():
             mp = form.save(commit=False)
+            if discount:
+                mp.discount = discount
+                mp.price = mp.get_window_price()
             mp.confirm()
             for tk in mp.tickets.all():
                 tk.sold_in_window = True

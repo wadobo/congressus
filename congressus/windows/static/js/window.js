@@ -48,18 +48,20 @@ function calcChange() {
     }
 }
 
-function apply_discount(total) {
+function apply_discount(total, ntickets) {
     var rcheck = $("input[name=discount]:checked");
     var type = rcheck.attr("data-type");
-    var value = (rcheck.attr("data-value"));
-    if (type == 'none') {
-        res = total;
-    } else if (type == 'percent') {
+    var value = Number(rcheck.attr("data-value"));
+    var unit = rcheck.attr("data-unit") == "True";
+    var res = total;
+    if (type == 'percent') {
         res = total - total * (value / 100);
     } else if (type == 'amount') {
-        res -= value;
-    } else {
-        res = total;
+        if (unit) {
+            res -= value * ntickets;
+        } else {
+            res -= value;
+        }
     }
     return res;
 
@@ -67,12 +69,14 @@ function apply_discount(total) {
 
 function recalcTotal() {
     var sum = 0;
+    var ntickets = 0;
     $(".sessioninput").each(function() {
         var n = parseInt($(this).val(), 10);
+        ntickets += n;
         var price = parseFloat($(this).data("price"));
         sum += price * n;
     });
-    sum = apply_discount(sum);
+    sum = apply_discount(sum, ntickets);
     if (sum > 0) {
         $("#finish")[0].disabled = false;
     } else {

@@ -57,13 +57,12 @@
 {% block button %}
     <div class="row window-foot">
         <div class="col-sm-2">
-            <!-- TODO, add discounts here -->
             <label>{% trans "Discount:" %}</label>
             <td class="text-left">
                 <div class="radio">
                   <label>
-                    <input type="radio" name="discount" value="none" checked
-                              data-type="none" data-value=0>
+                    <input type="radio" name="discount" value="" checked
+                              data-type="" data-unit="" data-value=0>
                     {% trans "None" %}
                   </label>
                 </div>
@@ -71,7 +70,8 @@
                 <div class="radio">
                   <label>
                       <input type="radio" name="discount" value={{ discount.id }}
-                              data-type={{ discount.type }} data-value={{ discount.value }}>
+                              data-unit={{ discount.unit }} data-type={{ discount.type }}
+                              data-value={{ discount.value }}>
                     {{ discount }}
                   </label>
                 </div>

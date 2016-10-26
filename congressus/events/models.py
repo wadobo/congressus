@@ -49,6 +49,7 @@ class Discount(models.Model):
     name = models.CharField(_('name'), max_length=200, unique=True)
     type = models.CharField(_('type'), max_length=8, choices=DISCOUNT_TYPES, default='percent')
     value = models.IntegerField(_('value'), default=0)
+    unit = models.BooleanField(_('per unit'), default=True)
 
     def apply_to(self, t):
         if not self.value:

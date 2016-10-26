@@ -78,11 +78,16 @@ class BaseTicketMixing:
         self.save()
 
     def get_price(self):
-        # TODO manage ticket type
-        return self.session.price
+        total = self.session.price
+        if self.mp and self.mp.discount and self.mp.discount.unit:
+            total = self.mp.discount.apply_to(total)
+        return total
 
     def get_window_price(self):
-        return self.session.window_price
+        total = self.session.window_price
+        if self.mp and self.mp.discount and self.mp.discount.unit:
+            total = self.mp.discount.apply_to(total)
+        return total
 
     def send_reg_email(self):
         tmpl = get_template('emails/reg.txt')
@@ -298,12 +303,15 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
 
     def get_price(self):
         total = sum(i.get_price() for i in self.tickets.all())
-        if self.discount:
+        if self.discount and not self.discount.unit:
             total = self.discount.apply_to(total)
         return total
 
     def get_window_price(self):
-        return sum(i.get_window_price() for i in self.tickets.all())
+        total = sum(i.get_window_price() for i in self.tickets.all())
+        if self.discount and not self.discount.unit:
+            total = self.discount.apply_to(total)
+        return total
 
     def is_mp(self):
         return True
