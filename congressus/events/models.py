@@ -16,6 +16,12 @@ from django.utils.translation import ugettext_lazy as _
 from invs.utils import get_sold_invs
 
 
+TICKET_DATE_FORMATS = (
+    ('start', _('Date and start time')),
+    ('complete', _('Date, start and end time')),
+    ('onlydate', _('Only date')),
+)
+
 INV_TYPES = (
     ('invited', _('Invited')),
     ('speaker', _('Speaker')),
@@ -266,6 +272,8 @@ class Session(models.Model):
     thermal_template = models.ForeignKey("ThermalTicketTemplate", blank=True, null=True, verbose_name=_('thermal template'))
     autoseat_mode = models.CharField(_('autoseat mode'), max_length=300, default='ASC',
             help_text="ASC, DESC, RANDOM or LIST: layout_name1,layout_name2")
+
+    dateformat = models.CharField(_('date format'), max_length=50, default='start', choices=TICKET_DATE_FORMATS)
 
     class Meta:
         ordering = ['start']

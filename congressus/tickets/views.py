@@ -490,7 +490,7 @@ class TicketTemplatePreview(UserPassesTestMixin, View):
                           start=timezone.now(),
                           end=timezone.now())
 
-        response = get_ticket_format(ticket, pf='A4')
+        response = get_ticket_format(ticket, pf='A4', attachment=False)
         return response
 
 template_preview = TicketTemplatePreview.as_view()
@@ -513,7 +513,7 @@ class ThermalTicketTemplatePreview(TicketTemplatePreview):
                           start=timezone.now(),
                           end=timezone.now())
 
-        response = get_ticket_format(ticket, pf='thermal')
+        response = get_ticket_format(ticket, pf='thermal', attachment=False)
         return response
 thermal_template_preview = ThermalTicketTemplatePreview.as_view()
 

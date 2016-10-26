@@ -500,7 +500,15 @@ class TicketPDF:
             send = ticket.session.end
 
         start = formats.date_format(sstart, "l d/m/Y")
-        date = _('%(date)s (%(start)s to %(end)s)') % {
+
+        dateformats = {
+            'start': _('%(date)s (%(start)s)'),
+            'complete': _('%(date)s (%(start)s to %(end)s)'),
+            'onlydate': _('%(date)s'),
+        }
+        strdate = dateformats[ticket.session.dateformat]
+
+        date = strdate % {
             'date': start,
             'start': short_hour(sstart),
             'end': short_hour(send),
