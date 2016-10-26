@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.views.generic import TemplateView, View
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
@@ -147,11 +148,12 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
                         'w': w.slug,
                         'pf': print_format,
                         'order': mp.order}))
-
-        ctx = self.get_context_data()
-        ctx['form'] = form
-
-        return render(request, self.template_name, ctx)
+        else:
+            errors = ''
+            for e in form.errors.get('__all__'):
+                errors += e + '\n'
+            errors += 'Recargar página (CTRL + F5) e intentar de nuevo.'
+            return JsonResponse({'errors': errors})
 # csrf_exempt because we use the same multipurchase form several times, we
 # use target="_blank" in the form to return the PDF
 window_multipurchase = csrf_exempt(WindowMultiPurchase.as_view())

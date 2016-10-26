@@ -1,11 +1,15 @@
 function ajaxsend() {
     $.post($("form").attr('action'), $("form").serialize(),
         function(response) {
-            var pdf = window.open(response);
-            setTimeout(function() {
-                setTimeout(function() { pdf.close(); }, 1000);
-                pdf.print();
-            }, 1000);
+            if (response.errors) {
+                alertify.alert(response.errors);
+            } else {
+                var pdf = window.open(response);
+                setTimeout(function() {
+                    setTimeout(function() { pdf.close(); }, 1000);
+                    pdf.print();
+                }, 1000);
+            }
         });
 }
 window.ajaxsend = ajaxsend;
