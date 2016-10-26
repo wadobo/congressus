@@ -6,6 +6,9 @@ if (!String.prototype.startsWith) {
     };
 }
 
+var loading = '<span class="glyphicon glyphicon-refresh spinning"></span>';
+var seaticon = '<span class="glyphicon glyphicon-th"></span>';
+
 var old_session = -1;
 var old_layout = -1;
 
@@ -213,6 +216,7 @@ function fillSelectedSeats(obj) {
 }
 
 function autoSelectSeat(s, n) {
+    $("#tooltip-"+s).html(loading);
     autoSeats(s, n).then(function(autoseats) {
         var value = [];
         autoseats.forEach(function(obj) {
@@ -240,6 +244,8 @@ function autoSelectSeat(s, n) {
         if (!data.fail_silently) {
             alertify.alert(data.error);
         }
+    }).always(function() {
+        $("#tooltip-"+s).html(seaticon);
     });
 }
 
