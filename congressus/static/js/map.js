@@ -8,7 +8,7 @@
         var display = '.display-' + session + '-' + layoutid;
         parentObj.find('.display').hide();
         parentObj.find(display).show();
-        try { $("#separator")[0].scrollIntoView(true); } catch (e) {};
+        try { parentObj.find("#separator")[0].scrollIntoView(true); } catch (e) {};
     },
 
     map.clickSeat = function(obj) {
