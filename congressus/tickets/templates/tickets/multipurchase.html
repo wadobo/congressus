@@ -22,11 +22,13 @@
 {% endblock %}
 
 {% block content %}
+    {% block pheader %}
     <div class="page-header">
         {% block header %}
         <h1> {{ ev }} </h1>
         {% endblock %}
     </div>
+    {% endblock %}
 
     {% block info %}
     <p> {{ ev.info }} </p>
