@@ -6,8 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ugettext as _u
+from django.utils.translation import ugettext as _
 from django.shortcuts import redirect, render
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.urlresolvers import reverse
@@ -148,7 +147,7 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
                         'w': w.slug,
                         'pf': print_format,
                         'order': mp.order}))
-        data = {"message": _u("There was an error, please try again"), "status": "ok"}
+        data = {"message": _("There was an error, please try again"), "status": "ok"}
         resp = JsonResponse(data)
         resp.status_code = 400
         return resp
