@@ -136,9 +136,23 @@ $(document).ready(function() {
         });
     }
 
+    function checkModalOpened() {
+        modal_open = false;
+        $(".modal").each(function() {
+            if (this.style['display'] == 'block') {
+                $("#"+this.id+" button.btn")[0].click()
+                modal_open = true;
+                return false;
+            }
+        });
+        return modal_open;
+    }
 
     $(document).keypress(function(key) {
         if (key.which == 13) {
+            if (checkModalOpened()) {
+                return;
+            }
             if ($("#alertify").length > 0 && ! $("#alertify").hasClass('alertify-hidden')) {
                 return;
             }
