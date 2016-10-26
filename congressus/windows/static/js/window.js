@@ -29,7 +29,7 @@ function clean() {
         }
     });
 
-    $("[value=none]").click();
+    $("[value='']").click();
     $("[value=cash]").click();
     $("#total").val(0);
     $("#change").val(0);
