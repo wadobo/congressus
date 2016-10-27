@@ -15,7 +15,10 @@ from tickets.utils import generate_thermal
 def get_csv(modeladmin, request, queryset):
     csv = []
     for i, inv in enumerate(queryset):
-        csv.append('%d, %s, %s' % (i+1, inv.order, inv.type.name))
+        row = '%d, %s, %s' % (i+1, inv.order, inv.type.name)
+        if inv.seat:
+            row += ',%s, %s, %s' % (inv.seat_layout.name, inv.seat_row(), inv.seat_column())
+        csv.append(row)
     response = HttpResponse(content_type='application/csv')
     response['Content-Disposition'] = 'filename="invs.csv"'
     response.write('\n'.join(csv))

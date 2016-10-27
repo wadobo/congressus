@@ -120,6 +120,25 @@ class Invitation(models.Model, BaseExtraData):
     def gen_thermal(self):
         return generate_thermal(self)
 
+    def cseat(self):
+        if not self.seat:
+            return None
+        row, column = self.seat.split('-')
+        return _('L%(layout)s-R%(row)s-C%(col)s') % {'layout': self.seat_layout.name, 'row': row, 'col': column}
+    cseat.short_description = _('seat')
+
+    def seat_row(self):
+        if not self.seat:
+            return None
+        row, column = self.seat.split('-')
+        return row
+
+    def seat_column(self):
+        if not self.seat:
+            return None
+        row, column = self.seat.split('-')
+        return column
+
     def __str__(self):
         return self.order
 
