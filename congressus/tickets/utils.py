@@ -576,15 +576,11 @@ class TicketPDF:
     @property
     def template(self):
         if self.inv:
-            from events.models import TicketTemplate
-            return TicketTemplate.objects.last()
-
+            self.ticket.type.template
         return self.ticket.session.template
 
     @property
     def thermal_template(self):
         if self.inv:
-            from events.models import ThermalTicketTemplate
-            return ThermalTicketTemplate.objects.last()
-
+            self.ticket.type.thermal_template
         return self.ticket.session.thermal_template

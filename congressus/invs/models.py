@@ -34,6 +34,9 @@ class InvitationType(models.Model):
     start = models.DateTimeField(_('start date'), null=True, blank=True)
     end = models.DateTimeField(_('end date'), null=True, blank=True)
 
+    template = models.ForeignKey("events.TicketTemplate", blank=True, null=True, verbose_name=_('template'))
+    thermal_template = models.ForeignKey("events.ThermalTicketTemplate", blank=True, null=True, verbose_name=_('thermal template'))
+
     class Meta:
         verbose_name = _('invitation type')
         verbose_name_plural = _('invitation types')
