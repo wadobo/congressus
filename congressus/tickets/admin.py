@@ -57,6 +57,7 @@ delete_selected.short_description = _("Remove")
 
 class TicketAdmin(CSVMixin, admin.ModelAdmin):
     list_per_page = 20
+    list_max_show_all = 800
     list_display = ('order', 'order_tpv2', 'session2', 'cseat', 'twin',
                     'created2', 'confirmed', 'used',
                     'email', 'payment', 'price2', 'event')
@@ -187,6 +188,7 @@ class TicketInline(admin.TabularInline):
 
 class MPAdmin(CSVMixin, admin.ModelAdmin):
     list_per_page = 20
+    list_max_show_all = 800
     list_display = ('order_tpv', 'twin', 'created', 'confirmed2', 'email', 'ntickets', 'price', 'event')
     list_filter = ('confirmed', TicketWindowFilter, 'ev', 'tpv_error')
     search_fields = ('order', 'order_tpv', 'email', 'extra_data')
