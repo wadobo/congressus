@@ -116,7 +116,7 @@ class GeneralView(TemplateView):
         res['datasets'][0]['data'] = [0]*max
         for control in AccessControl.objects.all():
             new_dataset = deepcopy(self.DEFAULT_LINE_DATASET)
-            new_dataset['label'] = control.name
+            new_dataset['label'] = control.slug
             new_dataset['borderColor'] = self.get_random_color()
             new_dataset['data'] = [0]*max
             res['datasets'].append(new_dataset)
@@ -134,7 +134,7 @@ class GeneralView(TemplateView):
                 index = res.get("labels").index(date)
             except ValueError:
                 continue
-            extra_index = self.dataset_index(res['datasets'], ac.access_control.name)
+            extra_index = self.dataset_index(res['datasets'], ac.access_control.slug)
             res.get("datasets")[self.INDEX_MAIN].get('data')[index] += 1
             res.get("datasets")[extra_index].get('data')[index] += 1
         return res
@@ -190,7 +190,7 @@ class GeneralView(TemplateView):
         res['datasets'][0]['data'] = [0]*max
         for ticket_window in TicketWindow.objects.all():
             new_dataset = deepcopy(self.DEFAULT_LINE_DATASET)
-            new_dataset['label'] = ticket_window.name
+            new_dataset['label'] = ticket_window.slug
             new_dataset['borderColor'] = self.get_random_color()
             new_dataset['data'] = [0]*max
             res['datasets'].append(new_dataset)
@@ -208,7 +208,7 @@ class GeneralView(TemplateView):
                 index = res.get("labels").index(date)
             except ValueError:
                 continue
-            extra_index = self.dataset_index(res['datasets'], sale.window.name)
+            extra_index = self.dataset_index(res['datasets'], sale.window.slug)
             res.get("datasets")[self.INDEX_MAIN].get('data')[index] += 1
             res.get("datasets")[extra_index].get('data')[index] += 1
         return res

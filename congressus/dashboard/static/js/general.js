@@ -31,7 +31,7 @@ function fill_charts() {
         //html += '</div>';
         //html += '</div>';
 
-        console.log(charts);
+        //console.log(charts);
         var title = charts[c].title;
         var container = $('<div class="col-sm-12"></div>');
         var panel = $('<div class="panel panel-default"></div>');
@@ -134,37 +134,49 @@ function update_pie_charts(chart, label, amount=1) {
     chart.update();
 }
 
+function get_date(date, ex_label) {
+    // get date with the correct format for the graphic labels
+    toT = date.indexOf('T');
+    res = date.substring(0, toT);
+
+    // Search label example and check if interval is daily, hourly o each minute
+    index = ex_label.indexOf(' ');
+    if (index == 3) { // hourly
+        res = date.substring(toT+1, toT+index) + 'h ' + res;
+    } else if (index == 5) { // each minute
+        res = date.substring(toT+1, toT+1+index) + ' ' + res;
+    }
+    return res;
+}
+
 function websocketCB(ev, data) {
     if (ev === 'add_ac') {
-        toT = data.date.indexOf('T');
-        date = data.date.substring(0, toT);
         for (c=0; c < window.data_charts['a'].length; c++) {
             d = window.data_charts['a'][c];
             if (d.config.type == 'doughnut') {
                 update_pie_charts(d, data.st);
             } else if (d.config.type == 'line') {
+                date = get_date(data.date, d.config.data.labels[0]);
                 update_line_charts(d, data.control, date);
             }
         }
     } else if (ev === 'add_online_sale') {
-        toT = data.date.indexOf('T');
-        date = data.date.substring(0, toT);
         for (c=0; c < window.data_charts['os'].length; c++) {
             d = window.data_charts['os'][c];
             if (d.config.type == 'doughnut') {
                 update_pie_charts(d, data.payment);
             } else if (d.config.type == 'line') {
+                date = get_date(data.date, d.config.data.labels[0]);
                 update_line_charts(d, data.window, date, data.amount);
             }
         }
     } else if (ev === 'add_sale') {
-        toT = data.date.indexOf('T');
-        date = data.date.substring(0, toT);
         for (c=0; c < window.data_charts['ws'].length; c++) {
             d = window.data_charts['ws'][c];
             if (d.config.type == 'doughnut') {
                 update_pie_charts(d, data.payment);
             } else if (d.config.type == 'line') {
+                date = get_date(data.date, d.config.data.labels[0]);
                 update_line_charts(d, data.window, date, data.amount);
             }
         }
