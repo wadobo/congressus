@@ -132,7 +132,15 @@ $(document).ready(function() {
                 args = ' ' + window.windows;
                 args += ' ' + moment().format('YYYY-MM-DDThh:mm:ss.SSSSSSZ');
                 args += ' ' + $('input[name=payment]:checked').val();
-                args += ' ' + $(".seat-selected").length;
+                // BY NUM TICKETS
+                //var ntickets = 0;
+                //$(".sessioninput").each(function() {
+                //    var n = parseInt($(this).val(), 10);
+                //    ntickets += n;
+                //});
+                //args += ' ' + String(ntickets);
+                // BY SALE
+                args += ' 1'
                 ws.send('add_sale' + args);
                 setTimeout(clean, 1000);
                 ajaxsend();

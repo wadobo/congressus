@@ -108,7 +108,7 @@ class GeneralView(TemplateView):
 
     def get_access(self, timestep, max):
         strftime, delta = self.get_timesteps_vars(timestep)
-        now = datetime.now()
+        now = timezone.localtime(timezone.now())
         min_date = now - delta*max
         res = deepcopy(self.DATA_LINE)
 
@@ -147,7 +147,7 @@ class GeneralView(TemplateView):
 
     def get_sales_online(self, timestep, max):
         strftime, delta = self.get_timesteps_vars(timestep)
-        now = datetime.now()
+        now = timezone.localtime(timezone.now())
         min_date = now - delta*max
         res = deepcopy(self.DATA_LINE)
 
@@ -182,7 +182,7 @@ class GeneralView(TemplateView):
 
     def get_sales(self, timestep, max):
         strftime, delta = self.get_timesteps_vars(timestep)
-        now = timezone.now()
+        now = timezone.localtime(timezone.now())
         min_date = now - delta*max
         res = deepcopy(self.DATA_LINE)
 
@@ -216,7 +216,7 @@ class GeneralView(TemplateView):
 
     def get_pie(self, type, timestep, max):
         strftime, delta = self.get_timesteps_vars(timestep)
-        now = timezone.now()
+        now = timezone.localtime(timezone.now())
         min_date = now - delta*max
         res = deepcopy(self.DATA_PIE)
         # Create labels and dataset
@@ -246,7 +246,7 @@ class GeneralView(TemplateView):
 
     def get_pie_sales_online(self, timestep, max):
         strftime, delta = self.get_timesteps_vars(timestep)
-        now = timezone.now()
+        now = timezone.localtime(timezone.now())
         min_date = now - delta*max
         res = deepcopy(self.DATA_PIE)
         # Create labels and dataset
