@@ -57,7 +57,9 @@
                                 {% endif %}
                                     <span class="session-name">{{ session.name }}</span>
                                     <div class="text-muted text-date">
+                                        {% block session-hour %}
                                         {{ session.start|date:"d/m/Y" }}
+                                        {% endblock %}
                                         <span class="session-hour">({{ session.start|date:"H:i" }})</span>
                                     </div>
                                 </div>
