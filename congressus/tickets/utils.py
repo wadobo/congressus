@@ -576,11 +576,11 @@ class TicketPDF:
     @property
     def template(self):
         if self.inv:
-            self.ticket.type.template
+            return self.ticket.type.template
         return self.ticket.session.template
 
     @property
     def thermal_template(self):
         if self.inv:
-            self.ticket.type.thermal_template
+            return self.ticket.type.thermal_template
         return self.ticket.session.thermal_template
