@@ -132,7 +132,7 @@ function seatCB(ev, seat) {
 
     updateBadges(session, layout);
 
-    $("#"+session).keyup();
+    $("#"+session).keydown();
 }
 
 function updateBadges(session, layout) {
@@ -199,7 +199,7 @@ function fillSelectedSeats(obj) {
         var current = [];
         current = v.split(",");
         $("#"+session).val(current.length);
-        $("#"+session).keyup();
+        $("#"+session).keydown();
 
         function recursiveSelection(arr, finish) {
             loadingSession(session, true);
@@ -383,7 +383,7 @@ $(document).ready(function() {
     });
 
     // calculating sums
-    $('.sessioninput').keyup(function(e) {
+    $('.sessioninput').keydown(function(e) {
         var obj = $(this);
         var id = obj.attr('id');
         if (e.keyCode == 9 || e.keyCode == 16) {
@@ -414,7 +414,7 @@ $(document).ready(function() {
             next = max;
         }
         $(id).val(next);
-        $(id).keyup();
+        $(id).keydown();
     });
     $(".minus").click(function() {
         var id = '#' + $(this).data("id");
@@ -426,6 +426,6 @@ $(document).ready(function() {
             next = min;
         }
         $(id).val(next);
-        $(id).keyup();
+        $(id).keydown();
     });
 });
