@@ -1,7 +1,57 @@
+var ticket_log = [];
+var opened_log = false;
+
+function showLog(mode) {
+    length = ticket_log.length;
+    if (length < 1) {
+        return;
+    }
+    res = '<br/>';
+    tail = '<br/>';
+    if (mode) {
+        ticket_log.forEach(function(tk) {
+            res += tk.n + ' - ' + tk.code + ' - ' + tk.mp + tail;
+        });
+    } else {
+        tk = ticket_log[length - 1];
+        res += tk.n + ' - ' + tk.code + ' - ' + tk.mp + tail;
+    }
+    $("#floating-log-input").html(res);
+}
+
+function update_ticket_log(mp, code, amount) {
+    if (ticket_log.length >= 10) {
+        ticket_log.shift();
+    }
+    ticket_log.push({mp: mp, code: code, n: amount});
+    showLog(false);
+}
+
+function notifysale(resp) {
+    var mp = resp.mp;
+    var wc = resp.wc;
+    var nt = resp.nt;
+
+    args = ' ' + window.windows;
+    args += ' ' + moment().format('YYYY-MM-DDThh:mm:ss.SSSSSSZ');
+    args += ' ' + $('input[name=payment]:checked').val();
+    // BY NUM TICKETS
+    //args += ' ' + String(nt);
+    // BY SALE
+    args += ' 1'
+    ws.send('add_sale' + args);
+
+    update_ticket_log(mp, wc, nt);
+
+    clean();
+}
+
 function ajaxsend() {
     var q = $.post($("form").attr('action'), $("form").serialize(),
         function(response) {
-            var pdf = window.open(response);
+            notifysale(response);
+
+            var pdf = window.open(response.url);
             setTimeout(function() {
                 setTimeout(function() { pdf.close(); }, 1000);
                 pdf.print();
@@ -129,21 +179,6 @@ $(document).ready(function() {
         } });
         alertify.confirm(msg, function(e) {
             if (e) {
-                args = ' ' + window.windows;
-                args += ' ' + moment().format('YYYY-MM-DDThh:mm:ss.SSSSSSZ');
-                args += ' ' + $('input[name=payment]:checked').val();
-                // BY NUM TICKETS
-                var ntickets = 0;
-                $(".sessioninput").each(function() {
-                    var n = parseInt($(this).val(), 10);
-                    ntickets += n;
-                });
-                //args += ' ' + String(ntickets);
-                update_ticket_log(ntickets);
-                // BY SALE
-                args += ' 1'
-                ws.send('add_sale' + args);
-                setTimeout(clean, 1000);
                 ajaxsend();
             }
         });
@@ -159,34 +194,6 @@ $(document).ready(function() {
             }
         });
         return modal_open;
-    }
-
-    ticket_log = [];
-    opened_log = false;
-
-    function update_ticket_log(amount) {
-        if (ticket_log.length >= 10) {
-            ticket_log.shift();
-        }
-        ticket_log.push(amount);
-        showLog(false);
-    }
-
-    function showLog(mode) {
-        length = ticket_log.length;
-        if (length < 1) {
-            return;
-        }
-        res = '<b>Últimas ventas</b><br>';
-        tail = ' entrada/s<br>';
-        if (mode) {
-            for (var t in ticket_log) {
-                res += ticket_log[length - 1 - t] + tail;
-            }
-        } else {
-            res += ticket_log[length - 1] + tail;
-        }
-        $("#floating-log").html(res);
     }
 
     $(document).keypress(function(key) {

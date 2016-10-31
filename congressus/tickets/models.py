@@ -338,6 +338,19 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
         self.remove_hold_seats()
         super(MultiPurchase, self).delete(*args, **kwargs)
 
+    def window_code(self):
+        '''
+        ONLMMDDHHMM
+        '''
+
+        prefix = 'ONL'
+        postfix = timezone.localtime(self.created).strftime('%m%d%H%M')
+
+        from windows.models import TicketWindowSale
+        prefix = TicketWindowSale.objects.values_list("window__code", flat=True).get(purchase=self)
+
+        return prefix + postfix
+
     class Meta:
         ordering = ['-created']
         verbose_name = _('multipurchase')

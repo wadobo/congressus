@@ -24,7 +24,10 @@
 {% endblock %}
 
 {% block info %}
-<span id="floating-log" type="button"><b>Últimas ventas</b></span>
+<span id="floating-log" type="button">
+    <b>{% trans "Last sales" %}</b>
+    <span id="floating-log-input"></span>
+</span>
 {% endblock %}
 
 {% block extrahead %}{{ block.super }}
