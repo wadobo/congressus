@@ -1141,11 +1141,11 @@ msgstr "descuento"
 
 #: tickets/models.py:356 tickets/models.py:388 windows/models.py:84
 msgid "multipurchase"
-msgstr "compra múltiple"
+msgstr "compra multiple"
 
 #: tickets/models.py:357
 msgid "multipurchases"
-msgstr "compras múltiples"
+msgstr "compras multiples"
 
 #: tickets/models.py:378
 msgid "sold in window"
