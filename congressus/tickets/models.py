@@ -190,8 +190,8 @@ class BaseTicketMixing:
 
     def confirm(self):
         self.confirmed = True
-        self.save()
         self.hold_seats()
+        self.save()
 
     def set_error(self, error, info):
         self.tpv_error = error
