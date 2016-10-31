@@ -170,7 +170,13 @@ $(document).ready(function() {
     }
 
     function confirmMsg() {
-        var msg = $("#finish").data("msg");
+        var ntickets = 0;
+        $(".sessioninput").each(function() {
+            var n = parseInt($(this).val(), 10);
+            ntickets += n;
+        });
+
+        var msg = "<b> " + String(ntickets) + "</b> " + $("#finish").data("msg");
         var btn_cancel = $("#finish").data("cancel");
         var btn_ok = $("#finish").data("ok");
         alertify.set({ labels: {
