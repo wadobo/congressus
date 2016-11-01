@@ -78,10 +78,18 @@ class GeneralView(TemplateView):
         "hoverBackgroundColor": [],
         "data": [],
     }
+    DEFAULT_BAR_DATASET = {
+        "label": "",
+        "backgroundColor": [],
+        "borderColor": [],
+        "borderWidth": 2,
+        "data": [],
+    }
     DATA_PIE = {
         "labels": [],
         "datasets": []
     }
+    DATA_BAR = deepcopy(DATA_PIE)
 
     def dataset_index(self, datasets, name):
         index = 0
@@ -139,11 +147,14 @@ class GeneralView(TemplateView):
             res.get("datasets")[extra_index].get('data')[index] += 1
         return res
 
-    def get_random_color(self):
+    def get_random_color(self, extra_alpha=False):
         rand = []
         for x in range(3):
             rand.append(randint(0, 255))
-        return 'rgba(%s,1)' % (','.join(map(str, rand)))
+        if extra_alpha:
+            return 'rgba(%s,1)' % (','.join(map(str, rand))), 'rgba(%s,0.2)' % (','.join(map(str, rand)))
+        else:
+            return 'rgba(%s,1)' % (','.join(map(str, rand)))
 
     def get_sales_online(self, timestep, max):
         strftime, delta = self.get_timesteps_vars(timestep)
@@ -257,8 +268,6 @@ class GeneralView(TemplateView):
                 {'confirmed': False, 'name': "F", 'color': 'rgba(255,0,0,1)'},
                 {'confirmed': True, 'name': "T", 'color': 'rgba(0,255,0,1)'}
         ]
-        colors = []
-
         values = MultiPurchase.objects.filter(created__gt=min_date)
 
         dataset = deepcopy(self.DEFAULT_PIE_DATASET)
@@ -269,6 +278,26 @@ class GeneralView(TemplateView):
             dataset['hoverBackgroundColor'].append(color)
             value = values.filter(confirmed=label.get('confirmed')).count()
             dataset['data'].append(value)
+        res['datasets'].append(dataset)
+        return res
+
+    def get_bar(self, type, timestep, max):
+        strftime, delta = self.get_timesteps_vars(timestep)
+        now = timezone.localtime(timezone.now())
+        min_date = now - delta*max
+        res = deepcopy(self.DATA_BAR)
+
+        # Create labels and dataset
+        datas = TicketWindow.objects.values_list('slug', 'cash').filter(event=self.ev)
+
+        dataset = deepcopy(self.DEFAULT_BAR_DATASET)
+        dataset['label'] = self.ev.slug
+        for name, cash in datas:
+            res.get("labels").append(name)
+            color, alpha = self.get_random_color(True)
+            dataset['borderColor'].append(color)
+            dataset['backgroundColor'].append(alpha)
+            dataset['data'].append(cash)
         res['datasets'].append(dataset)
         return res
 
@@ -298,6 +327,8 @@ class GeneralView(TemplateView):
             chart = self.get_pie('sale', timestep, max)
         elif type_chart == 'a_p':
             chart = self.get_pie('access', timestep, max)
+        elif type_chart == 'ws_b':
+            chart = self.get_bar('sale', timestep, max)
         else:
             chart = None
         tdata, tchart = type_chart.split('_')
@@ -312,6 +343,7 @@ class GeneralView(TemplateView):
         ctx = {}
         ctx['charts'] = []
         ev = get_object_or_404(Event, slug=ev)
+        self.ev = ev
         dashboard = get_object_or_404(Dashboard, event=ev, slug=dash)
         for chart in dashboard.charts.all():
             ctx['charts'].append(self.get_chart(chart.type, chart.timestep, chart.max_steps))

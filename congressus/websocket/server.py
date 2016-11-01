@@ -145,12 +145,13 @@ class WSServer:
         log.save()
         self.server.send_message_to_all(json.dumps(data))
 
-    def internal_ws_add_sale(self, client, window, date, payment, amount):
+    def internal_ws_add_sale(self, client, window, date, payment, amount, price):
         data = {
             'action': 'add_sale',
             'window': window,
             'date': date,
             'payment': payment,
             'amount': amount,
+            'price': price
         }
         self.server.send_message_to_all(json.dumps(data))

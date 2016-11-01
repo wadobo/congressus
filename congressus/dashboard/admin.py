@@ -10,6 +10,7 @@ class ConfigChartAdmin(admin.ModelAdmin):
 
 class DashboardAdmin(admin.ModelAdmin):
     list_display = ('event', 'name')
+    filter_horizontal = ('charts',)
 
 
 admin.site.register(ConfigChart, ConfigChartAdmin)

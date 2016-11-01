@@ -51,6 +51,9 @@ function fill_charts() {
         } else if (type_chart == 'c') {
             type = 'line';
             options = {yAxes: [{ ticks: { beginAtZero: true }}]};
+        } else if (type_chart == 'b') {
+            type = 'bar';
+            options = {yAxes: [{ ticks: { beginAtZero: true }}]};
         }
         window.data_charts[type_data].push(new Chart(ctx, {
             type: type,
@@ -134,6 +137,13 @@ function update_pie_charts(chart, label, amount=1) {
     chart.update();
 }
 
+function update_bar_charts(chart, dataset_label, label, price) {
+    price = Number(price);
+    index = chart.data.labels.indexOf(dataset_label);
+    chart.data.datasets[0].data[index] += price;
+    chart.update();
+}
+
 function get_date(date, ex_label) {
     // get date with the correct format for the graphic labels
     toT = date.indexOf('T');
@@ -178,6 +188,9 @@ function websocketCB(ev, data) {
             } else if (d.config.type == 'line') {
                 date = get_date(data.date, d.config.data.labels[0]);
                 update_line_charts(d, data.window, date, data.amount);
+            } else if (d.config.type == 'bar') {
+                date = get_date(data.date, d.config.data.labels[0]);
+                update_bar_charts(d, data.window, date, data.price);
             }
         }
     }

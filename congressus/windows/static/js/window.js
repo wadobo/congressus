@@ -39,6 +39,7 @@ function notifysale(resp) {
     //args += ' ' + String(nt);
     // BY SALE
     args += ' 1'
+    args += ' ' + $("#total").val();
     ws.send('add_sale' + args);
 
     update_ticket_log(mp, wc, nt);
