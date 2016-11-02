@@ -129,6 +129,10 @@ USE_L10N = True
 
 USE_TZ = True
 
+USE_THOUSAND_SEPARATOR = True
+
+LANGUAGE_CODE = 'en-us'
+
 LOCALE_PATHS = (BASE_DIR + '/locale', )
 
 from django.contrib.messages import constants as messages
@@ -183,7 +187,6 @@ EXPIRED_SEAT_C = 15*60 # 15 minutes
 EXPIRED_SEAT_P = 35*60 # TPV expired: 35 minutes
 
 SHOW_TOOLBAR_CALLBACK = False
-USE_THOUSAND_SEPARATOR = True
 
 try:
     from local_settings import *

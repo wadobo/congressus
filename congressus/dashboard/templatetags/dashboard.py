@@ -49,7 +49,9 @@ def db_prices(event, **kwargs):
     tickets = tickets.aggregate(total_price=Sum('price'),
                     price_without_iva=Sum(F('price')/(1+F('tax')/100.0), output_field=FloatField()))
     if tickets and tickets['total_price']:
-        return intcomma('{total_price:.2f} / {price_without_iva:.2f}'.format(**tickets))
+        iva = intcomma('{total_price:.2f}'.format(**tickets))
+        noiva = intcomma('{price_without_iva:.2f}'.format(**tickets))
+        return '{0} / {1}'.format(iva, noiva)
 
     return '--'
 
