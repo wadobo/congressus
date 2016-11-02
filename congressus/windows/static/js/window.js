@@ -10,11 +10,11 @@ function showLog(mode) {
     tail = '<br/>';
     if (mode) {
         ticket_log.forEach(function(tk) {
-            res += tk.n + ' - ' + tk.code + ' - ' + tk.mp + tail;
+            res += tk.n + ' - ' + tk.code + ' - ' + tk.mp + ' - ' + tk.price + tail;
         });
     } else {
         tk = ticket_log[length - 1];
-        res += tk.n + ' - ' + tk.code + ' - ' + tk.mp + tail;
+        res += tk.n + ' - ' + tk.code + ' - ' + tk.mp + ' - ' + tk.price + tail;
     }
     $("#floating-log-input").html(res);
 }
@@ -23,7 +23,7 @@ function update_ticket_log(mp, code, amount) {
     if (ticket_log.length >= 10) {
         ticket_log.shift();
     }
-    ticket_log.push({mp: mp, code: code, n: amount});
+    ticket_log.push({mp: mp, code: code, n: amount, price: $("#total").val() + '€'});
     showLog(false);
 }
 
