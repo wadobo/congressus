@@ -133,7 +133,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
 
         if not extra:
             if self.is_inv(ticket.order):
-                return 'wrong', ticket.name
+                return 'wrong', ticket.type.name
             else:
                 return 'wrong', ticket.session.short()
 
