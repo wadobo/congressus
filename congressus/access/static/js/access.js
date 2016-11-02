@@ -68,39 +68,10 @@ function makeReq() {
 }
 
 function enableQrCode() {
-    var mobile = window.innerWidth <= 800;
-
-    function detect_mobile() {
-        var options = decodeURIComponent(window.location.search.slice(1))
-                                         .split('&')
-                                         .reduce(function _reduce (/*Object*/ a, /*String*/ b) {
-                                           b = b.split('=');
-                                           a[b[0]] = b[1];
-                                           return a;
-                                         }, {});
-        nomobile = options.nomobile;
-
-        if (navigator.userAgent.match(/iPad/i) != null)
-            mobile = false;
-        else if (navigator.userAgent.match(/iPhone/i) != null)
-            mobile = true;
-        else if (navigator.userAgent.match(/Android/i) != null)
-            mobile = true;
-
-        if (mobile && !nomobile) {
-            document.location = 'http://www.ANCCE.es/app'
-            //document.location = "{% url publicMobile concurso.codigoWeb %}"+window.location.search;
-            return false;
-        }
-
-        return true;
-    }
-
-    if (mobile) {
+    if (window.innerWidth <= 800) {
         $('#reader').html5_qrcode(
             function(data){
                 $("#order").val(data);
-                alertify.alert(data);
                 makeReq();
             },
             function(error){
