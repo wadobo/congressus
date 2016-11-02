@@ -20,7 +20,7 @@
             {% for n, ss in sessions_grouped %}
                 <td class="{{ n|slugify }}">{% db_count ev space=sp sessions=ss windows=windows days=days %}</td>
             {% endfor %}
-            <td> {% db_count ev space=sp sessions=sessions windows=windows days=days %} </td>
+            <td><b> {% db_count ev space=sp sessions=sessions windows=windows days=days %} </b></td>
         </tr>
     {% endfor %}
 
@@ -29,7 +29,7 @@
         {% for n, ss in sessions_grouped %}
             <td class="{{ n|slugify }}">{% db_count ev sessions=ss windows=windows days=days %}</td>
         {% endfor %}
-        <td>{% db_count ev windows=windows session=s days=days %}</td>
+        <td><b>{% db_count ev windows=windows session=s days=days %}</b></td>
     </tr>
 
     <tr class="bg-primary">
@@ -42,7 +42,7 @@
             {% for n, ss in sessions_grouped %}
                 <td class="{{ n|slugify }}">{% db_prices ev space=sp sessions=ss windows=windows days=days %}</td>
             {% endfor %}
-            <td> {% db_prices ev space=sp sessions=sessions windows=windows days=days %} </td>
+            <td><b> {% db_prices ev space=sp sessions=sessions windows=windows days=days %} </b></td>
         </tr>
     {% endfor %}
 
@@ -51,7 +51,7 @@
         {% for n, ss in sessions_grouped %}
             <td class="{{ n|slugify }}">{% db_prices ev sessions=ss windows=windows days=days %}</td>
         {% endfor %}
-        <td>{% db_prices ev windows=windows session=s days=days %}</td>
+        <td><b>{% db_prices ev windows=windows session=s days=days %}</b></td>
     </tr>
 
 </table>
