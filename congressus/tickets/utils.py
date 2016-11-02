@@ -129,7 +129,7 @@ def check_free_seats(sessions, res):
         for v in res.get(k)[:]:
             col, row = v.split('-')
             try:
-                st = layout_maps[int(col)-1, int(row)-1]
+                st = layout_maps[int(col)-1, int(row)-layout.column_start_number]
                 if st == '_':
                     res[k].remove(v)
             except IndexError:
@@ -162,13 +162,6 @@ def get_seats_by_str(sessions, string):
                     ini_seat, end_seat = seat.split(':')
                     ini_col, ini_row = ini_seat.split('-')
                     end_col, end_row = end_seat.split('-')
-                    layout_map = SeatLayout.objects.get(name=lay).real_rows()
-                    LIMIT_ROW = len(layout_map)
-                    LIMIT_COL = len(layout_map[0])
-                    if int(end_col) > LIMIT_ROW:
-                        end_col = LIMIT_ROW
-                    if int(end_row) > LIMIT_COL:
-                        end_row = LIMIT_COL
                     row_seat = []
                     for col in range(int(ini_col), int(end_col)+1):
                         for row in range(int(ini_row), int(end_row)+1):
