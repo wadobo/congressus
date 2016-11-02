@@ -7,6 +7,7 @@ from django.db.models import F
 from django.db.models import FloatField
 from django.db.models import Sum
 from django.db.models import Value
+from django.contrib.humanize.templatetags.humanize import intcomma
 
 
 from tickets.models import Ticket
@@ -40,7 +41,7 @@ def filter_tickets(event, space=None, sessions=None, windows=None,
 @register.simple_tag
 def db_count(event, **kwargs):
     tickets = filter_tickets(event, **kwargs)
-    return tickets.count()
+    return intcomma(tickets.count())
 
 @register.simple_tag
 def db_prices(event, **kwargs):
@@ -48,7 +49,7 @@ def db_prices(event, **kwargs):
     tickets = tickets.aggregate(total_price=Sum('price'),
                     price_without_iva=Sum(F('price')/(1+F('tax')/100.0), output_field=FloatField()))
     if tickets and tickets['total_price']:
-        return '{total_price:.2f} / {price_without_iva:.2f}'.format(**tickets)
+        return intcomma('{total_price:.2f} / {price_without_iva:.2f}'.format(**tickets))
 
     return '--'
 

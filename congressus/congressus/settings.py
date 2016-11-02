@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'django.contrib.humanize',
 
     # 3rd party
     'crispy_forms',
@@ -182,6 +183,7 @@ EXPIRED_SEAT_C = 15*60 # 15 minutes
 EXPIRED_SEAT_P = 35*60 # TPV expired: 35 minutes
 
 SHOW_TOOLBAR_CALLBACK = False
+USE_THOUSAND_SEPARATOR = True
 
 try:
     from local_settings import *
