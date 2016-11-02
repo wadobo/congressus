@@ -33,59 +33,6 @@
     <h1>{% trans "Count Report" %}</h1>
 
     {% if query %}
-        <h3>{% trans "# of tickets" %}</h3>
-        <table class="table table-bordered">
-            <tr>
-                <th></th>
-                {% for d, _ in session_days %}
-                    <th>{{ d|date:"l" }}</th>
-                {% endfor %}
-                <th>{% trans "TOTAL" %}</th>
-            </tr>
-            {% for s in spaces %}
-                <tr>
-                    <td>{{ s.name }}</td>
-                    {% for d, sessions in session_days %}
-                        <td>{% db_count ev space=s sessions=sessions windows=selected_windows days=selected_days %}</td>
-                    {% endfor %}
-                    <td>{% db_count ev windows=selected_windows space=s sessions=selected_sessions days=selected_days %}</td>
-                </tr>
-            {% endfor %}
-            <tr>
-                <td>{% trans "TOTAL" %}</td>
-                {% for d, sessions in session_days %}
-                    <td>{% db_count ev sessions=sessions windows=selected_windows days=selected_days %}</td>
-                {% endfor %}
-                <td>{% db_count ev windows=selected_windows sessions=selected_sessions days=selected_days %}</td>
-            </tr>
-        </table>
-
-        <h3>{% trans "€ with TAX / without TAX" %}</h3>
-        <table class="table table-bordered">
-            <tr>
-                <th></th>
-                {% for d, _ in session_days %}
-                    <th>{{ d|date:"l" }}</th>
-                {% endfor %}
-                <th>{% trans "TOTAL" %}</th>
-            </tr>
-            {% for s in spaces %}
-                <tr>
-                    <td>{{ s.name }}</td>
-                    {% for d, sessions in session_days %}
-                        <td>{% db_prices ev space=s sessions=sessions windows=selected_windows days=selected_days %}</td>
-                    {% endfor %}
-                    <td>{% db_prices ev windows=selected_windows space=s sessions=selected_sessions days=selected_days %}</td>
-                </tr>
-            {% endfor %}
-            <tr>
-                <td>{% trans "TOTAL" %}</td>
-                {% for d, sessions in session_days %}
-                    <td>{% db_prices ev sessions=sessions windows=selected_windows days=selected_days %}</td>
-                {% endfor %}
-                <td>{% db_prices ev windows=selected_windows sessions=selected_sessions days=selected_days %}</td>
-            </tr>
-        </table>
 
         <h3>{% trans "sessions" %}</h3>
         {% include "dashboard/report_table2.html" with spaces=spaces sessions_grouped=sessions_grouped sessions=sessions windows=selected_windows days=selected_days %}
