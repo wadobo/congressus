@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-10-31 10:31+0100\n"
-"PO-Revision-Date: 2016-10-31 10:31+0100\n"
+"PO-Revision-Date: 2016-11-02 07:47+0100\n"
 "Last-Translator: Victor Ramirez <virako@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
 "Language: es\n"
@@ -312,7 +312,7 @@ msgstr "Informe de Arqueo"
 #: dashboard/templates/dashboard/report_table.html:18
 #: dashboard/templates/dashboard/report_table2.html:14
 msgid "# of tickets"
-msgstr "Nº de entreadas"
+msgstr "Nº de entradas"
 
 #: dashboard/templates/dashboard/count_report.html:43
 #: dashboard/templates/dashboard/count_report.html:55
