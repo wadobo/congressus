@@ -14,11 +14,20 @@ from tickets.utils import generate_thermal
 
 def get_csv(modeladmin, request, queryset):
     csv = []
-    for i, inv in enumerate(queryset):
-        row = '%d, %s, %s' % (i+1, inv.order, inv.type.name)
-        if inv.seat:
-            row += ',%s, %s, %s' % (inv.seat_layout.name, inv.seat_row(), inv.seat_column())
-        csv.append(row)
+
+    def fillcsv(q):
+        for i, inv in enumerate(q):
+            row = '%d, %s, %s' % (i+1, inv.order, inv.type.name)
+            if inv.seat:
+                row += ',%s, %s, %s' % (inv.seat_layout.name, inv.seat_row(), inv.seat_column())
+            csv.append(row)
+
+    if modeladmin.model == InvitationGenerator:
+        for ig in queryset:
+            fillcsv(ig.invitations.all())
+    else:
+        fillcsv(queryset)
+
     response = HttpResponse(content_type='application/csv')
     response['Content-Disposition'] = 'filename="invs.csv"'
     response.write('\n'.join(csv))
@@ -29,8 +38,16 @@ get_csv.short_description = _("Download csv")
 def get_pdf(modeladmin, request, queryset):
     files = []
 
-    for inv in queryset:
-        files.append(generate_pdf(inv, asbuf=True, inv=True))
+    def fillfiles(q):
+        for inv in q:
+            files.append(generate_pdf(inv, asbuf=True, inv=True))
+
+    if modeladmin.model == InvitationGenerator:
+        for ig in queryset:
+            fillfiles(ig.invitations.all())
+    else:
+        fillfiles(queryset)
+
     pdfs = concat_pdf(files)
 
     response = HttpResponse(content_type='application/pdf')
@@ -43,8 +60,16 @@ get_pdf.short_description = _("Download A4")
 def get_thermal(modeladmin, request, queryset):
     files = []
 
-    for inv in queryset:
-        files.append(generate_thermal(inv, asbuf=True, inv=True))
+    def fillfiles(q):
+        for inv in q:
+            files.append(generate_thermal(inv, asbuf=True, inv=True))
+
+    if modeladmin.model == InvitationGenerator:
+        for ig in queryset:
+            fillfiles(ig.invitations.all())
+    else:
+        fillfiles(queryset)
+
     pdfs = concat_pdf(files)
 
     response = HttpResponse(content_type='application/pdf')
@@ -66,7 +91,6 @@ class InvitationAdmin(admin.ModelAdmin):
     date_hierarchy = 'created'
     search_fields = ('order',)
 
-    # TODO, add get_A4 and get_thermal
     actions = [get_csv, get_pdf, get_thermal]
 
     def concept(self, obj):
@@ -77,6 +101,7 @@ class InvitationAdmin(admin.ModelAdmin):
 
 class InvitationGeneratorAdmin(admin.ModelAdmin):
     list_display = ('type', 'amount', 'price', 'concept', 'created')
+    actions = [get_csv, get_pdf, get_thermal]
 
     class Media:
         js = [
