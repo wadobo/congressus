@@ -226,7 +226,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
         #    * check if there's extra session in this ticket
         #  * Check if it's a valid gate
 
-        if self.is_inv(ticket.order):
+        if self.is_inv(ticket.order) and ticket.is_pass:
             used = ticket.is_used(session)
             used_date = ticket.get_used_date(session)
         else:

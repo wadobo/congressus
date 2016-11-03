@@ -74,6 +74,13 @@ class Invitation(models.Model, BaseExtraData):
     def used(self):
         return self.usedin.exists()
 
+    @property
+    def used_date(self):
+        try:
+            return self.usedin.all()[0].date
+        except:
+            return None
+
     def is_used(self, session):
         return self.usedin.filter(session=session).exists()
 
