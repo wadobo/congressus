@@ -188,11 +188,11 @@ class AccessView(UserPassesTestMixin, TemplateView):
 
         # if we're here, everything is ok
         #  * If is a valid inv and it's not a pass, mark as used
-        if not inv.is_pass:
+        #  * If it's a pass with one_time_for_session we mark as used
+        if not inv.is_pass or inv.type.one_time_for_session:
             if self.get_ac().mark_used:
-                inv.used = True
-                inv.used_date = timezone.now()
-            inv.save()
+                inv.set_used(session)
+                inv.save()
 
         msg = _("Ok: %(session)s") % { 'session': session.short() }
         return self.response_json(msg, msg2=inv.order)
@@ -226,9 +226,16 @@ class AccessView(UserPassesTestMixin, TemplateView):
         #    * check if there's extra session in this ticket
         #  * Check if it's a valid gate
 
+        if self.is_inv(ticket.order):
+            used = ticket.is_used(session)
+            used_date = ticket.get_used_date(session)
+        else:
+            used = ticket.used
+            used_date = ticket.used_date
+
         msg2 = str(session or ticket.session)
-        if ticket.used:
-            msg = _('Used: %(date)s') % {'date': short_date(ticket.used_date)}
+        if used:
+            msg = _('Used: %(date)s') % {'date': short_date(used_date)}
             return self.response_json(msg, msg2=msg2, st='wrong')
 
         if not valid_session:

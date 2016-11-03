@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from .models import InvitationGenerator
 from .models import Invitation
 from .models import InvitationType
+from .models import InvUsedInSession
 
 from tickets.utils import concat_pdf
 from tickets.utils import generate_pdf
@@ -85,18 +86,33 @@ class InvitationTypeAdmin(admin.ModelAdmin):
     filter_horizontal = ('sessions', 'gates')
 
 
+class InvUsedInSessionInline(admin.TabularInline):
+    model = InvUsedInSession
+    fields = ('session', 'date')
+    readonly_fields = fields
+
+    def has_add_permission(self, request):
+        return False
+
+
 class InvitationAdmin(admin.ModelAdmin):
-    list_display = ('order', 'type', 'is_pass', 'created', 'used', 'concept')
+    list_display = ('order', 'type', 'is_pass', 'created', 'iused', 'concept')
     list_filter = ('is_pass', 'type')
     date_hierarchy = 'created'
     search_fields = ('order',)
 
     actions = [get_csv, get_pdf, get_thermal]
+    inlines = [InvUsedInSessionInline]
 
     def concept(self, obj):
         if not obj.generator:
             return '-'
         return obj.generator.concept or '-'
+
+    def iused(self, obj):
+        return obj.used
+    iused.short_description = _('used')
+    iused.boolean = True
 
 
 class InvitationGeneratorAdmin(admin.ModelAdmin):

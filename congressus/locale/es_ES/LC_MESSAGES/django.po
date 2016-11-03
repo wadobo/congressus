@@ -7,31 +7,31 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-10-31 10:31+0100\n"
-"PO-Revision-Date: 2016-11-02 07:47+0100\n"
-"Last-Translator: Victor Ramirez <virako@wadobo.com>\n"
+"POT-Creation-Date: 2016-11-03 10:40+0100\n"
+"PO-Revision-Date: 2016-11-03 10:42+0100\n"
+"Last-Translator: Daniel Garcia Moreno <danigm@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
-"X-Generator: Poedit 1.6.10\n"
+"X-Generator: Poedit 1.8.8\n"
 
 #: access/apps.py:7 access/templates/access/access.html:5
 msgid "Access"
 msgstr "Control de acceso"
 
-#: access/models.py:11 dashboard/models.py:32 events/models.py:86
+#: access/models.py:11 dashboard/models.py:33 events/models.py:86
 #: events/models.py:146 events/models.py:234 events/models.py:352
-#: events/models.py:378 events/models.py:393 invs/models.py:26
+#: events/models.py:378 events/models.py:393 invs/models.py:31
 #: tickets/models.py:264 tickets/models.py:364 tickets/models.py:503
 #: windows/models.py:31
 msgid "event"
 msgstr "evento"
 
 #: access/models.py:13 access/templates/access/list.html:33
-#: dashboard/models.py:33 events/models.py:55 events/models.py:75
+#: dashboard/models.py:34 events/models.py:55 events/models.py:75
 #: events/models.py:109 events/models.py:147 events/models.py:159
 #: events/models.py:235 events/models.py:259 events/models.py:442
 #: events/models.py:462 invs/models.py:22 windows/models.py:33
@@ -69,7 +69,7 @@ msgid "incorrect"
 msgstr "incorrecto"
 
 #: access/models.py:41 events/models.py:341 events/models.py:381
-#: invs/models.py:65 tickets/models.py:402
+#: invs/admin.py:114 tickets/models.py:402
 msgid "used"
 msgstr "usado"
 
@@ -148,7 +148,7 @@ msgid "password"
 msgstr "contraseña"
 
 #: access/templates/access/login.html:28 events/models.py:280
-#: tickets/admin.py:169 tickets/models.py:525
+#: invs/models.py:169 tickets/admin.py:152 tickets/models.py:525
 msgid "session"
 msgstr "sesión"
 
@@ -175,7 +175,7 @@ msgstr "Este usuario no puede acceder a este punto de control de acceso"
 msgid "Invalid username or password"
 msgstr "Nombre de usuario o contraseña incorrectos"
 
-#: access/views.py:142 access/views.py:231
+#: access/views.py:142 access/views.py:237
 #, python-format
 msgid "Used: %(date)s"
 msgstr "Usado: %(date)s"
@@ -199,17 +199,17 @@ msgstr "Sesión extra: %(session)s"
 msgid "Not exists"
 msgstr "No existe"
 
-#: access/views.py:197 access/views.py:218
+#: access/views.py:197 access/views.py:217
 #, python-format
 msgid "Ok: %(session)s"
 msgstr "Ok: %(session)s"
 
-#: access/views.py:242
+#: access/views.py:248
 #, python-format
 msgid "%(session)s - Gate: %(gate)s"
 msgstr "%(session)s - Puerta: %(gate)s"
 
-#: access/views.py:250
+#: access/views.py:256
 msgid "Incorrect readind"
 msgstr "Lectura incorrecta"
 
@@ -277,29 +277,33 @@ msgstr "Gráfico circular de ventas en taquilla"
 msgid "Access pie"
 msgstr "Gráfico circular de acceso"
 
-#: dashboard/models.py:17
+#: dashboard/models.py:15
+msgid "Window sales bar"
+msgstr "Gráfica de barras de taquillas"
+
+#: dashboard/models.py:18
 msgid "daily"
 msgstr "diario"
 
-#: dashboard/models.py:18
+#: dashboard/models.py:19
 msgid "hourly"
 msgstr "por horas"
 
-#: dashboard/models.py:19
+#: dashboard/models.py:20
 msgid "each minute"
 msgstr "cada minuto"
 
-#: dashboard/models.py:23 events/models.py:56 events/models.py:382
-#: events/models.py:395 invs/models.py:150 tickets/models.py:507
+#: dashboard/models.py:24 events/models.py:56 events/models.py:382
+#: events/models.py:395 invs/models.py:178 tickets/models.py:507
 #: tickets/models.py:529 windows/models.py:106
 msgid "type"
 msgstr "tipo"
 
-#: dashboard/models.py:24
+#: dashboard/models.py:25
 msgid "time step"
 msgstr "intervalos de tiempo"
 
-#: dashboard/models.py:25
+#: dashboard/models.py:26
 msgid "maximum steps"
 msgstr "máximo de intervalos"
 
@@ -308,73 +312,51 @@ msgstr "máximo de intervalos"
 msgid "Count Report"
 msgstr "Informe de Arqueo"
 
-#: dashboard/templates/dashboard/count_report.html:36
-#: dashboard/templates/dashboard/report_table.html:18
-#: dashboard/templates/dashboard/report_table2.html:14
-msgid "# of tickets"
-msgstr "Nº de entradas"
-
-#: dashboard/templates/dashboard/count_report.html:43
-#: dashboard/templates/dashboard/count_report.html:55
-#: dashboard/templates/dashboard/count_report.html:70
-#: dashboard/templates/dashboard/count_report.html:82
-#: dashboard/templates/dashboard/report_table2.html:10
-#: dashboard/templates/dashboard/report_table2.html:28
-#: dashboard/templates/dashboard/report_table2.html:50
-msgid "TOTAL"
-msgstr "TOTAL"
-
-#: dashboard/templates/dashboard/count_report.html:63
-#: dashboard/templates/dashboard/report_table.html:25
-#: dashboard/templates/dashboard/report_table2.html:36
-msgid "€ with TAX / without TAX"
-msgstr "€ con IVA / sin IVA"
-
-#: dashboard/templates/dashboard/count_report.html:90 events/models.py:281
-#: invs/models.py:29
+#: dashboard/templates/dashboard/count_report.html:37 events/models.py:281
+#: invs/models.py:34
 msgid "sessions"
 msgstr "sesiones"
 
-#: dashboard/templates/dashboard/count_report.html:96
+#: dashboard/templates/dashboard/count_report.html:43
 msgid "Window Count"
 msgstr "Arqueo de taquilla"
 
-#: dashboard/templates/dashboard/count_report.html:100
+#: dashboard/templates/dashboard/count_report.html:47
 msgid "Total amount, (cash + credit card)"
 msgstr "Cantidad total, (caja + tarjeta de crédito)"
 
-#: dashboard/templates/dashboard/count_report.html:104
+#: dashboard/templates/dashboard/count_report.html:51
 msgid "Cash balance"
 msgstr "Balance de caja"
 
-#: dashboard/templates/dashboard/count_report.html:115
-#: dashboard/templates/dashboard/count_report.html:123
+#: dashboard/templates/dashboard/count_report.html:62
+#: dashboard/templates/dashboard/count_report.html:70
 msgid "total"
 msgstr "total"
 
-#: dashboard/templates/dashboard/count_report.html:119
+#: dashboard/templates/dashboard/count_report.html:66
 msgid "Window total balance"
 msgstr "Balance total de taquilla"
 
-#: dashboard/templates/dashboard/count_report.html:136
+#: dashboard/templates/dashboard/count_report.html:83
 #: dashboard/templates/dashboard/online_report.html:48
 msgid "Sessions"
 msgstr "Sesiones"
 
-#: dashboard/templates/dashboard/count_report.html:137
-#: dashboard/templates/dashboard/count_report.html:158
+#: dashboard/templates/dashboard/count_report.html:84
+#: dashboard/templates/dashboard/count_report.html:105
 msgid "All"
 msgstr "Todos"
 
-#: dashboard/templates/dashboard/count_report.html:140
+#: dashboard/templates/dashboard/count_report.html:87
 msgid "days"
 msgstr "días"
 
-#: dashboard/templates/dashboard/count_report.html:157 windows/apps.py:7
+#: dashboard/templates/dashboard/count_report.html:104 windows/apps.py:7
 msgid "Windows"
 msgstr "Taquillas"
 
-#: dashboard/templates/dashboard/count_report.html:171
+#: dashboard/templates/dashboard/count_report.html:118
 msgid "Count"
 msgstr "Arqueo"
 
@@ -433,12 +415,12 @@ msgid "Online Report"
 msgstr "Informe Online"
 
 #: dashboard/templates/dashboard/online_report.html:26 events/models.py:264
-#: invs/models.py:34 tickets/models.py:396
+#: invs/models.py:39 tickets/models.py:396
 msgid "start date"
 msgstr "fecha llegada"
 
 #: dashboard/templates/dashboard/online_report.html:30 events/models.py:265
-#: invs/models.py:35 tickets/models.py:397
+#: invs/models.py:40 tickets/models.py:397
 msgid "end date"
 msgstr "fecha salida"
 
@@ -449,7 +431,23 @@ msgstr "fecha salida"
 msgid "Total"
 msgstr "Total"
 
-#: dashboard/templatetags/dashboard.py:91
+#: dashboard/templates/dashboard/report_table.html:18
+#: dashboard/templates/dashboard/report_table2.html:14
+msgid "# of tickets"
+msgstr "Nº de entradas"
+
+#: dashboard/templates/dashboard/report_table.html:25
+#: dashboard/templates/dashboard/report_table2.html:36
+msgid "€ with TAX / without TAX"
+msgstr "€ con IVA / sin IVA"
+
+#: dashboard/templates/dashboard/report_table2.html:10
+#: dashboard/templates/dashboard/report_table2.html:28
+#: dashboard/templates/dashboard/report_table2.html:50
+msgid "TOTAL"
+msgstr "TOTAL"
+
+#: dashboard/templatetags/dashboard.py:94
 msgid "Credit card sale"
 msgstr "Ventas de tarjeta de crédito"
 
@@ -590,7 +588,7 @@ msgstr "graderio"
 msgid "seat Maps"
 msgstr "graderios"
 
-#: events/models.py:151 invs/models.py:32
+#: events/models.py:151 invs/models.py:37
 msgid "gates"
 msgstr "puertas"
 
@@ -645,8 +643,8 @@ msgstr "numerado"
 msgid "seat map"
 msgstr "graderio"
 
-#: events/models.py:242 events/models.py:394 invs/models.py:55
-#: tickets/admin.py:197 tickets/models.py:266 tickets/models.py:368
+#: events/models.py:242 events/models.py:394 invs/models.py:60
+#: tickets/admin.py:180 tickets/models.py:266 tickets/models.py:368
 msgid "order"
 msgstr "orden"
 
@@ -674,11 +672,11 @@ msgstr "precio en taquilla"
 msgid "ticket tax percentage"
 msgstr "porcentaje de impuestos"
 
-#: events/models.py:271 invs/models.py:37
+#: events/models.py:271 invs/models.py:42
 msgid "template"
 msgstr "plantilla"
 
-#: events/models.py:272 invs/models.py:38
+#: events/models.py:272 invs/models.py:43
 msgid "thermal template"
 msgstr "plantilla de entrada impresora térmica"
 
@@ -842,15 +840,15 @@ msgstr "plantilla de entrada impresora térmica"
 msgid "thermal ticket templates"
 msgstr "plantillas de entrada impresora térmica"
 
-#: invs/admin.py:26
+#: invs/admin.py:36
 msgid "Download csv"
 msgstr "Descargar csv"
 
-#: invs/admin.py:40
+#: invs/admin.py:58
 msgid "Download A4"
 msgstr "Descargar A4"
 
-#: invs/admin.py:54
+#: invs/admin.py:80
 msgid "Download thermal"
 msgstr "Descarga impresora térmica"
 
@@ -858,88 +856,105 @@ msgstr "Descarga impresora térmica"
 msgid "Invitations"
 msgstr "Invitaciones"
 
-#: invs/models.py:23 invs/models.py:58
+#: invs/models.py:23 invs/models.py:63
 msgid "is pass"
 msgstr "es pase"
 
-#: invs/models.py:41 invs/models.py:50
+#: invs/models.py:24
+msgid "one time for session"
+msgstr "una vez por sesión"
+
+#: invs/models.py:25
+msgid ""
+"This is used for passes that will be only valid one time for each session. "
+"Invitations always have only one use. So this is ignored in invitations."
+msgstr ""
+"Esto sirve para los pases que sólo son válidos una vez por sesión. Las "
+"invitaciones siempre son de un sólo uso, así que esto se ignora para "
+"invitaciones."
+
+#: invs/models.py:46 invs/models.py:55
 msgid "invitation type"
 msgstr "tipo de invitación"
 
-#: invs/models.py:42
+#: invs/models.py:47
 msgid "invitation types"
 msgstr "tipos de invitación"
 
-#: invs/models.py:53
+#: invs/models.py:58
 msgid "generator"
 msgstr "generador"
 
-#: invs/models.py:56 invs/models.py:157 tickets/models.py:272
+#: invs/models.py:61 invs/models.py:185 tickets/models.py:272
 #: tickets/models.py:374
 msgid "created at"
 msgstr "creado el"
 
-#: invs/models.py:57 tickets/admin.py:136 tickets/admin.py:315
+#: invs/models.py:62 tickets/admin.py:119 tickets/admin.py:282
 #: tickets/models.py:282 tickets/models.py:386
 msgid "extra data"
 msgstr "datos extra"
 
-#: invs/models.py:61 tickets/models.py:382
+#: invs/models.py:66 tickets/models.py:382
 msgid "seat layout"
 msgstr "disposición de asientos"
 
-#: invs/models.py:62 invs/models.py:131 tickets/models.py:381
+#: invs/models.py:67 invs/models.py:149 tickets/models.py:381
 #: tickets/models.py:442 tickets/models.py:527
 msgid "seat"
 msgstr "asiento"
 
-#: invs/models.py:66
-msgid "invitation used date"
-msgstr "fecha de uso de invitación"
-
-#: invs/models.py:69
+#: invs/models.py:70 invs/models.py:168
 msgid "invitation"
 msgstr "invitación"
 
-#: invs/models.py:70
+#: invs/models.py:71
 msgid "invitations"
 msgstr "invitaciones"
 
-#: invs/models.py:130 tickets/models.py:441
+#: invs/models.py:148 tickets/models.py:441
 #, python-format
 msgid "L%(layout)s-R%(row)s-C%(col)s"
 msgstr "L%(layout)s-F%(row)s-C%(col)s"
 
-#: invs/models.py:151 windows/admin.py:60 windows/models.py:107
+#: invs/models.py:173
+msgid "invitation used in"
+msgstr "invitación usada en"
+
+#: invs/models.py:174
+msgid "invitations used in"
+msgstr "invitaciones usadas en"
+
+#: invs/models.py:179 windows/admin.py:60 windows/models.py:107
 msgid "amount"
 msgstr "cantidad"
 
-#: invs/models.py:152 tickets/admin.py:149 tickets/admin.py:306
+#: invs/models.py:180 tickets/admin.py:132 tickets/admin.py:273
 #: tickets/models.py:394 windows/models.py:86
 msgid "price"
 msgstr "precio"
 
-#: invs/models.py:153 tickets/models.py:395
+#: invs/models.py:181 tickets/models.py:395
 msgid "tax"
 msgstr "impuestos"
 
-#: invs/models.py:154
+#: invs/models.py:182
 msgid "concept"
 msgstr "concepto"
 
-#: invs/models.py:155
+#: invs/models.py:183
 msgid "seats"
 msgstr "asiento"
 
-#: invs/models.py:163
+#: invs/models.py:191
 msgid "invitation generator"
 msgstr "Generador de invitaciones y pases"
 
-#: invs/models.py:164
+#: invs/models.py:192
 msgid "invitation generators"
 msgstr "generador de invitaciones y pases"
 
-#: invs/models.py:186
+#: invs/models.py:214
 msgid "Seats number should be equal to amount"
 msgstr "El número de asientos debería ser igual a la cantidad seleccionada"
 
@@ -1004,40 +1019,39 @@ msgstr "Marcar como no usado"
 msgid "Remove"
 msgstr "Eliminar"
 
-#: tickets/admin.py:66 tickets/admin.py:158 tickets/admin.py:213
-#: tickets/admin.py:302 windows/models.py:43
-msgid "ticket window"
-msgstr "taquilla"
-
-#: tickets/admin.py:118 tickets/admin.py:260
+#: tickets/admin.py:101 tickets/admin.py:227
 #: tickets/templates/emails/ticket-info.txt:10
 #: tickets/templates/tickets/multipurchase.html:145
 #: tickets/templates/tickets/ticket-info.html:41
 msgid "Personal info"
 msgstr "Información personal"
 
-#: tickets/admin.py:121 tickets/admin.py:263
+#: tickets/admin.py:104 tickets/admin.py:230
 msgid "Extra info"
 msgstr "Información extra"
 
-#: tickets/admin.py:145 tickets/admin.py:165 tickets/models.py:267
+#: tickets/admin.py:128 tickets/admin.py:148 tickets/models.py:267
 #: tickets/models.py:369
 msgid "order TPV"
 msgstr "código TPV"
 
-#: tickets/admin.py:179 tickets/admin.py:289 windows/models.py:89
+#: tickets/admin.py:141 tickets/admin.py:269 windows/models.py:43
+msgid "ticket window"
+msgstr "taquilla"
+
+#: tickets/admin.py:162 tickets/admin.py:256 windows/models.py:89
 msgid "payment"
 msgstr "forma de pago"
 
-#: tickets/admin.py:185
+#: tickets/admin.py:168
 msgid "date"
 msgstr "fecha"
 
-#: tickets/admin.py:280 tickets/models.py:274 tickets/models.py:376
+#: tickets/admin.py:247 tickets/models.py:274 tickets/models.py:376
 msgid "confirmed"
 msgstr "confirmado"
 
-#: tickets/admin.py:293
+#: tickets/admin.py:260
 msgid "ntickets"
 msgstr "nentradas"
 
@@ -1451,58 +1465,58 @@ msgstr "Precio:"
 msgid "scene"
 msgstr "escenario"
 
-#: tickets/utils.py:221
+#: tickets/utils.py:214
 #, python-format
 msgid "ORDER: %s"
 msgstr "LOCALIZADOR: %s"
 
-#: tickets/utils.py:335
+#: tickets/utils.py:328
 msgid "PRINT AND BRING THIS TICKET WITH YOU"
 msgstr "IMPRIME Y LLEVA ESTA ENTRADA CONTIGO"
 
-#: tickets/utils.py:353
+#: tickets/utils.py:346
 msgid "Sponsors"
 msgstr "Patrocinadores"
 
-#: tickets/utils.py:377
+#: tickets/utils.py:370
 msgid "Contributors"
 msgstr "Colaboradores"
 
-#: tickets/utils.py:475
+#: tickets/utils.py:468
 msgid "T"
 msgstr "E"
 
-#: tickets/utils.py:485
+#: tickets/utils.py:478
 #, python-format
 msgid "Ticket %(space)s %(session)s"
 msgstr "Entrada %(space)s %(session)s"
 
-#: tickets/utils.py:505
+#: tickets/utils.py:498
 #, python-format
 msgid "%(date)s (%(start)s)"
 msgstr "%(date)s (%(start)s)"
 
-#: tickets/utils.py:506
+#: tickets/utils.py:499
 #, python-format
 msgid "%(date)s (%(start)s to %(end)s)"
 msgstr "%(date)s (%(start)s a %(end)s)"
 
-#: tickets/utils.py:507
+#: tickets/utils.py:500
 #, python-format
 msgid "%(date)s"
 msgstr "%(date)s"
 
-#: tickets/utils.py:557
+#: tickets/utils.py:550
 #, python-format
 msgid "SECTOR: %(layout)s ROW: %(row)s SEAT: %(col)s"
 msgstr "SECTOR: %(layout)s, FILA: %(row)s, ASIENTO: %(col)s"
 
-#: tickets/utils.py:569
+#: tickets/utils.py:562
 #, python-format
 msgid "%4.2f €"
 msgstr "%4.2f €"
 
-#: tickets/utils.py:572
+#: tickets/utils.py:565
 msgid "TAX INC."
 msgstr "IVA INC."
 

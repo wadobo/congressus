@@ -21,6 +21,11 @@ from tickets.utils import generate_thermal
 class InvitationType(models.Model):
     name = models.CharField(_('name'), max_length=200)
     is_pass = models.BooleanField(_('is pass'), default=False)
+    one_time_for_session = models.BooleanField(_('one time for session'),
+        default=False, help_text=_('This is used for passes that will be '
+                                   'only valid one time for each session. '
+                                   'Invitations always have only one use. '
+                                   'So this is ignored in invitations.'))
 
     event = models.ForeignKey(Event, related_name='invitation_types',
                               verbose_name=_('event'))
@@ -61,13 +66,26 @@ class Invitation(models.Model, BaseExtraData):
     seat_layout = models.ForeignKey(SeatLayout, null=True, blank=True, verbose_name=_('seat layout'))
     seat = models.CharField(_('seat'), max_length=20, null=True, blank=True)
 
-    # field to control the access
-    used = models.BooleanField(_('used'), default=False)
-    used_date = models.DateTimeField(_('invitation used date'), blank=True, null=True)
-
     class Meta:
         verbose_name = _('invitation')
         verbose_name_plural = _('invitations')
+
+    @property
+    def used(self):
+        return self.usedin.exists()
+
+    def is_used(self, session):
+        return self.usedin.filter(session=session).exists()
+
+    def get_used_date(self, session):
+        try:
+            return self.usedin.get(session=session).date
+        except:
+            return None
+
+    def set_used(self, session):
+        i, created = InvUsedInSession.objects.get_or_create(session=session, inv=self)
+        i.save()
 
     def get_gate_name(self):
         return ', '.join(i.name for i in self.type.gates.all())
@@ -144,6 +162,16 @@ class Invitation(models.Model, BaseExtraData):
 
     def __str__(self):
         return self.order
+
+
+class InvUsedInSession(models.Model):
+    inv = models.ForeignKey(Invitation, related_name='usedin', verbose_name=_('invitation'))
+    session = models.ForeignKey(Session, related_name='usedby', verbose_name=_('session'))
+    date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _('invitation used in')
+        verbose_name_plural = _('invitations used in')
 
 
 class InvitationGenerator(models.Model):
