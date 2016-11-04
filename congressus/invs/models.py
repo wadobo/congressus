@@ -17,6 +17,9 @@ from tickets.utils import get_seats_by_str
 from tickets.utils import generate_pdf
 from tickets.utils import generate_thermal
 
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+
 
 class InvitationType(models.Model):
     name = models.CharField(_('name'), max_length=200)
@@ -167,6 +170,17 @@ class Invitation(models.Model, BaseExtraData):
         row, column = self.seat.split('-')
         return column
 
+    def remove_hold_seats(self):
+        if self.seat_layout and self.seat:
+            for s in self.type.sessions.all():
+                tsh = TicketSeatHold.objects.filter(
+                        session=s,
+                        layout=self.seat_layout,
+                        type='R',
+                        seat=self.seat)
+                if tsh:
+                    tsh.delete()
+
     def __str__(self):
         return self.order
 
@@ -245,3 +259,10 @@ class InvitationGenerator(models.Model):
                 )
                 tsh.type = 'R'
                 tsh.save()
+
+
+def remove_seatholds(sender, instance, using, **kwargs):
+    instance.remove_hold_seats()
+
+
+post_delete.connect(remove_seatholds, Invitation)
