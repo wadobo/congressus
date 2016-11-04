@@ -312,7 +312,7 @@ class Payment(TemplateView):
                                       ' confirm payment in less than'
                                       ' {:d} minutes. You need to select'
                                       ' seats again.').format(expired))
-            return redirect('multipurchase', ev=ev.slug)
+            return redirect('multipurchase', ev=tk.event().slug)
 
         # Expired time reset to expired_time_TPV
         seathold_update(client, type='P')
