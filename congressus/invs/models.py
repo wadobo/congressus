@@ -227,15 +227,15 @@ class InvitationGenerator(models.Model):
 
     def clean(self):
         super(InvitationGenerator, self).clean()
-        if self.seats:
+        # only validate on creation
+        if self.seats and not self.id:
             seats = 0
             for val in self.get_seats().values():
                 seats += len(val)
             if seats != self.amount:
                 raise ValidationError(_("Seats number should be equal to amount"))
 
-    def save(self, *args, **kwargs):
-        super(InvitationGenerator, self).save(*args, **kwargs)
+    def generate(self):
         seat_list = []
         if self.seats:
             seats = self.get_seats()
@@ -259,6 +259,14 @@ class InvitationGenerator(models.Model):
                 )
                 tsh.type = 'R'
                 tsh.save()
+
+    def save(self, *args, **kwargs):
+        should_generate = not self.id
+
+        super(InvitationGenerator, self).save(*args, **kwargs)
+
+        if should_generate:
+            self.generate()
 
 
 def remove_seatholds(sender, instance, using, **kwargs):
