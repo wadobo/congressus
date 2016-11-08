@@ -68,6 +68,7 @@ class Invitation(models.Model, BaseExtraData):
     # row-col
     seat_layout = models.ForeignKey(SeatLayout, null=True, blank=True, verbose_name=_('seat layout'))
     seat = models.CharField(_('seat'), max_length=20, null=True, blank=True)
+    name = models.CharField(_('name'), max_length=200, null=True, blank=True)
 
     class Meta:
         verbose_name = _('invitation')
