@@ -96,7 +96,7 @@ class InvUsedInSessionInline(admin.TabularInline):
 
 
 class InvitationAdmin(admin.ModelAdmin):
-    list_display = ('order', 'type', 'is_pass', 'created', 'iused', 'concept')
+    list_display = ('order', 'type', 'is_pass', 'created', 'iused', 'concept', 'name')
     list_filter = ('is_pass', 'type')
     date_hierarchy = 'created'
     search_fields = ('order',)
