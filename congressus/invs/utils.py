@@ -44,6 +44,13 @@ def gen_pdf(igs):
     return concat_pdf(files)
 
 
+def gen_invs_pdf(invs):
+    files = []
+    for inv in invs:
+        files.append(generate_pdf(inv, asbuf=True, inv=True))
+    return concat_pdf(files)
+
+
 def get_ticket_format(invs, pf):
     """ With a list of invitations or invitations,generate ticket output """
     if pf == 'csv':
