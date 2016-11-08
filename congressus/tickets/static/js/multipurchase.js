@@ -388,15 +388,24 @@ $(document).ready(function() {
 
     // calculating sums
     $('.sessioninput').keydown(function(e) {
+        if (e.keyCode == 13) {
+            return;
+        }
         var obj = $(this);
         var id = obj.attr('id');
         if (e.keyCode == 9 || e.keyCode == 16) {
             seatsChange(obj);
             clearTimeout(delays[id]);
         } else {
+            if (window.location.pathname.startsWith("/window/")) {
+                $("#finish")[0].disabled = true;
+            }
             clearTimeout(delays[id]);
             delays[id] = setTimeout(function() {
                 seatsChange(obj);
+                if (window.location.pathname.startsWith("/window/")) {
+                    $("#finish")[0].disabled = false;
+                }
             }, 500);
         }
     });

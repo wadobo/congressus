@@ -140,12 +140,10 @@ function recalcTotal() {
         sum += price * n;
     });
     sum = apply_discount(sum, ntickets);
-    if (sum > 0) {
-        $("#finish")[0].disabled = false;
-    } else {
+    $("#total").val(sum);
+    if (sum <= 0) {
         $("#finish")[0].disabled = true;
     }
-    $("#total").val(sum);
 }
 
 $(document).ready(function() {
