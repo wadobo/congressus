@@ -419,6 +419,7 @@ $(document).ready(function() {
         }
         $(id).val(next);
         $(id).keydown();
+        $(".plus").blur();
     });
     $(".minus").click(function() {
         var id = '#' + $(this).data("id");
@@ -431,5 +432,6 @@ $(document).ready(function() {
         }
         $(id).val(next);
         $(id).keydown();
+        $(".minus").blur();
     });
 });
