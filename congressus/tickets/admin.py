@@ -90,13 +90,13 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
         'confirmed', 'confirmed_date', 'price', 'tax',
         'email', 'formated_extra_data',
         'used_date', 'gate_name',
-        'start', 'end',
+        'start', 'end', 'twin'
     )
 
     fieldsets = (
         (None, {
             'fields': ('order', 'order_tpv_linked', 'event_name',
-                       'session2', 'cseat')
+                       'session2', 'cseat', 'twin')
         }),
         (_('Personal info'), {
             'fields': ('email', 'formated_extra_data')
@@ -217,12 +217,12 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
         'confirmed', 'confirmed_date',
         'ntickets', 'price', 'payment',
         'formated_extra_data',
-        'tpv_error', 'tpv_error_info',
+        'tpv_error', 'tpv_error_info', 'twin'
     )
 
     fieldsets = (
         (None, {
-            'fields': ('order_tpv', 'order', 'ev')
+            'fields': ('order_tpv', 'order', 'ev', 'twin')
         }),
         (_('Personal info'), {
             'fields': (('email', 'confirm_sent'), 'formated_extra_data')
