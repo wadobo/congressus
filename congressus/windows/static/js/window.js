@@ -70,6 +70,12 @@ window.ajaxsend = ajaxsend;
 function clean() {
     $(".seat-selected").each(function() {
         $(this).click();
+        $(this).removeClass("seat-selected");
+    });
+    $("span.label-success").each(function() {
+        $(this).text("0");
+        $(this).removeClass("label-success");
+        $(this).addClass("label-default");
     });
 
     $("input.sessioninput").each(function() {
@@ -90,6 +96,7 @@ function clean() {
         $(this).html(0);
     });
     $("input[autofocus]").trigger('focus');
+    cleanSelectedSeat();
 
     return false;
 }

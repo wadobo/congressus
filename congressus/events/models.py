@@ -312,7 +312,7 @@ class Session(models.Model):
         seat = row + '-' + column
         holds = self.seat_holds.filter(layout=layout, seat=seat)
         if client:
-            holds = holds.exclude(client=client)
+            holds = holds.exclude(client=client, type='H')
         if holds.exists():
             return holds[0].type
         else:
