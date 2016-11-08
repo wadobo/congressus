@@ -295,22 +295,24 @@ function seatsChange(obj) {
         } else {
             var current = [];
             current = v.split(",");
-            // unselecting all selected
-            current.forEach(function(c) {
-                selector = '#' + s + '_' + c;
-                $(selector).removeClass('seat-selected');
+            if (current.length != val) {
+                // unselecting all selected
+                current.forEach(function(c) {
+                    selector = '#' + s + '_' + c;
+                    $(selector).removeClass('seat-selected');
 
-                a = c.split('_');
-                args = s;
-                args += ' ' + a[0];
-                args += ' ' + a[1];
-                args += ' ' + a[2];
-                args += ' ' + client;
-                ws.send('drop_seat ' + args);
-            });
-            $("#seats-"+s).val("");
+                    a = c.split('_');
+                    args = s;
+                    args += ' ' + a[0];
+                    args += ' ' + a[1];
+                    args += ' ' + a[2];
+                    args += ' ' + client;
+                    ws.send('drop_seat ' + args);
+                });
+                $("#seats-"+s).val("");
 
-            autoSelectSeat(s, val);
+                autoSelectSeat(s, val);
+            }
         }
     }
 }
