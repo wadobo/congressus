@@ -38,6 +38,7 @@
             <li {% if menuitem == 'inv' %}class="active"{% endif %}>
                 <a href="{% url 'gen_invitations' ev.slug %}">{% trans "invitations and passes" %}</a>
             </li>
+            {% block extramenu %}{% endblock %}
         {% endif %}
       </ul>
 
