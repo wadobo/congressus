@@ -128,7 +128,7 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
     order_tpv_linked.short_description = _('order TPV')
 
     def price2(self, obj):
-        return obj.get_price()
+        return obj.get_real_price()
     price2.short_description = _('price')
 
     def twin(self, obj):
@@ -269,7 +269,7 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
     twin.short_description = _('ticket window')
 
     def price(self, obj):
-        return obj.get_price()
+        return obj.get_real_price()
     price.short_description = _('price')
 
     def formated_extra_data(self, obj):

@@ -316,6 +316,15 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
             total = self.discount.apply_to(total)
         return total
 
+    def get_real_price(self):
+        if self.tickets.first().sold_in_window:
+            total = sum(i.get_window_price() for i in self.tickets.all())
+        else:
+            total = sum(i.get_price() for i in self.tickets.all())
+        if self.discount and not self.discount.unit:
+            total = self.discount.apply_to(total)
+        return total
+
     def is_mp(self):
         return True
 
@@ -495,6 +504,12 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
             prefix = TicketWindowSale.objects.values_list("window__code", flat=True).get(purchase__tickets=self)
 
         return prefix + postfix
+
+    def get_real_price(self):
+        if self.sold_in_window:
+            return self.get_window_price()
+        else:
+            return self.get_price()
 
 
 class TicketWarning(models.Model):
