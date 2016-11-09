@@ -8,6 +8,7 @@ if (!String.prototype.startsWith) {
 
 var loading = '<span class="glyphicon glyphicon-refresh spinning"></span>';
 var seaticon = '<span class="glyphicon glyphicon-th"></span>';
+var sessionsloading = {};
 
 function loadingSession(s, isloading) {
     if (isloading) {
@@ -19,6 +20,24 @@ function loadingSession(s, isloading) {
         $(".plus[data-id="+s+"]").removeAttr("disabled");
         $(".minus[data-id="+s+"]").removeAttr("disabled");
     }
+    setLoading(s, isloading);
+}
+
+function setLoading(id, isloading) {
+    if (isloading) {
+        sessionsloading[id] = true;
+    } else {
+        sessionsloading[id] = false;
+    }
+
+    for (i in sessionsloading) {
+        if (sessionsloading[i]) {
+            $("#finish").attr("disabled", "");
+            return;
+        }
+    }
+
+    $("#finish").removeAttr("disabled");
 }
 
 var old_session = -1;
@@ -397,15 +416,11 @@ $(document).ready(function() {
             seatsChange(obj);
             clearTimeout(delays[id]);
         } else {
-            if (window.location.pathname.startsWith("/window/")) {
-                $("#finish")[0].disabled = true;
-            }
+            setLoading("delay" + id, true);
             clearTimeout(delays[id]);
             delays[id] = setTimeout(function() {
                 seatsChange(obj);
-                if (window.location.pathname.startsWith("/window/")) {
-                    $("#finish")[0].disabled = false;
-                }
+                setLoading("delay" + id, false);
             }, 500);
         }
     });
