@@ -99,7 +99,7 @@ class InvitationAdmin(admin.ModelAdmin):
     list_display = ('order', 'type', 'is_pass', 'created', 'iused', 'concept', 'name')
     list_filter = ('is_pass', 'type')
     date_hierarchy = 'created'
-    search_fields = ('order',)
+    search_fields = ('order', 'generator__concept', 'name')
 
     actions = [get_csv, get_pdf, get_thermal]
     inlines = [InvUsedInSessionInline]
