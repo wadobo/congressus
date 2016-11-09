@@ -135,6 +135,10 @@ class Invitation(models.Model, BaseExtraData):
                })
         self.set_extra_data('extra_sessions', data)
 
+    @property
+    def sold_in_window(self):
+        return False
+
     def get_price(self):
         if self.generator:
             return self.generator.price
