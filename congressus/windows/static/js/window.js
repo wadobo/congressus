@@ -82,10 +82,12 @@ function clean() {
         if ($(this).attr("type") == 'number') {
             $(this).val("0");
             $(this).change();
+            $(this).keydown(); // keydown to run the seatChange
         } else {
             $(this).val("0");
         }
     });
+    $(".seats-input").val("");
 
     $("[value='']").click();
     $("[value=cash]").click();
