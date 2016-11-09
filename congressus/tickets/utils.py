@@ -555,7 +555,10 @@ class TicketPDF:
     def price(self):
         ticket = self.ticket
 
-        price = ticket.get_price()
+        if ticket.sold_in_window:
+            price = ticket.get_window_price()
+        else:
+            price = ticket.get_price()
         if not price:
             return ''
 
