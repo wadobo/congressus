@@ -210,6 +210,19 @@ $(document).ready(function() {
         return modal_open;
     }
 
+    $(document).keyup(function(key) {
+        // Check ESC key for clean
+        if (key.which == 27) {
+            if (checkModalOpened()) {
+                return;
+            }
+            if ($("#alertify").length > 0 && ! $("#alertify").hasClass('alertify-hidden')) {
+                return;
+            }
+            clean();
+        }
+    });
+
     $(document).keypress(function(key) {
         if (key.which == 13) {
             if (checkModalOpened()) {
