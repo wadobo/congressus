@@ -1,5 +1,7 @@
 import json
+import datetime
 from django.core import serializers
+from django.utils import timezone
 
 from threading import Timer
 
@@ -74,6 +76,21 @@ class WSServer:
 
         self.server.send_message_to_all(json.dumps(data))
 
+    def notify_confirmed(self):
+        d = timezone.now()
+        d = d - datetime.timedelta(seconds=80)
+        holds = TicketSeatHold.objects.filter(date__gt=d, type="R")
+        for h in holds:
+            row, col = h.seat.split('-')
+            data = {
+                'action': 'confirm',
+                'session': h.session.id,
+                'layout': h.layout.id,
+                'row': row,
+                'col': col,
+            }
+            self.server.send_message_to_all(json.dumps(data))
+
     # Protocol definitions
 
     def internal_ws_get_events(self, client):
@@ -113,24 +130,14 @@ class WSServer:
             self.server.send_message(client, json.dumps(data))
 
     def internal_ws_drop_seat(self, client, session, layout, row, col, user):
-        session = Session.objects.get(id=session)
-        layout = SeatLayout.objects.get(id=layout)
-        data = {
-            'action': 'drop',
-            'session': session.id,
-            'layout': layout.id,
-            'row': row,
-            'col': col,
-        }
-
         try:
             seat = row + '-' + col
             sh = TicketSeatHold.objects.get(client=user,
+                                            type='H',
                                             layout=layout,
                                             seat=seat,
                                             session=session)
-            sh.delete()
-            self.server.send_message_to_all(json.dumps(data))
+            self.drop_seat(sh)
         except:
             pass
 

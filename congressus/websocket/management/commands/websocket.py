@@ -16,6 +16,8 @@ def clean_holds(ws):
     holds = TicketSeatHold.objects.filter(query)
     for hold in holds:
         ws.drop_seat(hold)
+
+    ws.notify_confirmed()
     t = Timer(60, clean_holds, [ws])
     t.start()
 

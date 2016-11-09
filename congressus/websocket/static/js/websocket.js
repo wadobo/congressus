@@ -18,6 +18,9 @@
             console.log("websocket closed");
             console.log(ev);
             ws.cbs.fire('close', ev);
+
+            //reloading
+            setTimeout(function() { ws.init(server); }, 1000);
         };
         ws.socket.onerror = function (ev) {
             console.log("websocket error");
