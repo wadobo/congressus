@@ -186,6 +186,8 @@ EXPIRED_SEAT_H = 5*60 # 5 minutes
 EXPIRED_SEAT_C = 15*60 # 15 minutes
 EXPIRED_SEAT_P = 35*60 # TPV expired: 35 minutes
 
+ROW_RAND = 3
+
 SHOW_TOOLBAR_CALLBACK = False
 
 try:

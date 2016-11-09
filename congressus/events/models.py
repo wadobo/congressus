@@ -214,7 +214,7 @@ class SeatLayout(models.Model):
         n = TicketSeatHold.objects.filter(session=session, layout=self).count()
         return self.free() - n
 
-    def contiguous_seats(self, amount, holded, col_start):
+    def contiguous_seats(self, amount, holded, col_start, row_rand=0):
         """ Free contiguous seats in a row. """
 
         layout = self.real_rows()
@@ -225,7 +225,10 @@ class SeatLayout(models.Model):
         for row in layout:
             free = ''.join(row).find(amount*'L')
             if free != -1:
-                return {'row': nrow, 'col_ini': free + 1, 'col_end': free + amount + 1}
+                if row_rand > 0:
+                    row_rand -= 1
+                else:
+                    return {'row': nrow, 'col_ini': free + 1, 'col_end': free + amount + 1}
             nrow += 1
         return {}
 
