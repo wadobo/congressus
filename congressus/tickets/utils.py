@@ -279,7 +279,7 @@ class TicketPDF:
             ['', '', Paragraph(self.date, self.styleN), '', ''],
             ['', '', Paragraph(self.seatinfo, self.styleN), '', ''],
             ['', '', '', '', self.wcode],
-        ], colWidths=[5*cm, 0.5*cm, 5.5*cm, 2.5*cm, 5*cm],
+        ], colWidths=[4*cm, 0.5*cm, 5.5*cm, 2.5*cm, 4*cm],
            rowHeights=[2.5*cm, 0.5*cm, 0.5*cm, 0.5*cm, 0.5*cm])
         tstyle_list = [
             ('VALIGN', (0,0), (0, 1), 'MIDDLE'),
@@ -295,6 +295,8 @@ class TicketPDF:
             ('SPAN', (2, 2), (3, 2)),
             ('SPAN', (2, 3), (3, 3)),
             ('SPAN', (-1, 0), (-1, 3)),
+            # DEBUG: preview grid
+            #('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
         ]
         tstyle = TableStyle(tstyle_list)
         t.setStyle(tstyle)
