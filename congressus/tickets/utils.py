@@ -279,7 +279,7 @@ class TicketPDF:
             ['', '', Paragraph(self.date, self.styleN), '', ''],
             ['', '', Paragraph(self.seatinfo, self.styleN), '', ''],
             ['', '', '', '', self.wcode],
-        ], colWidths=[5*cm, 0.5*cm, 5*cm, 2.5*cm, 5*cm],
+        ], colWidths=[5*cm, 0.5*cm, 5.5*cm, 2.5*cm, 5*cm],
            rowHeights=[2.5*cm, 0.5*cm, 0.5*cm, 0.5*cm, 0.5*cm])
         tstyle_list = [
             ('VALIGN', (0,0), (0, 1), 'MIDDLE'),
