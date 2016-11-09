@@ -415,6 +415,7 @@ $(document).ready(function() {
         if (e.keyCode == 9 || e.keyCode == 16) {
             seatsChange(obj);
             clearTimeout(delays[id]);
+            setLoading("delay" + id, false);
         } else {
             setLoading("delay" + id, true);
             clearTimeout(delays[id]);
