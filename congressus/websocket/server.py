@@ -3,6 +3,7 @@ import datetime
 from django.core import serializers
 from django.utils import timezone
 
+from threading import Lock
 from threading import Timer
 
 from websocket_server import WebsocketServer
@@ -21,6 +22,7 @@ class WSServer:
         self.server.set_fn_new_client(self.on_connect)
         self.server.set_fn_message_received(self.on_msg)
         self.server.set_fn_client_left(self.on_disconnect)
+        self.msg_lock = Lock()
 
     def ping(self):
         self.server.send_message_to_all(json.dumps({'action': 'ping'}))
@@ -38,6 +40,7 @@ class WSServer:
         pass
 
     def on_msg(self, client, server, message):
+        self.msg_lock.acquire()
         try:
             args = message.split(' ')
             command = args[0]
@@ -50,6 +53,7 @@ class WSServer:
                 self.server.send_message(client, json.dumps(data))
         except Exception as e:
             print("Error: ", e)
+        self.msg_lock.release()
 
     def run(self):
         self.ping()
