@@ -17,6 +17,7 @@ from admin_csv import CSVMixin
 from .filters import TicketWindowFilter
 from .filters import SingleTicketWindowFilter
 from windows.models import TicketWindowSale
+from windows.utils import online_sale
 
 
 def confirm(modeladmin, request, queryset):
@@ -186,6 +187,13 @@ class TicketInline(admin.TabularInline):
         return False
 
 
+def link_online_sale(modeladmin, request, queryset):
+    for i in queryset:
+        online_sale(i)
+        i.save()
+link_online_sale.short_description = _("Link online sale")
+
+
 class MPAdmin(CSVMixin, admin.ModelAdmin):
     list_per_page = 20
     list_max_show_all = 800
@@ -193,7 +201,7 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
     list_filter = ('confirmed', TicketWindowFilter, 'ev', 'tpv_error')
     search_fields = ('order', 'order_tpv', 'email', 'extra_data')
     date_hierarchy = 'created'
-    actions = [delete_selected, confirm, unconfirm]
+    actions = [delete_selected, confirm, unconfirm, link_online_sale]
     inlines = [TicketInline, ]
     csv_fields = [
         'email',
