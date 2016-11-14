@@ -112,6 +112,8 @@ function websocketCB(ev, data) {
     } else if (ev == 'confirm') {
         var seat = data.row + '_' + data.col;
         seat_reserved(data.session, data.layout, seat);
+    } else if (ev == 'autoseat') {
+        autoSelectSeatCB(data.session, data.seats);
     }
 }
 
@@ -251,23 +253,17 @@ function fillSelectedSeats(obj) {
     }
 }
 
-function autoSelectSeat(s, n) {
-    loadingSession(s, true);
-    autoSeats(s, n).then(function(autoseats) {
-        var value = [];
-        autoseats.forEach(function(obj) {
-            value.push(obj.layout+"_"+obj.row+"_"+obj.col);
+function autoSelectSeatCB(s, seats) {
+    loadingSession(s, false);
 
-            args = s;
-            args += ' ' + obj.layout;
-            args += ' ' + obj.row;
-            args += ' ' + obj.col;
-            args += ' ' + client;
-            ws.send('hold_seat ' + args);
+    if (seats.length) {
+        var value = [];
+        seats.forEach(function(obj) {
+            value.push(obj.layout+"_"+obj.row+"_"+obj.col);
         });
         $("#seats-"+s).val(value.join(","));
         fillSelectedSeats($("#seats-"+s));
-    }).fail(function(data) {
+    } else {
         if ($("#"+s).val() != 0) {
             $("#"+s).val(0);
             $("#"+s).select();
@@ -277,11 +273,14 @@ function autoSelectSeat(s, n) {
             var id = $(this).data('id');
             updateBadges(s, id);
         });
-        if (!data.fail_silently) {
-            alertify.alert(data.error);
-        }
+        alertify.alert("{% trans 'Not found contiguous seats, please, select manually using the green button' %}");
         loadingSession(s, false);
-    });
+    }
+}
+
+function autoSelectSeat(s, n) {
+    loadingSession(s, true);
+    ws.send('autoseats ' + s + ' ' + n + ' ' + client);
 }
 
 function cleanSelectedSeat() {

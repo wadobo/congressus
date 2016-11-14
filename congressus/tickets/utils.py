@@ -1,4 +1,5 @@
 import os
+import random
 from django.conf import settings
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
@@ -582,3 +583,49 @@ class TicketPDF:
         if self.inv:
             return self.ticket.type.thermal_template
         return self.ticket.session.thermal_template
+
+
+def search_seats(session, amount):
+    layouts = []
+    row_rand = 0
+    if session.autoseat_mode == 'ASC':
+        layouts = session.space.seat_map.layouts.all().order_by('name')
+    elif session.autoseat_mode == 'DESC':
+        layouts = session.space.seat_map.layouts.all().order_by('-name')
+    elif session.autoseat_mode == 'RANDOM':
+        layouts = list(session.space.seat_map.layouts.all())
+        random.shuffle(layouts)
+        row_rand = settings.ROW_RAND * 1
+    elif session.autoseat_mode.startswith("LIST"):
+        autoseats = session.autoseat_mode.split(':')[1]
+        for layout in autoseats.split(','):
+            l = session.space.seat_map.layouts.filter(name=layout.strip()).first()
+            if l:
+                layouts.append(l)
+    else:
+        layouts = session.space.seat_map.layouts.all().order_by('name')
+
+    best_avail = None
+    if row_rand:
+        row_rand = random.randint(0, row_rand)
+    for layout in layouts:
+        hold_seats = session.seats_holded(layout)
+        avail = layout.contiguous_seats(amount, hold_seats, layout.column_start_number, row_rand=row_rand)
+        if not avail:
+            continue
+        best_avail = {
+            'layout': layout,
+            'row': avail.get('row'),
+            'col_ini': avail.get('col_ini'),
+            'col_end': avail.get('col_end')
+        }
+        break
+    seats = []
+    if best_avail:
+        for col in range(best_avail.get('col_ini'), best_avail.get('col_end')):
+            seats.append({
+                "session": session.id,
+                "layout": best_avail['layout'].id,
+                "row": best_avail['row'],
+                "col": col+best_avail['layout'].column_start_number-1})
+    return seats

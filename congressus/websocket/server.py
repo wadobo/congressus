@@ -13,6 +13,7 @@ from events.models import Event
 from events.models import Session
 from events.models import SeatLayout
 from tickets.models import TicketSeatHold
+from tickets.utils import search_seats
 
 
 class WSServer:
@@ -96,6 +97,35 @@ class WSServer:
             self.server.send_message_to_all(json.dumps(data))
 
     # Protocol definitions
+
+    def internal_ws_autoseats(self, client, session, amount, user):
+        session = Session.objects.get(id=session)
+        seats = search_seats(session, int(amount))
+        data = {
+            'action': 'autoseat',
+            'session': session.id,
+            'seats': seats,
+        }
+
+        for s in seats:
+            layout = SeatLayout.objects.get(id=s['layout'])
+            seat = '{}-{}'.format(s['row'], s['col'])
+
+            d2 = {
+                'action': 'hold',
+                'session': session.id,
+                'layout': layout.id,
+                'row': s['row'],
+                'col': s['col'],
+            }
+            sh = TicketSeatHold(client=user,
+                                layout=layout,
+                                seat=seat,
+                                session=session)
+            sh.save()
+            self.server.send_message_to_all(json.dumps(d2))
+
+        self.server.send_message(client, json.dumps(data))
 
     def internal_ws_get_events(self, client):
         events = serializers.serialize("json", Event.objects.all())

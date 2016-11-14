@@ -47,6 +47,7 @@ from .forms import RegisterForm
 from .forms import MPRegisterForm
 from tickets.utils import get_ticket_format
 from tickets.utils import get_seats_by_str
+from tickets.utils import search_seats
 from invs.models import InvitationType
 
 from base64 import b64encode, b64decode
@@ -390,52 +391,6 @@ seats = SeatView.as_view()
 
 
 class AutoSeats(View):
-    def search_seats(self, id_session, amount):
-        session = Session.objects.get(id=id_session)
-        layouts = []
-        row_rand = 0
-        if session.autoseat_mode == 'ASC':
-            layouts = session.space.seat_map.layouts.all().order_by('name')
-        elif session.autoseat_mode == 'DESC':
-            layouts = session.space.seat_map.layouts.all().order_by('-name')
-        elif session.autoseat_mode == 'RANDOM':
-            layouts = list(session.space.seat_map.layouts.all())
-            random.shuffle(layouts)
-            row_rand = settings.ROW_RAND * 1
-        elif session.autoseat_mode.startswith("LIST"):
-            autoseats = session.autoseat_mode.split(':')[1]
-            for layout in autoseats.split(','):
-                l = session.space.seat_map.layouts.filter(name=layout.strip()).first()
-                if l:
-                    layouts.append(l)
-        else:
-            layouts = session.space.seat_map.layouts.all().order_by('name')
-
-        best_avail = None
-        if row_rand:
-            row_rand = random.randint(0, row_rand)
-        for layout in layouts:
-            hold_seats = session.seats_holded(layout)
-            avail = layout.contiguous_seats(amount, hold_seats, layout.column_start_number, row_rand=row_rand)
-            if not avail:
-                continue
-            best_avail = {
-                'layout': layout,
-                'row': avail.get('row'),
-                'col_ini': avail.get('col_ini'),
-                'col_end': avail.get('col_end')
-            }
-            break
-        seats = []
-        if best_avail:
-            for col in range(best_avail.get('col_ini'), best_avail.get('col_end')):
-                seats.append({
-                    "session": id_session,
-                    "layout": best_avail['layout'].id,
-                    "row": best_avail['row'],
-                    "col": col+best_avail['layout'].column_start_number-1})
-        return seats
-
     def post(self, request):
         ctx = {'seats': []}
         req = request.POST
@@ -447,7 +402,8 @@ class AutoSeats(View):
         except:
             return HttpResponse(json.dumps(ctx), content_type="application/json")
 
-        seats = self.search_seats(session, amount)
+        session = Session.objects.get(id=session)
+        seats = search_seats(session, amount)
         if seats:
             ctx['seats'] = seats
         else:
