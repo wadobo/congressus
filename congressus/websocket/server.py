@@ -2,6 +2,7 @@ import json
 import datetime
 from django.core import serializers
 from django.utils import timezone
+from django.utils.translation import ugettext as _
 
 from threading import Lock
 from threading import Timer
@@ -124,6 +125,9 @@ class WSServer:
                                 session=session)
             sh.save()
             self.server.send_message_to_all(json.dumps(d2))
+
+        if not seats:
+            data['error'] = _('Not found contiguous seats, please, select manually using the green button')
 
         self.server.send_message(client, json.dumps(data))
 

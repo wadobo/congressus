@@ -113,7 +113,7 @@ function websocketCB(ev, data) {
         var seat = data.row + '_' + data.col;
         seat_reserved(data.session, data.layout, seat);
     } else if (ev == 'autoseat') {
-        autoSelectSeatCB(data.session, data.seats);
+        autoSelectSeatCB(data.session, data.seats, data.error);
     }
 }
 
@@ -253,7 +253,7 @@ function fillSelectedSeats(obj) {
     }
 }
 
-function autoSelectSeatCB(s, seats) {
+function autoSelectSeatCB(s, seats, error) {
     loadingSession(s, false);
 
     if (seats.length) {
@@ -273,7 +273,7 @@ function autoSelectSeatCB(s, seats) {
             var id = $(this).data('id');
             updateBadges(s, id);
         });
-        alertify.alert("{% trans 'Not found contiguous seats, please, select manually using the green button' %}");
+        alertify.alert(error);
         loadingSession(s, false);
     }
 }
