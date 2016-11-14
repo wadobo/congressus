@@ -222,15 +222,17 @@ class SeatLayout(models.Model):
             r, c = h.seat.split("-")
             layout[int(r) - 1, int(c) - self.column_start_number] = h.type
         nrow = 1
+        avail = {}
         for row in layout:
             free = ''.join(row).find(amount*'L')
             if free != -1:
+                avail = {'row': nrow, 'col_ini': free + 1, 'col_end': free + amount + 1}
                 if row_rand > 0:
                     row_rand -= 1
                 else:
-                    return {'row': nrow, 'col_ini': free + 1, 'col_end': free + amount + 1}
+                    break
             nrow += 1
-        return {}
+        return avail
 
 
 class Space(models.Model):
