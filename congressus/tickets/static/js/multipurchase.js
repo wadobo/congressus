@@ -114,6 +114,11 @@ function websocketCB(ev, data) {
         seat_reserved(data.session, data.layout, seat);
     } else if (ev == 'autoseat') {
         autoSelectSeatCB(data.session, data.seats, data.error);
+    } else if (ev == 'holded') {
+        var seat = data.row + '_' + data.col;
+        var selector = '#' + data.session + '_' + data.layout + '_' + seat;
+        $(selector).removeClass("seat-selected");
+        seat_holded(data.session, data.layout, seat);
     }
 }
 
