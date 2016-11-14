@@ -284,6 +284,10 @@ function autoSelectSeatCB(s, seats, error) {
 }
 
 function autoSelectSeat(s, n) {
+    if (n == 0) {
+        return;
+    }
+
     loadingSession(s, true);
     ws.send('autoseats ' + s + ' ' + n + ' ' + client);
 }
