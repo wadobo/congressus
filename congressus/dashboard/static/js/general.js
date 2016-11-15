@@ -193,6 +193,15 @@ function websocketCB(ev, data) {
                 update_bar_charts(d, data.window, date, data.price);
             }
         }
+    } else if (ev === 'add_change') {
+        for (c=0; c < window.data_charts['ws'].length; c++) {
+            d = window.data_charts['ws'][c];
+            if (d.config.type == 'bar') {
+                date = get_date(data.date, d.config.data.labels[0]);
+                update_bar_charts(d, data.window, date, data.price);
+            }
+        }
+    }
     }
 }
 

@@ -200,3 +200,14 @@ class WSServer:
             'price': price
         }
         self.server.send_message_to_all(json.dumps(data))
+
+    def internal_ws_add_change(self, client, window, date, payment, amount, price):
+        data = {
+            'action': 'add_change',
+            'window': window,
+            'date': date,
+            'payment': payment,
+            'amount': amount,
+            'price': price
+        }
+        self.server.send_message_to_all(json.dumps(data))

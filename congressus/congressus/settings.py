@@ -50,7 +50,7 @@ INSTALLED_APPS = (
     'adminmenu',
     'tickets',
     'events',
-    'websocket',
+    'mywebsocket',
     'windows',
     'access',
     'dashboard',

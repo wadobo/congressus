@@ -3,7 +3,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Q
 from django.utils import timezone
-from websocket.server import WSServer
+from mywebsocket.server import WSServer
 from threading import Timer
 from tickets.models import TicketSeatHold
 

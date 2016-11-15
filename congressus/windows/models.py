@@ -1,7 +1,10 @@
+import websocket
+from datetime import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.conf import settings
 
 from autoslug import AutoSlugField
 
@@ -130,6 +133,16 @@ def update_window_cash(sender, instance, created, raw, using, update_fields, **k
                 amount = instance.amount
             else:
                 amount = -instance.amount
+            # Only affect to dashboard
+            try:
+                ws = websocket.WebSocket()
+                ws.connect('ws://' + settings.WS_SERVER)
+                now = datetime.now()
+                args = 'add_change {0} {1} {2} {3} {4}'.format(instance.window.slug, now.isoformat(), instance.type, 'cash', -instance.amount)
+                ws.send(args)
+                ws.close()
+            except:
+                pass
         instance.window.cash += amount
         instance.window.save()
 
