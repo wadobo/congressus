@@ -202,7 +202,6 @@ function websocketCB(ev, data) {
             }
         }
     }
-    }
 }
 
 $(document).ready(function() {
