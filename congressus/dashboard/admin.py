@@ -9,7 +9,7 @@ class ConfigChartAdmin(admin.ModelAdmin):
 
 
 class DashboardAdmin(admin.ModelAdmin):
-    list_display = ('event', 'name')
+    list_display = ('event', 'num_cols', 'name')
     filter_horizontal = ('charts',)
 
 

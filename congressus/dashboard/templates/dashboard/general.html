@@ -4,6 +4,10 @@
 
 {% block title %}{{ ev }}{% endblock %}
 
+{% block container %}
+container-fluid
+{% endblock %}
+
 {% block extraclasses %}access{% endblock %}
 
 {% block extrahead %}
@@ -56,6 +60,7 @@
     </script>
     <script src="{% static "js/general.js" %}"></script>
     <script>
+        var num_cols = {{num_cols}};
         try {
             ws.init("{{ ws_server }}");
         } catch (e) {

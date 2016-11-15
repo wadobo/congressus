@@ -37,7 +37,7 @@
     {% block translation %}
     {% endblock %}
 
-    <div class="container content {% block extraclasses %}{% endblock %}">
+    <div class="{% block container %}container{% endblock %} content {% block extraclasses %}{% endblock %}">
 
     {% block messages %}
         {% if messages %}

@@ -33,7 +33,7 @@ function fill_charts() {
 
         //console.log(charts);
         var title = charts[c].title;
-        var container = $('<div class="col-sm-12"></div>');
+        var container = $('<div class="col-sm-'+num_cols+'"></div>');
         var panel = $('<div class="panel panel-default"></div>');
         var head = $('<div class="panel-heading">'+ title +'</div>');
         var body = $('<div class="panel-body"></div>');

@@ -19,6 +19,13 @@ TIMESTEPS = (
     ('hourly', _('hourly')),
     ('minly', _('each minute')),
 )
+NUM_COLS = (
+        ('1', '1'),
+        ('2', '2'),
+        ('3', '3'),
+        ('4', '4'),
+        ('6', '6')
+)
 
 class ConfigChart(models.Model):
     type = models.CharField(_('type'), max_length=8, choices=CHARTS, default="os_c")
@@ -32,5 +39,6 @@ class ConfigChart(models.Model):
 class Dashboard(models.Model):
     event = models.ForeignKey(Event, verbose_name=_('event'))
     name = models.CharField(_('name'), max_length=200)
+    num_cols = models.CharField(_("number columns"), max_length=2, choices=NUM_COLS, default="2")
     slug = AutoSlugField(populate_from='name')
     charts = models.ManyToManyField(ConfigChart)

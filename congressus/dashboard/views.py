@@ -307,6 +307,11 @@ class GeneralView(TemplateView):
         ctx['ws_server'] = settings.WS_SERVER
         ctx['ev'] = self.kwargs['ev']
         ctx['dash'] = self.kwargs['dash']
+        dash = Dashboard.objects.filter(name=ctx['dash']).first()
+        if dash:
+            ctx['num_cols'] = str(12 / int(dash.num_cols))
+        else:
+            ctx['num_cols'] = '12'
         return ctx
 
     def get_chart(self, type_chart, timestep=settings.TIMESTEP_CHART, max=settings.MAX_STEP_CHART):
