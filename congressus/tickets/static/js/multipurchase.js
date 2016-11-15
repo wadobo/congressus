@@ -238,7 +238,14 @@ function fillSelectedSeats(obj) {
             SeatMap.preloadLayout(l, obj, function() {
                 updateBadges(session, layout);
                 loadingSession(session, false);
+
+                $(selector).removeClass("seat-H");
+                $(selector).removeClass("seat-L");
                 $(selector).addClass("seat-selected");
+                $(selector).unbind("click").click(function() {
+                    SeatMap.clickSeat($(this));
+                });
+
                 if (arr.length) {
                     recursiveSelection(arr, finish);
                 } else {
