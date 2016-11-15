@@ -240,7 +240,6 @@ function fillSelectedSeats(obj) {
                 loadingSession(session, false);
 
                 $(selector).removeClass("seat-H");
-                $(selector).removeClass("seat-L");
                 $(selector).addClass("seat-selected");
                 $(selector).unbind("click").click(function() {
                     SeatMap.clickSeat($(this));
