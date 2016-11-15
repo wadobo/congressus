@@ -171,7 +171,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
 
         session = Session.objects.get(pk=s)
         valid_session = inv.type.sessions.filter(pk=s).exists()
-        invalid_gate = (g and not inv.gates.filter(name=g).exists())
+        invalid_gate = (g and not inv.type.gates.filter(name=g).exists())
 
         ret = self.check_all(inv, s, valid_session, invalid_gate, session=session)
         if ret:
