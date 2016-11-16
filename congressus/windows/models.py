@@ -138,7 +138,7 @@ def update_window_cash(sender, instance, created, raw, using, update_fields, **k
                 ws = websocket.WebSocket()
                 ws.connect('ws://' + settings.WS_SERVER)
                 now = datetime.now()
-                args = 'add_change {0} {1} {2} {3} {4}'.format(instance.window.slug, now.isoformat(), instance.type, 'cash', -instance.amount)
+                args = 'add_change {0} {1} {2} {3} {4}'.format(instance.window.slug, now.isoformat(), instance.type, 'cash', amount)
                 ws.send(args)
                 ws.close()
             except:
