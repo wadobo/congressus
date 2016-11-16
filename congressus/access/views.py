@@ -181,10 +181,10 @@ class AccessView(UserPassesTestMixin, TemplateView):
         # Checking if there's start or end date and if it's valid
         if inv.type.end and timezone.now() > inv.type.end:
             msg = _("Expired, ended at %(date)s") % { 'date': short_date(inv.type.end) }
-            return 'wrong', msg
+            return self.response_json(msg, st='wrong')
         if inv.type.start and timezone.now() < inv.type.start:
             msg = _("Too soon, wait until %(date)s") % { 'date': short_date(inv.type.start) }
-            return 'wrong', msg
+            return self.response_json(msg, st='wrong')
 
         # if we're here, everything is ok
         #  * If is a valid inv and it's not a pass, mark as used
