@@ -160,6 +160,19 @@ function get_date(date, ex_label) {
 }
 
 function websocketCB(ev, data) {
+    if (window.data_charts === undefined) {
+        if (ev === 'add_ac' || ev === 'add_online_sale' || ev === 'add_sale' || ev === 'add_change') {
+            // Save for later: charts not exists: loading ...
+            window.tmp.push({'ev': ev, 'data': data});
+        }
+        return;
+    } else {
+        t = window.tmp.pop();
+        if (t != undefined) {
+            // Load when chart exists and receive whatever events
+            websocketCB(t.ev, t.data);
+        }
+    }
     if (ev === 'add_ac') {
         for (c=0; c < window.data_charts['a'].length; c++) {
             d = window.data_charts['a'][c];
@@ -208,5 +221,6 @@ function websocketCB(ev, data) {
 }
 
 $(document).ready(function() {
+    window.tmp = [];
     ws.cbs.add(websocketCB);
 });
