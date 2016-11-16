@@ -92,7 +92,7 @@ class MPRegisterForm(forms.ModelForm):
         data = super(MPRegisterForm, self).clean()
 
         confirm_email = data.get('confirm_email', None)
-        if confirm_email and not data['email'] == confirm_email:
+        if confirm_email and not data.get('email') == confirm_email:
             raise forms.ValidationError(_("Emails didn't match"))
 
         tickets_without_seat = list(filter(lambda x: int(x[1]), self.ids))
