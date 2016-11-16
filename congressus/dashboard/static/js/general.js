@@ -189,6 +189,9 @@ function websocketCB(ev, data) {
                 date = get_date(data.date, d.config.data.labels[0]);
                 update_line_charts(d, data.window, date, data.amount);
             } else if (d.config.type == 'bar') {
+                if (data.payment === 'card') {
+                    continue;
+                }
                 date = get_date(data.date, d.config.data.labels[0]);
                 update_bar_charts(d, data.window, date, data.price);
             }
