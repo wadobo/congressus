@@ -11,7 +11,9 @@ from autoslug import AutoSlugField
 from events.models import Event
 from tickets.models import MultiPurchase
 
+from django.db.models.signals import post_delete
 from django.db.models.signals import post_save
+from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
 from django.db.models import Sum
@@ -118,33 +120,63 @@ class TicketWindowCashMovement(models.Model):
         verbose_name_plural = _('ticket window cash movements')
         ordering = ['id']
 
+    def signed_amount(self):
+        if self.type == 'change':
+            amount = self.amount
+        else:
+            amount = -self.amount
+        return amount
+
     def __str__(self):
         return "%s - %s - %s" % (self.window, self.type, self.amount)
 
 
-def update_window_cash(sender, instance, created, raw, using, update_fields, **kwargs):
+def send_cash_change_ws(slug, wtype, amount):
+    # Only affect to dashboard
+    try:
+        ws = websocket.WebSocket()
+        ws.connect('ws://' + settings.WS_SERVER)
+        now = datetime.now().isoformat()
+        args = 'add_change {0} {1} {2} {3} {4}'.format(slug, now, wtype, 'cash', amount)
+        ws.send(args)
+        ws.close()
+    except:
+        pass
+
+
+def update_window_cash_sale(sender, instance, created, raw, using, update_fields, **kwargs):
     if created:
         amount = 0
-        if isinstance(instance, TicketWindowSale):
-            if instance.payment == 'cash':
-                amount = instance.price
-        elif isinstance(instance, TicketWindowCashMovement):
-            if instance.type == 'change':
-                amount = instance.amount
-            else:
-                amount = -instance.amount
-            # Only affect to dashboard
-            try:
-                ws = websocket.WebSocket()
-                ws.connect('ws://' + settings.WS_SERVER)
-                now = datetime.now()
-                args = 'add_change {0} {1} {2} {3} {4}'.format(instance.window.slug, now.isoformat(), instance.type, 'cash', amount)
-                ws.send(args)
-                ws.close()
-            except:
-                pass
+        if instance.payment == 'cash':
+            amount = instance.price
+            send_cash_change_ws(instance.window.slug, instance.type, amount)
         instance.window.cash += amount
         instance.window.save()
 
-post_save.connect(update_window_cash, TicketWindowCashMovement)
-post_save.connect(update_window_cash, TicketWindowSale)
+
+def update_window_cash_movement(sender, instance, **kwargs):
+    prev = TicketWindowCashMovement.objects.filter(id=instance.id).first()
+    if prev: # modify: remove previous change
+        if prev.type == 'change':
+            amount = prev.amount
+        else:
+            amount = -prev.amount
+        print("modify", -amount)
+        send_cash_change_ws(prev.window.slug, prev.type, -amount)
+    # new or modify: apply change
+    amount = instance.signed_amount()
+    send_cash_change_ws(instance.window.slug, instance.type, amount)
+
+    instance.window.cash += amount
+    instance.window.save()
+
+
+def delete_window_cash_movement(sender, instance, **kwargs):
+    amount = instance.signed_amount()
+    send_cash_change_ws(instance.window.slug, instance.type, -amount)
+    instance.window.cash -= amount
+    instance.window.save()
+
+post_save.connect(update_window_cash_sale, TicketWindowSale)
+pre_save.connect(update_window_cash_movement, TicketWindowCashMovement)
+post_delete.connect(delete_window_cash_movement, TicketWindowCashMovement)
