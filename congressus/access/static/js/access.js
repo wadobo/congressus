@@ -1,6 +1,12 @@
 var notifyTimer = null;
 var enabled = true;
 
+var audios = {
+    right: null,
+    error: null,
+    maybe: null
+};
+
 function gonormal() {
     $("body").removeClass("wrong");
     $("body").removeClass("right");
@@ -11,8 +17,6 @@ function gonormal() {
 function notify(what) {
     gonormal();
     $("body").addClass(what);
-    var audio = new Audio($("#audio-"+what).attr('src'));
-    audio.play();
     clearTimeout(notifyTimer);
     timeTimeout = 1000;
     if (what == 'right') {
@@ -22,6 +26,9 @@ function notify(what) {
         gonormal();
         setEnabled(true);
     }, timeTimeout);
+
+    audios[what].currentTime = 0;
+    audios[what].play();
 
     args = ' ' + window.ac;
     args += ' ' + moment().format('YYYY-MM-DDTHH:mm:ss.SSSSSSZ');
@@ -53,14 +60,24 @@ function makeReq() {
     $("#last").html(req);
 
     d = {'order': req};
-    $.post(url, d, function(data) {
-        notify(data.st);
-        $("#extra").html(data.extra);
-        $("#extra2").html(data.extra2);
-    }).fail(function() {
-        notify("wrong");
-        $("#extra").html('');
-        $("#extra2").html('');
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: d,
+        timeout: 2000,
+        success: function(data) {
+            notify(data.st);
+            $("#extra").html(data.extra);
+            $("#extra2").html(data.extra2);
+        },
+        error: function(req, status, err) {
+            notify("wrong");
+            $("#extra").html('');
+            $("#extra2").html('');
+            if (status == 'timeout') {
+                $("#extra").html('TIMEOUT');
+            }
+        }
     });
     $("#order").val("");
     $("#order").focus();
@@ -87,4 +104,8 @@ $(document).ready(function() {
     $("#access").submit(makeReq);
 
     enableQrCode();
+
+    audios.right = document.querySelector("#audio-right");
+    audios.wrong = document.querySelector("#audio-wrong");
+    audios.maybe = document.querySelector("#audio-maybe");
 });

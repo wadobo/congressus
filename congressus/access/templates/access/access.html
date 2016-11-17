@@ -54,16 +54,16 @@
 
 {% block extrabody %}
     <!-- feedback audios -->
-    <audio id="audio-right" src="{% static "audio/right.mp3" %}" class="hidden"> </audio>
-    <audio id="audio-wrong" src="{% static "audio/wrong.mp3" %}" class="hidden"> </audio>
-    <audio id="audio-maybe" src="{% static "audio/maybe.mp3" %}" class="hidden"> </audio>
+    <audio id="audio-right" src="{% static "audio/right.mp3" %}" preload="auto" class="hidden"> </audio>
+    <audio id="audio-wrong" src="{% static "audio/wrong.mp3" %}" preload="auto" class="hidden"> </audio>
+    <audio id="audio-maybe" src="{% static "audio/maybe.mp3" %}" preload="auto" class="hidden"> </audio>
 
     <script src="{% static "js/moment.min.js" %}"></script>
-    <script src="{% static "js/websocket.js" %}"></script>
+    <script src="{% static "js/websocket.js" %}?ver=1.0"></script>
     <script src="{% static "js/adapter-latest.js" %}"></script>
     <script src="{% static "js/jsqrcode-combined.min.js" %}"></script>
     <script src="{% static "js/html5-qrcode.js" %}?v=9.0"></script>
-    <script src="{% static "js/access.js" %}?v=7.0"></script>
+    <script src="{% static "js/access.js" %}?v=8.0"></script>
 
     <script>
         var ac = "{{ac.slug}}";

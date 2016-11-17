@@ -255,7 +255,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
         order = request.POST.get('order', '')
         if len(order) != settings.ORDER_SIZE:
             msg = _("Incorrect readind")
-            return self.response_json(msg, st='incorrect')
+            return self.response_json(msg, st='wrong')
         s = self.request.session.get('session', '')
         g = self.request.session.get('gate', '')
 
