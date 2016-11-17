@@ -54,7 +54,9 @@ function ajaxsend() {
 
             var pdf = window.open(response.url);
             setTimeout(function() {
-                setTimeout(function() { pdf.close(); }, 1000);
+                if (response.nt < 20) {
+                    setTimeout(function() { pdf.close(); }, 1000);
+                }
                 pdf.print();
             }, 1000);
         });
