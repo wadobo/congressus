@@ -288,7 +288,7 @@ class GeneralView(TemplateView):
         res = deepcopy(self.DATA_BAR)
 
         # Create labels and dataset
-        datas = TicketWindow.objects.values_list('slug', 'cash').filter(event=self.ev)
+        datas = TicketWindow.objects.values_list('slug', 'cash').filter(event=self.ev).order_by('slug')
 
         dataset = deepcopy(self.DEFAULT_BAR_DATASET)
         dataset['label'] = self.ev.slug
