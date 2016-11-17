@@ -26,19 +26,19 @@
         {% include "dashboard/report_table2.html" with spaces=spaces sessions_grouped=sessions_grouped sessions="" windows=all_windows %}
         <hr/>
         <!-- online report -->
-        <h4>{% trans "Online" %}</h4>
+        <h2>{% trans "Online" %}</h2>
         {% include "dashboard/report_table2.html" with spaces=spaces sessions_grouped=sessions_grouped sessions="" windows=online_windows %}
     {% endif %}
 
     <!-- by days -->
-    <h4>{% trans "Ticket windows" %}</h4>
+    <h2>{% trans "Ticket windows" %}</h2>
     {% for day in session_days %}
-        <h5>
+        <h3>
             {{ day.0|date:"l" }} /
             <small>
                 {% trans "sold on" %}: {{ day.0|date }}
             </small>
-        </h5>
+        </h3>
         {% include "dashboard/report_table2.html" with spaces=spaces sessions_grouped=sessions_grouped sessions="" windows=local_windows days=day %}
     {% endfor %}
 
