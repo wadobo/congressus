@@ -8,6 +8,8 @@ from .models import Invitation
 from .models import InvitationType
 from .models import InvUsedInSession
 
+from .filters import UsedFilter
+
 from tickets.utils import concat_pdf
 from tickets.utils import generate_pdf
 from tickets.utils import generate_thermal
@@ -97,7 +99,7 @@ class InvUsedInSessionInline(admin.TabularInline):
 
 class InvitationAdmin(admin.ModelAdmin):
     list_display = ('order', 'type', 'is_pass', 'created', 'iused', 'concept', 'name')
-    list_filter = ('is_pass', 'type')
+    list_filter = ('is_pass', UsedFilter, 'type')
     date_hierarchy = 'created'
     search_fields = ('order', 'generator__concept', 'name')
 
