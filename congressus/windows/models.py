@@ -149,7 +149,6 @@ def update_window_cash_sale(sender, instance, created, raw, using, update_fields
         amount = 0
         if instance.payment == 'cash':
             amount = instance.price
-            send_cash_change_ws(instance.window.slug, instance.type, amount)
         instance.window.cash += amount
         instance.window.save()
 
