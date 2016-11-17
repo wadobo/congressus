@@ -161,7 +161,7 @@ def update_window_cash_movement(sender, instance, **kwargs):
             amount = prev.amount
         else:
             amount = -prev.amount
-        print("modify", -amount)
+        instance.window.cash -= amount
         send_cash_change_ws(prev.window.slug, prev.type, -amount)
     # new or modify: apply change
     amount = instance.signed_amount()
