@@ -1,6 +1,7 @@
 import string
 import random
 from django.db import models
+from django.utils import timezone
 from django.conf import settings
 from django.core.exceptions import ValidationError
 
@@ -127,12 +128,13 @@ class Invitation(models.Model, BaseExtraData):
         data = []
         for session in self.type.sessions.all():
             for extra in session.orig_sessions.all():
-               data.append({
-                   'session': extra.extra.id,
-                   'start': extra.start.strftime(settings.DATETIME_FORMAT),
-                   'end': extra.end.strftime(settings.DATETIME_FORMAT),
-                   'used': extra.used
-               })
+                prev = self.get_extra_session(extra.extra.id)
+                data.append({
+                    'session': extra.extra.id,
+                    'start': timezone.make_naive(extra.start).strftime(settings.DATETIME_FORMAT),
+                    'end': timezone.make_naive(extra.end).strftime(settings.DATETIME_FORMAT),
+                    'used': prev['used'] if prev else extra.used
+                })
         self.set_extra_data('extra_sessions', data)
 
     @property

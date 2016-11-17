@@ -251,12 +251,13 @@ class BaseExtraData:
     def save_extra_sessions(self):
         data = []
         for extra in self.session.orig_sessions.all():
-           data.append({
-               'session': extra.extra.id,
-               'start': extra.start.strftime(settings.DATETIME_FORMAT),
-               'end': extra.end.strftime(settings.DATETIME_FORMAT),
-               'used': extra.used
-           })
+            prev = self.get_extra_session(extra.extra.id)
+            data.append({
+                'session': extra.extra.id,
+                'start': timezone.make_naive(extra.start).strftime(settings.DATETIME_FORMAT),
+                'end': timezone.make_naive(extra.end).strftime(settings.DATETIME_FORMAT),
+                'used': prev['used'] if prev else extra.used
+            })
         self.set_extra_data('extra_sessions', data)
 
 
