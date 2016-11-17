@@ -33,7 +33,7 @@ function notifysale(resp) {
     var nt = resp.nt;
 
     args = ' ' + window.windows;
-    args += ' ' + moment().format('YYYY-MM-DDThh:mm:ss.SSSSSSZ');
+    args += ' ' + moment().format('YYYY-MM-DDTHH:mm:ss.SSSSSSZ');
     args += ' ' + $('input[name=payment]:checked').val();
     // BY NUM TICKETS
     //args += ' ' + String(nt);

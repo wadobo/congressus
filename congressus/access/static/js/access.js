@@ -24,7 +24,7 @@ function notify(what) {
     }, timeTimeout);
 
     args = ' ' + window.ac;
-    args += ' ' + moment().format('YYYY-MM-DDThh:mm:ss.SSSSSSZ');
+    args += ' ' + moment().format('YYYY-MM-DDTHH:mm:ss.SSSSSSZ');
     args += ' ' + what;
     ws.send('add_ac' + args);
 }
