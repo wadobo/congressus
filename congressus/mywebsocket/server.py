@@ -3,6 +3,7 @@ import datetime
 from django.core import serializers
 from django.utils import timezone
 from django.utils.translation import ugettext as _
+from django.db import connection
 
 from threading import Lock
 from threading import Timer
@@ -55,6 +56,8 @@ class WSServer:
                 self.server.send_message(client, json.dumps(data))
         except Exception as e:
             print("Error: ", e)
+
+        connection.close()
         self.msg_lock.release()
 
     def run(self):
