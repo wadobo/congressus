@@ -2,6 +2,7 @@ import datetime
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Q
+from django.db import connection
 from django.utils import timezone
 from mywebsocket.server import WSServer
 from threading import Timer
@@ -20,6 +21,8 @@ def clean_holds(ws):
     ws.notify_confirmed()
     t = Timer(60, clean_holds, [ws])
     t.start()
+
+    connection.close()
 
 
 class Command(BaseCommand):
