@@ -9,6 +9,7 @@ if (!String.prototype.startsWith) {
 var loading = '<span class="glyphicon glyphicon-refresh spinning"></span>';
 var seaticon = '<span class="glyphicon glyphicon-th"></span>';
 var sessionsloading = {};
+var reserved_seats = [];
 
 function loadingSession(s, isloading) {
     if (isloading) {
@@ -96,15 +97,25 @@ function seat_holded(session, layout, seat) {
 
 function seat_reserved(session, layout, seat) {
     var selector = '#' + session + '_' + layout + '_' + seat;
+
     $(selector).addClass("seat-R");
     $(selector).removeClass("seat-L");
     $(selector).removeClass("seat-H");
     $(selector).unbind("click");
+
     // Update free seats from websockets
-    free = $("td.layout-"+session+"-"+layout+" > div.layout-zone-free");
-    free_num = free.html().trim().split(": ")[1];
-    res = String(Number(free_num) - 1);
-    free.html(free.html().replace(free_num, res));
+    if (reserved_seats.indexOf(selector) >= 0) {
+        return;
+    }
+    reserved_seats.push(selector);
+    try {
+        free = $("td.layout-"+session+"-"+layout+" > div.layout-zone-free");
+        free_num = free.html().trim().split(": ")[1];
+        res = String(Number(free_num) - 1);
+        free.html(free.html().replace(free_num, res));
+    } catch(e) {
+        console.error("Error updating free seats");
+    }
 
 }
 

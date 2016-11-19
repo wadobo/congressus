@@ -101,7 +101,7 @@ class MultiPurchaseView(TemplateView):
 
         # preloading seat layout free seats number
         ctx['free_seats'] = {}
-        q = TicketSeatHold.objects.values('session', 'layout')
+        q = TicketSeatHold.objects.filter(type="R").values('session', 'layout')
         q = q.annotate(busy=Count('pk'))
         q = q.values_list("session", "layout", "layout__layout", "busy")
         for s, l, layout, b in q:
