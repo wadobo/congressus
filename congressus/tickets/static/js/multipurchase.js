@@ -100,6 +100,12 @@ function seat_reserved(session, layout, seat) {
     $(selector).removeClass("seat-L");
     $(selector).removeClass("seat-H");
     $(selector).unbind("click");
+    // Update free seats from websockets
+    free = $("td.layout-"+session+"-"+layout+" > div.layout-zone-free");
+    free_num = free.html().trim().split(": ")[1];
+    res = String(Number(free_num) - 1);
+    free.html(free.html().replace(free_num, res));
+
 }
 
 function websocketCB(ev, data) {
