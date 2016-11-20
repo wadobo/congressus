@@ -47,11 +47,11 @@ def db_count(event, **kwargs):
 def db_prices(event, **kwargs):
     tickets = filter_tickets(event, **kwargs)
     tickets = tickets.aggregate(total_price=Sum('price'),
-                    price_without_iva=Sum(F('price')/(1+F('tax')/100.0), output_field=FloatField()))
+                    price_without_tax=Sum(F('price')/(1+F('tax')/100.0), output_field=FloatField()))
     if tickets and tickets['total_price']:
-        iva = intcomma('{total_price:.2f}'.format(**tickets))
-        noiva = intcomma('{price_without_iva:.2f}'.format(**tickets))
-        return '{0} / {1}'.format(iva, noiva)
+        tax = intcomma('{total_price:.2f}'.format(**tickets))
+        notax = intcomma('{price_without_tax:.2f}'.format(**tickets))
+        return '{0} / {1}'.format(tax, notax)
 
     return '--'
 
@@ -59,7 +59,7 @@ def db_prices(event, **kwargs):
 def db_window_total(event, **kwargs):
     tickets = filter_tickets(event, **kwargs)
     tickets = tickets.aggregate(total_price=Sum('price'),
-                    price_without_iva=Sum(F('price')/(1+F('tax')/100.0), output_field=FloatField()))
+                    price_without_tax=Sum(F('price')/(1+F('tax')/100.0), output_field=FloatField()))
     if tickets and tickets['total_price']:
         return tickets['total_price']
 
