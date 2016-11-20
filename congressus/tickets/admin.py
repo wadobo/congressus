@@ -84,6 +84,8 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
         'space_name',
         'session_name',
         'created',
+
+        'used',
     ]
 
     readonly_fields = (
