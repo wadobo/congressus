@@ -356,6 +356,47 @@ class GeneralView(TemplateView):
 general = csrf_exempt(GeneralView.as_view())
 
 
+class ReportView(TemplateView):
+    template_name = 'dashboard/generate_report.html'
+
+    def sessions_grouped(self, sessions):
+        g = itertools.groupby(sessions, lambda x: x.name)
+        g = [(n, list(l)) for n, l in g]
+        return g
+
+    def get_days(self):
+        days = set()
+        q = self.sessions.extra({'date':"date(start)"}).values('date')
+        for d in q:
+            if type(d) == str:
+                args = d['date'].split('-')
+                args = map(int, args)
+            else:
+                d1 = d['date']
+                args = (d1.year, d1.month, d1.day)
+            day = timezone.make_aware(datetime(*args))
+            days.add(day)
+        days = sorted(list(days))
+        return days
+
+    def get_context_data(self, *args, **kwargs):
+        ctx = super(ReportView, self).get_context_data(*args, **kwargs)
+        ev = self.kwargs['ev']
+        self.ev = get_object_or_404(Event, slug=ev)
+        self.windows = self.ev.windows.all()
+        self.sessions = self.ev.get_sessions()
+        self.spaces = self.ev.spaces.all()
+
+        ctx['ws_server'] = settings.WS_SERVER
+        ctx['ev'] = self.ev
+        ctx['spaces'] = self.spaces
+        ctx['sessions'] = self.sessions
+        ctx['windows'] = self.windows
+        ctx['menuitem'] = 'report'
+
+        return ctx
+
+
 class GeneralReportView(ReportView):
     template_name = 'dashboard/general_report.html'
     window = False
