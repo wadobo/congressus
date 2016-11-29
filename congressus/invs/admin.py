@@ -3,6 +3,8 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from django.http import HttpResponse
 
+from admin_csv import CSVMixin
+
 from .models import InvitationGenerator
 from .models import Invitation
 from .models import InvitationType
@@ -97,7 +99,7 @@ class InvUsedInSessionInline(admin.TabularInline):
         return False
 
 
-class InvitationAdmin(admin.ModelAdmin):
+class InvitationAdmin(CSVMixin, admin.ModelAdmin):
     list_display = ('order', 'type', 'is_pass', 'created', 'iused', 'concept', 'name')
     list_filter = ('is_pass', UsedFilter, 'type')
     date_hierarchy = 'created'
@@ -105,6 +107,16 @@ class InvitationAdmin(admin.ModelAdmin):
 
     actions = [get_csv, get_pdf, get_thermal]
     inlines = [InvUsedInSessionInline]
+
+    csv_fields = [
+        'order',
+        'type',
+        'is_pass',
+        'created',
+        'iused',
+        'concept',
+        'name',
+    ]
 
     def concept(self, obj):
         if not obj.generator:
