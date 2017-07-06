@@ -46,6 +46,7 @@ INSTALLED_APPS = (
     'admin_csv',
     'autoslug',
     'maintenancemode',
+    'tinymce',
 
     # custom apps
     'adminmenu',

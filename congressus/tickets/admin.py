@@ -315,3 +315,28 @@ admin.site.register(Ticket, TicketAdmin)
 admin.site.register(TicketWarning, TicketWarningAdmin)
 admin.site.register(MultiPurchase, MPAdmin)
 admin.site.register(TicketSeatHold, TicketSeatHoldAdmin)
+
+
+# tinymce for flatpages
+
+from django import forms
+from django.contrib.flatpages.admin import FlatpageForm, FlatPageAdmin
+from django.contrib.flatpages.models import FlatPage
+from tinymce.widgets import TinyMCE
+
+
+class PageForm(FlatpageForm):
+
+    content = forms.CharField(widget=TinyMCE(attrs={'cols': 80, 'rows': 30}))
+
+    class Meta:
+        model = FlatPage
+        fields = ['content']
+
+
+class PageAdmin(FlatPageAdmin):
+    form = PageForm
+
+
+admin.site.unregister(FlatPage)
+admin.site.register(FlatPage, PageAdmin)
