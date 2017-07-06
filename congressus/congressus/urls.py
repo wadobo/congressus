@@ -19,6 +19,7 @@ from django.conf import settings
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^pages/', include('django.contrib.flatpages.urls')),
     url(r'^window/', include('windows.urls')),
     url(r'^access/', include('access.urls')),
     url(r'^dashboard/', include('dashboard.urls')),
