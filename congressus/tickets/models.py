@@ -318,6 +318,9 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
         return total
 
     def get_real_price(self):
+        if not self.tickets.count():
+            return 0
+
         if self.tickets.first().sold_in_window:
             total = sum(i.get_window_price() for i in self.tickets.all())
         else:
