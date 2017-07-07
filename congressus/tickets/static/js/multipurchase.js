@@ -221,7 +221,7 @@ function recalcSums(obj) {
     }
 
     var price = parseFloat(obj.data("price").replace(",", "."));
-    $("#"+session+"-subtotal-price").html(val * price);
+    $("#"+session+"-subtotal-price").html((val * price).toFixed(2));
 }
 
 function recalcTotal() {
@@ -231,7 +231,7 @@ function recalcTotal() {
         var price = parseFloat($(this).data("price").replace(",", "."));
         sum += price * n;
     });
-    $("#total").html(sum);
+    $("#total").html(sum.toFixed(2));
 }
 
 function fillSelectedSeats(obj) {
