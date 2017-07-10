@@ -4,7 +4,12 @@
     ws.cbs = $.Callbacks();
 
     ws.init = function(server) {
-        ws.socket = new WebSocket("ws://"+server);
+        var protocol = "ws:";
+        if (window.location.protocol === "https:") {
+            protocol = "wss:";
+        }
+
+        ws.socket = new WebSocket(protocol + "//" + server);
         ws.socket.onmessage = function(ev) {
             var data = JSON.parse(ev.data);
             if (data.action) {
