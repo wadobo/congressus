@@ -77,9 +77,6 @@
         var btn = $('#make-payment');
         timerIn(EXPIRED_TIME, obj, btn);
 
-        var CREATE_PAYMENT_URL  = 'https://my-store.com/paypal/create-payment';
-        var EXECUTE_PAYMENT_URL = 'https://my-store.com/paypal/execute-payment';
-
         $("#make-payment").click(function() {
             var order = '{{ ticket.order }}';
             $.ajax({
@@ -122,9 +119,16 @@
             },
 
             onAuthorize: function(data, actions) {
-                return actions.payment.execute().then(function() {
-                    // TODO: Redirect to thanks
-                    window.alert('Payment Complete!');
+                return actions.payment.execute().then(function(payment) {
+                    var data = { payment_id: payment.id };
+                    paypal.request.post('{% url 'confirm_paypal' %}', data)
+                        .then(function(r) {
+                            if (r.status == 'ok') {
+                                window.location = '{% url 'thanks' ticket.order %}';
+                            } else {
+                                window.alert('{% trans "Paypal payment error, please, contact with the admin" %}');
+                            }
+                        });
                 });
            }
         }, '#paypal-button');

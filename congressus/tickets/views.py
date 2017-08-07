@@ -391,35 +391,30 @@ confirm = csrf_exempt(Confirm.as_view())
 class ConfirmPaypal(View):
     def post(self, request):
         import paypalrestsdk
-        from paypalrestsdk.notifications import WebhookEvent
 
         paypalrestsdk.configure({
           'mode': 'sandbox',
           'client_id': settings.PAYPAL_CLIENTID,
           'client_secret': settings.PAYPAL_SECRET})
 
-        event_body = request.body.decode()
-        req = json.loads(event_body)
+        payment_id = request.POST['payment_id']
+        try:
+            p = paypalrestsdk.Payment.find(payment_id)
+        except:
+            raise Http404
 
-        webhook_id = settings.PAYPAL_WEBHOOK
-        transmission_id = request.META['HTTP_PAYPAL_TRANSMISSION_ID']
-        timestamp = request.META['HTTP_PAYPAL_TRANSMISSION_TIME']
-        actual_signature = request.META['HTTP_PAYPAL_TRANSMISSION_SIG']
-        cert_url = request.META['HTTP_PAYPAL_CERT_URL']
-        auth_algo = request.META['HTTP_PAYPAL_AUTH_ALGO']
+        tr = p.transactions[0]
+        order_tpv = tr.invoice_number
+        tk = get_ticket_or_404(order_tpv=order_tpv)
 
-        valid = WebhookEvent.verify(
-            transmission_id, timestamp, webhook_id,
-            event_body, cert_url, actual_signature, auth_algo)
-
-        e = WebhookEvent(req)
-        if valid and e.event_type == 'PAYMENT.SALE.COMPLETED':
-            order_tpv = e.resource.invoice_number
-            tk = get_ticket_or_404(order_tpv=order_tpv)
+        if (float(tr.amount.total) == tk.get_price() and
+                p.intent == 'sale' and p.state == 'approved'):
             tk.confirm()
             online_sale(tk)
+        else:
+            return JsonResponse({'status': 'error'})
 
-        return HttpResponse("")
+        return JsonResponse({'status': 'ok'})
 confirm_paypal = csrf_exempt(ConfirmPaypal.as_view())
 
 
