@@ -174,6 +174,12 @@ FROM_EMAIL = 'congressus@us.es'
 SITE_URL = "http://localhost:8000"
 TPV_MERCHANT_URL = SITE_URL + '/ticket/confirm/'
 
+# PAYPAL
+PAYPAL_ACCOUNT = 'info-facilitator@wadobo.com'
+PAYPAL_CLIENTID = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+PAYPAL_SECRET = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+PAYPAL_WEBHOOK = 'xxxxxxxxxxxxxxxxx'
+
 QRCODE = True
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
 WS_SERVER = 'localhost:9007'

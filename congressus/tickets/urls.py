@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^ticket/(?P<order>[\w-]+)/payment/$', views.payment, name='payment'),
     url(r'^ticket/(?P<order>[\w-]+)/thanks/$', views.thanks, name='thanks'),
     url(r'^ticket/confirm/$', views.confirm, name='confirm'),
+    url(r'^ticket/confirm/paypal/$', views.confirm_paypal, name='confirm_paypal'),
 
     url(r'^ticket/template/(?P<id>\d+)/preview/$', views.template_preview, name='template_preview'),
     url(r'^ticket/thermal/template/(?P<id>\d+)/preview/$', views.thermal_template_preview, name='thermal_template_preview'),

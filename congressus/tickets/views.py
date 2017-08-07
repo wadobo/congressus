@@ -245,6 +245,13 @@ def get_ticket_or_404(**kwargs):
 class Payment(TemplateView):
     template_name = 'tickets/payment.html'
 
+    def get_paypal_context(self, ctx, tk):
+        ctx['paypal'] = {
+            'clientid': settings.PAYPAL_CLIENTID,
+            'amount': '%5.2f' % tk.get_price(),
+        }
+        return ctx
+
     def get_context_data(self, *args, **kwargs):
         ctx = super(Payment, self).get_context_data(*args, **kwargs)
         tk = get_ticket_or_404(order=kwargs['order'])
@@ -302,6 +309,8 @@ class Payment(TemplateView):
                 resp = data['Ds_Response']
                 error = redsystpv.ERROR_CODES.get(int(resp), _('Unknown error'))
                 ctx['errormsg'] = '{}: {}'.format(resp, error)
+
+        ctx = self.get_paypal_context(ctx, tk)
         return ctx
 
     def post(self, request, order):
@@ -377,6 +386,41 @@ class Confirm(View):
         online_sale(tk)
         return HttpResponse("")
 confirm = csrf_exempt(Confirm.as_view())
+
+
+class ConfirmPaypal(View):
+    def post(self, request):
+        import paypalrestsdk
+        from paypalrestsdk.notifications import WebhookEvent
+
+        paypalrestsdk.configure({
+          'mode': 'sandbox',
+          'client_id': settings.PAYPAL_CLIENTID,
+          'client_secret': settings.PAYPAL_SECRET})
+
+        event_body = request.body.decode()
+        req = json.loads(event_body)
+
+        webhook_id = settings.PAYPAL_WEBHOOK
+        transmission_id = request.META['HTTP_PAYPAL_TRANSMISSION_ID']
+        timestamp = request.META['HTTP_PAYPAL_TRANSMISSION_TIME']
+        actual_signature = request.META['HTTP_PAYPAL_TRANSMISSION_SIG']
+        cert_url = request.META['HTTP_PAYPAL_CERT_URL']
+        auth_algo = request.META['HTTP_PAYPAL_AUTH_ALGO']
+
+        valid = WebhookEvent.verify(
+            transmission_id, timestamp, webhook_id,
+            event_body, cert_url, actual_signature, auth_algo)
+
+        e = WebhookEvent(req)
+        if valid and e.event_type == 'PAYMENT.SALE.COMPLETED':
+            order_tpv = e.resource.invoice_number
+            tk = get_ticket_or_404(order_tpv=order_tpv)
+            tk.confirm()
+            online_sale(tk)
+
+        return HttpResponse("")
+confirm_paypal = csrf_exempt(ConfirmPaypal.as_view())
 
 
 class SeatView(TemplateView):

@@ -41,7 +41,8 @@
                     {% trans "Make payment" %}
                     <span id="timer-confirm" class="pull-right">xx:xx</span>
                 </button>
-                <div class="text-muted text-center">
+
+                <div id="payment_help" class="text-muted text-center">
                     {% block payment_help_text %}
                     {% trans '"Make payment" will redirect to' %} {{ tpv_url }}
                     {% endblock %}
@@ -51,6 +52,8 @@
                     <input type="hidden" name="Ds_MerchantParameters" value="{{ mdata }}"/>
                     <input type="hidden" name="Ds_Signature" value="{{ sig }}"/>
                 </form>
+
+                <div id="paypal-button"></div>
             {% endif %}
 
             <br/>
@@ -66,12 +69,16 @@
 {% endblock %}
 
 {% block extrabody %}
+    <script src="https://www.paypalobjects.com/api/checkout.js"></script>
     <script src="{% static "js/timer.js" %}"></script>
     <script>
         var EXPIRED_TIME = '{{ expired_time }}';
         var obj = $('#timer-confirm');
         var btn = $('#make-payment');
         timerIn(EXPIRED_TIME, obj, btn);
+
+        var CREATE_PAYMENT_URL  = 'https://my-store.com/paypal/create-payment';
+        var EXECUTE_PAYMENT_URL = 'https://my-store.com/paypal/execute-payment';
 
         $("#make-payment").click(function() {
             var order = '{{ ticket.order }}';
@@ -85,5 +92,41 @@
                 }
             });
         });
+
+        paypal.Button.render({
+            env: 'sandbox', // sandbox | production
+
+            client: {
+                sandbox: '{{paypal.clientid}}',
+                production: '{{paypal.clientid}}'
+            },
+
+            commit: true,
+
+            style: {
+                shape: 'rect',
+                size: 'responsive',
+            },
+
+            payment: function(data, actions) {
+                return actions.payment.create({
+                    payment: {
+                        transactions: [
+                            {
+                                amount: { total: '{{ paypal.amount }}', currency: 'EUR' },
+                                invoice_number: '{{ ticket.order_tpv }}'
+                            }
+                        ]
+                    }
+                });
+            },
+
+            onAuthorize: function(data, actions) {
+                return actions.payment.execute().then(function() {
+                    // TODO: Redirect to thanks
+                    window.alert('Payment Complete!');
+                });
+           }
+        }, '#paypal-button');
     </script>
 {% endblock %}
