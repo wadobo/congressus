@@ -246,9 +246,14 @@ class Payment(TemplateView):
     template_name = 'tickets/payment.html'
 
     def get_paypal_context(self, ctx, tk):
+        p = getattr(settings, 'PAYPAL_ENABLED', False)
+        if not p:
+            return ctx
+
         ctx['paypal'] = {
             'clientid': settings.PAYPAL_CLIENTID,
             'amount': '%5.2f' % tk.get_price(),
+            'sandbox': settings.PAYPAL_SANDBOX,
         }
         return ctx
 

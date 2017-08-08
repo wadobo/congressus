@@ -175,7 +175,8 @@ SITE_URL = "http://localhost:8000"
 TPV_MERCHANT_URL = SITE_URL + '/ticket/confirm/'
 
 # PAYPAL
-PAYPAL_ACCOUNT = 'info-facilitator@wadobo.com'
+PAYPAL_ENABLED = False
+PAYPAL_SANDBOX = True
 PAYPAL_CLIENTID = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 PAYPAL_SECRET = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 PAYPAL_WEBHOOK = 'xxxxxxxxxxxxxxxxx'
