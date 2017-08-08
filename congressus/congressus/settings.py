@@ -179,7 +179,6 @@ PAYPAL_ENABLED = False
 PAYPAL_SANDBOX = True
 PAYPAL_CLIENTID = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 PAYPAL_SECRET = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-PAYPAL_WEBHOOK = 'xxxxxxxxxxxxxxxxx'
 
 QRCODE = True
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
