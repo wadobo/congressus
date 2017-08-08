@@ -246,6 +246,7 @@ class Payment(TemplateView):
     template_name = 'tickets/payment.html'
 
     def get_paypal_context(self, ctx, tk):
+        # Disabled by default
         p = getattr(settings, 'PAYPAL_ENABLED', False)
         if not p:
             return ctx
@@ -257,12 +258,11 @@ class Payment(TemplateView):
         }
         return ctx
 
-    def get_context_data(self, *args, **kwargs):
-        ctx = super(Payment, self).get_context_data(*args, **kwargs)
-        tk = get_ticket_or_404(order=kwargs['order'])
-        ctx['ticket'] = tk
-        ctx['error'] = self.request.GET.get('error', '')
-        ctx['expired_time'] = settings.EXPIRED_SEAT_C
+    def get_redsys_context(self, ctx, tk):
+        # Enabled by default
+        p = getattr(settings, 'REDSYS_ENABLED', True)
+        if not p:
+            return ctx
 
         amount = str(int(tk.get_price() * 100))
         order = tk.order_tpv
@@ -292,10 +292,23 @@ class Payment(TemplateView):
         sig = tpv_sig_data(mdata, order, key)
 
         ctx.update({
+            'redsys': True,
             'tpv_url': tpv_url,
             'mdata': mdata,
             'sig': sig,
         })
+
+        return ctx
+
+    def get_context_data(self, *args, **kwargs):
+        ctx = super(Payment, self).get_context_data(*args, **kwargs)
+        tk = get_ticket_or_404(order=kwargs['order'])
+        ctx['ticket'] = tk
+        ctx['error'] = self.request.GET.get('error', '')
+        ctx['expired_time'] = settings.EXPIRED_SEAT_C
+
+        ctx = self.get_redsys_context(ctx, tk)
+        ctx = self.get_paypal_context(ctx, tk)
 
         if not tk.confirmed and (not tk.order_tpv or ctx['error']):
             tk.gen_order_tpv()
@@ -315,7 +328,6 @@ class Payment(TemplateView):
                 error = redsystpv.ERROR_CODES.get(int(resp), _('Unknown error'))
                 ctx['errormsg'] = '{}: {}'.format(resp, error)
 
-        ctx = self.get_paypal_context(ctx, tk)
         return ctx
 
     def post(self, request, order):

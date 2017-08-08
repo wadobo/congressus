@@ -163,6 +163,11 @@ INTERNAL_IPS = ['127.0.0.1']
 # CUSTOM SETTINGS
 
 ORDER_SIZE = 15
+FROM_EMAIL = 'congressus@us.es'
+SITE_URL = "http://localhost:8000"
+
+# REDSYS TPV options
+REDSYS_ENABLED = True
 TPV_TERMINAL = 1
 TPV_MERCHANT = 'XXXXXX'
 TPV_URL = "https://sis-t.redsys.es:25443/sis/realizarPago"
@@ -170,8 +175,6 @@ TPV_URL = "https://sis-t.redsys.es:25443/sis/realizarPago"
 TPV_LANG = '002'
 #TPV_URL = "https://sis.redsys.es/sis/realizarPago"
 TPV_KEY = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-FROM_EMAIL = 'congressus@us.es'
-SITE_URL = "http://localhost:8000"
 TPV_MERCHANT_URL = SITE_URL + '/ticket/confirm/'
 
 # PAYPAL
