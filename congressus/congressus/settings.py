@@ -183,6 +183,15 @@ PAYPAL_SANDBOX = True
 PAYPAL_CLIENTID = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 PAYPAL_SECRET = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 
+# STRIPE
+STRIPE_ENABLED = False
+STRIPE_PK = 'pk_live_xxxxxxxxxxxxxxxxxxxxxxxx'
+STRIPE_SK = 'sk_live_xxxxxxxxxxxxxxxxxxxxxxxx'
+STRIPE_NAME = 'No es magia es Wadobo S.L.L.'
+STRIPE_DESC = ''
+STRIPE_IMAGE = 'https://s3.amazonaws.com/stripe-uploads/acct_103f1h2csBUWpoVVmerchant-icon-713198-wadobo-icon.png'
+STRIPE_BITCOIN = False
+
 QRCODE = True
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
 WS_SERVER = 'localhost:9007'

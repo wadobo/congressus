@@ -14,3 +14,4 @@ django-maintenancemode-2
 git+https://bitbucket.org/legion_an/django-extended-filters.git@fe56536b44afbe752a5d57475d8db32c939adeff
 django-tinymce
 paypalrestsdk
+stripe

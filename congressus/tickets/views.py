@@ -245,6 +245,23 @@ def get_ticket_or_404(**kwargs):
 class Payment(TemplateView):
     template_name = 'tickets/payment.html'
 
+    def get_stripe_context(self, ctx, tk):
+        # Disabled by default
+        p = getattr(settings, 'STRIPE_ENABLED', False)
+        if not p:
+            return ctx
+
+        ctx['stripe'] = {
+            'pk': settings.STRIPE_PK,
+            'amount': str(int(tk.get_price() * 100)),
+            'name': settings.STRIPE_NAME,
+            'desc': settings.STRIPE_DESC,
+            'image': settings.STRIPE_IMAGE,
+            'bitcoin': settings.STRIPE_BITCOIN,
+
+        }
+        return ctx
+
     def get_paypal_context(self, ctx, tk):
         # Disabled by default
         p = getattr(settings, 'PAYPAL_ENABLED', False)
@@ -309,6 +326,7 @@ class Payment(TemplateView):
 
         ctx = self.get_redsys_context(ctx, tk)
         ctx = self.get_paypal_context(ctx, tk)
+        ctx = self.get_stripe_context(ctx, tk)
 
         if not tk.confirmed and (not tk.order_tpv or ctx['error']):
             tk.gen_order_tpv()
@@ -433,6 +451,32 @@ class ConfirmPaypal(View):
 
         return JsonResponse({'status': 'ok'})
 confirm_paypal = csrf_exempt(ConfirmPaypal.as_view())
+
+
+class ConfirmStripe(View):
+    def post(self, request, order):
+        import stripe
+        stripe.api_key = settings.STRIPE_SK
+
+        token = request.POST['stripeToken']
+
+        tk = get_ticket_or_404(order=order)
+        amount = str(int(tk.get_price() * 100))
+        try:
+            charge = stripe.Charge.create(
+                amount=amount,
+                currency='eur',
+                source=token
+            )
+        except stripe.CardError as e:
+            messages.error(request, _('The credit card has been declined.'))
+            return redirect('payment', order=tk.order)
+
+        tk.confirm()
+        online_sale(tk)
+
+        return redirect('thanks', order=tk.order)
+confirm_stripe = ConfirmStripe.as_view()
 
 
 class SeatView(TemplateView):

@@ -58,6 +58,26 @@
                 {% if paypal %}
                     <div id="paypal-button"></div>
                 {% endif %}
+
+                {% if stripe %}
+                    <form action="{% url 'confirm_stripe' ticket.order %}" method="POST">
+                        {% csrf_token %}
+                      <script
+                        src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                        data-key="{{ stripe.pk }}"
+                        data-amount="{{ stripe.amount }}"
+                        data-name="{{ stripe.name }}"
+                        data-description="{{ stripe.desc }}"
+                        data-image="{{ stripe.image }}"
+                        data-locale="auto"
+                        data-email="{{ ticket.email }}"
+                        data-allow-remember-me=false
+                        data-label="{% trans "Pay with credit card (using stripe)" %}"
+                        {% if stripe.bitcoin %} data-bitcoin=true {% endif %}
+                        data-currency="eur">
+                      </script>
+                    </form>
+                {% endif %}
             {% endif %}
 
             <br/>
@@ -94,7 +114,7 @@
         });
     </script>
 
-        {% if paypal %}
+    {% if paypal %}
         <script src="https://www.paypalobjects.com/api/checkout.js"></script>
         <script>
             paypal.Button.render({
@@ -141,5 +161,15 @@
                }
             }, '#paypal-button');
         </script>
-        {% endif %}
+    {% endif %}
+
+    {% if stripe %}
+        <script>
+        $(document).ready(function() {
+            $(".stripe-button-el")
+                .addClass("btn btn-warning btn-block btn-lg")
+                .removeClass("stripe-button-el");
+        });
+        </script>
+    {% endif %}
 {% endblock %}
