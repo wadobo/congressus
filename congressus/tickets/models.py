@@ -35,6 +35,14 @@ SEATHOLD_TYPES = (
     ('R', _('Reserved')),
 )
 
+PAYMENT_TYPES = (
+    ('tpv', _('TPV')),
+    ('paypal', _('Paypal')),
+    ('stripe', _('Stripe')),
+    ('twcash', _('Cash, Ticket Window')),
+    ('twtpv', _('TPV, Ticket Window')),
+)
+
 
 class BaseTicketMixing:
     '''
@@ -188,8 +196,13 @@ class BaseTicketMixing:
                     seat=t.seat
             ).delete()
 
-    def confirm(self):
+    def confirm(self, method='tpv'):
         self.confirmed = True
+        self.payment_method = method
+
+        if self.is_mp():
+            self.tickets.update(payment_method=method)
+
         self.hold_seats()
         self.save()
 
@@ -269,6 +282,8 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
 
     tpv_error = models.CharField(_('error TPV'), max_length=200, blank=True, null=True)
     tpv_error_info = models.CharField(_('error TPV info'), max_length=200, blank=True, null=True)
+
+    payment_method = models.CharField(_('payment method'), max_length=10, choices=PAYMENT_TYPES, blank=True, null=True)
 
     created = models.DateTimeField(_('created at'), auto_now_add=True)
     confirmed_date = models.DateTimeField(_('confirmed at'), blank=True, null=True)
@@ -383,6 +398,8 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
 
     tpv_error = models.CharField(_('error TPV'), max_length=200, blank=True, null=True)
     tpv_error_info = models.CharField(_('error TPV info'), max_length=200, blank=True, null=True)
+
+    payment_method = models.CharField(_('payment method'), max_length=10, choices=PAYMENT_TYPES, blank=True, null=True)
 
     created = models.DateTimeField(_('created at'), auto_now_add=True)
     confirmed_date = models.DateTimeField(_('confirmed at'), blank=True, null=True)

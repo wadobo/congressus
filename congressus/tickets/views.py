@@ -155,7 +155,7 @@ class MultiPurchaseView(TemplateView):
             mp.send_reg_email()
 
             if not mp.get_price():
-                mp.confirm()
+                mp.confirm(method=None)
                 online_sale(mp)
                 return redirect('thanks', order=mp.order)
 
@@ -444,7 +444,7 @@ class ConfirmPaypal(View):
 
         if (float(tr.amount.total) == tk.get_price() and
                 p.intent == 'sale' and p.state == 'approved'):
-            tk.confirm()
+            tk.confirm(method="paypal")
             online_sale(tk)
         else:
             return JsonResponse({'status': 'error'})
@@ -472,7 +472,7 @@ class ConfirmStripe(View):
             messages.error(request, _('The credit card has been declined.'))
             return redirect('payment', order=tk.order)
 
-        tk.confirm()
+        tk.confirm(method="stripe")
         online_sale(tk)
 
         return redirect('thanks', order=tk.order)

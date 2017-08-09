@@ -61,8 +61,8 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
     list_max_show_all = 800
     list_display = ('order', 'order_tpv2', 'session2', 'cseat', 'twin',
                     'created2', 'confirmed', 'used',
-                    'email', 'payment', 'price2', 'event')
-    list_filter = ('confirmed', 'used', SingleTicketWindowFilter, 'event_name', 'session__space')
+                    'email', 'payment', 'payment_method', 'price2', 'event')
+    list_filter = ('confirmed', 'payment_method', 'used', SingleTicketWindowFilter, 'event_name', 'session__space')
     search_fields = ('order', 'order_tpv', 'email', 'mp__order', 'mp__order_tpv')
     date_hierarchy = 'created'
     actions = [delete_selected, confirm, unconfirm, mark_used, mark_no_used]
@@ -199,8 +199,8 @@ link_online_sale.short_description = _("Link online sale")
 class MPAdmin(CSVMixin, admin.ModelAdmin):
     list_per_page = 20
     list_max_show_all = 800
-    list_display = ('order_tpv', 'twin', 'created', 'confirmed2', 'email', 'ntickets', 'price', 'event')
-    list_filter = ('confirmed', TicketWindowFilter, 'ev', 'tpv_error')
+    list_display = ('order_tpv', 'twin', 'created', 'confirmed2', 'email', 'ntickets', 'price', 'payment_method', 'event')
+    list_filter = ('confirmed', 'payment_method', TicketWindowFilter, 'ev', 'tpv_error')
     search_fields = ('order', 'order_tpv', 'email', 'extra_data')
     date_hierarchy = 'created'
     actions = [delete_selected, confirm, unconfirm, link_online_sale]
@@ -225,7 +225,7 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
     readonly_fields = (
         'order_tpv', 'order', 'ev',
         'confirmed', 'confirmed_date',
-        'ntickets', 'price', 'payment',
+        'ntickets', 'price', 'payment', 'payment_method',
         'formated_extra_data',
         'tpv_error', 'tpv_error_info', 'twin'
     )
@@ -240,7 +240,7 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
         (_('Extra info'), {
             'fields': (('confirmed', 'confirmed_date'),
                        ('ntickets', 'price'),
-                       'discount', 'payment',
+                       'discount', 'payment', 'payment_method',
                        'tpv_error', 'tpv_error_info',
                       )
         }),

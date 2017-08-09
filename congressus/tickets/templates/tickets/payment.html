@@ -180,7 +180,11 @@
                                 }
                             });
                     });
-               }
+                },
+
+                onError: function(err, error) {
+                    window.alert('{% trans "Error during the paypal payment. Try again" %}');
+                }
             }, '#paypal-button');
         </script>
     {% endif %}
