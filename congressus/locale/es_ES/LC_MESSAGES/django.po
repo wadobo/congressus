@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-08 12:43+0200\n"
-"PO-Revision-Date: 2017-08-08 12:44+0200\n"
+"POT-Creation-Date: 2017-08-09 12:00+0200\n"
+"PO-Revision-Date: 2017-08-09 12:00+0200\n"
 "Last-Translator: Daniel Garcia Moreno <danigm@wadobo.com>\n"
 "Language-Team: Español; Castellano <>\n"
 "Language: es\n"
@@ -1408,15 +1408,15 @@ msgstr "Continuar"
 msgid "Confirm"
 msgstr "Confirmar"
 
-#: tickets/templates/tickets/payment.html:17
+#: tickets/templates/tickets/payment.html:21
 msgid "Ticket payment"
 msgstr "Pago de entrada"
 
-#: tickets/templates/tickets/payment.html:18
+#: tickets/templates/tickets/payment.html:22
 msgid "Verify the data and make the payment"
 msgstr "Verificar datos y realizar el pago"
 
-#: tickets/templates/tickets/payment.html:30
+#: tickets/templates/tickets/payment.html:34
 #, python-format
 msgid ""
 "There was an error in the payment. Try again and if the problem continue, "
@@ -1425,27 +1425,32 @@ msgstr ""
 "Ha ocurrido un error en el pago. Prueba otra vez y si el problema continua, "
 "contacta con el administrador: %(admin)s"
 
-#: tickets/templates/tickets/payment.html:36
+#: tickets/templates/tickets/payment.html:40
 msgid "Go to purchase"
 msgstr "Ir a la compra"
 
-#: tickets/templates/tickets/payment.html:42
-msgid "Make payment"
-msgstr "Realizar pago"
+#: tickets/templates/tickets/payment.html:45
+msgid "Choose your payment method"
+msgstr "Elige tu forma de pago"
 
-#: tickets/templates/tickets/payment.html:48
+#: tickets/templates/tickets/payment.html:54
+msgid "Credit Card payment"
+msgstr "Pago con tarjeta"
+
+#: tickets/templates/tickets/payment.html:58
+#: tickets/templates/tickets/payment.html:96
 msgid "\"Make payment\" will redirect to"
 msgstr "\"Realizar pago\" redirigirá a "
 
-#: tickets/templates/tickets/payment.html:75
+#: tickets/templates/tickets/payment.html:86
 msgid "Pay with credit card (using stripe)"
 msgstr "Pagar con tarjeta de crédito (usando stripe)"
 
-#: tickets/templates/tickets/payment.html:89
+#: tickets/templates/tickets/payment.html:109
 msgid "Cancel payment"
 msgstr "Cancelar pago"
 
-#: tickets/templates/tickets/payment.html:157
+#: tickets/templates/tickets/payment.html:179
 msgid "Paypal payment error, please, contact with the admin"
 msgstr "Error de pago con paypal, por favor, contacte con el administrador"
 
@@ -1739,6 +1744,9 @@ msgstr "Este usuario no puede acceder a esta taquilla"
 #: windows/views.py:148
 msgid "There was an error, please try again"
 msgstr "Ha ocurrido un error, por favor, inténtalo de nuevo"
+
+#~ msgid "Make payment"
+#~ msgstr "Realizar pago"
 
 #~ msgid ""
 #~ "SECTOR: %(layout)s &nbsp;&nbsp;&nbsp; ROW: %(row)s &nbsp;&nbsp;&nbsp; "
