@@ -4,6 +4,10 @@
 
 {% block title %}{% trans "Confirm" %}{% endblock %}
 
+{% block extrahead %}
+    <link href="{% static "css/payment.css" %}" rel="stylesheet"/>
+{% endblock %}
+
 {% block content %}
     {% if ticket.is_mp %}
         {% url 'multipurchase' ticket.event.slug as cancel_url %}
@@ -36,48 +40,64 @@
                     {% trans "Go to purchase" %}
                 </a>
             {% else %}
-                {% if redsys %}
-                <button id="make-payment" class="btn btn-lg btn-warning btn-block">
-                    <span class="glyphicon glyphicon-credit-card" aria-hidden="true"></span>
-                    {% trans "Make payment" %}
+                <div id="choose" class="btn btn-lg btn-primary btn-block">
                     <span id="timer-confirm" class="pull-right">xx:xx</span>
-                </button>
-
-                <div id="payment_help" class="text-muted text-center">
-                    {% block payment_help_text %}
-                    {% trans '"Make payment" will redirect to' %} {{ tpv_url }}
-                    {% endblock %}
+                    <span class="pull-left">{% trans "Choose your payment method" %}</span>
+                    <div class="clearfix"></div>
                 </div>
-                <form id="go-pay" method="POST" action="{{ tpv_url }}">
-                    <input type="hidden" name="Ds_SignatureVersion" value="HMAC_SHA256_V1"/>
-                    <input type="hidden" name="Ds_MerchantParameters" value="{{ mdata }}"/>
-                    <input type="hidden" name="Ds_Signature" value="{{ sig }}"/>
-                </form>
-                {% endif %}
 
-                {% if paypal %}
-                    <div id="paypal-button"></div>
-                {% endif %}
+                <div id="payment-methods">
 
-                {% if stripe %}
-                    <form action="{% url 'confirm_stripe' ticket.order %}" method="POST">
-                        {% csrf_token %}
-                      <script
-                        src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-                        data-key="{{ stripe.pk }}"
-                        data-amount="{{ stripe.amount }}"
-                        data-name="{{ stripe.name }}"
-                        data-description="{{ stripe.desc }}"
-                        data-image="{{ stripe.image }}"
-                        data-locale="auto"
-                        data-email="{{ ticket.email }}"
-                        data-allow-remember-me=false
-                        data-label="{% trans "Pay with credit card (using stripe)" %}"
-                        {% if stripe.bitcoin %} data-bitcoin=true {% endif %}
-                        data-currency="eur">
-                      </script>
+                    {% if redsys %}
+                    <form id="go-pay" method="POST" action="{{ tpv_url }}">
+                        <button id="make-payment" class="btn btn-lg btn-warning btn-block">
+                            {% trans "Credit Card payment" %}
+                        </button>
+                        {% block tpv_help_text %}
+                            <div class="text-muted text-center">
+                                {% trans '"Make payment" will redirect to' %} {{ tpv_url }}
+                            </div>
+                        {% endblock %}
+
+                        <input type="hidden" name="Ds_SignatureVersion" value="HMAC_SHA256_V1"/>
+                        <input type="hidden" name="Ds_MerchantParameters" value="{{ mdata }}"/>
+                        <input type="hidden" name="Ds_Signature" value="{{ sig }}"/>
                     </form>
-                {% endif %}
+                    {% endif %}
+
+                    {% if paypal %}
+                        <div id="paypal-button"></div>
+                        {% block paypal_help_text %}{% endblock %}
+                    {% endif %}
+
+                    {% if stripe %}
+                        <form action="{% url 'confirm_stripe' ticket.order %}" method="POST">
+                            {% csrf_token %}
+                          <script
+                            src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                            data-key="{{ stripe.pk }}"
+                            data-amount="{{ stripe.amount }}"
+                            data-name="{{ stripe.name }}"
+                            data-description="{{ stripe.desc }}"
+                            data-image="{{ stripe.image }}"
+                            data-locale="auto"
+                            data-email="{{ ticket.email }}"
+                            data-allow-remember-me=false
+                            data-label="{% trans "Pay with credit card (using stripe)" %}"
+                            {% if stripe.bitcoin %} data-bitcoin=true {% endif %}
+                            data-currency="eur">
+                          </script>
+                        </form>
+                        {% block stripe_help_text %}{% endblock %}
+                    {% endif %}
+
+                    <div id="payment_help" class="text-muted text-center">
+                        {% block payment_help_text %}
+                        {% trans '"Make payment" will redirect to' %} {{ tpv_url }}
+                        {% endblock %}
+                    </div>
+
+                </div>
             {% endif %}
 
             <br/>
@@ -111,6 +131,7 @@
                     $("#go-pay").submit();
                 }
             });
+            return false;
         });
     </script>
 
@@ -131,6 +152,7 @@
                 style: {
                     shape: 'rect',
                     size: 'responsive',
+                    label: 'pay',
                 },
 
                 payment: function(data, actions) {

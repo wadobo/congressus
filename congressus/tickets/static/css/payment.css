@@ -2,3 +2,16 @@
     margin-top: 20px;
     margin-bottom: 20px;
 }
+
+#choose {
+    cursor: inherit;
+}
+
+#payment-methods {
+    margin: 20px 0px;
+}
+
+#payment-methods .btn,
+#payment-methods #paypal-button {
+    margin-top: 20px;
+}
