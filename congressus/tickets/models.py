@@ -577,5 +577,12 @@ def confirm_email(sender, instance, created, raw, using, update_fields, **kwargs
         instance.send_confirm_email()
 
 
+def ticket_seat_hold_confirmed(sender, instance, **kwargs):
+        tsh_list = TicketSeatHold.objects.filter(session=instance.session, 
+                                                 layout=instance.layout, 
+                                                 seat=instance.seat).exclude(pk=instance.pk).delete()
+
+
+post_save.connect(ticket_seat_hold_confirmed, TicketSeatHold)
 post_save.connect(confirm_email, Ticket)
 post_save.connect(confirm_email, MultiPurchase)
