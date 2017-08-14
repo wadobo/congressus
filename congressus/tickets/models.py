@@ -180,6 +180,12 @@ class BaseTicketMixing:
             tsh.client='CONFIRMED'
             tsh.save()
 
+            # removing hold seats not confirmed
+            TicketSeatHold.objects.filter(
+                session=t.session,
+                layout=t.seat_layout,
+                seat=t.seat, type__in=['H', 'C', 'P']).delete()
+
     def remove_hold_seats(self):
         all_tk = []
         if self.is_mp():
