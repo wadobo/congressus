@@ -6,6 +6,7 @@
 
 {% block extrahead %}
     <link href="{% static "css/payment.css" %}" rel="stylesheet"/>
+    <link href="{% static "css/loaders.min.css" %}" rel="stylesheet"/>
 {% endblock %}
 
 {% block content %}
@@ -68,6 +69,32 @@
                     {% if paypal %}
                         <div id="paypal-button"></div>
                         {% block paypal_help_text %}{% endblock %}
+
+                        <div class="modal fade" id="paypal-modal" tabindex="-1" role="dialog">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-body">
+                                <p>
+                                {% blocktrans %}
+                                We're confirming the payment, please, wait.
+                                We'll redirect you in a few seconds...
+                                {% endblocktrans %}
+                                </p>
+                                <div class="text-center ajax-loading loading">
+                                    <div class="loader-inner line-scale-pulse-out-rapid">
+                                        <div></div>
+                                        <div></div>
+                                        <div></div>
+                                        <div></div>
+                                        <div></div>
+                                        <div></div>
+                                    </div>
+                                </div>
+
+                              </div>
+                            </div><!-- /.modal-content -->
+                          </div><!-- /.modal-dialog -->
+                        </div><!-- /.modal -->
                     {% endif %}
 
                     {% if stripe %}
@@ -156,6 +183,7 @@
                 },
 
                 payment: function(data, actions) {
+                    $("#paypal-modal").modal("show");
                     return actions.payment.create({
                         payment: {
                             transactions: [
@@ -176,6 +204,7 @@
                                 if (r.status == 'ok') {
                                     window.location = '{% url 'thanks' ticket.order %}';
                                 } else {
+                                    $("#paypal-modal").modal("hide");
                                     window.alert('{% trans "Paypal payment error, please, contact with the admin" %}');
                                 }
                             });
@@ -183,8 +212,14 @@
                 },
 
                 onError: function(err, error) {
+                    $("#paypal-modal").modal("hide");
                     window.alert('{% trans "Error during the paypal payment. Try again" %}');
+                },
+
+                onCancel: function() {
+                    $("#paypal-modal").modal("hide");
                 }
+
             }, '#paypal-button');
         </script>
     {% endif %}

@@ -15,3 +15,7 @@
 #payment-methods #paypal-button {
     margin-top: 20px;
 }
+
+.loader-inner > div {
+  background: black !important;
+}
