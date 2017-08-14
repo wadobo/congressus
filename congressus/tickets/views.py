@@ -428,7 +428,7 @@ class ConfirmPaypal(View):
         import paypalrestsdk
 
         paypalrestsdk.configure({
-          'mode': 'sandbox',
+          'mode': 'sandbox' if settings.PAYPAL_SANDBOX else 'live',
           'client_id': settings.PAYPAL_CLIENTID,
           'client_secret': settings.PAYPAL_SECRET})
 
