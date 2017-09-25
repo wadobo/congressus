@@ -432,8 +432,8 @@ class ConfirmPaypal(View):
           'client_id': settings.PAYPAL_CLIENTID,
           'client_secret': settings.PAYPAL_SECRET})
 
-        payment_id = request.POST['payment_id']
         try:
+            payment_id = request.POST['payment_id']
             p = paypalrestsdk.Payment.find(payment_id)
         except:
             raise Http404
