@@ -20,6 +20,8 @@ from windows.models import TicketWindowSale
 from django.core.exceptions import MultipleObjectsReturned
 from windows.utils import online_sale
 
+from extended_filters.filters import DateRangeFilter
+
 
 def confirm(modeladmin, request, queryset):
     for i in queryset:
@@ -63,7 +65,7 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
     list_display = ('order', 'order_tpv2', 'session2', 'cseat', 'twin',
                     'created2', 'confirmed', 'used',
                     'email', 'payment', 'payment_method', 'price2', 'event')
-    list_filter = ('confirmed', 'payment_method', 'used', SingleTicketWindowFilter, 'event_name', 'session__space')
+    list_filter = (('created', DateRangeFilter), 'confirmed', 'payment_method', 'used', SingleTicketWindowFilter, 'event_name', 'session__space')
     search_fields = ('order', 'order_tpv', 'email', 'mp__order', 'mp__order_tpv')
     date_hierarchy = 'created'
     actions = [delete_selected, confirm, unconfirm, mark_used, mark_no_used]
@@ -201,7 +203,8 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
     list_per_page = 20
     list_max_show_all = 800
     list_display = ('order_tpv', 'twin', 'created', 'confirmed2', 'email', 'ntickets', 'price', 'payment_method', 'event')
-    list_filter = ('confirmed', 'payment_method', TicketWindowFilter, 'ev', 'tpv_error')
+    list_filter = (('created', DateRangeFilter), 'confirmed', 'payment_method', TicketWindowFilter, 'ev', 'tpv_error')
+
     search_fields = ('order', 'order_tpv', 'email', 'extra_data')
     date_hierarchy = 'created'
     actions = [delete_selected, confirm, unconfirm, link_online_sale]
