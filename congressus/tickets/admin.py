@@ -17,6 +17,7 @@ from admin_csv import CSVMixin
 from .filters import TicketWindowFilter
 from .filters import SingleTicketWindowFilter
 from windows.models import TicketWindowSale
+from django.core.exceptions import MultipleObjectsReturned
 from windows.utils import online_sale
 
 
@@ -272,6 +273,12 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
     def twin(self, obj):
         try:
             tws = TicketWindowSale.objects.get(purchase=obj)
+        except MultipleObjectsReturned:
+            tws = TicketWindowSale.objects.filter(purchase=obj).first()
+            tws.id = None
+
+            TicketWindowSale.objects.filter(purchase=obj).delete()
+            tws.save()
         except:
             return '-'
         prefix = tws.window.code
