@@ -229,7 +229,7 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
     readonly_fields = (
         'order_tpv', 'order', 'ev',
         'confirmed', 'confirmed_date',
-        'ntickets', 'price', 'payment', 'payment_method',
+        'ntickets', 'price', 'payment',
         'formated_extra_data',
         'tpv_error', 'tpv_error_info', 'twin'
     )
