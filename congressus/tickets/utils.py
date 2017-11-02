@@ -474,6 +474,8 @@ class TicketPDF:
     @property
     def text(self):
         if self.inv:
+            if self.ticket.generator:
+                return self.ticket.generator.concept
             return self.ticket.type.name
 
         space = self.ticket.session.space.name
