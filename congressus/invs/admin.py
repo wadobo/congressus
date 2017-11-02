@@ -22,9 +22,9 @@ def get_csv(modeladmin, request, queryset):
 
     def fillcsv(q):
         for i, inv in enumerate(q):
-            row = '%d, %s, %s' % (i+1, inv.order, inv.type.name)
+            row = '%d,%s,%s' % (i+1, inv.order, inv.type.name)
             if inv.seat:
-                row += ',%s, %s, %s' % (inv.seat_layout.name, inv.seat_row(), inv.seat_column())
+                row += ',%s,%s,%s' % (inv.seat_layout.name, inv.seat_row(), inv.seat_column())
             csv.append(row)
 
     if modeladmin.model == InvitationGenerator:

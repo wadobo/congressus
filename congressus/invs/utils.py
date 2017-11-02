@@ -9,13 +9,13 @@ def gen_csv_from_generator(ig, numbered=True, string=True):
     csv = []
     name = ig.type.name
     for i, inv in enumerate(ig.invitations.all()):
-        line = '%s, %s' % (inv.order, name)
+        line = '%s,%s' % (inv.order, name)
         if numbered:
             line = ('%d,' % (i + 1)) + line
         if inv.seat_layout and inv.seat:
             row, col = inv.seat.split('-')
             col = int(col) + inv.seat_layout.column_start_number - 1
-            line += ', %s, %s, %s' % (inv.seat_layout.gate, row, col)
+            line += ',%s,%s,%s' % (inv.seat_layout.gate, row, col)
         csv.append(line)
 
     if string:
@@ -31,7 +31,7 @@ def gen_csv_from_generators(igs):
 
     out = []
     for i, line in enumerate(csv):
-        out.append(('%d ' % (i + 1)) + line)
+        out.append(('%d,' % (i + 1)) + line)
 
     return '\n'.join(out)
 
