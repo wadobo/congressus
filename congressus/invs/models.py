@@ -49,6 +49,7 @@ class InvitationType(models.Model):
     class Meta:
         verbose_name = _('invitation type')
         verbose_name_plural = _('invitation types')
+        ordering = ['-event__name']
 
     def __str__(self):
         return self.name
