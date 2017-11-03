@@ -1,9 +1,10 @@
-from django.utils.deprecation import MiddlewareMixin
+from django.utils import deprecation
+from django import VERSION as DJANGO_VERSION
 from maintenancemode.models import Maintenance
 from django.contrib.sites.models import Site
 
 
-class FixMaintenanceDup(MiddlewareMixin):
+class FixMaintenanceDup(deprecation.MiddlewareMixin if DJANGO_VERSION >= (1, 10, 0) else object):
 
     def process_request(self, request):
         site = Site.objects.get_current()
