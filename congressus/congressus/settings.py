@@ -78,6 +78,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'middlewares.FixMaintenanceDup',
     'maintenancemode.middleware.MaintenanceModeMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
 )
