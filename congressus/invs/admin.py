@@ -100,7 +100,7 @@ class InvUsedInSessionInline(admin.TabularInline):
 
 
 class InvitationAdmin(CSVMixin, admin.ModelAdmin):
-    list_display = ('order', 'type', 'is_pass', 'created', 'iused', 'concept', 'name')
+    list_display = ('order', 'type', 'is_pass', 'created', 'iused', 'concept', 'cseat')
     list_filter = ('is_pass', UsedFilter, 'type')
     date_hierarchy = 'created'
     search_fields = ('order', 'generator__concept', 'name')
@@ -115,7 +115,7 @@ class InvitationAdmin(CSVMixin, admin.ModelAdmin):
         'created',
         'iused',
         'concept',
-        'name',
+        'cseat',
     ]
 
     def concept(self, obj):
