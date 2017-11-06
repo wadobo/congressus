@@ -4,6 +4,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.http import HttpResponse
 
 from admin_csv import CSVMixin
+from django_admin_listfilter_dropdown.filters import DropdownFilter
+from django_admin_listfilter_dropdown.filters import RelatedDropdownFilter
 
 from .models import InvitationGenerator
 from .models import Invitation
@@ -101,9 +103,15 @@ class InvUsedInSessionInline(admin.TabularInline):
 
 class InvitationAdmin(CSVMixin, admin.ModelAdmin):
     list_display = ('order', 'type', 'is_pass', 'created', 'iused', 'concept', 'cseat')
-    list_filter = ('is_pass', UsedFilter, 'type')
     date_hierarchy = 'created'
     search_fields = ('order', 'generator__concept', 'name')
+
+    list_filter = (
+        'is_pass', UsedFilter,
+        ('type__event', RelatedDropdownFilter),
+        ('type', RelatedDropdownFilter),
+        ('generator__concept', DropdownFilter),
+    )
 
     actions = [get_csv, get_pdf, get_thermal]
     inlines = [InvUsedInSessionInline]

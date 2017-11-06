@@ -60,6 +60,7 @@ INSTALLED_APPS = (
 
     # 3rd party, here to override templates
     'extended_filters',
+    'django_admin_listfilter_dropdown',
 )
 
 SITE_ID = 1
