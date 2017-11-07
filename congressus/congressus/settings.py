@@ -212,6 +212,8 @@ ROW_RAND = 3
 
 SHOW_TOOLBAR_CALLBACK = False
 
+ACCESS_VALIDATE_INV_HOURS = True
+
 try:
     from local_settings import *
 except:
