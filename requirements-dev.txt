@@ -1,6 +1,6 @@
 -r requirements.txt
+Cython==0.27.3
 django-debug-toolbar==1.6
-Cython==0.24.1
 -e hg+https://bitbucket.org/kmike/line_profiler@7999f21cafbe00950070c8ff0fd8f029d8e90996#egg=line_profiler
 django-debug-toolbar-line-profiler==0.6.1
 django-silk==0.7.1
