@@ -47,6 +47,7 @@ class TicketWindow(models.Model):
     class Meta:
         verbose_name = _('ticket window')
         verbose_name_plural = _('ticket windows')
+        ordering = ['-event', 'name']
 
     def get_sales(self, date, **kwargs):
         if not date:
@@ -80,7 +81,7 @@ class TicketWindow(models.Model):
         return sales['sold'] or 0
 
     def __str__(self):
-        return self.name
+        return "{0} - {1}".format(self.event.name, self.name)
 
 
 class TicketWindowSale(models.Model):
