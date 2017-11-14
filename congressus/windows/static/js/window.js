@@ -8,13 +8,19 @@ function showLog(mode) {
     }
     res = '<br/>';
     tail = '<br/>';
+
+
     if (mode) {
         ticket_log.forEach(function(tk) {
-            res += tk.n + ' - ' + tk.code + ' - ' + tk.mp + ' - ' + tk.price + tail;
+            name = tk.n + ' - ' + tk.code + ' - ' + tk.mp + ' - ' + tk.price + tail;
+            link = "/window/" + window.ev + "/" + window_name + "/thermal/" + tk.mp + "/";
+            res += "<a href='" + link + "' target='_blank'>" + name + "</a>";
         });
     } else {
         tk = ticket_log[length - 1];
-        res += tk.n + ' - ' + tk.code + ' - ' + tk.mp + ' - ' + tk.price + tail;
+        name = tk.n + ' - ' + tk.code + ' - ' + tk.mp + ' - ' + tk.price + tail;
+        link = "/window/" + window.ev + "/" + window_name + "/thermal/" + tk.mp + "/";
+        res += "<a href='" + link + "' target='_blank'>" + name + "</a>";
     }
     $("#floating-log-input").html(res);
 }

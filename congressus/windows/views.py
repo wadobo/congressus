@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
+from django.db.models import Q
 from django.utils.translation import ugettext as _
 from django.shortcuts import redirect, render
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -156,7 +157,7 @@ window_multipurchase = csrf_exempt(WindowMultiPurchase.as_view())
 
 class WindowTicket(WindowMultiPurchase):
     def get(self, request, ev=None, pf=None, order=None, w=None):
-        mp = get_object_or_404(MultiPurchase, order=order)
+        mp = get_object_or_404(MultiPurchase, Q(order=order) | Q(order_tpv=order))
         response = get_ticket_format(mp, pf=pf, attachment=False)
         return response
 window_ticket = csrf_exempt(WindowTicket.as_view())
