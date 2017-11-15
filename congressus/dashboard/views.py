@@ -435,8 +435,12 @@ class OnlineReportView(ReportView):
         end_date = self.request.GET.get('end-date')
 
         if start_date and end_date:
-            start_date = datetime.strptime(start_date, "%d-%m-%Y").date()
-            end_date = datetime.strptime(end_date, "%d-%m-%Y").date()
+            str_format = "%d-%m-%Y"
+            if start_date.find("/") > 0:
+                str_format = str_format.replace("-", "/")
+
+            start_date = datetime.strptime(start_date, str_format).date()
+            end_date = datetime.strptime(end_date, str_format).date()
             self.sessions = self.sessions.filter(start__range=(start_date, end_date))
 
             delta = timedelta(days=1)
