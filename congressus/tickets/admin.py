@@ -89,6 +89,7 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
         'created',
 
         'used',
+        'used_at',
     ]
 
     readonly_fields = (
@@ -172,6 +173,14 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
         d1 = timezone.localtime(obj.created)
         return date_format(d1, fmt)
     created2.short_description = _('date')
+
+    def used_at(self, obj):
+        if not obj.used_date:
+            return '-'
+        fmt='d/m/y H:i:s'
+        d1 = timezone.localtime(obj.used_date)
+        return date_format(d1, fmt)
+    used_at.short_description = _('used at')
 
 
 class TicketInline(admin.TabularInline):
