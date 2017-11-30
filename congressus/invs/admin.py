@@ -3,6 +3,9 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from django.http import HttpResponse
 
+from django.utils import timezone
+from django.utils.formats import date_format
+
 from admin_csv import CSVMixin
 from django_admin_listfilter_dropdown.filters import DropdownFilter
 from django_admin_listfilter_dropdown.filters import RelatedDropdownFilter
@@ -124,6 +127,7 @@ class InvitationAdmin(CSVMixin, admin.ModelAdmin):
         'iused',
         'concept',
         'cseat',
+        'used_at',
     ]
 
     def concept(self, obj):
@@ -135,6 +139,14 @@ class InvitationAdmin(CSVMixin, admin.ModelAdmin):
         return obj.used
     iused.short_description = _('used')
     iused.boolean = True
+
+    def used_at(self, obj):
+        if not obj.used_date:
+            return '-'
+        fmt='d/m/y H:i:s'
+        d1 = timezone.localtime(obj.used_date)
+        return date_format(d1, fmt)
+    used_at.short_description = _('used at')
 
 
 class InvitationGeneratorAdmin(admin.ModelAdmin):
