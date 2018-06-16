@@ -13,28 +13,29 @@ Including another URLconf
     1. Add an import:  from blog import urls as blog_urls
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
-from django.conf.urls import include, url
+from django.urls import include, path
 from django.contrib import admin
 from django.conf import settings
 
+
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^pages/', include('django.contrib.flatpages.urls')),
-    url(r'^tinymce/', include('tinymce.urls')),
-    url(r'^window/', include('windows.urls')),
-    url(r'^access/', include('access.urls')),
-    url(r'^dashboard/', include('dashboard.urls')),
-    url(r'^report/', include('dashboard.urls_report')),
-    url(r'^invs/', include('invs.urls')),
-    url(r'', include('tickets.urls')),
+    path('admin/', admin.site.urls),
+    path('pages/', include('django.contrib.flatpages.urls')),
+    path('tinymce/', include('tinymce.urls')),
+    path('window/', include('windows.urls')),
+    path('access/', include('access.urls')),
+    path('dashboard/', include('dashboard.urls')),
+    path('report/', include('dashboard.urls_report')),
+    path('invs/', include('invs.urls')),
+    path('', include('tickets.urls')),
 ]
 
 if 'theme' in settings.INSTALLED_APPS:
-    urlpatterns += url(r'^custom/', include('theme.urls')),
+    urlpatterns += path('custom/', include('theme.urls')),
 
 if settings.DEBUG:
     import debug_toolbar
     urlpatterns += [
-        url(r'^debug/', include(debug_toolbar.urls)),
-        url(r'^silk/', include('silk.urls', namespace='silk'))
+        path('debug/', include(debug_toolbar.urls)),
+        path('silk/', include('silk.urls', namespace='silk'))
     ]

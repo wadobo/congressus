@@ -25,7 +25,7 @@ from django.views.generic import View
 
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect, render
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth.mixins import UserPassesTestMixin
 
 from django.views.decorators.csrf import csrf_exempt
@@ -115,7 +115,7 @@ class MultiPurchaseView(TemplateView):
             client = ''.join(random.choice(string.hexdigits) for _ in range(20))
             self.request.session['client'] = client
 
-        authenticated_user = self.request.user.is_authenticated()
+        authenticated_user = self.request.User.is_authenticated
         if not authenticated_user:
             # Expired time reset. If not new client
             seathold_update(client, type='H')

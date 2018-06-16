@@ -8,12 +8,14 @@ from events.models import Event
 
 
 class AccessControl(models.Model):
-    event = models.ForeignKey(Event, related_name='access', verbose_name=_('event'))
+    event = models.ForeignKey(Event, related_name='access', verbose_name=_(
+        'event'), on_delete=models.CASCADE)
 
     name = models.CharField(_('name'), max_length=200)
     slug = AutoSlugField(populate_from='name')
 
-    location = models.CharField(_('location'), max_length=500, blank=True, null=True)
+    location = models.CharField(
+        _('location'), max_length=500, blank=True, null=True)
     mark_used = models.BooleanField(_('mark used'), default=True)
 
     class Meta:
@@ -44,9 +46,11 @@ AC_TYPES = (
 
 
 class LogAccessControl(models.Model):
-    access_control = models.ForeignKey(AccessControl, related_name='log_access', verbose_name=_('access control'))
+    access_control = models.ForeignKey(AccessControl, related_name='log_access', verbose_name=_(
+        'access control'), on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(_('status'), max_length=10, choices=AC_TYPES, default="ok")
+    status = models.CharField(
+        _('status'), max_length=10, choices=AC_TYPES, default="ok")
 
     class Meta:
         verbose_name = _('access control point log')

@@ -69,13 +69,12 @@ if os.path.exists(os.path.join(BASE_DIR, 'theme')):
     print("Custom theme found... Using it")
     INSTALLED_APPS = ('theme', ) + INSTALLED_APPS
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -243,10 +242,10 @@ if DEBUG:
         'silk',
     ) + INSTALLED_APPS
 
-    MIDDLEWARE_CLASSES = (
+    MIDDLEWARE = (
         'debug_toolbar.middleware.DebugToolbarMiddleware',
         'silk.middleware.SilkyMiddleware',
-    ) + MIDDLEWARE_CLASSES
+    ) + MIDDLEWARE
 
     SILKY_PYTHON_PROFILER = True
     #SILKY_PYTHON_PROFILER_BINARY = True # crate file for view with snakeviz

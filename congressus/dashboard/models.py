@@ -37,7 +37,7 @@ class ConfigChart(models.Model):
 
 
 class Dashboard(models.Model):
-    event = models.ForeignKey(Event, verbose_name=_('event'))
+    event = models.ForeignKey(Event, verbose_name=_('event'), on_delete=models.CASCADE)
     name = models.CharField(_('name'), max_length=200)
     num_cols = models.CharField(_("number columns"), max_length=2, choices=NUM_COLS, default="2")
     slug = AutoSlugField(populate_from='name')

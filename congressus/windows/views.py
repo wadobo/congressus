@@ -10,7 +10,7 @@ from django.db.models import Q
 from django.utils.translation import ugettext as _
 from django.shortcuts import redirect, render
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from .models import TicketWindow
 from .models import TicketWindowSale

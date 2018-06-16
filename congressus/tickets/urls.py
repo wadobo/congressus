@@ -1,27 +1,29 @@
-from django.conf.urls import url
+from django.urls import path
 from . import views
 
 
+app_name = 'tickets'
+
 urlpatterns = [
-    url(r'^$', views.last_event, name='last_event'),
-    url(r'^event/(?P<ev>[\w-]+)/$', views.event, name='event'),
+    path('', views.last_event, name='last_event'),
+    path('event/<str:ev>/', views.event, name='event'),
 
-    url(r'^event/(?P<ev>[\w-]+)/(?P<space>[\w-]+)/(?P<session>[\w-]+)/register/$', views.register, name='register'),
-    url(r'^ticket/(?P<order>[\w-]+)/payment/$', views.payment, name='payment'),
-    url(r'^ticket/(?P<order>[\w-]+)/thanks/$', views.thanks, name='thanks'),
-    url(r'^ticket/confirm/$', views.confirm, name='confirm'),
-    url(r'^ticket/confirm/paypal/$', views.confirm_paypal, name='confirm_paypal'),
-    url(r'^ticket/(?P<order>[\w-]+)/confirm/stripe/$', views.confirm_stripe, name='confirm_stripe'),
+    path('event/<str:ev>/<str:space>/<str:session>/register/', views.register, name='register'),
+    path('ticket/<str:order>/payment/', views.payment, name='payment'),
+    path('ticket/<str:order>/thanks/', views.thanks, name='thanks'),
+    path('ticket/confirm/', views.confirm, name='confirm'),
+    path('ticket/confirm/paypal/', views.confirm_paypal, name='confirm_paypal'),
+    path('ticket/<str:order>/confirm/stripe/', views.confirm_stripe, name='confirm_stripe'),
 
-    url(r'^ticket/template/(?P<id>\d+)/preview/$', views.template_preview, name='template_preview'),
-    url(r'^ticket/thermal/template/(?P<id>\d+)/preview/$', views.thermal_template_preview, name='thermal_template_preview'),
-    url(r'^ticket/email-confirm/(?P<id>\d+)/preview/$', views.email_confirm_preview, name='email_confirm_preview'),
+    path('ticket/template/<int:id>/preview/', views.template_preview, name='template_preview'),
+    path('ticket/thermal/template/<int:id>/preview/', views.thermal_template_preview, name='thermal_template_preview'),
+    path('ticket/email-confirm/<int:id>/preview/', views.email_confirm_preview, name='email_confirm_preview'),
 
-    url(r'^(?P<ev>[\w-]+)/$', views.multipurchase, name='multipurchase'),
+    path('<str:ev>/', views.multipurchase, name='multipurchase'),
 
-    url(r'^seats/(?P<session>\d+)/(?P<layout>\d+)/$', views.ajax_layout, name='ajax_layout'),
-    url(r'^seats/view/(?P<map>\d+)/$', views.seats, name='seats'),
-    url(r'^seats/auto/$', views.autoseats, name='autoseats'),
-    url(r'^seats/bystr/$', views.seats_by_str, name='seats_by_str'),
+    path('seats/<int:session>/<int:layout>/', views.ajax_layout, name='ajax_layout'),
+    path('seats/view/<int:map>/', views.seats, name='seats'),
+    path('seats/auto/', views.autoseats, name='autoseats'),
+    path('seats/bystr/', views.seats_by_str, name='seats_by_str'),
 ]
 

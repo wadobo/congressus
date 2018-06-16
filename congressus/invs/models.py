@@ -32,7 +32,7 @@ class InvitationType(models.Model):
                                    'So this is ignored in invitations.'))
 
     event = models.ForeignKey(Event, related_name='invitation_types',
-                              verbose_name=_('event'))
+                              verbose_name=_('event'), on_delete=models.CASCADE)
     sessions = models.ManyToManyField(Session, related_name='invitation_types',
                                       blank=True,
                                       verbose_name=_('sessions'))
@@ -43,8 +43,8 @@ class InvitationType(models.Model):
     start = models.DateTimeField(_('start date'), null=True, blank=True)
     end = models.DateTimeField(_('end date'), null=True, blank=True)
 
-    template = models.ForeignKey("events.TicketTemplate", blank=True, null=True, verbose_name=_('template'))
-    thermal_template = models.ForeignKey("events.ThermalTicketTemplate", blank=True, null=True, verbose_name=_('thermal template'))
+    template = models.ForeignKey("events.TicketTemplate", blank=True, null=True, verbose_name=_('template'), on_delete=models.CASCADE)
+    thermal_template = models.ForeignKey("events.ThermalTicketTemplate", blank=True, null=True, verbose_name=_('thermal template'), on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = _('invitation type')
@@ -57,10 +57,10 @@ class InvitationType(models.Model):
 
 class Invitation(models.Model, BaseExtraData):
     type = models.ForeignKey(InvitationType, related_name='invitations',
-                             verbose_name=_('invitation type'))
+                             verbose_name=_('invitation type'), on_delete=models.CASCADE)
 
     generator = models.ForeignKey('InvitationGenerator', related_name='invitations',
-                                  null=True, blank=True, verbose_name=_('generator'))
+                                  null=True, blank=True, verbose_name=_('generator'), on_delete=models.CASCADE)
 
     order = models.CharField(_('order'), max_length=200, unique=True)
     created = models.DateTimeField(_('created at'), auto_now_add=True)
@@ -68,7 +68,7 @@ class Invitation(models.Model, BaseExtraData):
     is_pass = models.BooleanField(_('is pass'), default=False)
 
     # row-col
-    seat_layout = models.ForeignKey(SeatLayout, null=True, blank=True, verbose_name=_('seat layout'))
+    seat_layout = models.ForeignKey(SeatLayout, null=True, blank=True, verbose_name=_('seat layout'), on_delete=models.CASCADE)
     seat = models.CharField(_('seat'), max_length=20, null=True, blank=True)
     name = models.CharField(_('name'), max_length=200, null=True, blank=True)
 
@@ -194,8 +194,8 @@ class Invitation(models.Model, BaseExtraData):
 
 
 class InvUsedInSession(models.Model):
-    inv = models.ForeignKey(Invitation, related_name='usedin', verbose_name=_('invitation'))
-    session = models.ForeignKey(Session, related_name='usedby', verbose_name=_('session'))
+    inv = models.ForeignKey(Invitation, related_name='usedin', verbose_name=_('invitation'), on_delete=models.CASCADE)
+    session = models.ForeignKey(Session, related_name='usedby', verbose_name=_('session'), on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -204,7 +204,7 @@ class InvUsedInSession(models.Model):
 
 
 class InvitationGenerator(models.Model):
-    type = models.ForeignKey(InvitationType, verbose_name=_('type'))
+    type = models.ForeignKey(InvitationType, verbose_name=_('type'), on_delete=models.CASCADE)
     amount = models.IntegerField(_('amount'), default=1)
     price = models.IntegerField(_('price'), blank=True, null=True)
     tax = models.IntegerField(_('tax'), null=True)

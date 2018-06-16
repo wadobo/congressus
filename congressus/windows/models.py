@@ -33,13 +33,13 @@ CASH_MOVEMENT_TYPES = (
 
 
 class TicketWindow(models.Model):
-    event = models.ForeignKey(Event, related_name='windows', verbose_name=_('event'))
+    event = models.ForeignKey(Event, related_name='windows', verbose_name=_('event'), on_delete=models.CASCADE)
 
     name = models.CharField(_('name'), max_length=200)
     slug = AutoSlugField(populate_from='name')
     code = models.CharField(_('code'), max_length=5, help_text=_('code to show in tickets'))
     cash = models.FloatField(_('cash in the ticket window'), default=0)
-    user = models.ForeignKey(User, verbose_name=_('user'), blank=True, null=True)
+    user = models.ForeignKey(User, verbose_name=_('user'), blank=True, null=True, on_delete=models.CASCADE)
 
     location = models.CharField(_('location'), max_length=500, blank=True, null=True)
     online = models.BooleanField(_('online'), default=False)
@@ -85,9 +85,9 @@ class TicketWindow(models.Model):
 
 
 class TicketWindowSale(models.Model):
-    window = models.ForeignKey(TicketWindow, related_name='sales', verbose_name=_('window'))
-    user = models.ForeignKey(User, related_name='sales', verbose_name=_('user'), blank=True, null=True)
-    purchase = models.ForeignKey(MultiPurchase, related_name='sales', verbose_name=_('multipurchase'))
+    window = models.ForeignKey(TicketWindow, related_name='sales', verbose_name=_('window'), on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='sales', verbose_name=_('user'), blank=True, null=True, on_delete=models.CASCADE)
+    purchase = models.ForeignKey(MultiPurchase, related_name='sales', verbose_name=_('multipurchase'), on_delete=models.CASCADE)
 
     price = models.FloatField(_('price'), default=0)
     payed = models.FloatField(_('payed'), default=0)
@@ -108,7 +108,7 @@ class TicketWindowSale(models.Model):
 
 
 class TicketWindowCashMovement(models.Model):
-    window = models.ForeignKey(TicketWindow, related_name='movements', verbose_name=_('window'))
+    window = models.ForeignKey(TicketWindow, related_name='movements', verbose_name=_('window'), on_delete=models.CASCADE)
     type = models.CharField(_('type'), max_length=10, choices=CASH_MOVEMENT_TYPES, default='change')
     amount = models.FloatField(_('amount'), default=0)
 

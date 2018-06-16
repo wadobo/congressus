@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.utils import formats
 from django.shortcuts import redirect, render
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from .models import AccessControl
 from .models import LogAccessControl
@@ -30,6 +30,7 @@ def short_date(dt):
     if timezone.is_aware(dt):
         dt = timezone.localtime(dt)
     return formats.date_format(dt, 'SHORT_DATETIME_FORMAT')
+
 
 def make_aware(dt):
     if not timezone.is_aware(dt):
@@ -62,26 +63,29 @@ class AccessLogin(TemplateView):
             if user.is_active and have_access:
                 # session
                 session = get_object_or_404(Session,
-                            space__event__slug=ev,
-                            id=request.POST['session'])
+                                            space__event__slug=ev,
+                                            id=request.POST['session'])
                 request.session['session'] = session.id
                 # gate
                 gate = request.POST.get('gate', '')
                 if gate:
                     gate = get_object_or_404(Gate, event__slug=ev,
-                                id=gate)
+                                             id=gate)
                     request.session['gate'] = gate.name
                 else:
                     request.session['gate'] = ''
                 login(request, user)
                 return redirect('access', ev=ac.event.slug, ac=ac.slug)
             else:
-                messages.error(request, _("This user can't access in this access control"))
+                messages.error(request, _(
+                    "This user can't access in this access control"))
         else:
             messages.error(request, _("Invalid username or password"))
 
         return render(request, self.template_name,
                       self.get_context_data(ev=ev, ac=ac.slug))
+
+
 access_login = AccessLogin.as_view()
 
 
@@ -138,7 +142,8 @@ class AccessView(UserPassesTestMixin, TemplateView):
                 return 'wrong', ticket.session.short()
 
         if extra.get('used'):
-            used_date = datetime.strptime(extra['used_date'], settings.DATETIME_FORMAT)
+            used_date = datetime.strptime(
+                extra['used_date'], settings.DATETIME_FORMAT)
             msg = _('Used: %(date)s') % {'date': short_date(used_date)}
             return 'wrong', msg
 
@@ -150,10 +155,11 @@ class AccessView(UserPassesTestMixin, TemplateView):
         end_formatted = short_date(end)
 
         if make_aware(end) < timezone.now():
-            msg = _("Expired, ended at %(date)s") % { 'date': end_formatted }
+            msg = _("Expired, ended at %(date)s") % {'date': end_formatted}
             return 'wrong', msg
         elif make_aware(start) > timezone.now():
-            msg = _("Too soon, wait until %(date)s") % { 'date': start_formatted }
+            msg = _("Too soon, wait until %(date)s") % {
+                'date': start_formatted}
             return 'wrong', msg
 
         if not hasattr(ticket, 'is_pass') or not ticket.is_pass:
@@ -161,7 +167,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
                 ticket.set_extra_session_to_used(s)
             ticket.save()
 
-        return 'right', _('Extra session: %(session)s') % { 'session': session.short() }
+        return 'right', _('Extra session: %(session)s') % {'session': session.short()}
 
     def check_inv(self, order, s, g):
         try:
@@ -173,7 +179,8 @@ class AccessView(UserPassesTestMixin, TemplateView):
         valid_session = inv.type.sessions.filter(pk=s).exists()
         invalid_gate = (g and not inv.type.gates.filter(name=g).exists())
 
-        ret = self.check_all(inv, s, valid_session, invalid_gate, session=session)
+        ret = self.check_all(inv, s, valid_session,
+                             invalid_gate, session=session)
         if ret:
             return ret
 
@@ -181,10 +188,12 @@ class AccessView(UserPassesTestMixin, TemplateView):
             now = timezone.now()
             # Checking if there's start or end date and if it's valid
             if inv.type.end and now > inv.type.end:
-                msg = _("Expired, ended at %(date)s") % { 'date': short_date(inv.type.end) }
+                msg = _("Expired, ended at %(date)s") % {
+                    'date': short_date(inv.type.end)}
                 return self.response_json(msg, st='wrong')
             if inv.type.start and now < inv.type.start:
-                msg = _("Too soon, wait until %(date)s") % { 'date': short_date(inv.type.start) }
+                msg = _("Too soon, wait until %(date)s") % {
+                    'date': short_date(inv.type.start)}
                 return self.response_json(msg, st='wrong')
 
         # if we're here, everything is ok
@@ -195,7 +204,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
                 inv.set_used(session)
                 inv.save()
 
-        msg = _("Ok: %(session)s") % { 'session': session.short() }
+        msg = _("Ok: %(session)s") % {'session': session.short()}
         return self.response_json(msg, msg2=inv.order)
 
     def check_ticket(self, order, s, g):
@@ -216,7 +225,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
             ticket.used = True
             ticket.used_date = timezone.now()
         ticket.save()
-        msg = _("Ok: %(session)s") % { 'session': ticket.session.short() }
+        msg = _("Ok: %(session)s") % {'session': ticket.session.short()}
         return self.response_json(msg, msg2=ticket.order)
 
     def check_all(self, ticket, s, valid_session, invalid_gate, session=None):
@@ -245,8 +254,8 @@ class AccessView(UserPassesTestMixin, TemplateView):
             return self.response_json(msg, msg2=msg2, st=st)
 
         if invalid_gate:
-            data = { 'session': (session or ticket.session).short(),
-                     'gate': ticket.get_gate_name() }
+            data = {'session': (session or ticket.session).short(),
+                    'gate': ticket.get_gate_name()}
             msg = _("%(session)s - Gate: %(gate)s") % data
             return self.response_json(msg, st='maybe')
 
@@ -265,6 +274,8 @@ class AccessView(UserPassesTestMixin, TemplateView):
             return self.check_inv(order, s, g)
 
         return self.check_ticket(order, s, g)
+
+
 access = csrf_exempt(AccessView.as_view())
 
 
@@ -272,6 +283,8 @@ class AccessLogout(View):
     def get(self, request, ev, ac):
         auth_logout(request)
         return redirect('access', ev=ev, ac=ac)
+
+
 access_logout = AccessLogout.as_view()
 
 
@@ -296,11 +309,15 @@ class AccessList(UserPassesTestMixin, TemplateView):
             date = datetime(*map(int, d.split('-')))
             ctx['date'] = date
 
-        q = Session.objects.extra({"start_date": "date(start)"}).filter(space__event=ev)
-        days = q.values_list('start_date', flat=True).distinct().order_by('start_date')
+        q = Session.objects.extra(
+            {"start_date": "date(start)"}).filter(space__event=ev)
+        days = q.values_list(
+            'start_date', flat=True).distinct().order_by('start_date')
         ctx['days'] = days
         ctx['today'] = timezone.now()
         ctx['menuitem'] = 'access'
 
         return ctx
+
+
 access_list = AccessList.as_view()

@@ -1,12 +1,14 @@
-from django.conf.urls import url
+from django.urls import path
 from . import views
 
 
+app_name = 'windows'
+
 urlpatterns = [
-    url(r'^(?P<ev>[\w-]+)/$', views.window_list, name='window_list'),
-    url(r'^(?P<ev>[\w-]+)/(?P<w>[\w-]+)/logout/$', views.window_logout, name='window_logout'),
-    url(r'^(?P<ev>[\w-]+)/(?P<w>[\w-]+)/login/$', views.window_login, name='window_login'),
-    url(r'^(?P<ev>[\w-]+)/(?P<w>[\w-]+)/$', views.window_multipurchase, name='window_multipurchase'),
-    url(r'^(?P<ev>[\w-]+)/(?P<w>[\w-]+)/(?P<pf>[\w-]+)/(?P<order>[\w-]+)/$', views.window_ticket, name='window_ticket'),
+    path('<str:ev>/', views.window_list, name='window_list'),
+    path('<str:ev>/<str:w>/logout/', views.window_logout, name='window_logout'),
+    path('<str:ev>/<str:w>/login/', views.window_login, name='window_login'),
+    path('<str:ev>/<str:w>/', views.window_multipurchase, name='window_multipurchase'),
+    path('<str:ev>/<str:w>/<str:pf>/<str:order>/', views.window_ticket, name='window_ticket'),
 ]
 

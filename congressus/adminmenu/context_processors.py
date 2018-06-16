@@ -1,4 +1,4 @@
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 
@@ -9,6 +9,6 @@ def links(request):
         return ctx
 
     ctx['menu_links'] = [
-        { 'label': _('admin'), 'url': reverse('admin:index') },
+        {'label': _('admin'), 'url': reverse('admin:index')},
     ]
     return ctx

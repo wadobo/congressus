@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
 from django.utils.safestring import mark_safe
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from django.utils import timezone
 from django.utils.formats import date_format
