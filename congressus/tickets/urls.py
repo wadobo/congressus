@@ -2,8 +2,6 @@ from django.urls import path
 from . import views
 
 
-app_name = 'tickets'
-
 urlpatterns = [
     path('', views.last_event, name='last_event'),
     path('event/<str:ev>/', views.event, name='event'),

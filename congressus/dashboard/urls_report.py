@@ -2,8 +2,6 @@ from django.urls import path
 from . import views
 
 
-app_name = 'dashboard_report'
-
 urlpatterns = [
     path('<str:ev>/', views.report_list, name='report'),
 

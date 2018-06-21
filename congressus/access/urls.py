@@ -1,7 +1,6 @@
 from django.urls import path
 from . import views
 
-app_name = 'access'
 
 urlpatterns = [
     path('<str:ev>/', views.access_list, name='access_list'),

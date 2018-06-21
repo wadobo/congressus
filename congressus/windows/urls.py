@@ -2,8 +2,6 @@ from django.urls import path
 from . import views
 
 
-app_name = 'windows'
-
 urlpatterns = [
     path('<str:ev>/', views.window_list, name='window_list'),
     path('<str:ev>/<str:w>/logout/', views.window_logout, name='window_logout'),
