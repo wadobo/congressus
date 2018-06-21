@@ -411,7 +411,8 @@ class TicketField(models.Model):
         verbose_name_plural = _('ticket fields')
 
     def form_type(self):
-        choices = ((i, i) for i in map(str.strip, self.options.split(',')))
+        opts = self.options or ''
+        choices = ((i, i) for i in map(str.strip, opts.split(',')))
 
         types = {
             'text': forms.CharField(),
