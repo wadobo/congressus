@@ -213,6 +213,11 @@ SHOW_TOOLBAR_CALLBACK = False
 
 ACCESS_VALIDATE_INV_HOURS = True
 
+TINYMCE_DEFAULT_CONFIG = {
+    "height": 500,
+    "width": "100%",
+}
+
 try:
     from local_settings import *
 except:
