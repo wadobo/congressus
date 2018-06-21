@@ -115,7 +115,7 @@ class MultiPurchaseView(TemplateView):
             client = ''.join(random.choice(string.hexdigits) for _ in range(20))
             self.request.session['client'] = client
 
-        authenticated_user = self.request.User.is_authenticated
+        authenticated_user = self.request.user.is_authenticated
         if not authenticated_user:
             # Expired time reset. If not new client
             seathold_update(client, type='H')
@@ -532,7 +532,7 @@ ajax_layout = AjaxLayout.as_view()
 class TicketTemplatePreview(UserPassesTestMixin, View):
     def test_func(self):
         u = self.request.user
-        return u.is_authenticated() and u.is_superuser
+        return u.is_authenticated and u.is_superuser
 
     def get(self, request, id):
         from events.models import TicketTemplate
@@ -581,7 +581,7 @@ thermal_template_preview = ThermalTicketTemplatePreview.as_view()
 class EmailConfirmPreview(UserPassesTestMixin, View):
     def test_func(self):
         u = self.request.user
-        return u.is_authenticated() and u.is_superuser
+        return u.is_authenticated and u.is_superuser
 
     def get(self, request, id):
         from events.models import ConfirmEmail

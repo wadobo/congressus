@@ -79,7 +79,7 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
     def test_func(self):
         u = self.request.user
         have_access = self.get_window().user == u
-        return u.is_authenticated() and have_access
+        return u.is_authenticated and have_access
 
     def get_login_url(self):
         return reverse('window_login', kwargs=self.kwargs)
@@ -175,7 +175,7 @@ class WindowList(UserPassesTestMixin, TemplateView):
 
     def test_func(self):
         u = self.request.user
-        return u.is_authenticated() and u.is_superuser
+        return u.is_authenticated and u.is_superuser
 
     def get_context_data(self, *args, **kwargs):
         ev = self.kwargs.get('ev')

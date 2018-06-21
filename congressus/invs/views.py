@@ -20,7 +20,7 @@ class GenInvitationsView(UserPassesTestMixin, TemplateView):
 
     def test_func(self):
         u = self.request.user
-        return u.is_authenticated() and u.is_superuser
+        return u.is_authenticated and u.is_superuser
 
     def get_discounts(self):
         ev = self.kwargs['ev']

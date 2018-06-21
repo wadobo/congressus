@@ -5,7 +5,7 @@ from django.utils.translation import ugettext as _
 def links(request):
     u = request.user
     ctx = {}
-    if not u.is_authenticated() or not u.is_superuser:
+    if not u.is_authenticated or not u.is_superuser:
         return ctx
 
     ctx['menu_links'] = [
