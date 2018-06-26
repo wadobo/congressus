@@ -6,6 +6,7 @@
     position: fixed;
     z-index: 1000;
     left: 50%;
+    top: 2px;
     background: lightblue;
     height: auto;
     border: none;
