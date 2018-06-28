@@ -209,8 +209,6 @@ EXPIRED_SEAT_P = 35*60 # TPV expired: 35 minutes
 
 ROW_RAND = 3
 
-SHOW_TOOLBAR_CALLBACK = False
-
 ACCESS_VALIDATE_INV_HOURS = True
 
 TINYMCE_DEFAULT_CONFIG = {
@@ -218,13 +216,24 @@ TINYMCE_DEFAULT_CONFIG = {
     "width": "100%",
 }
 
+DEBUG_TOOLS = True
+EXTRA_APPS = tuple()
+
 try:
     from local_settings import *
 except:
     print("NO LOCAL SETTINGS")
 
+if EXTRA_APPS:
+    INSTALLED_APPS = INSTALLED_APPS + EXTRA_APPS
+
 # Debug toolbar options
-if DEBUG:
+if DEBUG and DEBUG_TOOLS:
+    DEBUG_TOOLBAR_CONFIG = {
+        "SHOW_TOOLBAR_CALLBACK": lambda request: True,
+        "SHOW_COLLAPSED": True,
+    }
+
     DEBUG_TOOLBAR_PANELS = [
         'debug_toolbar.panels.versions.VersionsPanel',
         'debug_toolbar.panels.timer.TimerPanel',
@@ -241,11 +250,11 @@ if DEBUG:
         'debug_toolbar_line_profiler.panel.ProfilingPanel',
     ]
 
-    INSTALLED_APPS = (
+    INSTALLED_APPS = INSTALLED_APPS + (
         'debug_toolbar',
         'debug_toolbar_line_profiler',
         'silk',
-    ) + INSTALLED_APPS
+    )
 
     MIDDLEWARE = (
         'debug_toolbar.middleware.DebugToolbarMiddleware',

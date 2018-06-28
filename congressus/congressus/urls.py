@@ -33,9 +33,9 @@ urlpatterns = [
 if 'theme' in settings.INSTALLED_APPS:
     urlpatterns += path('custom/', include('theme.urls')),
 
-if settings.DEBUG:
+if settings.DEBUG and settings.DEBUG_TOOLS:
     import debug_toolbar
-    urlpatterns += [
+    urlpatterns = [
         path('debug/', include(debug_toolbar.urls)),
         path('silk/', include('silk.urls', namespace='silk'))
-    ]
+    ] + urlpatterns
