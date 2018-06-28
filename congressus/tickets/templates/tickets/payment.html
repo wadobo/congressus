@@ -17,15 +17,19 @@
     {% endif %}
 
 
+    {% block page_header %}
     <div class="page-header">
         <h1>
             {% trans "Ticket payment" %}
             <small>{% trans "Verify the data and make the payment" %}</small>
         </h1>
     </div>
+    {% endblock %}
 
     <div class="row">
-        <div class="col-md-6 col-md-offset-3">
+        <div class="{% block form_column %}col-md-6 col-md-offset-3{% endblock %}">
+            {% block payment %}
+
             {% if error %}
                 <div class="alert alert-danger" role="alert">
                     {% if errormsg %}
@@ -41,11 +45,13 @@
                     {% trans "Go to purchase" %}
                 </a>
             {% else %}
+                {% block choose_payment_header %}
                 <div id="choose" class="btn btn-lg btn-primary btn-block">
                     <span id="timer-confirm" class="pull-right">xx:xx</span>
                     <span class="pull-left">{% trans "Choose your payment method" %}</span>
                     <div class="clearfix"></div>
                 </div>
+                {% endblock %}
 
                 <div id="payment-methods">
 
@@ -128,13 +134,16 @@
             {% endif %}
 
             <br/>
+            {% endblock %}
 
+            {% block sale_summary %}
             {% include "tickets/ticket-info.html" %}
 
             <a href="{{ cancel_url }}" class="btn btn-lg btn-warning btn-block">
                 <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
                 {% trans "Cancel payment" %}
             </a>
+            {% endblock %}
         </div>
     </div>
 {% endblock %}

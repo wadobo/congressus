@@ -4,6 +4,7 @@
 {% block title %}{% trans "Thank you" %}{% endblock %}
 
 {% block content %}
+    {% block page_header %}
     <div class="page-header">
         <h1>
             {% block thx_text %}
@@ -12,10 +13,13 @@
             {% endblock %}
         </h1>
     </div>
+    {% endblock %}
 
+    {% block info %}
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
             {% include "tickets/ticket-info.html" %}
         </div>
     </div>
+    {% endblock %}
 {% endblock %}
