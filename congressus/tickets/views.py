@@ -380,13 +380,22 @@ class Thanks(TemplateView):
         ctx = super(Thanks, self).get_context_data(*args, **kwargs)
         ctx['ticket'] = get_ticket_or_404(order=kwargs['order'], confirmed=True)
         return ctx
+
+    def get(self, request, *args, **kwargs):
+        if self.request.GET.get('Ds_MerchantParameters'):
+            mdata = self.request.GET.get('Ds_MerchantParameters', '')
+            sig = self.request.GET.get('Ds_Signature', '')
+            Confirm.confirm_data(mdata, sig)
+            return redirect('thanks', order=kwargs['order'])
+
+        return super().get(request, *args, **kwargs)
+
 thanks = Thanks.as_view()
 
 
 class Confirm(View):
-    def post(self, request):
-        mdata = request.POST.get('Ds_MerchantParameters', '')
-        sig = request.POST.get('Ds_Signature', '')
+    @classmethod
+    def confirm_data(cls, mdata, sig):
         data = tpv_parse_data(mdata, sig)
 
         if not data:
@@ -417,8 +426,13 @@ class Confirm(View):
             raise Http404
 
         tk.confirm()
-
         online_sale(tk)
+
+    def post(self, request):
+        mdata = request.POST.get('Ds_MerchantParameters', '')
+        sig = request.POST.get('Ds_Signature', '')
+        Confirm.confirm_data(mdata, sig)
+
         return HttpResponse("")
 confirm = csrf_exempt(Confirm.as_view())
 
