@@ -15,6 +15,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from invs.utils import get_sold_invs
 
+from .widgets import HTMLWidget
+
 
 TICKET_DATE_FORMATS = (
     ('start', _('Date and start time')),
@@ -36,6 +38,7 @@ FIELD_TYPES = (
     ('textarea', _('TextArea')),
     ('check', _('CheckBox')),
     ('select', _('Select')),
+    ('html', _('HTML')),
 )
 
 DIRECTIONS = (
@@ -398,7 +401,7 @@ class TicketField(models.Model):
     event = models.ForeignKey(Event, related_name='fields', verbose_name=_('event'), on_delete=models.CASCADE)
     order = models.IntegerField(_('order'), default=0)
     type = models.CharField(_('type'), max_length=100, choices=FIELD_TYPES, default='text')
-    label = models.CharField(_('label'), max_length=500)
+    label = models.TextField(_('label'))
     help_text = models.CharField(_('help text'), max_length=1000, blank=True, null=True)
     required = models.BooleanField(_('required'), default=False)
     options = models.CharField(_('options'), max_length=500,
@@ -415,6 +418,7 @@ class TicketField(models.Model):
         choices = ((i, i) for i in map(str.strip, opts.split(',')))
 
         types = {
+            'html': forms.CharField(widget=HTMLWidget),
             'text': forms.CharField(),
             'textarea': forms.CharField(widget=forms.Textarea),
             'check': forms.BooleanField(),

@@ -26,6 +26,9 @@ class RegisterForm(forms.ModelForm):
         for field in self.session.event().fields.all():
             self.fields[field.label] = field.form_type()
 
+            if field.type == 'html':
+                self.fields[field.label].label = False
+
         # Adding html5 required attr to required fields
         for f in self.fields.values():
             if f.required:
@@ -82,6 +85,10 @@ class MPRegisterForm(forms.ModelForm):
 
         for field in self.event.fields.all():
             self.fields[field.label] = field.form_type()
+
+            if field.type == 'html':
+                self.fields[field.label].label = False
+
 
         # Adding html5 required attr to required fields
         for f in self.fields.values():
