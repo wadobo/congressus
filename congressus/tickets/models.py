@@ -234,13 +234,15 @@ class BaseExtraData:
 
     def get_extras_dict(self):
         extras = {}
-        for field in self.event().fields.all():
+        # excluding html, we don't want to show in visualization
+        for field in self.event().fields.exclude(type='html'):
             extras[field.label] = self.get_extra_data(field.label)
         return extras
 
     def get_extras(self):
         extras = []
-        for field in self.event().fields.all():
+        # excluding html, we don't want to show in visualization
+        for field in self.event().fields.exclude(type='html'):
             extras.append({
                 'field': field,
                 'value': self.get_extra_data(field.label)
