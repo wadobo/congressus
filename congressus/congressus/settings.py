@@ -213,23 +213,25 @@ TINYMCE_DEFAULT_CONFIG = {
 }
 
 DEBUG_TOOLS = True
-EXTRA_APPS = tuple()
+REAL_EXTRA_APPS = tuple()
 
 if os.path.exists(os.path.join(BASE_DIR, 'theme')):
     print("Custom theme found... Using it")
     INSTALLED_APPS = ('theme', ) + INSTALLED_APPS
     try:
         from theme.settings import *
+        REAL_EXTRA_APPS = REAL_EXTRA_APPS + EXTRA_APPS
     except:
         pass
 
 try:
     from local_settings import *
+    REAL_EXTRA_APPS = REAL_EXTRA_APPS + EXTRA_APPS
 except:
     print("NO LOCAL SETTINGS")
 
-if EXTRA_APPS:
-    INSTALLED_APPS = INSTALLED_APPS + EXTRA_APPS
+if REAL_EXTRA_APPS:
+    INSTALLED_APPS = INSTALLED_APPS + REAL_EXTRA_APPS
 
 # Debug toolbar options
 if DEBUG and DEBUG_TOOLS:
