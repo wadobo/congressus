@@ -65,10 +65,6 @@ INSTALLED_APPS = (
 
 SITE_ID = 1
 
-if os.path.exists(os.path.join(BASE_DIR, 'theme')):
-    print("Custom theme found... Using it")
-    INSTALLED_APPS = ('theme', ) + INSTALLED_APPS
-
 MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -218,6 +214,14 @@ TINYMCE_DEFAULT_CONFIG = {
 
 DEBUG_TOOLS = True
 EXTRA_APPS = tuple()
+
+if os.path.exists(os.path.join(BASE_DIR, 'theme')):
+    print("Custom theme found... Using it")
+    INSTALLED_APPS = ('theme', ) + INSTALLED_APPS
+    try:
+        from theme.settings import *
+    except:
+        pass
 
 try:
     from local_settings import *
