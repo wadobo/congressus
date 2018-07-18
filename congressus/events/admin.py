@@ -38,7 +38,7 @@ class TicketFieldInline(admin.TabularInline):
 
 class EventAdmin(admin.ModelAdmin):
     inlines = [SpaceInline, TicketFieldInline, InvCodeInline]
-    list_display = ('name', 'active', 'sold')
+    list_display = ('name', 'active', 'ticket_sale_enabled', 'sold')
     list_filter = ('active',)
     filter_horizontal = ('discounts',)
 

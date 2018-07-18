@@ -2,8 +2,12 @@
 {% load staticfiles %}
 
 <div id="tooltip-{{ session.id }}" class="withtooltip btn {% if session.have_places %}btn-success{% else %}btn-danger{% endif %}"
-    data-toggle="modal" data-target="#modal-{{ session.id }}"
     title="{% trans "select the seat" %}" data-placement="top"
+    {% if ev.ticket_sale_enabled %}
+      data-toggle="modal" data-target="#modal-{{ session.id }}"
+    {% else %}
+      disabled="disabled"
+    {% endif %}
     >
     <span class="glyphicon glyphicon-th" aria-hidden="true"></span>
 </div>

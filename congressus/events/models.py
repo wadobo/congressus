@@ -85,6 +85,12 @@ class Event(models.Model):
                                       blank=True,
                                       verbose_name=_('discounts'))
 
+    # fields to activate/deactivate tickets sale
+    ticket_sale_enabled = models.BooleanField(_('sale enabled'), default=True)
+    ticket_sale_message = models.TextField(_('sale message'),
+       help_text=_('Message to show when the ticket sale is disabled'),
+       blank=True, null=True)
+
     class Meta:
         verbose_name = _('event')
         verbose_name_plural = _('events')
