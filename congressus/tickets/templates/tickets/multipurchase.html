@@ -34,12 +34,13 @@
     <p> {{ ev.info }} </p>
     {% endblock %}
 
-    {% block ticket_sale_message %}
-      <div class="bg-info text-center">
-        <p>{{ ev.ticket_sale_message }}</p>
-      </div>
-    {% endblock %}
-
+    {% if not ev.ticket_sale_enabled %}
+      {% block ticket_sale_message %}
+        <div class="alert alert-info text-center">
+          <p>{{ ev.ticket_sale_message }}</p>
+        </div>
+      {% endblock %}
+    {% endif %}
 
     {% block form %}
     <form method="POST" action="" {% block extraform %}{% endblock %}>
