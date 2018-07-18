@@ -220,18 +220,18 @@ if os.path.exists(os.path.join(BASE_DIR, 'theme')):
     INSTALLED_APPS = ('theme', ) + INSTALLED_APPS
     try:
         from theme.settings import *
-        REAL_EXTRA_APPS = REAL_EXTRA_APPS + EXTRA_APPS
+        REAL_EXTRA_APPS = REAL_EXTRA_APPS + tuple(i for i in EXTRA_APPS if not i in REAL_EXTRA_APPS)
     except:
         pass
 
 try:
     from local_settings import *
-    REAL_EXTRA_APPS = REAL_EXTRA_APPS + EXTRA_APPS
+    REAL_EXTRA_APPS = REAL_EXTRA_APPS + tuple(i for i in EXTRA_APPS if not i in REAL_EXTRA_APPS)
 except:
     print("NO LOCAL SETTINGS")
 
 if REAL_EXTRA_APPS:
-    INSTALLED_APPS = INSTALLED_APPS + REAL_EXTRA_APPS
+    INSTALLED_APPS = INSTALLED_APPS + tuple(i for i in REAL_EXTRA_APPS if not i in INSTALLED_APPS)
 
 # Debug toolbar options
 if DEBUG and DEBUG_TOOLS:
