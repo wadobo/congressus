@@ -40,14 +40,16 @@
           <p>{{ ev.ticket_sale_message }}</p>
         </div>
       {% endblock %}
-    {% endif %}
 
-    {% block form %}
-    <form method="POST" action="" {% block extraform %}{% endblock %}>
+    {% else %}
 
-    {% csrf_token %}
-    <div class="row">
-    {% for space in ev.spaces.all %}
+      {% block form %}
+      <form method="POST" action="" {% block extraform %}{% endblock %}>
+
+      {% csrf_token %}
+      <div class="row">
+      {% for space in ev.spaces.all %}
+
         {% get_value seat_maps_table space.seat_map.id as seat_map_table %}
         <div class="col-sm-6">
             <div class="panel panel-info">
@@ -85,7 +87,6 @@
                                                  min='0' max='{{ max_seat_by_session }}' type="text"
                                             data-session="{{ session.id }}"
                                             data-price="{% if window %}{{ session.window_price }}{% else %}{{ session.price }}{% endif %}"
-                                            {% if not ev.ticket_sale_enabled %}disabled="disabled"{% endif %}
                                             {% if not session.space.numbered %}
                                             name="number_{{ session.id }}"
                                             {% elif not window %}
@@ -98,14 +99,10 @@
                                         {% if not window and session.space.numbered %}
                                         {% else %}
                                         <span class="buttons input-group-btn">
-                                            <button data-id="{{ session.id }}" class="plus btn btn-default"
-                                              {% if not ev.ticket_sale_enabled %}disabled="disabled"{% endif %}
-                                              type="button">
+                                            <button data-id="{{ session.id }}" class="plus btn btn-default" type="button">
                                                 <span class="glyphicon glyphicon-plus" ahire-hidden="true"></span>
                                             </button>
-                                            <button data-id="{{ session.id }}" class="minus btn btn-default"
-                                              {% if not ev.ticket_sale_enabled %}disabled="disabled"{% endif %}
-                                              type="button">
+                                            <button data-id="{{ session.id }}" class="minus btn btn-default" type="button">
                                                 <span class="glyphicon glyphicon-minus" ahire-hidden="true"></span>
                                             </button>
                                         </span>
@@ -129,46 +126,45 @@
 
                             </div> <!-- endof row -->
                         {% endfor %}
-                    </div>
-                </div>
-            </div>
+                    </div> <!-- session-table close -->
+                </div> <!-- panel body close -->
+            </div> <!-- panel close -->
             {% block space_extra %}
             {% endblock %}
-        </div>
-    {% endfor %}
-    </div>
+        </div> <!-- endof col -->
 
-    {% block after_sessions %}{% endblock %}
+      {% endfor %} <!-- endfor spaces -->
+      </div> <!-- close spaces row -->
 
+        {% block after_sessions %}{% endblock %}
         {% block total %}
-            <div class="totalinfo text-right">
-                <h2>
-                    {% trans "Total" %}
-                    <span id="total" class="outputbox text-primary">0</span>
-                    €
-                </h2>
-            </div>
-            <br/>
+          <div class="totalinfo text-right">
+            <h2>
+              {% trans "Total" %}
+              <span id="total" class="outputbox text-primary">0</span>
+              €
+              </h2>
+          </div>
+          <br/>
         {% endblock %}
 
-    {% endblock %}
-
-    {% if ev.ticket_sale_enabled %}
-      {% block personal_info %}
-      <fieldset>
-          <legend>{% trans "Personal info" %}</legend>
-          <div class="reg-form bootstrap">
+        {% block personal_info %}
+          <fieldset>
+            <legend>{% trans "Personal info" %}</legend>
+            <div class="reg-form bootstrap">
               {{ form|crispy }}
-          </div>
-      </fieldset>
-      {% endblock %}
+              </div>
+          </fieldset>
+        {% endblock %}
 
-      {% block button %}
-      <button id="btn-continue" type="button" class="btn btn-primary btn-block btn-lg">{% trans "Continue" %}</button>
-      {% endblock %}
+        {% block button %}
+          <button id="btn-continue" type="button" class="btn btn-primary btn-block btn-lg">{% trans "Continue" %}</button>
+        {% endblock %}
+
+      </form>
+      {% endblock %} <!-- form block -->
+
     {% endif %}
-
-    </form>
 
     <div id="restrictions" class="hidden">
         {% for w in ev.warnings.all %}
