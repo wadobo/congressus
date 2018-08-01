@@ -9,26 +9,36 @@ from django.utils import timezone
 from django.utils.formats import date_format
 from django.utils.safestring import mark_safe
 
-from extended_filters.filters import CheckBoxListFilter
 from extended_filters.filters import DateRangeFilter
 
+from congressus.admin import register
+from events.admin import EventMixin, EVFilter
 
-class TicketWindowAdmin(admin.ModelAdmin):
+
+class TicketWindowAdmin(EventMixin, admin.ModelAdmin):
     list_display = ('name', 'code', 'slug', 'event', 'location', 'online', 'user')
-    list_filter = ('event', 'location')
+    list_filter = (EVFilter, 'location')
     search_fields = ('name', 'slug', 'event__name')
 
 
 class TicketWindowSaleAdmin(admin.ModelAdmin):
     list_display = ('window', 'user', 'purchase', 'price', 'payment')
-    list_filter = ('user', 'payment', 'window', 'window__event')
+    list_filter = (('user', admin.RelatedOnlyFieldListFilter),
+                   'payment',
+                   ('window', admin.RelatedOnlyFieldListFilter),
+                   ('window__event', admin.RelatedOnlyFieldListFilter))
     search_fields = ('window__name', 'user__username', 'window__event__name')
     date_hierarchy = 'date'
+
+    def event_filter(self, request, slug):
+        qs = super().get_queryset(request)
+        return qs.filter(window__event__slug=slug)
 
 
 class TicketWindowCashMovementAdmin(admin.ModelAdmin):
     list_display = ('id', 'day', 'window', 'famount', 'type', 'date', 'note')
-    list_filter = ('type', ('window', CheckBoxListFilter), ('date', DateRangeFilter))
+    list_filter = ('type', ('window', admin.RelatedOnlyFieldListFilter),
+                   ('date', DateRangeFilter))
     search_fields = ('window__name', )
     date_hierarchy = 'date'
 
@@ -59,7 +69,11 @@ class TicketWindowCashMovementAdmin(admin.ModelAdmin):
         return mark_safe(html)
     famount.short_description = _('amount')
 
+    def event_filter(self, request, slug):
+        qs = super().get_queryset(request)
+        return qs.filter(window__event__slug=slug)
 
-admin.site.register(TicketWindow, TicketWindowAdmin)
-admin.site.register(TicketWindowSale, TicketWindowSaleAdmin)
-admin.site.register(TicketWindowCashMovement, TicketWindowCashMovementAdmin)
+
+register(TicketWindow, TicketWindowAdmin)
+register(TicketWindowSale, TicketWindowSaleAdmin)
+register(TicketWindowCashMovement, TicketWindowCashMovementAdmin)

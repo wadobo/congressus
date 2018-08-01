@@ -9,7 +9,10 @@ class TicketWindowFilter(admin.SimpleListFilter):
     parameter_name = 'twin'
 
     def lookups(self, request, model_admin):
-        ws = [(w.id, '%s - %s' % (w.event, w.name)) for w in TicketWindow.objects.all()]
+        q = TicketWindow.objects.all()
+        if hasattr(model_admin, "EVENT"):
+            q = q.filter(event__slug=model_admin.EVENT)
+        ws = [(w.id, '%s - %s' % (w.event, w.name)) for w in q]
         ws = [('--', _('without ticket window'))] + ws
         return ws
 

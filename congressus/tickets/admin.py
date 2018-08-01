@@ -21,6 +21,7 @@ from django.core.exceptions import MultipleObjectsReturned
 from windows.utils import online_sale
 
 from extended_filters.filters import DateRangeFilter
+from congressus.admin import register
 
 
 def confirm(modeladmin, request, queryset):
@@ -65,7 +66,10 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
     list_display = ('order', 'order_tpv2', 'session2', 'cseat', 'twin',
                     'created2', 'confirmed', 'used',
                     'email', 'payment', 'payment_method', 'price2', 'event')
-    list_filter = (('created', DateRangeFilter), 'confirmed', 'payment_method', 'used', SingleTicketWindowFilter, 'event_name', 'session__space')
+    list_filter = (('created', DateRangeFilter), 'confirmed',
+                   'payment_method', 'used', SingleTicketWindowFilter,
+                   'event_name',
+                   ('session__space', admin.RelatedOnlyFieldListFilter))
     search_fields = ('order', 'order_tpv', 'email', 'mp__order', 'mp__order_tpv')
     date_hierarchy = 'created'
     actions = [delete_selected, confirm, unconfirm, mark_used, mark_no_used]
@@ -182,6 +186,10 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
         return date_format(d1, fmt)
     used_at.short_description = _('used at')
 
+    def event_filter(self, request, slug):
+        qs = super().get_queryset(request)
+        return qs.filter(session__space__event__slug=slug)
+
 
 class TicketInline(admin.TabularInline):
     model = Ticket
@@ -212,7 +220,9 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
     list_per_page = 20
     list_max_show_all = 800
     list_display = ('order_tpv', 'twin', 'created', 'confirmed2', 'email', 'ntickets', 'price', 'payment_method', 'event')
-    list_filter = (('created', DateRangeFilter), 'confirmed', 'payment_method', TicketWindowFilter, 'ev', 'tpv_error')
+    list_filter = (('created', DateRangeFilter), 'confirmed', 'payment_method',
+                   TicketWindowFilter,
+                   ('ev', admin.RelatedOnlyFieldListFilter), 'tpv_error')
 
     search_fields = ('order', 'order_tpv', 'email', 'extra_data')
     date_hierarchy = 'created'
@@ -310,6 +320,10 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
         return mark_safe(html)
     formated_extra_data.short_description = _('extra data')
 
+    def event_filter(self, request, slug):
+        qs = super().get_queryset(request)
+        return qs.filter(ev__slug=slug)
+
 
 class TicketWarningAdmin(admin.ModelAdmin):
     list_display = ('name', 'ev',  'csessions1', 'csessions2', 'message')
@@ -322,18 +336,28 @@ class TicketWarningAdmin(admin.ModelAdmin):
     def csessions2(self, obj):
         return ', '.join(str(s) for s in obj.sessions2.all())
 
+    def event_filter(self, request, slug):
+        qs = super().get_queryset(request)
+        return qs.filter(ev__slug=slug)
+
 
 class TicketSeatHoldAdmin(admin.ModelAdmin):
     search_fields = ('client', )
     date_hierarchy = 'date'
     list_display = ('client', 'session',  'layout', 'seat', 'date', 'type')
-    list_filter = ('session', 'type', 'layout')
+    list_filter = (('session', admin.RelatedOnlyFieldListFilter),
+                   'type',
+                   ('layout', admin.RelatedOnlyFieldListFilter))
+
+    def event_filter(self, request, slug):
+        qs = super().get_queryset(request)
+        return qs.filter(session__space__event__slug=slug)
 
 
-admin.site.register(Ticket, TicketAdmin)
-admin.site.register(TicketWarning, TicketWarningAdmin)
-admin.site.register(MultiPurchase, MPAdmin)
-admin.site.register(TicketSeatHold, TicketSeatHoldAdmin)
+register(Ticket, TicketAdmin)
+register(TicketWarning, TicketWarningAdmin)
+register(MultiPurchase, MPAdmin)
+register(TicketSeatHold, TicketSeatHoldAdmin)
 
 
 # tinymce for flatpages

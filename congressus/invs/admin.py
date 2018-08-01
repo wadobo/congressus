@@ -21,6 +21,14 @@ from tickets.utils import concat_pdf
 from tickets.utils import generate_pdf
 from tickets.utils import generate_thermal
 
+from events.admin import EventMixin, EVFilter
+
+from congressus.admin import register
+
+
+class RelatedOnlyDropdownFilter(admin.RelatedOnlyFieldListFilter):
+    template = 'django_admin_listfilter_dropdown/dropdown_filter.html'
+
 
 def get_csv(modeladmin, request, queryset):
     csv = []
@@ -89,9 +97,9 @@ def get_thermal(modeladmin, request, queryset):
 get_thermal.short_description = _("Download thermal")
 
 
-class InvitationTypeAdmin(admin.ModelAdmin):
+class InvitationTypeAdmin(EventMixin, admin.ModelAdmin):
     list_display = ('name', 'event', 'is_pass', 'start', 'end')
-    list_filter = ('is_pass', 'event')
+    list_filter = ('is_pass', EVFilter)
     filter_horizontal = ('sessions', 'gates')
 
 
@@ -111,9 +119,9 @@ class InvitationAdmin(CSVMixin, admin.ModelAdmin):
 
     list_filter = (
         'is_pass', UsedFilter,
-        ('type__event', RelatedDropdownFilter),
-        ('type', RelatedDropdownFilter),
-        ('generator__concept', DropdownFilter),
+        ('type__event', admin.RelatedOnlyFieldListFilter),
+        ('type', RelatedOnlyDropdownFilter),
+        ('generator', RelatedOnlyDropdownFilter),
     )
 
     actions = [get_csv, get_pdf, get_thermal]
@@ -148,6 +156,10 @@ class InvitationAdmin(CSVMixin, admin.ModelAdmin):
         return date_format(d1, fmt)
     used_at.short_description = _('used at')
 
+    def event_filter(self, request, slug):
+        qs = super().get_queryset(request)
+        return qs.filter(type__event__slug=slug)
+
 
 class InvitationGeneratorAdmin(admin.ModelAdmin):
     list_display = ('type', 'amount', 'price', 'concept', 'created')
@@ -159,6 +171,10 @@ class InvitationGeneratorAdmin(admin.ModelAdmin):
                 settings.STATIC_URL + 'js/invitation.js',
         ]
 
-admin.site.register(InvitationGenerator, InvitationGeneratorAdmin)
-admin.site.register(Invitation, InvitationAdmin)
-admin.site.register(InvitationType, InvitationTypeAdmin)
+    def event_filter(self, request, slug):
+        qs = super().get_queryset(request)
+        return qs.filter(type__event__slug=slug)
+
+register(InvitationGenerator, InvitationGeneratorAdmin)
+register(Invitation, InvitationAdmin)
+register(InvitationType, InvitationTypeAdmin)
