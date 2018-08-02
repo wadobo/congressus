@@ -52,6 +52,7 @@
 
         {% get_value seat_maps_table space.seat_map.id as seat_map_table %}
         <div class="col-sm-6">
+            {% block pre_session %}{% endblock %}
             <div class="panel panel-info">
                 <div class="panel-heading">
                     {{ space.name }}
