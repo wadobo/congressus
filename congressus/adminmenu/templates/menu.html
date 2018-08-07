@@ -11,7 +11,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="{% url 'admin:index' %}">
+      {% if ev %}
+        {% url ev.slug|add:":index" as url %}
+      {% else %}
+        {% url "admin:index" as url %}
+      {% endif %}
+      <a class="navbar-brand" href="{{ url }}">
         {% block menubrand %}Congressus{% endblock %}
       </a>
     </div>

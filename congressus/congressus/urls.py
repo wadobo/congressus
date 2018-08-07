@@ -16,6 +16,7 @@ Including another URLconf
 from django.urls import include, path
 from django.contrib import admin
 from django.conf import settings
+from django.views.generic.base import RedirectView
 
 from congressus.admin import SITES
 
@@ -25,8 +26,17 @@ ADMINS = [
         for site in SITES
 ]
 
+class AdminView(RedirectView):
+    def get_redirect_url(*args, **kwargs):
+        if SITES:
+            defsite = SITES[-1]
+            return '/admin/{}'.format(defsite.name)
+        else:
+            return '/admin/all/'
+
 urlpatterns = ADMINS + [
-    path('admin/', admin.site.urls),
+    path('admin/', AdminView.as_view()),
+    path('admin/all/', admin.site.urls),
     path('pages/', include('django.contrib.flatpages.urls')),
     path('tinymce/', include('tinymce.urls')),
     path('window/', include('windows.urls')),

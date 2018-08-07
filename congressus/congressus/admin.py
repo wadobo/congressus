@@ -17,8 +17,6 @@ for ev in Event.objects.all():
 def register(model, modeladmin):
     admin.site.register(model, modeladmin)
     for s in SITES:
-        # TODO: modify the modeladmin to use  the custom queryset
-        # for this event
         if hasattr(modeladmin, 'event_filter'):
             class CustomAdmin(modeladmin):
                 EVENT = s.name
