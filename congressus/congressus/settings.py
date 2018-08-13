@@ -58,6 +58,7 @@ INSTALLED_APPS = (
     'access',
     'dashboard',
     'invs',
+    'singlerow',
 
     # 3rd party, here to override templates
     'extended_filters',
@@ -216,6 +217,9 @@ TINYMCE_DEFAULT_CONFIG = {
 
 DEBUG_TOOLS = True
 REAL_EXTRA_APPS = tuple()
+
+SINGLEROW_MS = 5000
+SINGLEROW_LANG = 'en'
 
 if os.path.exists(os.path.join(BASE_DIR, 'theme')):
     print("Custom theme found... Using it")

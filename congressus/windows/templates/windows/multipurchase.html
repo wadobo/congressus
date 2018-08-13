@@ -28,6 +28,9 @@
     <b>{% trans "Last sales" %}</b>
     <span id="floating-log-input"></span>
 </span>
+<div id="floating-singlerow" type="button">
+    <b>{% trans "Closed" %}</b>
+</div>
 {% endblock %}
 
 {% block extrahead %}{{ block.super }}
@@ -137,8 +140,73 @@
     <script src="{% static 'js/moment.min.js' %}"></script>
     <script src="{% static 'js/window.js' %}"></script>
     <script>
-        var windows = '{{ window.slug }}';
         var ev = '{{ window.event.slug }}';
         var window_name = '{{ window.slug }}';
+        var window_singlerow = '{{ window.singlerow }}' == 'True' ? true : false;
+        var window_status = '{{ window_status }}';
+        var info_bar = $("div.number-section");
+        var singlerow = $("div#floating-singlerow");
+        singlerow.html('<b>' + window_status + '</b>');
+        if (window_singlerow) {
+            info_bar.removeClass('bg-close');
+            singlerow.removeClass('bg-close');
+            info_bar.addClass('bg-open');
+            singlerow.addClass('bg-open');
+        } else {
+            info_bar.removeClass('bg-open');
+            singlerow.removeClass('bg-open');
+            info_bar.addClass('bg-close');
+            singlerow.addClass('bg-close');
+        }
+
+        function singlerow_ajax(command) {
+            $.ajax({
+                type: "POST",
+                url: '/singlerow/',
+                data: {
+                    window_slug: window_name,
+                    command: command
+                },
+                success: function(data) {
+                    if (command == 'open') {
+                        info_bar.removeClass('bg-close');
+                        singlerow.removeClass('bg-close');
+                        info_bar.addClass('bg-open');
+                        singlerow.addClass('bg-open');
+                        window_singlerow = true;
+                        singlerow.html('<b>' + data.window_status + '</b>');
+                    } else if (command == 'close') {
+                        info_bar.removeClass('bg-open');
+                        singlerow.removeClass('bg-open');
+                        info_bar.addClass('bg-close');
+                        singlerow.addClass('bg-close');
+                        window_singlerow = false;
+                        singlerow.html('<b>' + data.window_status + '</b>');
+                    } else if (command == 'request' || command == 'wait') {
+                        console.log("NOTIFY");
+                    }
+                },
+                error: function(req, status, err) {
+                    console.log("ERR", err);
+                }
+            });
+        }
+
+        singlerow.click(function() {
+            var command = window_singlerow ? 'close' : 'open';
+            singlerow_ajax(command);
+
+        });
+
+        window.addEventListener("keydown", function(e) {
+            if (e.keyCode == 42) { // ImprPant
+                var command = window_singlerow ? 'close' : 'open';
+                singlerow_ajax(command);
+            } else if (e.keyCode == 145) { // Bloq Despl
+                singlerow_ajax('request');
+            } else if (e.keyCode == 19) { // Pausa Inter
+                singlerow_ajax('wait');
+            }
+        }, false);
     </script>
 {% endblock %}

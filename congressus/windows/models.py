@@ -43,6 +43,7 @@ class TicketWindow(models.Model):
 
     location = models.CharField(_('location'), max_length=500, blank=True, null=True)
     online = models.BooleanField(_('online'), default=False)
+    singlerow = models.BooleanField(_('single row'), default=False)
 
     class Meta:
         verbose_name = _('ticket window')

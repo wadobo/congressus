@@ -92,6 +92,7 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
         ctx['print_formats'] = settings.PRINT_FORMATS
         ctx['default_pf'] = self.DEFAULT_PF
         ctx['discounts'] = self.get_discounts()
+        ctx['window_status'] = _('Opened') if w.singlerow else _('Closed')
         return ctx
 
     def post(self, request, *args, **kwargs):

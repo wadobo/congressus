@@ -5,7 +5,7 @@
 #floating-log {
     position: fixed;
     z-index: 1000;
-    left: 50%;
+    left: 45%;
     top: 2px;
     background: lightblue;
     height: auto;
@@ -16,4 +16,28 @@
     padding-left: 3%;
     padding-right: 3%;
     cursor: pointer;
+}
+
+#floating-singlerow {
+    position: fixed;
+    z-index: 1000;
+    left: 75%;
+    top: 2px;
+    height: auto;
+    border: 2px solid black;
+    border-radius: 5px;
+    font-size: medium;
+    text-align: center;
+    color: white;
+    padding-left: 3%;
+    padding-right: 3%;
+    cursor: pointer;
+}
+
+.bg-close {
+    background: darkred;
+}
+
+.bg-open {
+    background: #5cb85c;
 }

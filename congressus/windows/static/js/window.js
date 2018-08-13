@@ -202,6 +202,7 @@ $(document).ready(function() {
         alertify.confirm(msg, function(e) {
             if (e) {
                 ajaxsend();
+                singlerow_ajax('request');
             }
         });
     }
