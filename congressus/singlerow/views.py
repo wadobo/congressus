@@ -50,10 +50,11 @@ class SingleRow(View):
         global WAIT
         data = {}
         params = request.POST.dict()
+        event = get_object_or_404(Event, id=params.get('event_id'))
         window_slug = params.get('window_slug')
         command = params.get('command')
 
-        tw = get_object_or_404(TicketWindow, slug=window_slug)
+        tw = get_object_or_404(TicketWindow, slug=window_slug, event=event)
 
         if command == 'open' and not tw.singlerow:
             tw.singlerow = True

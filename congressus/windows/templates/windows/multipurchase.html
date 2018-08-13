@@ -140,6 +140,7 @@
     <script src="{% static 'js/moment.min.js' %}"></script>
     <script src="{% static 'js/window.js' %}"></script>
     <script>
+        var event_id = {{ window.event.id|safe }};
         var ev = '{{ window.event.slug }}';
         var window_name = '{{ window.slug }}';
         var window_singlerow = '{{ window.singlerow }}' == 'True' ? true : false;
@@ -164,6 +165,7 @@
                 type: "POST",
                 url: '/singlerow/',
                 data: {
+                    event_id: event_id,
                     window_slug: window_name,
                     command: command
                 },
