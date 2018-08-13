@@ -7,6 +7,7 @@ django-crispy-forms==1.7.2
 django-extended-filters==0.5.7
 django-maintenancemode-2==1.1.11
 django-tinymce==2.7.0
+gTTS==2.0.1
 ipdb==0.11
 numpy==1.14.5
 paypalrestsdk==1.13.1
