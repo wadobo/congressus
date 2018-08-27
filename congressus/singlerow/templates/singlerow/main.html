@@ -34,21 +34,32 @@
     {% block body %}
 
         <div class="contents">
-            <div class="col-md-6 quarter">
+            <div class="col-md-6 w60">
+                {% block q1 %}
                 <h1 class="taq">-</h1>
                 <audio class="taq" autoplay>
                     <source class="taq" type="audio/mpeg">
                 </audio>
+                {% endblock %}
             </div>
-            <div class="col-md-6 quarter">
+            <div class="col-md-6 w40">
+                {% block q2 %}
+                <div class="big-number">
+                    _
+                </div>
+                {% endblock %}
             </div>
-            <div class="col-md-6 quarter">
-                <video class="ads" autoplay>
+            <div class="col-md-6 w60">
+                {% block q3 %}
+                <video id="ads" autoplay>
                     <source class="taq" type="video/mp4">
                 </video>
+                {% endblock %}
             </div>
-            <div class="col-md-6 quarter">
-                <img class="logo" src="">
+            <div class="col-md-6 w40">
+                {% block q4 %}
+                <img id="logo" src="">
+                {% endblock %}
             </div>
         </div>
 
@@ -106,13 +117,15 @@
                     event_id: event_id,
                 },
                 success: function(data) {
-                    $("h1.taq").html(data.name);
+                    $("h1.taq").html(data.tw_name);
+                    $(".big-number").text(data.tw_num);
                     $("source.taq").attr('src', data.url);
                     audio[0].load();
                     audio[0].play();
                 },
                 error: function(req, status, err) {
                     $("h1.taq").html("-");
+                    $(".big-number").text("_");
                     console.log("ERR", err);
                 }
             });

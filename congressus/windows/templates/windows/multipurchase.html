@@ -135,6 +135,13 @@
 {% block total %}
 {% endblock %}
 
+{% block footer %}
+    {% if request.user.is_staff %}
+    <div class="floating-footer">
+    </div>
+    {% endif %}
+{% endblock %}
+
 {% block extrabody %}
     {{ block.super }}
     <script src="{% static 'js/moment.min.js' %}"></script>
@@ -147,6 +154,7 @@
         var window_status = '{{ window_status }}';
         var info_bar = $("div.number-section");
         var singlerow = $("div#floating-singlerow");
+        var staff = '{{ request.user.is_staff }}' == 'True' ? true : false;
         singlerow.html('<b>' + window_status + '</b>');
         if (window_singlerow) {
             info_bar.removeClass('bg-close');
@@ -161,13 +169,15 @@
         }
 
         function singlerow_ajax(command) {
+            console.log("STAFF",staff);
             $.ajax({
                 type: "POST",
                 url: '/singlerow/',
                 data: {
                     event_id: event_id,
                     window_slug: window_name,
-                    command: command
+                    command: command,
+                    staff: staff
                 },
                 success: function(data) {
                     if (command == 'open') {
@@ -187,6 +197,7 @@
                     } else if (command == 'request' || command == 'wait') {
                         console.log("NOTIFY");
                     }
+                    $('.floating-footer').html(data.debug);
                 },
                 error: function(req, status, err) {
                     console.log("ERR", err);
@@ -199,6 +210,12 @@
             singlerow_ajax(command);
 
         });
+
+        if (staff) {
+            setInterval(function() {
+                singlerow_ajax('check');
+            }, 5000);
+        }
 
         window.addEventListener("keydown", function(e) {
             if (e.keyCode == 42) { // ImprPant

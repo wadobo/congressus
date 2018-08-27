@@ -1,9 +1,5 @@
 h1 {
-    margin: 0;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    text-align: center;
     font-size: 90px;
 }
 
@@ -14,10 +10,18 @@ html, body {
     min-height:100%;
 }
 
-.quarter {
-    width:50%;
+.w60 {
+    width:60%;
     height:100%;
     float:left;
+    text-align: center;
+}
+
+.w40 {
+    width:40%;
+    height:100%;
+    float:left;
+    text-align: center;
 }
 
 .contents {
@@ -26,8 +30,23 @@ html, body {
 }
 
 video, img {
-    width: 100%;
-    height: auto;
+    max-width: 100%;
+    max-height: auto;
     padding: 5px;
     text-align: center;
+}
+
+#floatdebug {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+
+.big-number {
+    font-size: 12em;
+    text-align: center;
+    border: black solid 2px;
+    background: lightblue;
+    border-radius: 50px;
+    margin: 5%;
 }

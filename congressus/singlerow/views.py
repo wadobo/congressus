@@ -2,6 +2,7 @@ import datetime
 import json
 import os
 
+from django.db.models import Count
 from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
@@ -42,15 +43,31 @@ class SingleRow(View):
             sr.delete()
 
         data['name'] = sr.window.name
+        tw_name, tw_num = sr.window.name.split()
+        data['tw_name'] = tw_name
+        data['tw_num'] = tw_num
         data['url']  = "/static/media/voice/" + data['name'] + ".mp3"
         return JsonResponse(data)
+
+    def get_singlerow_tails(self, event):
+        singlerow_tails = SingleRowTail.objects.filter(event=event)\
+                .values('window__name').annotate(total=Count('window'))\
+                .order_by('total').values_list('window__name', 'total')
+        out = ''
+        for sr in singlerow_tails:
+            out += '<span class="window-debug {0}">{1}: {2}</span>'.format(st, sr[0], sr[1])
+        return out
 
     def post(self, request, *args, **kwargs):
         global LAST_TW
         global WAIT
-        data = {}
+        data = {'debug': ''}
         params = request.POST.dict()
         event = get_object_or_404(Event, id=params.get('event_id'))
+        staff = params.get('staff', False)
+        if staff:
+            data['debug'] = self.get_singlerow_tails(event=event)
+
         window_slug = params.get('window_slug')
         command = params.get('command')
 
@@ -80,9 +97,6 @@ class SingleRow(View):
                 last.delete()
             else:
                 WAIT.append(tw)
-        else:
-            return JsonResponse(data, status=400)
-
         return JsonResponse(data)
 
 singlerow = csrf_exempt(SingleRow.as_view())

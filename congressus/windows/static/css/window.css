@@ -34,6 +34,18 @@
     cursor: pointer;
 }
 
+.floating-footer {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+}
+
+.window-debug {
+    margin-right: 5px;
+    border: green solid 2px;
+    padding: 2px;
+}
+
 .bg-close {
     background: darkred;
 }
