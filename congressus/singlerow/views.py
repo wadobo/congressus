@@ -55,7 +55,7 @@ class SingleRow(View):
                 .order_by('total').values_list('window__name', 'total')
         out = ''
         for sr in singlerow_tails:
-            out += '<span class="window-debug {0}">{1}: {2}</span>'.format(st, sr[0], sr[1])
+            out += '<span class="window-debug">{0}: {1}</span>'.format(sr[0], sr[1])
         return out
 
     def post(self, request, *args, **kwargs):
