@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
@@ -29,10 +30,17 @@ class TicketWindowSaleAdmin(admin.ModelAdmin):
                    ('window__event', admin.RelatedOnlyFieldListFilter))
     search_fields = ('window__name', 'user__username', 'window__event__name')
     date_hierarchy = 'date'
+    autocomplete_fields = ('purchase', )
 
     def event_filter(self, request, slug):
         qs = super().get_queryset(request)
         return qs.filter(window__event__slug=slug)
+
+    def event_filter_fields(self, slug):
+        return {
+            'window': Q(event__slug=slug),
+            'purchase': Q(ev__slug=slug),
+        }
 
 
 class TicketWindowCashMovementAdmin(admin.ModelAdmin):
@@ -72,6 +80,11 @@ class TicketWindowCashMovementAdmin(admin.ModelAdmin):
     def event_filter(self, request, slug):
         qs = super().get_queryset(request)
         return qs.filter(window__event__slug=slug)
+
+    def event_filter_fields(self, slug):
+        return {
+            'window': Q(event__slug=slug),
+        }
 
 
 register(TicketWindow, TicketWindowAdmin)

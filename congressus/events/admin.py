@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.contrib import admin
 
 from .models import Event, InvCode
@@ -22,11 +23,16 @@ class EventMixin:
         qs = super().get_queryset(request)
         return qs.filter(event__slug=slug)
 
+    def event_filter_fields(self, slug):
+        return { 'event': Q(slug=slug), }
 
 class SpaceMixin:
     def event_filter(self, request, slug):
         qs = super().get_queryset(request)
         return qs.filter(space__event__slug=slug)
+
+    def event_filter_fields(self, slug):
+        return { 'space': Q(event__slug=slug), }
 
 
 class InvCodeInline(admin.TabularInline):
@@ -78,6 +84,8 @@ class ExtraSessionInline(admin.TabularInline):
     model = ExtraSession
     fk_name = 'orig'
 
+    def event_filter_fields(self, slug):
+        return { 'extra': Q(space__event__slug=slug), }
 
 class ExtraSessionAdmin(admin.ModelAdmin):
     list_display = ('orig', 'extra', 'start', 'end', 'used')
@@ -85,6 +93,12 @@ class ExtraSessionAdmin(admin.ModelAdmin):
     def event_filter(self, request, slug):
         qs = super().get_queryset(request)
         return qs.filter(orig__space__event__slug=slug)
+
+    def event_filter_fields(self, slug):
+        return {
+            'orig': Q(space__event__slug=slug),
+            'extra': Q(space__event__slug=slug),
+        }
 
 
 class SessionAdmin(SpaceMixin, admin.ModelAdmin):

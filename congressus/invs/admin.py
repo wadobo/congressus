@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.conf import settings
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
@@ -102,6 +103,11 @@ class InvitationTypeAdmin(EventMixin, admin.ModelAdmin):
     list_filter = ('is_pass', EVFilter)
     filter_horizontal = ('sessions', 'gates')
 
+    def event_filter_fields(self, slug):
+        f = super().event_filter_fields(slug)
+        f.update({ "sessions": Q(space__event__slug=slug), })
+        return f
+
 
 class InvUsedInSessionInline(admin.TabularInline):
     model = InvUsedInSession
@@ -160,6 +166,12 @@ class InvitationAdmin(CSVMixin, admin.ModelAdmin):
         qs = super().get_queryset(request)
         return qs.filter(type__event__slug=slug)
 
+    def event_filter_fields(self, slug):
+        return {
+            'type': Q(event__slug=slug),
+            'generator': Q(type__event__slug=slug),
+        }
+
 
 class InvitationGeneratorAdmin(admin.ModelAdmin):
     list_display = ('type', 'amount', 'price', 'concept', 'created')
@@ -174,6 +186,9 @@ class InvitationGeneratorAdmin(admin.ModelAdmin):
     def event_filter(self, request, slug):
         qs = super().get_queryset(request)
         return qs.filter(type__event__slug=slug)
+
+    def event_filter_fields(self, slug):
+        return { 'type': Q(event__slug=slug), }
 
 register(InvitationGenerator, InvitationGeneratorAdmin)
 register(Invitation, InvitationAdmin)
