@@ -146,9 +146,11 @@ function recalcTotal() {
     $(".sessioninput").each(function() {
         var n = parseInt($(this).val(), 10);
         ntickets += n;
-        var price = parseFloat($(this).data("price"));
+        var price = parseFloat($(this).data("price").replace(",", "."));
+        console.log("price", price);
         sum += price * n;
     });
+    console.log("TOTAL", sum);
     sum = apply_discount(sum, ntickets);
     $("#total").val(sum);
     if (sum <= 0) {

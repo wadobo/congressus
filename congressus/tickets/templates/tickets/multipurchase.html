@@ -4,6 +4,7 @@
 {% load staticfiles %}
 {% load tickets %}
 
+{% load windows %}
 {% block title %}{{ ev }}{% endblock %}
 
 {% block extrahead %}
@@ -60,6 +61,11 @@
                 <div class="panel-body">
                     <div class="sessions-table">
                         {% for session in space.get_next_sessions %}
+                            {% if window %}
+                              {% session_price window session as price %}
+                            {% else %}
+                              {% session_price None session as price %}
+                            {% endif %}
                             <div class="row session-row {% cycle 'odd' 'even' %}">
                                 {% if session.space.numbered %}
                                 {% block col-session-num-1 %}<div class="col-md-5 col-xs-9">{% endblock %}
@@ -87,7 +93,7 @@
                                         <input id="{{ session.id }}" class="sessioninput form-control"
                                                  min='0' max='{{ max_seat_by_session }}' type="text"
                                             data-session="{{ session.id }}"
-                                            data-price="{% if window %}{{ session.window_price }}{% else %}{{ session.price }}{% endif %}"
+                                            data-price="{{ price }}"
                                             {% if not session.space.numbered %}
                                             name="number_{{ session.id }}"
                                             {% elif not window %}
@@ -110,9 +116,9 @@
                                         {% endif %}
                                         <span class="ticket-price input-group-addon">
                                             {% if window %}
-                                                x{{ session.window_price|floatformat:"-2" }} €
+                                                x{{ price|floatformat:"-2" }} €
                                             {% else %}
-                                                {{ session.price|floatformat:"-2" }} €
+                                                {{ price|floatformat:"-2" }} €
                                                 <span>/ {% trans "u" %}</span>
                                             {% endif %}
                                         </span>

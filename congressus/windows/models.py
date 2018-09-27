@@ -45,6 +45,8 @@ class TicketWindow(models.Model):
     online = models.BooleanField(_('online'), default=False)
     singlerow = models.BooleanField(_('single row'), default=False)
 
+    supplement = models.FloatField(_('increments or decrements the ticket price for this window'), default=0)
+
     class Meta:
         verbose_name = _('ticket window')
         verbose_name_plural = _('ticket windows')
@@ -80,6 +82,9 @@ class TicketWindow(models.Model):
         sales = self.get_sales(date, payment='card')
         sales = sales.aggregate(sold=Sum('price'))
         return sales['sold'] or 0
+
+    def get_price(self, session):
+        return session.window_price + self.supplement
 
     def __str__(self):
         return "{0} - {1}".format(self.event.name, self.name)

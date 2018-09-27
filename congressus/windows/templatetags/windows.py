@@ -19,3 +19,9 @@ def sold_today_cash(w, date):
 @register.simple_tag
 def sold_today_card(w, date):
     return w.sold_today_card(date)
+
+@register.simple_tag
+def session_price(w, session):
+    if not w:
+        return session.price
+    return w.get_price(session)

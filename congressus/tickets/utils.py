@@ -240,7 +240,7 @@ class TicketPDF:
             img.drawOn(canvas, doc.width, doc.height + doc.topMargin)
             canvas.restoreState()
 
-        elif self.template:
+        elif self.template and self.template.header:
             header = self.template.header
             header = self.get_image(header.path, width=doc.width)
 
