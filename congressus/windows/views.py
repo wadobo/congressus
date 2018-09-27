@@ -126,11 +126,11 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
             mp = form.save(commit=False)
             if discount:
                 mp.discount = discount
-                mp.price = mp.get_window_price()
+                mp.price = mp.get_window_price(window=w)
             mp.confirm(method="twcash" if payment == 'cash' else 'twtpv')
             for tk in mp.tickets.all():
                 tk.sold_in_window = True
-                tk.price = tk.get_window_price()
+                tk.price = tk.get_window_price(window=w)
                 tk.save()
 
             price = float(data.get('price', 0))

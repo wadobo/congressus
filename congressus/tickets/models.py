@@ -94,10 +94,13 @@ class BaseTicketMixing:
     def get_tax(self):
         return self.session.tax
 
-    def get_window_price(self):
-        from windows.models import TicketWindowSale
-        sale = TicketWindowSale.objects.get(purchase__tickets=self)
-        total = sale.window.get_price(self.session)
+    def get_window_price(self, window=None):
+        if not window:
+            from windows.models import TicketWindowSale
+            sale = TicketWindowSale.objects.get(purchase__tickets=self)
+            total = sale.window.get_price(self.session)
+        else:
+            total = window.get_price(self.session)
 
         if self.mp and self.mp.discount and self.mp.discount.unit:
             total = self.mp.discount.apply_to(total)
