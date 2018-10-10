@@ -15,6 +15,6 @@ def online_sale(mp):
 
     price = mp.get_price()
     payed = mp.get_price()
-    sale = TicketWindowSale(purchase=mp, window=w,
-                            price=price, payed=payed, payment='card')
+    sale, created = TicketWindowSale.objects.get_or_create(purchase=mp, window=w,
+                                                           price=price, payed=payed, payment='card')
     sale.save()
