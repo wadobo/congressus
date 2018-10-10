@@ -171,7 +171,8 @@ def get_seats_by_str(sessions, string):
                     res[lay] += row_seat
                 else:
                     res.update({lay: row_seat})
-    res = check_free_seats(sessions, res)
+    # we don't check for free seats, we'll return always the array
+    # res = check_free_seats(sessions, res)
     return res
 
 
