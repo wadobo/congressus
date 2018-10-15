@@ -122,6 +122,7 @@
                     <option value="{{ pf }}" {% if pf == default_pf %} selected{% endif %}>{{ pf }}</option>
                 {% endfor %}
             </select>
+            <input id="postal-code" name="postal-code" placeholder="{% trans "Postal Code" %}" />
             <button type="button" id="finish" class="btn btn-success btn-block btn-lg" disabled
                 data-cancel="{% trans "Cancel" %}"
                 data-ok="{% trans "Accept" %}"

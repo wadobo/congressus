@@ -101,6 +101,7 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
         ids = [(i[len('number_'):], request.POST[i]) for i in request.POST if i.startswith('number_')]
         seats = [(i[len('seats_'):], request.POST[i].split(',')) for i in request.POST if i.startswith('seats_')]
         print_format = request.POST.get('print-format', self.DEFAULT_PF)
+        postal_code = request.POST.get('postal-code', None)
         discount = request.POST.get('discount', '')
         if discount:
             discount = Discount.objects.get(id=discount)
@@ -127,10 +128,13 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
             if discount:
                 mp.discount = discount
                 mp.price = mp.get_window_price(window=w)
+            if postal_code:
+                mp.set_extra_data('Código Postal', postal_code)
             mp.confirm(method="twcash" if payment == 'cash' else 'twtpv')
             for tk in mp.tickets.all():
                 tk.sold_in_window = True
                 tk.price = tk.get_window_price(window=w)
+                tk.update_mp_extra_data()
                 tk.save()
 
             price = float(data.get('price', 0))

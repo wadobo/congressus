@@ -53,3 +53,7 @@
 .bg-open {
     background: #5cb85c;
 }
+
+#postal-code {
+    margin-bottom: 10px;
+}
