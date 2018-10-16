@@ -413,6 +413,8 @@ class TicketField(models.Model):
     options = models.CharField(_('options'), max_length=500,
                                help_text='comma separated values, only for select type',
                                blank=True, null=True)
+    show_in_tws = models.BooleanField(_('show in ticket window sale'), default=False,
+            help_text='Only can show one field per event. If you check this field, other field could be unchecked')
 
     class Meta:
         ordering = ['order']
@@ -444,6 +446,14 @@ class TicketField(models.Model):
             field.required = False
 
         return field
+
+
+@receiver(post_save, sender=TicketField)
+def unchecked(sender, instance, created, raw, using, update_fields, **kwargs):
+    if instance.show_in_tws:
+        for tf in TicketField.objects.filter(event=instance.event, show_in_tws=True).exclude(pk=instance.pk):
+            tf.show_in_tws = False
+            tf.save()
 
 
 @receiver(post_save, sender=InvCode)
