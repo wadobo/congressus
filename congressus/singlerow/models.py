@@ -18,7 +18,7 @@ class SingleRowConfig(models.Model):
                                     verbose_name=_('last ticket window'),
                                     related_name="config_last",
                                     on_delete=models.SET_NULL)
-    waiting = models.ManyToManyField(TicketWindow, related_name="config_waiting", verbose_name=_('waiting ticket windows'))
+    waiting = models.ManyToManyField(TicketWindow, related_name="config_waiting", verbose_name=_('waiting ticket windows'), blank=True)
 
     class Meta:
         verbose_name = _("Single Row Config")
