@@ -17,7 +17,7 @@ from events.admin import EventMixin, EVFilter
 
 
 class TicketWindowAdmin(EventMixin, admin.ModelAdmin):
-    list_display = ('name', 'code', 'slug', 'event', 'location', 'online', 'singlerow', 'user')
+    list_display = ('name', 'code', 'slug', 'event', 'location', 'online', 'singlerow', 'singlerow_pos', 'user')
     list_filter = (EVFilter, 'location')
     search_fields = ('name', 'slug', 'event__name')
 

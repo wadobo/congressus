@@ -133,8 +133,6 @@ USE_TZ = True
 
 USE_THOUSAND_SEPARATOR = True
 
-LANGUAGE_CODE = 'en-us'
-
 LOCALE_PATHS = (BASE_DIR + '/locale', )
 
 from django.contrib.messages import constants as messages

@@ -32,6 +32,12 @@ CASH_MOVEMENT_TYPES = (
 )
 
 
+SINGLEROW_POS = (
+    ('R', _('Right')),
+    ('L', _('Left')),
+)
+
+
 class TicketWindow(models.Model):
     event = models.ForeignKey(Event, related_name='windows', verbose_name=_('event'), on_delete=models.CASCADE)
 
@@ -44,6 +50,7 @@ class TicketWindow(models.Model):
     location = models.CharField(_('location'), max_length=500, blank=True, null=True)
     online = models.BooleanField(_('online'), default=False)
     singlerow = models.BooleanField(_('single row'), default=False)
+    singlerow_pos = models.CharField(_('single row position'), default="R", choices=SINGLEROW_POS, max_length=1)
 
     supplement = models.FloatField(_('increments or decrements the ticket price for this window'), default=0)
 

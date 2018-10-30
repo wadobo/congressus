@@ -44,9 +44,10 @@
             </div>
             <div class="col-md-6 w40">
                 {% block q2 %}
-                <div class="big-number">
+                <div class="big-number bg-primary">
                     _
                 </div>
+                <div class="arrow"></div>
                 {% endblock %}
             </div>
             <div class="col-md-6 w60">
@@ -109,6 +110,11 @@
         var seconds = {{ seconds|safe }};
         var audio = $("audio.taq");
         var event_id = {{ event.id|safe }};
+        var arrows = {
+            "R": '<span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>',
+            "L": '<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>',
+        };
+
         setInterval(function() {
             $.ajax({
                 type: "GET",
@@ -120,12 +126,14 @@
                     $("h1.taq").html(data.tw_name);
                     $(".big-number").text(data.tw_num);
                     $("source.taq").attr('src', data.url);
+                    $(".arrow").html(arrows[data.position]);
                     audio[0].load();
                     audio[0].play();
                 },
                 error: function(req, status, err) {
                     $("h1.taq").html("-");
                     $(".big-number").text("_");
+                    $(".arrow").html("");
                     console.log("ERR", err);
                 }
             });

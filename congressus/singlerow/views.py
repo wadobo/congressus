@@ -48,6 +48,7 @@ class SingleRow(View):
         data['tw_name'] = tw_name
         data['tw_num'] = tw_num
         data['url']  = "/static/media/voice/" + data['name'] + ".mp3"
+        data['position'] = sr.window.singlerow_pos
         return JsonResponse(data)
 
     def get_singlerow_tails(self, event):

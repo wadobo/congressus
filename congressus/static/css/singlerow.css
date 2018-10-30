@@ -46,7 +46,11 @@ video, img {
     font-size: 12em;
     text-align: center;
     border: black solid 2px;
-    background: lightblue;
-    border-radius: 50px;
+    border-radius: 5px;
     margin: 5%;
+    margin-bottom: 0px;
+}
+
+.arrow {
+    font-size: 120px;
 }
