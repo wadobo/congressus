@@ -13,33 +13,38 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, View
 
-from .models import SingleRowTail
+from .models import SingleRowTail, SingleRowConfig
 from events.models import Event
 from windows.models import TicketWindow
 
-
-LAST_TW = None
-WAIT = []
 
 
 class SingleRow(View):
 
     def get(self, request, *args, **kwargs):
-        global LAST_TW
         data = {}
         params = request.GET.dict()
         event = get_object_or_404(Event, id=params.get('event_id'))
+
+        config, crated = SingleRowConfig.objects.get_or_create(event=event)
+        data['config'] = {
+            "extra_text": config.extra_text,
+            "last_window": config.last_window.name if config.last_window else "",
+        }
+
         tail = SingleRowTail.objects.filter(event=event)
         if not tail.exists():
             return JsonResponse(data, status=404)
         else:
-            tail_exclude = tail.exclude(window=LAST_TW)
-            if tail_exclude.exists():
-                sr = tail_exclude.first()
-            else:
-                sr = tail.first()
+            if config.last_window:
+                tail_exclude = tail.exclude(window=config.last_window)
+                if tail_exclude.exists():
+                    tail = tail_exclude
+            sr = tail.first()
 
-            LAST_TW = sr.window
+            config.last_window = sr.window
+            config.save()
+
             sr.delete()
 
         tw_name = sr.window.name
@@ -47,8 +52,9 @@ class SingleRow(View):
         data['name'] = tw_name
         data['tw_name'] = tw_name
         data['tw_num'] = tw_num
-        data['url']  = "/static/media/voice/" + data['name'] + ".mp3"
+        data['url'] = sr.voice_url()
         data['position'] = sr.window.singlerow_pos
+
         return JsonResponse(data)
 
     def get_singlerow_tails(self, event):
@@ -61,11 +67,10 @@ class SingleRow(View):
         return out
 
     def post(self, request, *args, **kwargs):
-        global LAST_TW
-        global WAIT
         data = {'debug': ''}
         params = request.POST.dict()
         event = get_object_or_404(Event, id=params.get('event_id'))
+        config, created = SingleRowConfig.objects.get_or_create(event=event)
         staff = params.get('staff', False)
         if staff:
             data['debug'] = self.get_singlerow_tails(event=event)
@@ -88,8 +93,8 @@ class SingleRow(View):
             data['window_status'] = _('Closed')
             SingleRowTail.objects.filter(window=tw).delete()
         elif command == 'request' and tw.singlerow:
-            if tw in WAIT:
-                WAIT.remove(tw)
+            if config.waiting.filter(id=tw.id).exists():
+                config.waiting.remove(tw)
             else:
                 sr = SingleRowTail(event=tw.event, window=tw)
                 sr.save()
@@ -98,7 +103,7 @@ class SingleRow(View):
             if last:
                 last.delete()
             else:
-                WAIT.append(tw)
+                config.waiting.add(tw)
         return JsonResponse(data)
 
 singlerow = csrf_exempt(SingleRow.as_view())

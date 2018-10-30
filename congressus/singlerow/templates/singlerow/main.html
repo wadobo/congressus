@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>{% block title %}{% trans "Register" %}{% endblock %}</title>
+    <title>{% block title %}{% trans "Single Row" %}{% endblock %}</title>
 
     <!-- Bootstrap -->
     <link href="{% static "bootstrap/css/bootstrap.min.css" %}" rel="stylesheet">
@@ -40,6 +40,9 @@
                 <audio class="taq" autoplay>
                     <source class="taq" type="audio/mpeg">
                 </audio>
+                {% endblock %}
+                {% block extra_text %}
+                    <div class="extra-text bg-primary"></div>
                 {% endblock %}
             </div>
             <div class="col-md-6 w40">
@@ -115,7 +118,23 @@
             "L": '<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>',
         };
 
-        setInterval(function() {
+        function show_config(conf) {
+            if (conf && conf.extra_text) {
+                $(".extra-text").html(conf.extra_text);
+                $(".extra-text").show();
+            } else {
+                $(".extra-text").hide();
+            }
+        }
+
+        function waiting(conf) {
+            $("h1.taq").html("{% trans "wait" %}");
+            $(".big-number").text("_");
+            $(".arrow").html("");
+            show_config(conf);
+        }
+
+        function update() {
             $.ajax({
                 type: "GET",
                 url: '/singlerow/',
@@ -127,17 +146,22 @@
                     $(".big-number").text(data.tw_num);
                     $("source.taq").attr('src', data.url);
                     $(".arrow").html(arrows[data.position]);
+
+                    show_config(data.config);
+
                     audio[0].load();
                     audio[0].play();
+                    setTimeout(function() { update(); }, seconds);
                 },
                 error: function(req, status, err) {
-                    $("h1.taq").html("-");
-                    $(".big-number").text("_");
-                    $(".arrow").html("");
+                    waiting(req && req.responseJSON && req.responseJSON.config);
                     console.log("ERR", err);
+                    setTimeout(function() { update(); }, seconds);
                 }
             });
-        }, seconds);
+        }
+
+        update();
     </script>
     {% endblock %}
 
