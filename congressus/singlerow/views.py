@@ -42,8 +42,9 @@ class SingleRow(View):
             LAST_TW = sr.window
             sr.delete()
 
-        data['name'] = sr.window.name
-        tw_name, tw_num = sr.window.name.split()
+        tw_name = sr.window.name
+        tw_num = sr.window.code
+        data['name'] = tw_name
         data['tw_name'] = tw_name
         data['tw_num'] = tw_num
         data['url']  = "/static/media/voice/" + data['name'] + ".mp3"
