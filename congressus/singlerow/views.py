@@ -118,6 +118,7 @@ class SingleRowView(TemplateView):
         ctx = super().get_context_data(*args, **kwargs)
         ctx['event'] = event
         ctx['seconds'] = settings.SINGLEROW_MS
+        ctx['config'] = SingleRowConfig.objects.filter(event=event).first()
         return ctx
 
 singlerow_view = SingleRowView.as_view()

@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load staticfiles %}
+{% load singlerow %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -55,14 +56,18 @@
             </div>
             <div class="col-md-6 w60">
                 {% block q3 %}
-                <video id="ads" autoplay>
-                    <source class="taq" type="video/mp4">
+                <video id="ads" autoplay loop>
+                    {% if config.video and config.video|startswith:'http' %}
+                        <source src="{{ config.video }}" class="taq" type="video/mp4">
+                    {% endif %}
                 </video>
                 {% endblock %}
             </div>
             <div class="col-md-6 w40">
                 {% block q4 %}
-                <img id="logo" src="">
+                    {% if config.logo and config.logo|startswith:'http' %}
+                        <img id="logo" src="{{ config.logo }}">
+                    {% endif %}
                 {% endblock %}
             </div>
         </div>

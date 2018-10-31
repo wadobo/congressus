@@ -19,6 +19,8 @@ class SingleRowConfig(models.Model):
                                     related_name="config_last",
                                     on_delete=models.SET_NULL)
     waiting = models.ManyToManyField(TicketWindow, related_name="config_waiting", verbose_name=_('waiting ticket windows'), blank=True)
+    logo = models.CharField(_('logo'), max_length=1024, default="")
+    video = models.CharField(_('video'), max_length=1024, default="")
 
     class Meta:
         verbose_name = _("Single Row Config")
