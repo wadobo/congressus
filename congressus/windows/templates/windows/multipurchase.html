@@ -28,9 +28,6 @@
     <b>{% trans "Last sales" %}</b>
     <span id="floating-log-input"></span>
 </span>
-<div id="floating-singlerow" type="button">
-    <b>{% trans "Closed" %}</b>
-</div>
 {% endblock %}
 
 {% block extrahead %}{{ block.super }}
@@ -43,6 +40,9 @@
     <small class="text-danger">{{ request.user.username }}</small> /
     <small>{{ ev }}</small>
     <small class="text-info pull-right">
+        <div id="floating-singlerow" type="button">
+            <b>{% trans "Closed" %}</b>
+        </div>
         <a href="{% url 'window_logout' window.event.slug window.slug %}">
         {% trans "logout" %}
         </a>

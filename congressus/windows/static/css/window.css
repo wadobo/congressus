@@ -19,9 +19,7 @@
 }
 
 #floating-singlerow {
-    position: fixed;
-    z-index: 1000;
-    left: 75%;
+    display: inline-block;
     top: 2px;
     height: auto;
     border: 2px solid black;
@@ -29,9 +27,8 @@
     font-size: medium;
     text-align: center;
     color: white;
-    padding-left: 3%;
-    padding-right: 3%;
     cursor: pointer;
+    padding: 3px;
 }
 
 .floating-footer {
