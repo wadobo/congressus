@@ -263,9 +263,12 @@ class InvitationGenerator(models.Model):
                 tsh, new = TicketSeatHold.objects.get_or_create(
                         session=invi.type.sessions.first(),
                         layout=invi.seat_layout,
-                        seat=invi.seat
+                        seat=invi.seat,
+                        defaults={'type': 'R', 'client': 'INV'},
                 )
+
                 tsh.type = 'R'
+                tsh.client = 'INV'
                 tsh.save()
 
     def save(self, *args, **kwargs):
