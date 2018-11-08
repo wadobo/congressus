@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-30 13:34+0000\n"
-"PO-Revision-Date: 2018-10-30 14:35+0100\n"
+"POT-Creation-Date: 2018-11-08 11:46+0000\n"
+"PO-Revision-Date: 2018-11-08 12:47+0100\n"
 "Last-Translator: danigm <danigm@gnome.org>\n"
 "Language-Team: Spanish; Castilian <es@gnome.org>\n"
 "Language: es\n"
@@ -26,7 +26,7 @@ msgstr "Control de acceso"
 #: access/models.py:12 dashboard/models.py:40 events/models.py:95
 #: events/models.py:155 events/models.py:248 events/models.py:366
 #: events/models.py:392 events/models.py:407 invs/models.py:35
-#: singlerow/models.py:13 singlerow/models.py:28 tickets/models.py:292
+#: singlerow/models.py:13 singlerow/models.py:30 tickets/models.py:292
 #: tickets/models.py:406 tickets/models.py:553 windows/models.py:42
 msgid "event"
 msgstr "evento"
@@ -41,7 +41,7 @@ msgid "name"
 msgstr "nombre"
 
 #: access/models.py:18 access/templates/access/list.html:34
-#: windows/models.py:50
+#: windows/models.py:51
 msgid "location"
 msgstr "localización"
 
@@ -234,11 +234,11 @@ msgstr "informe"
 msgid "dashboard"
 msgstr "panel de control"
 
-#: adminmenu/templates/menu.html:35 windows/models.py:51
+#: adminmenu/templates/menu.html:35 windows/models.py:52
 msgid "online"
 msgstr "online"
 
-#: adminmenu/templates/menu.html:38 windows/models.py:59
+#: adminmenu/templates/menu.html:38 windows/models.py:60
 msgid "ticket windows"
 msgstr "taquillas"
 
@@ -306,7 +306,7 @@ msgstr "cada minuto"
 
 #: dashboard/models.py:31 events/models.py:59 events/models.py:396
 #: events/models.py:409 invs/models.py:207 tickets/models.py:557
-#: tickets/models.py:579 windows/models.py:125
+#: tickets/models.py:579 windows/models.py:126
 msgid "type"
 msgstr "tipo"
 
@@ -769,7 +769,7 @@ msgstr "adjunto de email"
 msgid "email attachments"
 msgstr "adjuntos de emails"
 
-#: events/models.py:393 windows/models.py:46
+#: events/models.py:393 windows/models.py:47
 msgid "code"
 msgstr "código"
 
@@ -970,12 +970,12 @@ msgstr "invitación usada en"
 msgid "invitations used in"
 msgstr "invitaciones usadas en"
 
-#: invs/models.py:208 windows/admin.py:78 windows/models.py:126
+#: invs/models.py:208 windows/admin.py:78 windows/models.py:127
 msgid "amount"
 msgstr "cantidad"
 
 #: invs/models.py:209 tickets/admin.py:143 tickets/admin.py:312
-#: tickets/models.py:438 windows/models.py:105
+#: tickets/models.py:438 windows/models.py:106
 msgid "price"
 msgstr "precio"
 
@@ -1051,8 +1051,7 @@ msgstr ""
 "No se encuentran asientos contiguos, por favor, selecciona manualmente "
 "usando el botón verde"
 
-#: singlerow/apps.py:7 singlerow/templates/singlerow/main.html:11
-#| msgid "Single Row Tail"
+#: singlerow/apps.py:7 singlerow/templates/singlerow/main.html:12
 msgid "Single Row"
 msgstr "Fila Única"
 
@@ -1069,23 +1068,40 @@ msgid "last ticket window"
 msgstr "última taquilla"
 
 #: singlerow/models.py:21
-#| msgid "last ticket window"
 msgid "waiting ticket windows"
 msgstr "taquillas en espera"
 
-#: singlerow/models.py:24
+#: singlerow/models.py:22
+#| msgid "logout"
+msgid "logo"
+msgstr "logo"
+
+#: singlerow/models.py:23
+msgid "video"
+msgstr "vídeo"
+
+#: singlerow/models.py:26
 msgid "Single Row Config"
 msgstr "Configuración de fila única"
 
-#: singlerow/models.py:29 windows/models.py:101 windows/models.py:124
+#: singlerow/models.py:31 windows/models.py:102 windows/models.py:125
 msgid "window"
 msgstr "taquilla"
 
-#: singlerow/models.py:64
+#: singlerow/models.py:60
+#| msgid "Ticket windows"
+msgid "Ticket window {}"
+msgstr "Taquilla {}"
+
+#: singlerow/models.py:68
 msgid "Single Row Tail"
 msgstr "Cola de fila única"
 
-#: singlerow/templates/singlerow/main.html:131
+#: singlerow/templates/singlerow/main.html:51
+msgid "Go to Window Nº"
+msgstr "Vaya a la Taquilla nº"
+
+#: singlerow/templates/singlerow/main.html:133
 msgid "wait"
 msgstr "espere"
 
@@ -1093,7 +1109,7 @@ msgstr "espere"
 msgid "Opened"
 msgstr "Abierto"
 
-#: singlerow/views.py:93 windows/templates/windows/multipurchase.html:32
+#: singlerow/views.py:93 windows/templates/windows/multipurchase.html:44
 #: windows/views.py:95
 msgid "Closed"
 msgstr "Cerrado"
@@ -1150,11 +1166,11 @@ msgstr "Información extra"
 msgid "order TPV"
 msgstr "código TPV"
 
-#: tickets/admin.py:152 tickets/admin.py:308 windows/models.py:58
+#: tickets/admin.py:152 tickets/admin.py:308 windows/models.py:59
 msgid "ticket window"
 msgstr "taquilla"
 
-#: tickets/admin.py:173 tickets/admin.py:289 windows/models.py:108
+#: tickets/admin.py:173 tickets/admin.py:289 windows/models.py:109
 msgid "payment"
 msgstr "forma de pago"
 
@@ -1300,7 +1316,7 @@ msgstr "confirmación enviada"
 msgid "discount"
 msgstr "descuento"
 
-#: tickets/models.py:398 tickets/models.py:432 windows/models.py:103
+#: tickets/models.py:398 tickets/models.py:432 windows/models.py:104
 msgid "multipurchase"
 msgstr "compra multiple"
 
@@ -1738,55 +1754,60 @@ msgstr "Entrega parcial"
 msgid "Final return"
 msgstr "Entrega final"
 
-#: windows/models.py:46
+#: windows/models.py:45
+#| msgid "numbered"
+msgid "number"
+msgstr "número"
+
+#: windows/models.py:47
 msgid "code to show in tickets"
 msgstr "código a mostrar en la entrada"
 
-#: windows/models.py:47
+#: windows/models.py:48
 msgid "cash in the ticket window"
 msgstr "dinero en taquilla"
 
-#: windows/models.py:48 windows/models.py:102
+#: windows/models.py:49 windows/models.py:103
 msgid "user"
 msgstr "usuario"
 
-#: windows/models.py:52
+#: windows/models.py:53
 msgid "single row"
 msgstr "fila única"
 
-#: windows/models.py:53
+#: windows/models.py:54
 msgid "single row position"
 msgstr "posición para fila única"
 
-#: windows/models.py:55
+#: windows/models.py:56
 msgid "increments or decrements the ticket price for this window"
 msgstr "incrementa o decrementa el precio de las entradas para esta taquilla"
 
-#: windows/models.py:106
+#: windows/models.py:107
 msgid "payed"
 msgstr "pagado"
 
-#: windows/models.py:107
+#: windows/models.py:108
 msgid "change"
 msgstr "cambio"
 
-#: windows/models.py:113
+#: windows/models.py:114
 msgid "ticket window sale"
 msgstr "venta en taquilla"
 
-#: windows/models.py:114
+#: windows/models.py:115
 msgid "ticket window sales"
 msgstr "ventas en taquilla"
 
-#: windows/models.py:128
+#: windows/models.py:129
 msgid "Note"
 msgstr "Nota"
 
-#: windows/models.py:133
+#: windows/models.py:134
 msgid "ticket window cash movement"
 msgstr "movimiento en taquilla"
 
-#: windows/models.py:134
+#: windows/models.py:135
 msgid "ticket window cash movements"
 msgstr "movimientos en taquilla"
 

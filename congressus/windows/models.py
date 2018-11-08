@@ -42,6 +42,7 @@ class TicketWindow(models.Model):
     event = models.ForeignKey(Event, related_name='windows', verbose_name=_('event'), on_delete=models.CASCADE)
 
     name = models.CharField(_('name'), max_length=200)
+    number = models.IntegerField(_('number'), default=1, blank=True, null=True)
     slug = AutoSlugField(populate_from='name')
     code = models.CharField(_('code'), max_length=5, help_text=_('code to show in tickets'))
     cash = models.FloatField(_('cash in the ticket window'), default=0)

@@ -37,7 +37,6 @@
         <div class="contents">
             <div class="col-md-6 w60">
                 {% block q1 %}
-                <h1 class="taq">-</h1>
                 <audio class="taq" autoplay>
                     <source class="taq" type="audio/mpeg">
                 </audio>
@@ -48,10 +47,12 @@
             </div>
             <div class="col-md-6 w40">
                 {% block q2 %}
+                <div class="big-number-text">
+                  {% trans "Go to Window Nº" %}
+                </div>
                 <div class="big-number bg-primary">
                     _
                 </div>
-                <div class="arrow"></div>
                 {% endblock %}
             </div>
             <div class="col-md-6 w60">
@@ -118,10 +119,6 @@
         var seconds = {{ seconds|safe }};
         var audio = $("audio.taq");
         var event_id = {{ event.id|safe }};
-        var arrows = {
-            "R": '<span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>',
-            "L": '<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>',
-        };
 
         function show_config(conf) {
             if (conf && conf.extra_text) {
@@ -133,9 +130,9 @@
         }
 
         function waiting(conf) {
-            $("h1.taq").html("{% trans "wait" %}");
-            $(".big-number").text("_");
-            $(".arrow").html("");
+            $(".big-number").text("{% trans "wait" %}");
+            $(".big-number").removeClass("arrow-left");
+            $(".big-number").removeClass("arrow-right");
             show_config(conf);
         }
 
@@ -150,7 +147,13 @@
                     $("h1.taq").html(data.tw_name);
                     $(".big-number").text(data.tw_num);
                     $("source.taq").attr('src', data.url);
-                    $(".arrow").html(arrows[data.position]);
+                    $(".big-number").removeClass("arrow-left");
+                    $(".big-number").removeClass("arrow-right");
+                    if (data.position === 'R') {
+                      $(".big-number").addClass("arrow-right");
+                    } else if (data.position === 'L') {
+                      $(".big-number").addClass("arrow-left");
+                    }
 
                     show_config(data.config);
 

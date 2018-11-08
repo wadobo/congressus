@@ -56,6 +56,8 @@ class SingleRowTail(models.Model):
 
     def text_to_say(self):
         text = self.window.name
+        if self.window.number:
+            text = _('Ticket window {}').format(self.window.number)
         config = self.get_config()
         if config and config.say_direction:
             text += ", " + self.window.get_singlerow_pos_display()

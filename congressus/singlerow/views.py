@@ -48,7 +48,7 @@ class SingleRow(View):
             sr.delete()
 
         tw_name = sr.window.name
-        tw_num = sr.window.code
+        tw_num = str(sr.window.number or sr.window.code)
         data['name'] = tw_name
         data['tw_name'] = tw_name
         data['tw_num'] = tw_num
