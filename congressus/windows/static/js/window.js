@@ -60,8 +60,8 @@ function ajaxsend() {
 
             var pdf = window.open(response.url);
             setTimeout(function() {
-                if (response.nt < 20) {
-                    setTimeout(function() { pdf.close(); }, 1000);
+                if (response.nt < 20 && response.timeout) {
+                    setTimeout(function() { pdf.close(); }, response.timeout);
                 }
                 pdf.print();
             }, 1000);

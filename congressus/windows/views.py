@@ -153,7 +153,14 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
                                     change=change, payment=payment)
             sale.save()
             url = reverse('window_ticket', kwargs={'ev': mp.ev.slug, 'w': w.slug, 'pf': print_format, 'order': mp.order})
-            data = {'url': url, 'mp': mp.order_tpv, 'wc': mp.window_code(), 'nt': mp.tickets.count()}
+            data = {
+                'url': url,
+                'mp': mp.order_tpv,
+                'wc': mp.window_code(),
+                'nt': mp.tickets.count(),
+                'timeout': w.print_close_timeout * 1000,
+            }
+
             return JsonResponse(data)
         data = {"message": _("There was an error, please try again"), "status": "ok"}
         resp = JsonResponse(data)

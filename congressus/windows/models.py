@@ -55,6 +55,10 @@ class TicketWindow(models.Model):
 
     supplement = models.FloatField(_('increments or decrements the ticket price for this window'), default=0)
 
+    print_close_timeout = models.FloatField(_('PDF ticket window close timeout'),
+                                            help_text=_('Time to auto close the ticket PDF popup window, use 0 to disable auto close'),
+                                            default=1.0)
+
     class Meta:
         verbose_name = _('ticket window')
         verbose_name_plural = _('ticket windows')
