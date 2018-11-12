@@ -41,6 +41,8 @@ class SingleRowTail(models.Model):
     def voice_url(self, full_path=False):
         path = "{media}/voice/{name}-{lang}"
         config = self.get_config()
+        if self.window.number:
+            path += "-{number}"
         if config and config.say_direction:
             path += "-{dir}"
         path += ".mp3"
@@ -48,6 +50,7 @@ class SingleRowTail(models.Model):
         path = path.format(**{
             "media": settings.MEDIA_ROOT if full_path else settings.MEDIA_URL,
             "name": self.window.name,
+            "number": self.window.number,
             "lang": settings.SINGLEROW_LANG,
             "dir": self.window.singlerow_pos,
         })

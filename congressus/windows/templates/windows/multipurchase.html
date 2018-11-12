@@ -150,6 +150,7 @@
     <script src="{% static 'js/moment.min.js' %}"></script>
     <script src="{% static 'js/window.js' %}"></script>
     <script>
+      $(document).ready(function() {
         var event_id = {{ window.event.id|safe }};
         var ev = '{{ window.event.slug }}';
         var window_name = '{{ window.slug }}';
@@ -172,7 +173,7 @@
         }
 
         function singlerow_ajax(command) {
-            console.log("STAFF",staff);
+            console.log("STAFF", staff);
             $.ajax({
                 type: "POST",
                 url: '/singlerow/',
@@ -220,7 +221,7 @@
             }, 5000);
         }
 
-        window.addEventListener("keydown", function(e) {
+        $(window).keydown(function(e) {
             if (e.keyCode == 42) { // ImprPant
                 var command = window_singlerow ? 'close' : 'open';
                 singlerow_ajax(command);
@@ -229,6 +230,7 @@
             } else if (e.keyCode == 19) { // Pausa Inter
                 singlerow_ajax('wait');
             }
-        }, false);
+        });
+      });
     </script>
 {% endblock %}
