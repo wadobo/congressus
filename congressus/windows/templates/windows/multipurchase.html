@@ -150,15 +150,59 @@
     <script src="{% static 'js/moment.min.js' %}"></script>
     <script src="{% static 'js/window.js' %}"></script>
     <script>
+      var event_id = {{ window.event.id|safe }};
+      var ev = '{{ window.event.slug }}';
+      var window_name = '{{ window.slug }}';
+      var window_singlerow = '{{ window.singlerow }}' == 'True' ? true : false;
+      var window_status = '{{ window_status }}';
+      var info_bar = $("div.number-section");
+      var singlerow = $("div#floating-singlerow");
+      var staff = '{{ request.user.is_staff }}' == 'True' ? true : false;
+
+      function singlerow_ajax(command) {
+          console.log("STAFF", staff);
+          $.ajax({
+              type: "POST",
+              url: '/singlerow/',
+              data: {
+                  event_id: event_id,
+                  window_slug: window_name,
+                  command: command,
+                  staff: staff
+              },
+              success: function(data) {
+                  if (command == 'open') {
+                      info_bar.removeClass('bg-close');
+                      singlerow.removeClass('bg-close');
+                      info_bar.addClass('bg-open');
+                      singlerow.addClass('bg-open');
+                      window_singlerow = true;
+                      singlerow.html('<b>' + data.window_status + '</b>');
+                  } else if (command == 'close') {
+                      info_bar.removeClass('bg-open');
+                      singlerow.removeClass('bg-open');
+                      info_bar.addClass('bg-close');
+                      singlerow.addClass('bg-close');
+                      window_singlerow = false;
+                      singlerow.html('<b>' + data.window_status + '</b>');
+                  } else if (command == 'request' || command == 'wait') {
+                      console.log("NOTIFY");
+                  }
+                  $('.floating-footer').html(data.debug);
+              },
+              error: function(req, status, err) {
+                  console.log("ERR", err);
+              }
+          });
+      }
+
+      singlerow.click(function() {
+          var command = window_singlerow ? 'close' : 'open';
+          singlerow_ajax(command);
+
+      });
+
       $(document).ready(function() {
-        var event_id = {{ window.event.id|safe }};
-        var ev = '{{ window.event.slug }}';
-        var window_name = '{{ window.slug }}';
-        var window_singlerow = '{{ window.singlerow }}' == 'True' ? true : false;
-        var window_status = '{{ window_status }}';
-        var info_bar = $("div.number-section");
-        var singlerow = $("div#floating-singlerow");
-        var staff = '{{ request.user.is_staff }}' == 'True' ? true : false;
         singlerow.html('<b>' + window_status + '</b>');
         if (window_singlerow) {
             info_bar.removeClass('bg-close');
@@ -171,49 +215,6 @@
             info_bar.addClass('bg-close');
             singlerow.addClass('bg-close');
         }
-
-        function singlerow_ajax(command) {
-            console.log("STAFF", staff);
-            $.ajax({
-                type: "POST",
-                url: '/singlerow/',
-                data: {
-                    event_id: event_id,
-                    window_slug: window_name,
-                    command: command,
-                    staff: staff
-                },
-                success: function(data) {
-                    if (command == 'open') {
-                        info_bar.removeClass('bg-close');
-                        singlerow.removeClass('bg-close');
-                        info_bar.addClass('bg-open');
-                        singlerow.addClass('bg-open');
-                        window_singlerow = true;
-                        singlerow.html('<b>' + data.window_status + '</b>');
-                    } else if (command == 'close') {
-                        info_bar.removeClass('bg-open');
-                        singlerow.removeClass('bg-open');
-                        info_bar.addClass('bg-close');
-                        singlerow.addClass('bg-close');
-                        window_singlerow = false;
-                        singlerow.html('<b>' + data.window_status + '</b>');
-                    } else if (command == 'request' || command == 'wait') {
-                        console.log("NOTIFY");
-                    }
-                    $('.floating-footer').html(data.debug);
-                },
-                error: function(req, status, err) {
-                    console.log("ERR", err);
-                }
-            });
-        }
-
-        singlerow.click(function() {
-            var command = window_singlerow ? 'close' : 'open';
-            singlerow_ajax(command);
-
-        });
 
         if (staff) {
             setInterval(function() {
