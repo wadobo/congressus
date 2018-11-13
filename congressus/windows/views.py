@@ -95,20 +95,21 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
         ctx['window_status'] = _('Opened') if w.singlerow else _('Closed')
         ctx['extra_field'] = w.event.fields.filter(show_in_tws=True).first()
         last_sale = w.sales.last()
-        name = "{0} - {1} - {2} - {3}".format(
-                last_sale.purchase.tickets.count(),
-                last_sale.purchase.window_code(),
-                last_sale.purchase.order_tpv,
-                last_sale.price
-        )
-        ctx['last_sale'] = {
-                'name': name,
-                'url': "/window/{0}/{1}/thermal/{2}/".format(
-                        w.event.slug,
-                        w.slug,
-                        str(last_sale.purchase)
-                )
-        }
+        if last_sale:
+            name = "{0} - {1} - {2} - {3}".format(
+                    last_sale.purchase.tickets.count(),
+                    last_sale.purchase.window_code(),
+                    last_sale.purchase.order_tpv,
+                    last_sale.price
+            )
+            ctx['last_sale'] = {
+                    'name': name,
+                    'url': "/window/{0}/{1}/thermal/{2}/".format(
+                            w.event.slug,
+                            w.slug,
+                            str(last_sale.purchase)
+                    )
+            }
         return ctx
 
     def post(self, request, *args, **kwargs):
