@@ -107,6 +107,7 @@ function clean() {
     });
     $("input[autofocus]").trigger('focus');
     cleanSelectedSeat();
+    $("#extra-field").val("");
 
     return false;
 }
