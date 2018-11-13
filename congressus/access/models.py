@@ -12,7 +12,7 @@ class AccessControl(models.Model):
         'event'), on_delete=models.CASCADE)
 
     name = models.CharField(_('name'), max_length=200)
-    slug = AutoSlugField(populate_from='name')
+    slug = AutoSlugField(populate_from='name', unique=True)
 
     location = models.CharField(
         _('location'), max_length=500, blank=True, null=True)
