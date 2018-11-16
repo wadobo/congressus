@@ -94,6 +94,7 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
         ctx['discounts'] = self.get_discounts()
         ctx['window_status'] = _('Opened') if w.singlerow else _('Closed')
         ctx['extra_field'] = w.event.fields.filter(show_in_tws=True).first()
+        ctx['shortcuts'] = w.shortcuts
         last_sale = w.sales.last()
         if last_sale:
             name = "{0} - {1} - {2} - {3}".format(

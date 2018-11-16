@@ -4,6 +4,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.contrib.postgres.fields import JSONField
 from django.conf import settings
 
 from autoslug import AutoSlugField
@@ -58,6 +59,7 @@ class TicketWindow(models.Model):
     print_close_timeout = models.FloatField(_('PDF ticket window close timeout'),
                                             help_text=_('Time to auto close the ticket PDF popup window, use 0 to disable auto close'),
                                             default=1.0)
+    shortcuts = JSONField(default=dict({'add': 145, 'sub': 19, 'onoff': 42}))
 
     class Meta:
         verbose_name = _('ticket window')

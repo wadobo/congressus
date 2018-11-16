@@ -157,6 +157,7 @@
     <script src="{% static 'js/window.js' %}"></script>
     <script>
       var event_id = {{ window.event.id|safe }};
+      var shortcuts = {{ window.shortcuts|safe }};
       var ev = '{{ window.event.slug }}';
       var window_name = '{{ window.slug }}';
       var window_singlerow = '{{ window.singlerow }}' == 'True' ? true : false;
@@ -229,12 +230,12 @@
         }
 
         $(window).keydown(function(e) {
-            if (e.keyCode == 42) { // ImprPant
+            if (e.keyCode == shortcuts.onoff) {
                 var command = window_singlerow ? 'close' : 'open';
                 singlerow_ajax(command);
-            } else if (e.keyCode == 145) { // Bloq Despl
+            } else if (e.keyCode == shortcuts.add) {
                 singlerow_ajax('request');
-            } else if (e.keyCode == 19) { // Pausa Inter
+            } else if (e.keyCode == shortcuts.sub) {
                 singlerow_ajax('wait');
             }
         });
