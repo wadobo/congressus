@@ -49,7 +49,7 @@ class SingleRowTail(models.Model):
 
         path = path.format(**{
             "media": settings.MEDIA_ROOT if full_path else settings.MEDIA_URL,
-            "name": self.window.name,
+            "name": self.window.slug,
             "number": self.window.number,
             "lang": settings.SINGLEROW_LANG,
             "dir": self.window.singlerow_pos,
