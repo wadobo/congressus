@@ -53,6 +53,7 @@
                 <div class="big-number bg-primary">
                     _
                 </div>
+                <div class="arrow"></div>
                 {% endblock %}
             </div>
             <div class="col-md-6 w60">
@@ -119,6 +120,10 @@
         var seconds = {{ seconds|safe }};
         var audio = $("audio.taq");
         var event_id = {{ event.id|safe }};
+        var arrows = {
+            "R": '<span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>',
+            "L": '<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>',
+        }
 
         function show_config(conf) {
             if (conf && conf.extra_text) {
@@ -131,8 +136,7 @@
 
         function waiting(conf) {
             $(".big-number").text("{% trans "wait" %}");
-            $(".big-number").removeClass("arrow-left");
-            $(".big-number").removeClass("arrow-right");
+            $(".arrow").html("");
             show_config(conf);
         }
 
@@ -147,13 +151,7 @@
                     $("h1.taq").html(data.tw_name);
                     $(".big-number").text(data.tw_num);
                     $("source.taq").attr('src', data.url);
-                    $(".big-number").removeClass("arrow-left");
-                    $(".big-number").removeClass("arrow-right");
-                    if (data.position === 'R') {
-                      $(".big-number").addClass("arrow-right");
-                    } else if (data.position === 'L') {
-                      $(".big-number").addClass("arrow-left");
-                    }
+                    $(".arrow").html(arrows[data.position]);
 
                     show_config(data.config);
 
