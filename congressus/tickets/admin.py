@@ -138,7 +138,7 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
                 return obj.get_extra_data(field.label)
             f.short_description = field.label
             return f
-        return super().__getattr__(self, value)
+        raise AttributeError
 
     def formated_extra_data(self, obj):
         extras = obj.get_extras_dict()
@@ -281,7 +281,7 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
                 return obj.get_extra_data(field.label)
             f.short_description = field.label
             return f
-        return super().__getattr__(self, value)
+        raise AttributeError
 
     readonly_fields = (
         'order_tpv', 'order', 'ev',
