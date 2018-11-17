@@ -20,6 +20,8 @@ from windows.models import TicketWindowSale
 from django.core.exceptions import MultipleObjectsReturned
 from windows.utils import online_sale
 
+from events.models import TicketField
+
 from extended_filters.filters import DateRangeFilter
 from congressus.admin import register
 
@@ -73,28 +75,6 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
     search_fields = ('order', 'order_tpv', 'email', 'mp__order', 'mp__order_tpv')
     date_hierarchy = 'created'
     actions = [delete_selected, confirm, unconfirm, mark_used, mark_no_used]
-    csv_fields = [
-        'email',
-
-        'order',
-        'order_tpv',
-
-        'confirmed',
-        'confirmed_date',
-
-        'price2',
-        'cseat',
-        'mp',
-        'twin',
-
-        'event_name',
-        'space_name',
-        'session_name',
-        'created',
-
-        'used',
-        'used_at',
-    ]
 
     readonly_fields = (
         'order_tpv_linked', 'order', 'event_name', 'session2', 'cseat',
@@ -119,6 +99,46 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
                        'start', 'end')
         }),
     )
+
+    @property
+    def csv_fields(self):
+        data = [
+            'email',
+
+            'order',
+            'order_tpv',
+
+            'confirmed',
+            'confirmed_date',
+
+            'price2',
+            'cseat',
+            'mp',
+            'twin',
+
+            'event_name',
+            'space_name',
+            'session_name',
+            'created',
+
+            'used',
+            'used_at',
+        ]
+
+        if getattr(settings, 'CSV_TICKET_FIELDS'):
+            data += ['ticket_field_' + i for i in settings.CSV_TICKET_FIELDS]
+
+        return data
+
+    def __getattr__(self, value):
+        if value.startswith('ticket_field_'):
+            pk = value.split("_")[-1]
+            field = TicketField.objects.get(pk=pk)
+            def f(obj):
+                return obj.get_extra_data(field.label)
+            f.short_description = field.label
+            return f
+        return super().__getattr__(self, value)
 
     def formated_extra_data(self, obj):
         extras = obj.get_extras_dict()
@@ -228,22 +248,40 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
     date_hierarchy = 'created'
     actions = [delete_selected, confirm, unconfirm, link_online_sale]
     inlines = [TicketInline, ]
-    csv_fields = [
-        'email',
 
-        'order',
-        'order_tpv',
+    @property
+    def csv_fields(self):
+        data = [
+            'email',
 
-        'confirmed',
-        'confirmed_date',
+            'order',
+            'order_tpv',
 
-        'price',
-        'ntickets',
-        'twin',
+            'confirmed',
+            'confirmed_date',
 
-        'ev',
-        'created',
-    ]
+            'price',
+            'ntickets',
+            'twin',
+
+            'ev',
+            'created',
+        ]
+
+        if getattr(settings, 'CSV_TICKET_FIELDS'):
+            data += ['ticket_field_' + i for i in settings.CSV_TICKET_FIELDS]
+
+        return data
+
+    def __getattr__(self, value):
+        if value.startswith('ticket_field_'):
+            pk = value.split("_")[-1]
+            field = TicketField.objects.get(pk=pk)
+            def f(obj):
+                return obj.get_extra_data(field.label)
+            f.short_description = field.label
+            return f
+        return super().__getattr__(self, value)
 
     readonly_fields = (
         'order_tpv', 'order', 'ev',
