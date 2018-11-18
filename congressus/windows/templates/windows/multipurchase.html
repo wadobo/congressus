@@ -154,6 +154,9 @@
 {% block extrabody %}
     {{ block.super }}
     <script src="{% static 'js/moment.min.js' %}"></script>
+    <script>
+        var autocall_singlerow = '{{ autocall_singlerow }}' == 'True' ? true : false;
+    </script>
     <script src="{% static 'js/window.js' %}"></script>
     <script>
       var event_id = {{ window.event.id|safe }};

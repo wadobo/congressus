@@ -60,6 +60,7 @@ class TicketWindow(models.Model):
                                             help_text=_('Time to auto close the ticket PDF popup window, use 0 to disable auto close'),
                                             default=1.0)
     shortcuts = JSONField(default=dict({'add': 145, 'sub': 19, 'onoff': 42}))
+    autocall_singlerow = models.BooleanField(_('autocall singlerow'), default=True)
 
     class Meta:
         verbose_name = _('ticket window')

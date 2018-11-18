@@ -1,5 +1,6 @@
 var ticket_log = [];
 var opened_log = false;
+// autocall_singlerow: load in multipurchase.html
 
 function showLog(mode) {
     length = ticket_log.length;
@@ -205,7 +206,9 @@ $(document).ready(function() {
         alertify.confirm(msg, function(e) {
             if (e) {
                 ajaxsend();
-                singlerow_ajax('request');
+                if (autocall_singlerow) {
+                    singlerow_ajax('request');
+                }
             }
         });
     }
