@@ -27,6 +27,6 @@ def clean_holds(ws):
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        s = WSServer()
+        s = WSServer(port=8080)
         clean_holds(s)
         s.run()

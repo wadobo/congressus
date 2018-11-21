@@ -162,10 +162,10 @@ INTERNAL_IPS = ['127.0.0.1']
 
 ORDER_SIZE = 15
 FROM_EMAIL = 'congressus@us.es'
-SITE_URL = "http://localhost:8000"
+SITE_URL = "https://congressus.herokuapp.com"
 
 # REDSYS TPV options
-REDSYS_ENABLED = True
+REDSYS_ENABLED = False
 TPV_TERMINAL = 1
 TPV_MERCHANT = 'XXXXXX'
 TPV_URL = "https://sis-t.redsys.es:25443/sis/realizarPago"
@@ -192,7 +192,7 @@ STRIPE_BITCOIN = False
 
 QRCODE = True
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
-WS_SERVER = 'localhost:9007'
+WS_SERVER = SITE_URL + ':8080'
 TIMESTEP_CHART = 'daily'
 MAX_STEP_CHART = 10
 
@@ -213,7 +213,7 @@ TINYMCE_DEFAULT_CONFIG = {
     "width": "100%",
 }
 
-DEBUG_TOOLS = True
+DEBUG_TOOLS = False
 REAL_EXTRA_APPS = tuple()
 
 SINGLEROW_MS = 5000
@@ -276,3 +276,6 @@ if DEBUG and DEBUG_TOOLS:
 
     for tmpl in TEMPLATES:
         tmpl['OPTIONS']['context_processors'] = ['django.template.context_processors.debug'] + tmpl['OPTIONS']['context_processors']
+
+import django_heroku
+django_heroku.settings(locals())
