@@ -9,11 +9,14 @@ class CustomSite(admin.AdminSite):
 
 
 SITES = []
-for ev in Event.objects.all():
-    class EvSite(CustomSite):
-        site_header = ev.name
-    SITES.append(EvSite(name=ev.slug))
-
+try:
+    for ev in Event.objects.all():
+        class EvSite(CustomSite):
+            site_header = ev.name
+        SITES.append(EvSite(name=ev.slug))
+except:
+    # when there's no db this will fail for each manage.py commands
+    pass
 
 def custom_inline(inline, slug):
     class CustomInlineAdmin(inline):
