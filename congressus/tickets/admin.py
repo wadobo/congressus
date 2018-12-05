@@ -263,6 +263,7 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
             'price',
             'ntickets',
             'twin',
+            'payment_method',
 
             'ev',
             'created',
