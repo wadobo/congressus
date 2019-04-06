@@ -9,7 +9,7 @@ class CustomSite(admin.AdminSite):
 
 
 SITES = []
-for ev in Event.objects.all():
+for ev in Event.objects.all().order_by('slug'):
     class EvSite(CustomSite):
         site_header = ev.name
     SITES.append(EvSite(name=ev.slug))
