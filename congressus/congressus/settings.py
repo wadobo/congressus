@@ -237,6 +237,13 @@ except:
 if REAL_EXTRA_APPS:
     INSTALLED_APPS = INSTALLED_APPS + tuple(i for i in REAL_EXTRA_APPS if not i in INSTALLED_APPS)
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'session_cache',
+    }
+}
+
 # Debug toolbar options
 if DEBUG and DEBUG_TOOLS:
     DEBUG_TOOLBAR_CONFIG = {

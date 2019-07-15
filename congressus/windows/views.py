@@ -6,6 +6,8 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
+from django.contrib.sessions.models import Session as DjSession
+from django.core.cache import cache
 from django.db.models import Q
 from django.utils.translation import ugettext as _
 from django.shortcuts import redirect, render
@@ -29,6 +31,21 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 
 
+def restrict_multiple_user(request):
+    if request.user.is_authenticated:
+        cache_timeout = 86400  # 24h
+        cache_key = 'user_pk_{}_restrict'.format(request.user.pk)
+        cache_value = cache.get(cache_key)
+
+        if cache_value is not None:
+            if request.session.session_key != cache_value:
+                session = DjSession.objects.filter(session_key=cache_value)
+                session.delete()
+                cache.set(cache_key, request.session.session_key, cache_timeout)
+        else:
+            cache.set(cache_key, request.session.session_key, cache_timeout)
+
+
 class WindowLogin(TemplateView):
     template_name = 'windows/login.html'
 
@@ -50,6 +67,7 @@ class WindowLogin(TemplateView):
             have_access = w.user == user
             if user.is_active and have_access:
                 login(request, user)
+                restrict_multiple_user(request)
                 return redirect('window_multipurchase', ev=w.event.slug, w=w.slug)
             else:
                 messages.error(request, _("This user can't access in this ticket window"))
