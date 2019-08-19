@@ -9,6 +9,7 @@
     <link href="{% static "css/loaders.min.css" %}" rel="stylesheet"/>
 {% endblock %}
 
+{% block body %}
 {% block content %}
     {% if ticket.is_mp %}
         {% url 'multipurchase' ticket.event.slug as cancel_url %}
@@ -146,6 +147,7 @@
             {% endblock %}
         </div>
     </div>
+{% endblock %}
 {% endblock %}
 
 {% block extrabody %}

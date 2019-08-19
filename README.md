@@ -115,6 +115,12 @@ congressus $ python manage.py migrate
 congressus $ python manage.py createsuperuser
 ```
 
+1. Añadimos la tabla de cache
+
+```
+./manage.py createcachetable
+```
+
 1. Fichero uwsgi
 
 Fichero /home/congressus/uwsgi.ini
