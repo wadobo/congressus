@@ -105,7 +105,10 @@ class InvitationTypeAdmin(EventMixin, admin.ModelAdmin):
 
     def event_filter_fields(self, slug):
         f = super().event_filter_fields(slug)
-        f.update({ "sessions": Q(space__event__slug=slug), })
+        f.update({
+            "sessions": Q(space__event__slug=slug),
+            "gates": Q(event__slug=slug)
+        })
         return f
 
 
