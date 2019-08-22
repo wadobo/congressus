@@ -30,6 +30,10 @@
     {% block extrahead %}{% endblock %}
   </head>
   <body>
+    {% block menu %}
+        {% include "menu.html" %}
+    {% endblock %}
+
     {% block body %}
 
     {% block head %}
