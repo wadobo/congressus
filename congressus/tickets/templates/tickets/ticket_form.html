@@ -2,33 +2,47 @@
 {% load i18n %}
 {% load crispy_forms_tags %}
 
-{% block content %}
-    <div class="page-header">
-        <h1>
-            {{ session.name }}
-            <small>{{ session.space }}</small>
-        </h1>
-    </div>
+{% block body %}
+    {% block head %}{% endblock %}
 
-    <div class="row">
-        <div class="col-md-6 col-md-offset-3">
-            <p class="well">
-                {% trans "Price:" %} {{ session.price }}
-            </p>
+    {% block translation %}{% endblock %}
 
-            {% if not session.have_places %}
-                <div class="alert alert-danger" role="alert">
-                    {% trans "Sorry, there's no more places for this event" %}
+    <div class="{% block container %}container{% endblock %} content {% block extraclasses %}{% endblock %}">
+
+        {% block messages %}{{ block.super }}{% endblock %}
+
+        {% block content %}
+            <div class="page-header">
+                <h1>
+                    {{ session.name }}
+                    <small>{{ session.space }}</small>
+                </h1>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3">
+                    <p class="well">
+                        {% trans "Price:" %} {{ session.price }}
+                    </p>
+
+                    {% if not session.have_places %}
+                        <div class="alert alert-danger" role="alert">
+                            {% trans "Sorry, there's no more places for this event" %}
+                        </div>
+                    {% else %}
+                        <form role="form" action="" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ form|crispy }}
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">{% trans 'Confirm' %}</button>
+                            </div>
+                        </form>
+                    {% endif %}
                 </div>
-            {% else %}
-                <form role="form" action="" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ form|crispy }}
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary">{% trans 'Confirm' %}</button>
-                    </div>
-                </form>
-            {% endif %}
-        </div>
+            </div>
+        {% endblock %}
+
     </div>
+
+    {% block foot %}{% endblock %}
 {% endblock %}

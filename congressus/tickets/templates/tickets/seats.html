@@ -4,14 +4,28 @@
 
 {% block title %}{{ map }}{% endblock %}
 
-{% block content %}
-    <div class="page-header">
-        <h1> {{ map }} </h1>
+{% block body %}
+    {% block head %}{% endblock %}
+
+    {% block translation %}{% endblock %}
+
+    <div class="{% block container %}container{% endblock %} content {% block extraclasses %}{% endblock %}">
+
+        {% block messages %}{{ block.super }}{% endblock %}
+
+        {% block content %}
+            <div class="page-header">
+                <h1> {{ map }} </h1>
+            </div>
+
+            <div id="sample-map" class="map">
+                {% include "tickets/map.html" %}
+            </div>
+        {% endblock %}
+
     </div>
 
-    <div id="sample-map" class="map">
-        {% include "tickets/map.html" %}
-    </div>
+    {% block foot %}{% endblock %}
 {% endblock %}
 
 {% block extrahead %}

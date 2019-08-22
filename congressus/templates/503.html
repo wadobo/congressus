@@ -5,10 +5,24 @@
     {% trans "503, maintenance" %}
 {% endblock %}
 
-{% block content %}
-    <div class="maintenance">
-        <div class="errorcode"> 503 </div>
-        <h1> {% trans "We're down for maintenance," %} </h1>
-        <h2> {% trans "but we'll be back soon" %} </h2>
+{% block body %}
+    {% block head %}{% endblock %}
+
+    {% block translation %}{% endblock %}
+
+    <div class="{% block container %}container{% endblock %} content {% block extraclasses %}{% endblock %}">
+
+        {% block messages %}{{ block.super }}{% endblock %}
+
+        {% block content %}
+            <div class="maintenance">
+                <div class="errorcode"> 503 </div>
+                <h1> {% trans "We're down for maintenance," %} </h1>
+                <h2> {% trans "but we'll be back soon" %} </h2>
+            </div>
+        {% endblock %}
+
     </div>
+
+    {% block foot %}{% endblock %}
 {% endblock %}

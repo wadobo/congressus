@@ -3,23 +3,38 @@
 
 {% block title %}{% trans "Thank you" %}{% endblock %}
 
-{% block content %}
-    {% block page_header %}
-    <div class="page-header">
-        <h1>
-            {% block thx_text %}
-            {% trans "Thank you" %}
-            <small>{% trans "Here you can view your ticket information" %}</small>
-            {% endblock %}
-        </h1>
-    </div>
-    {% endblock %}
+{% block body %}
 
-    {% block info %}
-    <div class="row">
-        <div class="col-md-6 col-md-offset-3">
-            {% include "tickets/ticket-info.html" %}
+    {% block head %}{% endblock %}
+
+    {% block translation %}{% endblock %}
+
+    <div class="{% block container %}container{% endblock %} content {% block extraclasses %}{% endblock %}">
+
+    {% block messages %}{{ block.super }}{% endblock %}
+
+    {% block content %}
+        {% block page_header %}
+        <div class="page-header">
+            <h1>
+                {% block thx_text %}
+                {% trans "Thank you" %}
+                <small>{% trans "Here you can view your ticket information" %}</small>
+                {% endblock %}
+            </h1>
         </div>
-    </div>
+        {% endblock %}
+
+        {% block info %}
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                {% include "tickets/ticket-info.html" %}
+            </div>
+        </div>
+        {% endblock %}
     {% endblock %}
+    </div>
+
+    {% block foot %}{% endblock %}
+
 {% endblock %}

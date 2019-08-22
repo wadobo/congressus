@@ -10,7 +10,16 @@
 {% endblock %}
 
 {% block body %}
-{% block content %}
+
+    {% block head %}{% endblock %}
+
+    {% block translation %}{% endblock %}
+
+    <div class="{% block container %}container{% endblock %} content {% block extraclasses %}{% endblock %}">
+
+    {% block messages %}{{ block.super }}{% endblock %}
+
+    {% block content %}
     {% if ticket.is_mp %}
         {% url 'multipurchase' ticket.event.slug as cancel_url %}
     {% else %}
@@ -30,7 +39,6 @@
     <div class="row">
         <div class="{% block form_column %}col-md-6 col-md-offset-3{% endblock %}">
             {% block payment %}
-
             {% if error %}
                 <div class="alert alert-danger" role="alert">
                     {% if errormsg %}
@@ -147,7 +155,11 @@
             {% endblock %}
         </div>
     </div>
-{% endblock %}
+    {% endblock %}
+    </div>
+
+    {% block foot %}{% endblock %}
+
 {% endblock %}
 
 {% block extrabody %}

@@ -2,6 +2,20 @@
 
 {% block title %}{{ flatpage.title }}{% endblock %}
 
-{% block content %}
-    {{ flatpage.content|safe }}
+{% block body %}
+    {% block head %}{% endblock %}
+
+    {% block translation %}{% endblock %}
+
+    <div class="{% block container %}container{% endblock %} content {% block extraclasses %}{% endblock %}">
+
+        {% block messages %}{{ block.super }}{% endblock %}
+
+        {% block content %}
+            {{ flatpage.content|safe }}
+        {% endblock %}
+
+    </div>
+
+    {% block foot %}{% endblock %}
 {% endblock %}
