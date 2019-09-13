@@ -214,7 +214,7 @@ class InvitationGenerator(models.Model):
     created = models.DateTimeField(_('created at'), auto_now_add=True)
 
     def __str__(self):
-        return '%s - %s' % (self.type, self.amount)
+        return '{} -{} - {}'.format(self.type, self.amount, self.concept)
 
     class Meta:
         verbose_name = _('invitation generator')
