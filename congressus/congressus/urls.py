@@ -34,7 +34,12 @@ class AdminView(RedirectView):
         else:
             return '/admin/all/'
 
-urlpatterns = ADMINS + [
+THEME = []
+if 'theme' in settings.INSTALLED_APPS:
+    THEME = [path('custom/', include('theme.urls'))]
+
+
+urlpatterns = ADMINS + THEME + [
     path('admin/', AdminView.as_view()),
     path('admin/all/', admin.site.urls),
     path('pages/', include('django.contrib.flatpages.urls')),
@@ -47,9 +52,6 @@ urlpatterns = ADMINS + [
     path('singlerow/', include('singlerow.urls')),
     path('', include('tickets.urls')),
 ]
-
-if 'theme' in settings.INSTALLED_APPS:
-    urlpatterns += path('custom/', include('theme.urls')),
 
 if settings.DEBUG and settings.DEBUG_TOOLS:
     import debug_toolbar
