@@ -257,7 +257,7 @@ class Space(models.Model):
 
     def get_next_sessions(self):
         now = timezone.now()
-        return self.sessions.filter(end__gte=now)
+        return self.sessions.filter(end__gte=now, active=True)
 
     class Meta:
         ordering = ['order']
@@ -288,6 +288,7 @@ class Session(models.Model):
             help_text="ASC, DESC, RANDOM or LIST: layout_name1,layout_name2")
 
     dateformat = models.CharField(_('date format'), max_length=50, default='start', choices=TICKET_DATE_FORMATS)
+    active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['start']
