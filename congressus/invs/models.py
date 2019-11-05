@@ -49,7 +49,7 @@ class InvitationType(models.Model):
     class Meta:
         verbose_name = _('invitation type')
         verbose_name_plural = _('invitation types')
-        ordering = ['-event__name']
+        ordering = ('-event__name', 'name')
 
     def __str__(self):
         return self.name
@@ -219,6 +219,7 @@ class InvitationGenerator(models.Model):
     class Meta:
         verbose_name = _('invitation generator')
         verbose_name_plural = _('invitation generators')
+        ordering = ('-created',)
 
 
     def window_code(self):
