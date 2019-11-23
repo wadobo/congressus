@@ -61,6 +61,9 @@ class TicketWindow(models.Model):
                                             default=1.0)
     shortcuts = JSONField(default=dict({'add': 145, 'sub': 19, 'onoff': 42}))
     autocall_singlerow = models.BooleanField(_('autocall singlerow'), default=True)
+    number_of_calls = models.PositiveSmallIntegerField(_('number of call'),
+            help_text=_('Number of calls created to singlerow when open ticket windows'),
+            default=1)
 
     class Meta:
         verbose_name = _('ticket window')

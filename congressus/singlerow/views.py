@@ -84,7 +84,7 @@ class SingleRow(View):
             tw.singlerow = True
             tw.save()
             data['window_status'] = _('Opened')
-            for i in range(2):
+            for i in range(tw.number_of_calls):
                 sr = SingleRowTail(event=tw.event, window=tw)
                 sr.save()
         elif command == 'close' and tw.singlerow:
