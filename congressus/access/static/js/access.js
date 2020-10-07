@@ -69,6 +69,9 @@ function makeReq() {
             notify(data.st);
             $("#extra").html(data.extra);
             $("#extra2").html(data.extra2);
+            if (data.invs_num) {
+              $("#inv-num").html(data.invs_num);
+            }
         },
         error: function(req, status, err) {
             notify("wrong");
