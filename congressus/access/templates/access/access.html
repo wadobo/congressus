@@ -31,6 +31,7 @@
         {% endblock %}
     </div>
 
+    Invitaciones usadas: <span id="invs-num">{{ invs_num }}</span>
     <form id="access" action="{% url 'access' ac.event.slug ac.slug %}" data-session="{{ session.id }}">
         <div class="input-group input-group-lg">
             <input type="text" class="form-control" id="order" placeholder="{% trans "ticket order" %}" value="" autofocus/>

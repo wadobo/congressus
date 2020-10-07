@@ -19,7 +19,8 @@ from events.models import Event
 from events.models import Session
 from events.models import Gate
 from tickets.models import Ticket
-from invs.models import Invitation
+from invs.models import Invitation, InvUsedInSession
+
 
 from django.contrib.auth import logout as auth_logout
 from django.conf import settings
@@ -117,16 +118,19 @@ class AccessView(UserPassesTestMixin, TemplateView):
         ctx['session'] = s
         ctx['ws_server'] = settings.WS_SERVER
         ctx['gate'] = self.request.session.get('gate', '')
+        now = datetime.now()
+        ctx['invs_num'] = InvUsedInSession.objects.filter(date__year=now.year, date__month=now.month, date__day=now.day).count()
         return ctx
 
     def is_inv(self, order):
         return order.startswith(settings.INVITATION_ORDER_START)
 
-    def response_json(self, msg, msg2='', st='right'):
+    def response_json(self, msg, msg2='', st='right', msg3=0):
         data = {}
         data['st'] = st
         data['extra'] = msg
         data['extra2'] = msg2
+        data['invs_num'] = msg3
         return HttpResponse(json.dumps(data), content_type="application/json")
 
     def get_ticket(self, order):
@@ -170,10 +174,15 @@ class AccessView(UserPassesTestMixin, TemplateView):
         return 'right', _('Extra session: %(session)s') % {'session': session.short()}
 
     def check_inv(self, order, s, g):
+        now = datetime.now()
+        invs_num = InvUsedInSession.objects.filter(date__year=now.year,
+                date__month=now.month, date__day=now.day).count()
+        if len(order) == 14:
+            order = '0'+order
         try:
             inv = Invitation.objects.get(order=order)
         except:
-            return self.response_json(_('Not exists'), st='wrong')
+            return self.response_json(_('Not exists'), st='wrong', msg3=invs_num)
 
         session = Session.objects.get(pk=s)
         valid_session = inv.type.sessions.filter(pk=s).exists()
@@ -190,11 +199,11 @@ class AccessView(UserPassesTestMixin, TemplateView):
             if inv.type.end and now > inv.type.end:
                 msg = _("Expired, ended at %(date)s") % {
                     'date': short_date(inv.type.end)}
-                return self.response_json(msg, st='wrong')
+                return self.response_json(msg, st='wrong', msg3=invs_num)
             if inv.type.start and now < inv.type.start:
                 msg = _("Too soon, wait until %(date)s") % {
                     'date': short_date(inv.type.start)}
-                return self.response_json(msg, st='wrong')
+                return self.response_json(msg, st='wrong', msg3=invs_num)
 
         # if we're here, everything is ok
         #  * If is a valid inv and it's not a pass, mark as used
@@ -205,7 +214,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
                 inv.save()
 
         msg = _("Ok: %(session)s") % {'session': session.short()}
-        return self.response_json(msg, msg2=inv.order)
+        return self.response_json(msg, msg2=inv.order, msg3=invs_num+1)
 
     def check_ticket(self, order, s, g):
         try:
@@ -264,6 +273,8 @@ class AccessView(UserPassesTestMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         order = request.POST.get('order', '')
         order = order.strip()
+        if len(order) == 14:
+            order = '0'+order
         if len(order) != settings.ORDER_SIZE:
             msg = _("Incorrect readind")
             return self.response_json(msg, st='wrong')
