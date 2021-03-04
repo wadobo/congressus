@@ -17,3 +17,4 @@ reportlab==3.4.0
 stripe==1.82.1
 websocket-client==0.48.0
 websocket-server==0.4
+pillow>=8.1.1 # not directly required, pinned by Snyk to avoid a vulnerability
