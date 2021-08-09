@@ -13,7 +13,7 @@ numpy==1.14.5
 paypalrestsdk==1.13.1
 psycopg2-binary==2.7.5
 pytz==2018.4
-reportlab==3.4.0
+reportlab==3.5.55
 stripe==1.82.1
 websocket-client==0.48.0
 websocket-server==0.4
