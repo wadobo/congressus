@@ -7,7 +7,6 @@ RUN apk add certbot certbot-nginx
 COPY etc/nginx/conf.d/*.conf /etc/nginx/conf.d/
 COPY etc/nginx/nginx.conf /etc/nginx/nginx.conf
 
-RUN sed -i "s/_DOMAIN_/${DOMAIN}/g" /etc/nginx/conf.d/*.conf
+RUN sed -i "s/#_${SCHEMA}_://g; s/_DOMAIN_/${DOMAIN}/g" /etc/nginx/conf.d/*.conf
 
 RUN rm /etc/nginx/conf.d/default.conf
-#CMD ["nginx", "-g", "daemon off;"]

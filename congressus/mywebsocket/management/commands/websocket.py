@@ -1,11 +1,13 @@
 import datetime
+from threading import Timer
+
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.db.models import Q
 from django.db import connection
 from django.utils import timezone
+
 from mywebsocket.server import WSServer
-from threading import Timer
 from tickets.models import TicketSeatHold
 
 
@@ -26,7 +28,10 @@ def clean_holds(ws):
 
 
 class Command(BaseCommand):
+    def add_arguments(self, parser):
+        parser.add_argument('--port', action='store', type=int, default=9007)
+
     def handle(self, *args, **options):
-        s = WSServer()
+        s = WSServer(port=options.get('port'))
         clean_holds(s)
         s.run()

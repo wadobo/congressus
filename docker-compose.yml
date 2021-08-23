@@ -24,7 +24,7 @@ services:
       - st:/app/congressus
       - /etc/letsencrypt:/etc/letsencrypt
     labels:
-      - "traefik.frontend.rule=Host:${DOMAIN},www.${DOMAIN}"
+      - "traefik.frontend.rule=Host:${DOMAIN},ws.${DOMAIN},www.${DOMAIN}"
       - "traefik.docker.network"
       - "traefik.port=80"
 
@@ -53,7 +53,7 @@ services:
       - db
     volumes:
       - .:/app
-      - ${CONGRESSUS_THEME}:/theme
+      - ${CONGRESSUS_THEME}:/app/congressus/theme
       - st:/app/static/
     labels:
       - "traefik.enable=false"
@@ -72,7 +72,7 @@ services:
       - db
     volumes:
       - .:/app
-      - ${CONGRESSUS_THEME}:/theme
+      - ${CONGRESSUS_THEME}:/app/congressus/theme
     labels:
       - "traefik.enable=false"
 

@@ -62,9 +62,11 @@ class AccessLogin(TemplateView):
             have_access = user.groups.filter(name='access').count()
             if user.is_active and have_access:
                 # session
-                session = get_object_or_404(Session,
-                                            space__event__slug=ev,
-                                            id=request.POST['session'])
+                session = get_object_or_404(
+                    Session,
+                    space__event__slug=ev,
+                    id=request.POST.get('session', None)
+                )
                 request.session['session'] = session.id
                 # gate
                 gate = request.POST.get('gate', '')
