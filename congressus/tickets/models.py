@@ -11,7 +11,6 @@ from django.template import Template
 from django.template.loader import get_template
 
 from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 from django.urls import reverse
 

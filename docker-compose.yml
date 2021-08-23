@@ -1,0 +1,88 @@
+version: '3.7'
+
+services:
+
+  proxy:
+    container_name: congressus_proxy
+    image: congressus-proxy:${TAG}
+    env_file: .env
+    build:
+      context: proxy
+      args:
+        DOMAIN: ${DOMAIN}
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    expose:
+      - "80"
+      - "443"
+    depends_on:
+      - web
+      - ws
+    volumes:
+      - st:/app/congressus
+      - /etc/letsencrypt:/etc/letsencrypt
+    labels:
+      - "traefik.frontend.rule=Host:${DOMAIN},www.${DOMAIN}"
+      - "traefik.docker.network"
+      - "traefik.port=80"
+
+  db:
+    container_name: congressus_db
+    image: postgres:alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - web-db:/var/lib/postgresql/data
+    labels:
+      - "traefik.enable=false"
+
+  web:
+    container_name: congressus_web
+    image: congressus-web:${TAG}
+    env_file: .env
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+      - ${CONGRESSUS_THEME}:/theme
+      - st:/app/static/
+    labels:
+      - "traefik.enable=false"
+
+  ws:
+    restart: always
+    container_name: congressus_ws
+    image: congressus-web:${TAG}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    command: python manage.py websocket
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+      - ${CONGRESSUS_THEME}:/theme
+    labels:
+      - "traefik.enable=false"
+
+volumes:
+  web-db:
+    name: web-db
+  st:
+    name: web-st
+
+networks:
+  default:
+    external:
+      name: traefik_congressus

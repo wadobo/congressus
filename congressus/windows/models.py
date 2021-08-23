@@ -15,7 +15,6 @@ from tickets.models import MultiPurchase
 from django.db.models.signals import post_delete
 from django.db.models.signals import post_save
 from django.db.models.signals import pre_save
-from django.dispatch import receiver
 
 from django.db.models import Sum
 

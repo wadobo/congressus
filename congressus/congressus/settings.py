@@ -12,6 +12,28 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from os import environ as env
+
+from django.contrib.messages import constants as messages
+
+
+def env_list(env_name, default=list):
+    """
+    Get environment var and convert in python list. Example .env: APPS=x1,y2,z3
+    """
+    list_vars = env.get(env_name, None)
+    return list_vars.split(',') if list_vars else default
+
+
+def env_get_admins():
+    """ Example: Foo:foo@test.com,Bar:bar@test.com """
+    res = list()
+    list_vars = env.get('ADMINS', '')
+    admins = list_vars.split(',') if list_vars else list()
+    for adm in admins:
+        res.append(tuple(adm.split(':')))
+    return tuple(res)
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -19,13 +41,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'v!r#8-@k_be__nior8(nwst!s&s$51+qu+^^(04q3w!nd1v_u9'
+SECRET_KEY = env.get('SECRET_KEY', 'v!r#8-@k_be__nior8(nwst!s&s$51+qu+^^(04q3w!nd1v_u9')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.get('DEBUG', 'True') == 'True'
+ADMINS = env_get_admins()
+MANAGERS = ADMINS
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env_list('ALLOWED_HOSTS', [])
 
 
 # Application definition
@@ -108,18 +130,25 @@ WSGI_APPLICATION = 'congressus.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+config_database = {
+    'ENGINE': 'django.db.backends.sqlite3',
+    'NAME': os.path.join(BASE_DIR, env.get('DB_NAME', 'db.sqlite3')),
 }
 
+if env.get('DB_ENGINE', None):
+    config_database = {
+        'ENGINE': env.get('DB_ENGINE', 'django.db.backends.postgresql'),
+        'NAME': env.get('DB_NAME', 'geas'),
+        'USER': env.get('DB_USER', 'geas'),
+        'PASSWORD': env.get('DB_PASSWORD', 'geas'),
+        'HOST': env.get('DB_HOST', 'db'),
+        'PORT': env.get('DB_PORT', '5432'),
+    }
+
+DATABASES = {'default': config_database}
 
 # Internationalization
-# https://docs.djangoproject.com/en/1.8/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -135,7 +164,6 @@ USE_THOUSAND_SEPARATOR = True
 
 LOCALE_PATHS = (BASE_DIR + '/locale', )
 
-from django.contrib.messages import constants as messages
 MESSAGE_TAGS = {
     messages.ERROR: 'danger'
 }
@@ -146,9 +174,10 @@ CRISPY_TEMPLATE_PACK = 'bootstrap3'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
-STATIC_URL = '/static/'
-MEDIA_URL = '/static/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'static', 'media')
+STATIC_URL = env.get('STATIC_URL', '/static/static/')
+STATIC_ROOT = env.get('STATIC_ROOT', None)
+MEDIA_URL = env.get('MEDIA_URL', '/static/media/')
+MEDIA_ROOT = env.get('MEDIA_URL', os.path.join(BASE_DIR, 'static/media'))
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
@@ -162,37 +191,37 @@ INTERNAL_IPS = ['127.0.0.1']
 
 ORDER_SIZE = 15
 FROM_EMAIL = 'congressus@us.es'
-SITE_URL = "http://localhost:8000"
+SITE_URL = env.get('SITE_URL', 'http://localhost:8000')
 
 # REDSYS TPV options
 REDSYS_ENABLED = True
-TPV_TERMINAL = 1
-TPV_MERCHANT = 'XXXXXX'
-TPV_URL = "https://sis-t.redsys.es:25443/sis/realizarPago"
+TPV_TERMINAL = env.get('TPV_TERMINAL', 1)
+TPV_MERCHANT = env.get('TPV_MERCHANT', 'XXXXXX')
+TPV_URL = env.get('TPV_URL', "https://sis-t.redsys.es:25443/sis/realizarPago")
 # LANGS: Spanish - 001, English - 002
-TPV_LANG = '002'
+TPV_LANG = env.get('TPV_LANG', '002')
 #TPV_URL = "https://sis.redsys.es/sis/realizarPago"
-TPV_KEY = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-TPV_MERCHANT_URL = SITE_URL + '/ticket/confirm/'
+TPV_KEY = env.get('TPV_KEY', "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+TPV_MERCHANT_URL = env.get('TPV_MERCHANT_URL', SITE_URL + '/ticket/confirm/')
 
 # PAYPAL
-PAYPAL_ENABLED = False
-PAYPAL_SANDBOX = True
-PAYPAL_CLIENTID = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-PAYPAL_SECRET = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+PAYPAL_ENABLED = env.get('PAYPAL_ENABLED', False)
+PAYPAL_SANDBOX = env.get('PAYPAL_SANDBOX', True)
+PAYPAL_CLIENTID = env.get('PAYPAL_CLIENTID', 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+PAYPAL_SECRET = env.get('PAYPAL_SECRET', 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
 
 # STRIPE
-STRIPE_ENABLED = False
-STRIPE_PK = 'pk_live_xxxxxxxxxxxxxxxxxxxxxxxx'
-STRIPE_SK = 'sk_live_xxxxxxxxxxxxxxxxxxxxxxxx'
-STRIPE_NAME = 'No es magia es Wadobo S.L.L.'
-STRIPE_DESC = ''
-STRIPE_IMAGE = 'https://s3.amazonaws.com/stripe-uploads/acct_103f1h2csBUWpoVVmerchant-icon-713198-wadobo-icon.png'
-STRIPE_BITCOIN = False
+STRIPE_ENABLED = env.get('STRIPE_ENABLED', False)
+STRIPE_PK = env.get('STRIPE_PK', 'pk_live_xxxxxxxxxxxxxxxxxxxxxxxx')
+STRIPE_SK = env.get('STRIPE_SK', 'sk_live_xxxxxxxxxxxxxxxxxxxxxxxx')
+STRIPE_NAME = env.get('STRIPE_NAME', 'No es magia es Wadobo S.L.L.')
+STRIPE_DESC = env.get('STRIPE_DESC', '')
+STRIPE_IMAGE = env.get('STRIPE_IMAGE', 'https://s3.amazonaws.com/stripe-uploads/acct_103f1h2csBUWpoVVmerchant-icon-713198-wadobo-icon.png')
+STRIPE_BITCOIN = env.get('STRIPE_BITCOIN', False)
 
 QRCODE = True
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
-WS_SERVER = 'localhost:9007'
+WS_SERVER = env.get('WS_SERVER', 'localhost:9007')
 TIMESTEP_CHART = 'daily'
 MAX_STEP_CHART = 10
 
@@ -217,7 +246,7 @@ DEBUG_TOOLS = True
 REAL_EXTRA_APPS = tuple()
 
 SINGLEROW_MS = 5000
-SINGLEROW_LANG = 'en'
+SINGLEROW_LANG = env.get('SINGLEROW_LANG', 'en')
 
 if os.path.exists(os.path.join(BASE_DIR, 'theme')):
     print("Custom theme found... Using it")
@@ -264,22 +293,15 @@ if DEBUG and DEBUG_TOOLS:
         'debug_toolbar.panels.signals.SignalsPanel',
         'debug_toolbar.panels.logging.LoggingPanel',
         'debug_toolbar.panels.redirects.RedirectsPanel',
-        'debug_toolbar_line_profiler.panel.ProfilingPanel',
     ]
 
     INSTALLED_APPS = INSTALLED_APPS + (
         'debug_toolbar',
-        'debug_toolbar_line_profiler',
-        'silk',
     )
 
     MIDDLEWARE = (
         'debug_toolbar.middleware.DebugToolbarMiddleware',
-        'silk.middleware.SilkyMiddleware',
     ) + MIDDLEWARE
-
-    SILKY_PYTHON_PROFILER = True
-    #SILKY_PYTHON_PROFILER_BINARY = True # crate file for view with snakeviz
 
     for tmpl in TEMPLATES:
         tmpl['OPTIONS']['context_processors'] = ['django.template.context_processors.debug'] + tmpl['OPTIONS']['context_processors']

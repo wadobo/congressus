@@ -12,6 +12,34 @@ las instrucciones del framework:
 
 Las dependencias django están en el fichero requirements.txt.
 
+## Despliegue con docker-compose
+
+Editar las variables de entorno que se encuentran en el fichero .env con su editor favorito
+
+Crear network desde docker:
+
+```
+docker network create traefik_congressus
+```
+
+Contruir imágenes y levantar contenedores:
+
+```
+docker-compose build
+docker-compose up -d
+```
+
+La primera vez que ejecute el entorno, necesitará entrar en el contenedor web para realizar
+la primera migración y crear un usuario administrador:
+
+```
+docker exec -ti congressus_web bash
+./manage.py migrate
+./manage.py createsuperuser
+```
+
+
+
 ## Entorno de desarrollo
 
 Creación de la base de datos:
