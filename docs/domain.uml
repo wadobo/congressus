@@ -1,0 +1,70 @@
+@startuml
+
+class Event
+class Discount
+class SeatMap
+class Gate
+class SeatLayout
+class Space
+class Session
+class ExtraSession
+class ConfirmEmail
+class EmailAttachment
+class InvCode
+class TicketField
+class TicketTemplate
+
+class TicketWindow
+class TicketWindowSale
+class TicketWindowCashMovement
+
+class BaseTicketMixing
+class BaseExtraData
+class MultiPurchase
+class Ticket
+class TicketWarning
+class TicketSeatHold
+
+class SingleRowConfig
+class SingleRowTail
+
+class InvitationType
+
+class Dashboard
+
+class AccessControl
+
+
+Ticket *--> Session
+Ticket *--> SeatLayout
+Ticket *--> MultiPurchase
+
+Event *--> ConfirmEmail
+Event *--> "1..n" Discount
+
+SeatLayout *--> SeatMap
+SeatLayout *--> Gate
+
+Space *--> Event
+Space *--> SeatMap
+
+Session *--> Space
+Session o--> TicketTemplate
+ExtraSession *--> "2" Session
+
+EmailAttachment *--> ConfirmEmail
+
+Gate *--> Event
+InvCode *--> Event
+TicketField *--> Event
+
+TicketWindow *--> Event
+MultiPurchase *--> Event
+TicketWarning *--> Event
+SingleRowConfig *--> Event
+SingleRowTail *--> Event
+InvitationType *--> Event
+Dashboard *--> Event
+AccessControl *--> Event
+
+@enduml

@@ -1,0 +1,51 @@
+@startuml
+package events {
+    class Event
+    class Discount
+    class SeatMap
+    class Gate
+    class SeatLayout
+    class Space
+    class Session
+    class ExtraSession
+    class ConfirmEmail
+    class EmailAttachment
+    class InvCode
+    class TicketField
+    class TicketTemplate
+}
+
+package windows {
+    class TicketWindow
+    class TicketWindowSale
+    class TicketWindowCashMovement
+}
+
+package tickets {
+    class BaseTicketMixing
+    class BaseExtraData
+    class MultiPurchase
+    class Ticket
+    class TicketWarning
+    class TicketSeatHold
+}
+
+package singlerow {
+    class SingleRowConfig
+    class SingleRowTail
+}
+
+package invs {
+    class InvitationType
+}
+
+package dashboard {
+    class Dashboard
+}
+
+package access {
+    class AccessControl
+}
+
+
+@enduml
