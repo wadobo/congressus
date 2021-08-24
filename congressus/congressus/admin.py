@@ -1,5 +1,3 @@
-# Custom admin sites to be able to show a different admin site for each Event
-
 from django.contrib import admin
 from django.db.utils import OperationalError, ProgrammingError
 from events.models import Event

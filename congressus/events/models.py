@@ -1,5 +1,5 @@
-import datetime
 import numpy as np
+import random
 
 from autoslug import AutoSlugField
 from django import forms
@@ -14,7 +14,6 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 from invs.utils import get_sold_invs
-
 from .widgets import HTMLWidget
 
 

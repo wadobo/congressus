@@ -19,7 +19,6 @@ from tickets.utils import generate_pdf
 from tickets.utils import generate_thermal
 
 from django.db.models.signals import post_delete
-from django.dispatch import receiver
 
 
 class InvitationType(models.Model):
@@ -262,10 +261,10 @@ class InvitationGenerator(models.Model):
             invi.save()
             if seat_list:
                 tsh, new = TicketSeatHold.objects.get_or_create(
-                        session=invi.type.sessions.first(),
-                        layout=invi.seat_layout,
-                        seat=invi.seat,
-                        defaults={'type': 'R', 'client': 'INV'},
+                    session=invi.type.sessions.first(),
+                    layout=invi.seat_layout,
+                    seat=invi.seat,
+                    defaults={'type': 'R', 'client': 'INV'},
                 )
 
                 tsh.type = 'R'

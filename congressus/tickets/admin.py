@@ -1,12 +1,14 @@
+from django import forms
 from django.conf import settings
 from django.contrib import admin
-from django.utils.translation import ugettext_lazy as _
-
-from django.utils.safestring import mark_safe
+from django.contrib.flatpages.admin import FlatpageForm, FlatPageAdmin
+from django.contrib.flatpages.models import FlatPage
 from django.urls import reverse
-
 from django.utils import timezone
 from django.utils.formats import date_format
+from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy as _
+from tinymce.widgets import TinyMCE
 
 from .models import Ticket
 from .models import MultiPurchase
@@ -40,28 +42,6 @@ def unconfirm(modeladmin, request, queryset):
 unconfirm.short_description = _("Manual unconfirm")
 
 
-def mark_used(modeladmin, request, queryset):
-    now = timezone.now()
-    for i in queryset:
-        i.used = True
-        i.used_date = now
-        i.save()
-mark_used.short_description = _("Mark like used")
-
-
-def mark_no_used(modeladmin, request, queryset):
-    for i in queryset:
-        i.used = False
-        i.used_date = None
-        i.save()
-mark_no_used.short_description = _("Mark like no used")
-
-
-def delete_selected(modeladmin, request, queryset):
-    for obj in queryset:
-        obj.delete()
-delete_selected.short_description = _("Remove")
-
 class TicketAdmin(CSVMixin, admin.ModelAdmin):
     list_per_page = 20
     list_max_show_all = 800
@@ -74,7 +54,7 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
                    ('session__space', admin.RelatedOnlyFieldListFilter))
     search_fields = ('order', 'order_tpv', 'email', 'mp__order', 'mp__order_tpv')
     date_hierarchy = 'created'
-    actions = [delete_selected, confirm, unconfirm, mark_used, mark_no_used]
+    actions = [confirm, unconfirm, 'mark_used', 'mark_no_used']
 
     readonly_fields = (
         'order_tpv_linked', 'order', 'event_name', 'session2', 'cseat',
@@ -210,6 +190,22 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
         qs = super().get_queryset(request)
         return qs.filter(session__space__event__slug=slug)
 
+    def mark_used(self, request, queryset):
+        now = timezone.now()
+        for i in queryset:
+            i.used = True
+            i.used_date = now
+            i.save()
+    mark_used.short_description = _("Mark like used")
+
+
+    def mark_no_used(self, request, queryset):
+        for i in queryset:
+            i.used = False
+            i.used_date = None
+            i.save()
+    mark_no_used.short_description = _("Mark like no used")
+
 
 class TicketInline(admin.TabularInline):
     model = Ticket
@@ -246,7 +242,7 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
 
     search_fields = ('order', 'order_tpv', 'email', 'extra_data')
     date_hierarchy = 'created'
-    actions = [delete_selected, confirm, unconfirm, link_online_sale]
+    actions = [confirm, unconfirm, link_online_sale]
     inlines = [TicketInline, ]
 
     @property
@@ -400,13 +396,6 @@ register(TicketSeatHold, TicketSeatHoldAdmin)
 
 
 # tinymce for flatpages
-
-from django import forms
-from django.contrib.flatpages.admin import FlatpageForm, FlatPageAdmin
-from django.contrib.flatpages.models import FlatPage
-from tinymce.widgets import TinyMCE
-
-
 class PageForm(FlatpageForm):
 
     content = forms.CharField(widget=TinyMCE(attrs={'cols': 80, 'rows': 30}))

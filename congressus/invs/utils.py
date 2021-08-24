@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.http import HttpResponse
 
 from tickets.utils import concat_pdf

@@ -14,7 +14,6 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.urls import reverse
 
 from .models import AccessControl
-from .models import LogAccessControl
 from events.models import Event
 from events.models import Session
 from events.models import Gate

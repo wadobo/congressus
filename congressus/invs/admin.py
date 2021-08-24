@@ -193,6 +193,7 @@ class InvitationGeneratorAdmin(admin.ModelAdmin):
     def event_filter_fields(self, slug):
         return { 'type': Q(event__slug=slug), }
 
+
 register(InvitationGenerator, InvitationGeneratorAdmin)
 register(Invitation, InvitationAdmin)
 register(InvitationType, InvitationTypeAdmin)
