@@ -239,7 +239,7 @@ TIMESTEP_CHART = 'daily'
 MAX_STEP_CHART = 10
 
 INVITATION_ORDER_START = '01'
-PRINT_FORMATS = ['A4', 'thermal', 'csv']
+PRINT_FORMATS = ['thermal', 'custom', 'csv']
 
 MAX_SEAT_BY_SESSION = 50
 EXPIRED_SEAT_H = 5*60 # 5 minutes

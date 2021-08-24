@@ -47,13 +47,13 @@ DIRECTIONS = (
     ('d', _('Down')),
 )
 
-DISCOUNT_TYPES = (
-    ('percent', _('Percent')),
-    ('amount', _('Amount')),
-)
-
 
 class Discount(models.Model):
+    DISCOUNT_TYPES = (
+        ('percent', _('Percent')),
+        ('amount', _('Amount')),
+    )
+
     name = models.CharField(_('name'), max_length=200, unique=True)
     type = models.CharField(_('type'), max_length=8, choices=DISCOUNT_TYPES, default='percent')
     value = models.IntegerField(_('value'), default=0)
@@ -282,7 +282,6 @@ class Session(models.Model):
     tax = models.IntegerField(_('ticket tax percentage'), default=21)
 
     template = models.ForeignKey("TicketTemplate", blank=True, null=True, verbose_name=_('template'), on_delete=models.CASCADE)
-    thermal_template = models.ForeignKey("ThermalTicketTemplate", blank=True, null=True, verbose_name=_('thermal template'), on_delete=models.CASCADE)
     autoseat_mode = models.CharField(_('autoseat mode'), max_length=300, default='ASC',
             help_text="ASC, DESC, RANDOM or LIST: layout_name1,layout_name2")
 
@@ -468,37 +467,57 @@ class TicketTemplate(models.Model):
     name = models.CharField(_('name'), max_length=200, unique=True)
     header = models.ImageField(_('header'), upload_to='templheader', blank=True, null=True)
     sponsors = models.ImageField(_('sponsors'), upload_to='templsponsors', blank=True, null=True)
-    contributors = models.ImageField(_('contributors'), upload_to='templcontributors', blank=True, null=True)
+    note = models.CharField(_('previous note'), max_length=200, blank=True, null=True)
     links = models.CharField(_('links'), max_length=200, blank=True, null=True)
-    info = models.TextField(_('info text'), blank=True, null=True)
-    note = models.CharField(_('note'), max_length=200, blank=True, null=True)
+    info = models.TextField(
+        _('next note'),
+        help_text=_(
+            'change fontsize: &ltfont size=6&gtNOTE&lt/font&gt</br>'
+            'bold: &ltb&gtNOTE&lt/b&gt'
+        ),
+        blank=True,
+        null=True
+    )
+    contributors = models.ImageField(_('footer'), upload_to='templcontributors', blank=True, null=True)
+
+    pagesize_width = models.FloatField(_('pagesize width'), help_text=_('in cm'), default=15.92)
+    pagesize_height = models.FloatField(_('pagesize height'), help_text=_('in cm'), default=24.62)
+    left_margin = models.FloatField(_('left margin'), help_text=_('in cm'), default=2.54)
+    right_margin = models.FloatField(_('right margin'), help_text=_('in cm'), default=2.54)
+    bottom_margin = models.FloatField(_('bottom margin'), help_text=_('in cm'), default=2.54)
+    top_margin = models.FloatField(_('top margin'), help_text=_('in cm'), default=2.54)
 
     class Meta:
         verbose_name = _('ticket template')
         verbose_name_plural = _('ticket templates')
 
+    @property
+    def footer(self):
+        return self.contributors
+
+    @property
+    def previous_note(self) -> str:
+        return self.note or ''
+
+    @property
+    def next_note(self) -> str:
+        return self.info or ''
+
+    @property
+    def is_vertical(self) -> bool:
+        return self.pagesize_width < self.pagesize_height
+
     def get_absolute_url(self):
         return reverse('template_preview', kwargs={'id': self.id})
 
-    def __str__(self):
-        return self.name
-
-
-class ThermalTicketTemplate(models.Model):
-    name = models.CharField(_('name'), max_length=200, unique=True)
-    header = models.ImageField(_('header'), upload_to='templheader', blank=True, null=True)
-    sponsors = models.ImageField(_('sponsors'), upload_to='templsponsors', blank=True, null=True)
-    background = models.ImageField(_('background'), upload_to='templsback', blank=True, null=True)
-
-    width = models.IntegerField(_('width'), default=1795)
-    height = models.IntegerField(_('height'), default=815)
-
-    class Meta:
-        verbose_name = _('thermal ticket template')
-        verbose_name_plural = _('thermal ticket templates')
-
-    def get_absolute_url(self):
-        return reverse('thermal_template_preview', kwargs={'id': self.id})
+    def config_in(self, unit: float) -> dict[str, float]:
+        return {
+            'pagesize': (self.pagesize_width * unit, self.pagesize_height * unit),
+            'leftMargin': self.left_margin * unit,
+            'rightMargin': self.right_margin * unit,
+            'bottomMargin': self.bottom_margin * unit,
+            'topMargin': self.top_margin * unit,
+        }
 
     def __str__(self):
         return self.name

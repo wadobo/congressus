@@ -1,30 +1,21 @@
-from django.db.models import Q
+from admin_csv import CSVMixin
 from django.conf import settings
 from django.contrib import admin
-from django.utils.translation import ugettext_lazy as _
+from django.db.models import Q
 from django.http import HttpResponse
-
 from django.utils import timezone
 from django.utils.formats import date_format
+from django.utils.translation import ugettext_lazy as _
 
-from admin_csv import CSVMixin
-from django_admin_listfilter_dropdown.filters import DropdownFilter
-from django_admin_listfilter_dropdown.filters import RelatedDropdownFilter
-
+from .filters import UsedFilter
 from .models import InvitationGenerator
 from .models import Invitation
 from .models import InvitationType
 from .models import InvUsedInSession
-
-from .filters import UsedFilter
-
-from tickets.utils import concat_pdf
-from tickets.utils import generate_pdf
-from tickets.utils import generate_thermal
-
-from events.admin import EventMixin, EVFilter
-
 from congressus.admin import register
+from events.admin import EventMixin, EVFilter
+from events.ticket_pdf import TicketPDF
+from tickets.utils import concat_pdf
 
 
 class RelatedOnlyDropdownFilter(admin.RelatedOnlyFieldListFilter):
@@ -59,7 +50,8 @@ def get_pdf(modeladmin, request, queryset):
 
     def fillfiles(q):
         for inv in q:
-            files.append(generate_pdf(inv, asbuf=True, inv=True))
+            pdf = TicketPDF(inv, True).generate(asbuf=True)
+            files.append(pdf)
 
     if modeladmin.model == InvitationGenerator:
         for ig in queryset:
@@ -81,7 +73,8 @@ def get_thermal(modeladmin, request, queryset):
 
     def fillfiles(q):
         for inv in q:
-            files.append(generate_thermal(inv, asbuf=True, inv=True))
+            pdf = TicketPDF(inv, True).generate(asbuf=True)
+            files.append(pdf)
 
     if modeladmin.model == InvitationGenerator:
         for ig in queryset:

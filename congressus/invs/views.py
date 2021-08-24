@@ -1,17 +1,12 @@
 from django.conf import settings
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.urls import reverse
-from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
 
 from events.models import Event
-
-from .models import Invitation
-from .models import InvitationType
-from .models import InvitationGenerator
-from .utils import get_ticket_format
+from invs.models import InvitationType, InvitationGenerator
+from invs.utils import get_ticket_format
 
 
 class GenInvitationsView(UserPassesTestMixin, TemplateView):

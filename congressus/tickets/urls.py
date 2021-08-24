@@ -14,7 +14,6 @@ urlpatterns = [
     path('ticket/<str:order>/confirm/stripe/', views.confirm_stripe, name='confirm_stripe'),
 
     path('ticket/template/<int:id>/preview/', views.template_preview, name='template_preview'),
-    path('ticket/thermal/template/<int:id>/preview/', views.thermal_template_preview, name='thermal_template_preview'),
     path('ticket/email-confirm/<int:id>/preview/', views.email_confirm_preview, name='email_confirm_preview'),
 
     path('<str:ev>/', views.multipurchase, name='multipurchase'),

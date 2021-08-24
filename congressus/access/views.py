@@ -1,6 +1,5 @@
 import json
 from datetime import datetime
-from datetime import timedelta
 from django.views.generic import TemplateView, View
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse

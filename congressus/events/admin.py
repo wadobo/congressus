@@ -136,10 +136,6 @@ class TicketTemplateAdmin(admin.ModelAdmin):
     list_display = ('name', )
 
 
-class ThermalTicketTemplateAdmin(admin.ModelAdmin):
-    list_display = ('name', )
-
-
 class DiscountAdmin(admin.ModelAdmin):
     list_display = ('name', 'type', 'value')
 
@@ -156,5 +152,4 @@ register(SeatLayout, SeatLayoutAdmin)
 register(Gate, GateAdmin)
 
 register(TicketTemplate, TicketTemplateAdmin)
-register(ThermalTicketTemplate, ThermalTicketTemplateAdmin)
 register(Discount, DiscountAdmin)

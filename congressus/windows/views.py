@@ -1,34 +1,29 @@
-import json
 import datetime
-from django.utils import timezone
-from django.views.generic import TemplateView, View
-from django.shortcuts import get_object_or_404
-from django.http import HttpResponse, JsonResponse
-from django.contrib.auth import authenticate, login
+
+from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import authenticate, login
+from django.contrib.auth import logout as auth_logout
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.sessions.models import Session as DjSession
 from django.core.cache import cache
 from django.db.models import Q
-from django.utils.translation import ugettext as _
-from django.shortcuts import redirect, render
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
+from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import TemplateView, View
 
-from .models import TicketWindow
-from .models import TicketWindowSale
-from tickets.views import MultiPurchaseView
-from tickets.views import get_ticket_or_404
-from events.models import Discount
-from events.models import Event
-from events.models import Session
+from events.models import Discount, Event, Session
 from tickets.forms import MPRegisterForm
 from tickets.models import Ticket
 from tickets.models import MultiPurchase
 from tickets.utils import get_ticket_format
-
-from django.contrib.auth import logout as auth_logout
-from django.conf import settings
-from django.views.decorators.csrf import csrf_exempt
+from tickets.views import MultiPurchaseView
+from windows.models import TicketWindow
+from windows.models import TicketWindowSale
 
 
 def restrict_multiple_user(request):
@@ -81,7 +76,7 @@ window_login = WindowLogin.as_view()
 
 class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
     template_name = 'windows/multipurchase.html'
-    DEFAULT_PF = 'thermal'
+    DEFAULT_PF = 'custom'
 
     def get_window(self):
         ev = self.kwargs['ev']
@@ -123,12 +118,16 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
                     last_sale.price
             )
             ctx['last_sale'] = {
-                    'name': name,
-                    'url': "/window/{0}/{1}/thermal/{2}/".format(
-                            w.event.slug,
-                            w.slug,
-                            str(last_sale.purchase)
-                    )
+                'name': name,
+                'url': reverse(
+                    'window_ticket',
+                    kwargs={
+                        'ev': w.event.slug,
+                        'w': w.slug,
+                        'pf': 'thermal',
+                        'order': str(last_sale.purchase)
+                    }
+                )
             }
         return ctx
 
@@ -148,9 +147,13 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
         data = request.POST.copy()
         data['email'] = settings.FROM_EMAIL
 
-        form = MPRegisterForm(data,
-                              event=w.event, ids=ids, seats=seats,
-                              client=request.session.get('client', ''))
+        form = MPRegisterForm(
+            data,
+            event=w.event,
+            ids=ids,
+            seats=seats,
+            client=request.session.get('client', '')
+        )
 
         keys = list(form.fields.keys())
         for k in keys:
