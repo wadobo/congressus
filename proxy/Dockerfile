@@ -1,6 +1,7 @@
 FROM nginx:1.19.6-alpine
 
 ARG DOMAIN
+ARG SCHEMA
 
 RUN apk add certbot certbot-nginx
 
