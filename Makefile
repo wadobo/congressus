@@ -13,7 +13,7 @@ cov:
 	coverage html
 
 i18n_extract:
-	django-admin makemessages -a
+	cd congressus; ./manage.py makemessages -a
 
 i18n_build:
-	django-admin compilemessages
+	cd congressus; ./manage.py compilemessages
