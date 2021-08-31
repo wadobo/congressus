@@ -90,6 +90,7 @@ INSTALLED_APPS = [
 SITE_ID = 1
 
 MIDDLEWARE = (
+    'congressus.suspicious_middleware.SuspiciousMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',

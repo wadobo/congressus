@@ -267,7 +267,7 @@ class Payment(TemplateView):
 
     def get_redsys_context(self, ctx, tk):
         # Enabled by default
-        site_url = self.request.site.domain
+        site_url = f'{self.request.scheme}://{self.request.get_host()}/'
         p = getattr(settings, 'REDSYS_ENABLED', True)
         if not p:
             return ctx
@@ -308,7 +308,7 @@ class Payment(TemplateView):
         return ctx
 
     def get_context_data(self, *args, **kwargs):
-        ctx = super(Payment, self).get_context_data(*args, **kwargs)
+        ctx = super().get_context_data(*args, **kwargs)
         tk = get_ticket_or_404(order=kwargs['order'])
         ctx['ticket'] = tk
         ctx['error'] = self.request.GET.get('error', '')
