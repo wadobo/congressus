@@ -15,7 +15,6 @@ from tickets.models import MultiPurchase
 from django.db.models.signals import post_delete
 from django.db.models.signals import post_save
 from django.db.models.signals import pre_save
-from django.dispatch import receiver
 
 from django.db.models import Sum
 
@@ -56,9 +55,11 @@ class TicketWindow(models.Model):
 
     supplement = models.FloatField(_('increments or decrements the ticket price for this window'), default=0)
 
-    print_close_timeout = models.FloatField(_('PDF ticket window close timeout'),
-                                            help_text=_('Time to auto close the ticket PDF popup window, use 0 to disable auto close'),
-                                            default=1.0)
+    print_close_timeout = models.FloatField(
+        _('PDF ticket window close timeout'),
+        help_text=_('Time to auto close the ticket PDF popup window, use 0 to disable auto close'),
+        default=1.0
+    )
     shortcuts = JSONField(default=dict({'add': 145, 'sub': 19, 'onoff': 42}))
     autocall_singlerow = models.BooleanField(_('autocall singlerow'), default=True)
     number_of_calls = models.PositiveSmallIntegerField(_('number of call'),

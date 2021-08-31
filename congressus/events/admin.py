@@ -1,18 +1,22 @@
 from django.db.models import Q
 from django.contrib import admin
 
-from .models import Event, InvCode
-from .models import ExtraSession
-from .models import ConfirmEmail, EmailAttachment
-from .models import Space
-from .models import Session
-from .models import TicketField
-from .models import SeatMap, SeatLayout, Gate
-from .models import TicketTemplate
-from .models import ThermalTicketTemplate
-from .models import Discount
-
 from congressus.admin import register
+from events.models import (
+    ConfirmEmail,
+    Discount,
+    EmailAttachment,
+    Event,
+    ExtraSession,
+    Gate,
+    InvCode,
+    SeatLayout,
+    SeatMap,
+    Session,
+    Space,
+    TicketField,
+    TicketTemplate,
+)
 
 
 EVFilter = ('event', admin.RelatedOnlyFieldListFilter)
@@ -25,6 +29,7 @@ class EventMixin:
 
     def event_filter_fields(self, slug):
         return { 'event': Q(slug=slug), }
+
 
 class SpaceMixin:
     def event_filter(self, request, slug):
@@ -131,10 +136,6 @@ class TicketTemplateAdmin(admin.ModelAdmin):
     list_display = ('name', )
 
 
-class ThermalTicketTemplateAdmin(admin.ModelAdmin):
-    list_display = ('name', )
-
-
 class DiscountAdmin(admin.ModelAdmin):
     list_display = ('name', 'type', 'value')
 
@@ -151,5 +152,4 @@ register(SeatLayout, SeatLayoutAdmin)
 register(Gate, GateAdmin)
 
 register(TicketTemplate, TicketTemplateAdmin)
-register(ThermalTicketTemplate, ThermalTicketTemplateAdmin)
 register(Discount, DiscountAdmin)

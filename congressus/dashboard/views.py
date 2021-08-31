@@ -3,20 +3,9 @@ from copy import deepcopy
 from datetime import timedelta
 from datetime import datetime
 from django.conf import settings
-from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.contenttypes.models import ContentType
-# Django 1.10: instead .extra (deprecated soon)
-#from django.db.models.functions import TruncDay
-from django.db import connection
-from django.db.models import Count
-from django.db.models import F
-from django.db.models import FloatField
-from django.db.models import Sum
-from django.db.models import Value
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
@@ -30,7 +19,6 @@ from access.models import LogAccessControl
 from events.models import Event
 from events.models import Session
 from tickets.models import MultiPurchase
-from tickets.models import Ticket
 from windows.models import PAYMENT_TYPES
 from windows.models import TicketWindow
 from windows.models import TicketWindowSale
@@ -283,8 +271,6 @@ class GeneralView(TemplateView):
 
     def get_bar(self, type, timestep, max):
         strftime, delta = self.get_timesteps_vars(timestep)
-        now = timezone.localtime(timezone.now())
-        min_date = now - delta*max
         res = deepcopy(self.DATA_BAR)
 
         # Create labels and dataset
@@ -408,7 +394,6 @@ class GeneralReportView(ReportView):
         ctx['all_windows'] = TicketWindow.objects.filter(event=self.ev)
 
         days = self.get_days()
-        delta = timedelta(days=1)
 
         ctx['session_days'] = [(d, ) for d in days]
         ctx['window'] = self.window

@@ -1,5 +1,5 @@
-# Custom admin sites to be able to show a different admin site for each Event
 from django.contrib import admin
+from django.db.utils import OperationalError, ProgrammingError
 from events.models import Event
 
 
@@ -9,10 +9,13 @@ class CustomSite(admin.AdminSite):
 
 
 SITES = []
-for ev in Event.objects.all().order_by('slug'):
-    class EvSite(CustomSite):
-        site_header = ev.name
-    SITES.append(EvSite(name=ev.slug))
+try:  # First migration Event don't exist
+    for ev in Event.objects.all().order_by('slug'):
+        class EvSite(CustomSite):
+            site_header = ev.name
+        SITES.append(EvSite(name=ev.slug))
+except (ProgrammingError, OperationalError):
+    print('SITES no loading')
 
 
 def custom_inline(inline, slug):

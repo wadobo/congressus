@@ -1,6 +1,5 @@
 import json
 from datetime import datetime
-from datetime import timedelta
 from django.views.generic import TemplateView, View
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
@@ -14,7 +13,6 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.urls import reverse
 
 from .models import AccessControl
-from .models import LogAccessControl
 from events.models import Event
 from events.models import Session
 from events.models import Gate
@@ -62,9 +60,11 @@ class AccessLogin(TemplateView):
             have_access = user.groups.filter(name='access').count()
             if user.is_active and have_access:
                 # session
-                session = get_object_or_404(Session,
-                                            space__event__slug=ev,
-                                            id=request.POST['session'])
+                session = get_object_or_404(
+                    Session,
+                    space__event__slug=ev,
+                    id=request.POST.get('session', None)
+                )
                 request.session['session'] = session.id
                 # gate
                 gate = request.POST.get('gate', '')

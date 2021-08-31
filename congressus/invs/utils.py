@@ -1,8 +1,7 @@
-from django.conf import settings
 from django.http import HttpResponse
 
+from events.ticket_pdf import TicketPDF
 from tickets.utils import concat_pdf
-from tickets.utils import generate_pdf
 
 
 def gen_csv_from_generator(ig, numbered=True, string=True):
@@ -40,14 +39,16 @@ def gen_pdf(igs):
     from .models import Invitation
     files = []
     for inv in Invitation.objects.filter(generator__in=igs):
-        files.append(generate_pdf(inv, asbuf=True, inv=True))
+        pdf = TicketPDF(inv, True).generate(asbuf=True)
+        files.append(pdf)
     return concat_pdf(files)
 
 
 def gen_invs_pdf(invs):
     files = []
     for inv in invs:
-        files.append(generate_pdf(inv, asbuf=True, inv=True))
+        pdf = TicketPDF(inv, True).generate(asbuf=True)
+        files.append(pdf)
     return concat_pdf(files)
 
 
@@ -62,7 +63,7 @@ def get_ticket_format(invs, pf):
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'filename="tickets.pdf"'
         response.write(pdf)
-    elif pf == 'A4':
+    elif pf == 'custom':
         pdf = gen_pdf(invs)
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="tickets.pdf"'

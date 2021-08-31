@@ -1,0 +1,19 @@
+strictness: high
+test-warnings: true
+doc-warnings: false
+
+ignore-paths:
+  - static
+  - migrations
+  - scripts
+  - tests
+  - tags
+  - test_settings.py
+  - env
+
+pep8:
+  options:
+    max-line-length: 100
+
+mccabe:
+  run: true

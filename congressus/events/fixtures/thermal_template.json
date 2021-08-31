@@ -1,0 +1,21 @@
+[
+    {
+        "model": "events.tickettemplate",
+        "pk": "null",
+        "fields": {
+            "name": "thermal",
+            "header": "",
+            "sponsors": "",
+            "note": null,
+            "links": null,
+            "info": "",
+            "contributors": "",
+            "pagesize_width": 17.64,
+            "pagesize_height": 8.01,
+            "left_margin": 0.0,
+            "right_margin": 0.0,
+            "bottom_margin": 0.0,
+            "top_margin": 1.76
+        }
+    }
+]

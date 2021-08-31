@@ -1,45 +1,40 @@
 import hmac
 import json
-import uuid
 import random
 import string
-import operator
+from base64 import b64encode, b64decode
+from collections import OrderedDict
+from hashlib import sha256
 
 import redsystpv
-
-from django.db.models import Count
-from django.db.models import Q
-from django.core.exceptions import ObjectDoesNotExist
-
-from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Count
+from django.db.models import Q
+from django.http import Http404, HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template import Context
 from django.template import Template
-from django.utils import timezone
-from django.utils import formats
-from django.views.generic.edit import CreateView
-from django.views.generic.edit import ModelFormMixin
-from django.views.generic import TemplateView
-from django.views.generic import View
-
-from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect, render
 from django.urls import reverse
-from django.contrib.auth.mixins import UserPassesTestMixin
-
-from django.views.decorators.csrf import csrf_exempt
-
+from django.utils import formats, timezone
 from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import TemplateView, View
+from django.views.generic.edit import CreateView
+from pyDes import triple_des, CBC
 
 from .models import Ticket
 from .models import MultiPurchase
 from .models import TicketSeatHold
-from events.models import Session
-from events.models import Event
-from events.models import Space
-from events.models import SeatMap
-from events.models import SeatLayout
+from events.models import (
+    Event,
+    SeatLayout,
+    SeatMap,
+    Session,
+    Space,
+)
 
 from windows.utils import online_sale
 
@@ -49,11 +44,6 @@ from tickets.utils import get_ticket_format
 from tickets.utils import get_seats_by_str
 from tickets.utils import search_seats
 from invs.models import InvitationType
-
-from base64 import b64encode, b64decode
-from pyDes import triple_des, CBC
-from collections import OrderedDict
-from hashlib import sha256
 
 
 class EventView(TemplateView):
@@ -277,6 +267,7 @@ class Payment(TemplateView):
 
     def get_redsys_context(self, ctx, tk):
         # Enabled by default
+        site_url = f'{self.request.scheme}://{self.request.get_host()}/'
         p = getattr(settings, 'REDSYS_ENABLED', True)
         if not p:
             return ctx
@@ -287,7 +278,6 @@ class Payment(TemplateView):
         currency = '978'
         key = settings.TPV_KEY
         ttype = '0'
-        url = settings.TPV_MERCHANT_URL
         tpv_url = settings.TPV_URL
         terminal = settings.TPV_TERMINAL
 
@@ -298,10 +288,10 @@ class Payment(TemplateView):
         data["DS_MERCHANT_CURRENCY"] = currency
         data["DS_MERCHANT_TRANSACTIONTYPE"] = ttype
         data["DS_MERCHANT_TERMINAL"] = terminal
-        data["DS_MERCHANT_MERCHANTURL"] = url
+        data["DS_MERCHANT_MERCHANTURL"] = site_url + settings.TPV_MERCHANT_URL
         data["DS_MERCHANT_CONSUMERLANGUAGE"] = settings.TPV_LANG
-        data["DS_MERCHANT_URLOK"] = settings.SITE_URL + '/ticket/%s/thanks/' % tk.order
-        data["DS_MERCHANT_URLKO"] = settings.SITE_URL + '/ticket/%s/payment/?error=1' % tk.order
+        data["DS_MERCHANT_URLOK"] = site_url + f'/ticket/{tk.order}/thanks/'
+        data["DS_MERCHANT_URLKO"] = site_url + f'/ticket/{tk.order}/payment/?error=1'
 
         jsdata = json.dumps(data).replace(' ', '')
         mdata = b64encode(jsdata.encode()).decode()
@@ -318,7 +308,7 @@ class Payment(TemplateView):
         return ctx
 
     def get_context_data(self, *args, **kwargs):
-        ctx = super(Payment, self).get_context_data(*args, **kwargs)
+        ctx = super().get_context_data(*args, **kwargs)
         tk = get_ticket_or_404(order=kwargs['order'])
         ctx['ticket'] = tk
         ctx['error'] = self.request.GET.get('error', '')
@@ -373,7 +363,7 @@ class Thanks(TemplateView):
 
     def post(self, request, order):
         ticket = get_ticket_or_404(order=request.POST.get('ticket'), confirmed=True)
-        response = get_ticket_format(ticket, pf='A4')
+        response = get_ticket_format(ticket, pf='custom')
         return response
 
     def get_context_data(self, *args, **kwargs):
@@ -558,38 +548,17 @@ class TicketTemplatePreview(UserPassesTestMixin, View):
         ticket.created = timezone.now()
 
         ticket.session = Session(
-                          name=formats.date_format(timezone.now(), "l"),
-                          template=template,
-                          space=random.choice(list(Space.objects.all())),
-                          start=timezone.now(),
-                          end=timezone.now())
+            name=formats.date_format(timezone.now(), "l"),
+            template=template,
+            space=random.choice(list(Space.objects.all())),
+            start=timezone.now(),
+            end=timezone.now()
+        )
 
-        response = get_ticket_format(ticket, pf='A4', attachment=False)
+        response = get_ticket_format(ticket, pf='custom', attachment=False)
         return response
 
 template_preview = TicketTemplatePreview.as_view()
-
-
-class ThermalTicketTemplatePreview(TicketTemplatePreview):
-    def get(self, request, id):
-        from events.models import ThermalTicketTemplate
-        template = get_object_or_404(ThermalTicketTemplate, pk=id)
-
-        # fake ticket
-        ticket = Ticket(email='test@email.com', price=12, tax=21, confirm_sent=True)
-        ticket.gen_order(save=False)
-        ticket.created = timezone.now()
-
-        ticket.session = Session(
-                          name=formats.date_format(timezone.now(), "l"),
-                          thermal_template=template,
-                          space=random.choice(list(Space.objects.all())),
-                          start=timezone.now(),
-                          end=timezone.now())
-
-        response = get_ticket_format(ticket, pf='thermal', attachment=False)
-        return response
-thermal_template_preview = ThermalTicketTemplatePreview.as_view()
 
 
 class EmailConfirmPreview(UserPassesTestMixin, View):

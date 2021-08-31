@@ -1,5 +1,5 @@
 {% load i18n %}
-{% load staticfiles %}
+{% load static %}
 
 <div id="tooltip-{{ session.id }}" class="withtooltip btn {% if session.have_places %}btn-success{% else %}btn-danger{% endif %}"
     title="{% trans "select the seat" %}" data-placement="top"

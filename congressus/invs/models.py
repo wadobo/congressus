@@ -11,15 +11,12 @@ from events.models import Event
 from events.models import Session
 from events.models import Gate
 from events.models import SeatLayout
+from events.ticket_pdf import TicketPDF
 from tickets.models import BaseExtraData
 from tickets.models import TicketSeatHold
 from tickets.utils import get_seats_by_str
 
-from tickets.utils import generate_pdf
-from tickets.utils import generate_thermal
-
 from django.db.models.signals import post_delete
-from django.dispatch import receiver
 
 
 class InvitationType(models.Model):
@@ -44,7 +41,6 @@ class InvitationType(models.Model):
     end = models.DateTimeField(_('end date'), null=True, blank=True)
 
     template = models.ForeignKey("events.TicketTemplate", blank=True, null=True, verbose_name=_('template'), on_delete=models.CASCADE)
-    thermal_template = models.ForeignKey("events.ThermalTicketTemplate", blank=True, null=True, verbose_name=_('thermal template'), on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = _('invitation type')
@@ -154,10 +150,10 @@ class Invitation(models.Model, BaseExtraData):
         return 0
 
     def gen_pdf(self):
-        return generate_pdf(self)
+        return TicketPDF(self).generate()
 
     def gen_thermal(self):
-        return generate_thermal(self)
+        return TicketPDF(self).generate()
 
     def cseat(self):
         if not self.seat:
@@ -262,10 +258,10 @@ class InvitationGenerator(models.Model):
             invi.save()
             if seat_list:
                 tsh, new = TicketSeatHold.objects.get_or_create(
-                        session=invi.type.sessions.first(),
-                        layout=invi.seat_layout,
-                        seat=invi.seat,
-                        defaults={'type': 'R', 'client': 'INV'},
+                    session=invi.type.sessions.first(),
+                    layout=invi.seat_layout,
+                    seat=invi.seat,
+                    defaults={'type': 'R', 'client': 'INV'},
                 )
 
                 tsh.type = 'R'
