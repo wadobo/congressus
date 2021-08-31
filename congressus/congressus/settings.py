@@ -192,7 +192,7 @@ INTERNAL_IPS = ['127.0.0.1']
 # Email
 
 SERVER_EMAIL = env.get('EMAIL_SERVER', 'congressus@localhost')
-FROM_EMAIL = 'congressus@localhost'
+FROM_EMAIL = env.get('FROM_EMAIL', 'congressus@localhost')
 DEFAULT_FROM_EMAIL = env.get('EMAIL_DEFAULT', 'congressus@localhost')
 EMAIL_BACKEND = env.get('EMAIL_BACKEND', 'django.core.mail.backends.filebased.EmailBackend')
 EMAIL_FILE_PATH = '.mails'
