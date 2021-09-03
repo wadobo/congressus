@@ -16,7 +16,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, View
 
-from events.models import Discount, Event, Session, TicketTemplate
+from events.models import Discount, Event, Session
 from tickets.forms import MPRegisterForm
 from tickets.models import Ticket
 from tickets.models import MultiPurchase

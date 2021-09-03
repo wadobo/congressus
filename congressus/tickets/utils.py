@@ -21,6 +21,7 @@ def concat_pdf(files):
 
 def get_ticket_format(mp, pf, attachment=True):
     """ With a list of invitations or invitations,generate ticket output """
+    from events.models import TicketTemplate
     if pf == 'csv':
         csv = []
         if hasattr(mp, 'all_tickets'): # is MultiPurchase
@@ -31,16 +32,20 @@ def get_ticket_format(mp, pf, attachment=True):
         response = HttpResponse(content_type='application/csv')
         response['Content-Disposition'] = 'filename="invs.csv"'
         response.write('\n'.join(csv))
-    elif pf in ['custom', 'thermal']:
-        pdf = mp.generate_pdf()
+
+    try:
+        template = TicketTemplate.objects.get(pk=pf)
+    except TicketTemplate.DoesNotExist:
+        raise NotImplementedError("Ticket format not found")
+    else:
+        pdf = mp.generate_pdf(template)
         response = HttpResponse(content_type='application/pdf')
         fname = 'filename="tickets.pdf"'
         if attachment:
             fname = 'attachment; ' + fname
         response['Content-Disposition'] = fname
         response.write(pdf)
-    else:
-        raise "Ticket format not found"
+
     return response
 
 
