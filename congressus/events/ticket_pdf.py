@@ -96,12 +96,12 @@ def get_image(path, width):
 
 
 class TicketPDF:
-    def __init__(self, ticket, is_invitation=False):
+    def __init__(self, ticket, is_invitation=False, template=None):
         self.ticket = ticket
         self.code = ticket.order
         self.is_invitation = is_invitation
         self.story = []
-        self.template: TicketTemplate = self._calc_template()
+        self.template = template if template is not None else self._calc_template()
 
         if not self.template:
             raise Exception(_('Not found ticket template'))

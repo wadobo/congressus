@@ -1,10 +1,8 @@
-from django.conf import settings
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.urls import reverse
 from django.views.generic import TemplateView
 from django.shortcuts import get_object_or_404
 
-from events.models import Event
+from events.models import Event, TicketTemplate
 from invs.models import InvitationType, InvitationGenerator
 from invs.utils import get_ticket_format
 
@@ -29,7 +27,7 @@ class GenInvitationsView(UserPassesTestMixin, TemplateView):
         ctx['invs'] = InvitationType.objects.filter(is_pass=False, event=ev)
         ctx['passes'] = InvitationType.objects.filter(is_pass=True, event=ev)
         ctx['menuitem'] = 'inv'
-        ctx['print_formats'] = settings.PRINT_FORMATS
+        ctx['print_formats'] = self._get_print_formats()
         ctx['default_pf'] = self.DEFAULT_PF
         ctx['discounts'] = self.get_discounts()
         return ctx
@@ -60,5 +58,10 @@ class GenInvitationsView(UserPassesTestMixin, TemplateView):
 
         response = get_ticket_format(igs, pf=print_format)
         return response
+
+    def _get_print_formats(self):
+        print_formats = TicketTemplate.get_all_templates_dict()
+        print_formats.update({'csv': 'csv'})
+        return print_formats
 
 gen_invitations = GenInvitationsView.as_view()

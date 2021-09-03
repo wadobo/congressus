@@ -16,7 +16,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, View
 
-from events.models import Discount, Event, Session
+from events.models import Discount, Event, Session, TicketTemplate
 from tickets.forms import MPRegisterForm
 from tickets.models import Ticket
 from tickets.models import MultiPurchase
@@ -76,7 +76,6 @@ window_login = WindowLogin.as_view()
 
 class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
     template_name = 'windows/multipurchase.html'
-    DEFAULT_PF = 'custom'
 
     def get_window(self):
         ev = self.kwargs['ev']
@@ -99,17 +98,21 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
 
     def get_context_data(self, *args, **kwargs):
         ctx = super(WindowMultiPurchase, self).get_context_data(*args, **kwargs)
-        w = self.get_window()
-        ctx['window'] = w
+        ticket_window = self.get_window()
+        ctx['window'] = ticket_window
         ctx['subsum'] = True
-        ctx['print_formats'] = settings.PRINT_FORMATS
-        ctx['default_pf'] = self.DEFAULT_PF
+
+        templates = ticket_window.get_available_templates()
+        if not templates:
+            messages.warning(self.request, _('Templates not found, is necessary selected any template'))
+        ctx['print_formats'] = templates
+
         ctx['discounts'] = self.get_discounts()
-        ctx['window_status'] = _('Opened') if w.singlerow else _('Closed')
-        ctx['extra_field'] = w.event.fields.filter(show_in_tws=True).first()
-        ctx['shortcuts'] = w.shortcuts
-        ctx['autocall_singlerow'] = w.autocall_singlerow
-        last_sale = w.sales.last()
+        ctx['window_status'] = _('Opened') if ticket_window.singlerow else _('Closed')
+        ctx['extra_field'] = ticket_window.event.fields.filter(show_in_tws=True).first()
+        ctx['shortcuts'] = ticket_window.shortcuts
+        ctx['autocall_singlerow'] = ticket_window.autocall_singlerow
+        last_sale = ticket_window.sales.last()
         if last_sale:
             name = "{0} - {1} - {2} - {3}".format(
                     last_sale.purchase.tickets.count(),
@@ -122,8 +125,8 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
                 'url': reverse(
                     'window_ticket',
                     kwargs={
-                        'ev': w.event.slug,
-                        'w': w.slug,
+                        'ev': ticket_window.event.slug,
+                        'w': ticket_window.slug,
                         'pf': 'thermal',
                         'order': str(last_sale.purchase)
                     }
@@ -139,7 +142,7 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
         extra_field = w.event.fields.filter(show_in_tws=True).first()
         if extra_field:
             extra_field_val = request.POST.get('extra-field', None)
-        print_format = request.POST.get('print-format', self.DEFAULT_PF)
+        print_format = request.POST.get('print-format')
         discount = request.POST.get('discount', '')
         if discount:
             discount = Discount.objects.get(id=discount)

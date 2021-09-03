@@ -507,6 +507,10 @@ class TicketTemplate(models.Model):
     def is_vertical(self) -> bool:
         return self.pagesize_width < self.pagesize_height
 
+    @classmethod
+    def get_all_templates_dict(cls) -> dict[int, str]:
+        return {tpl.id: tpl.name for tpl in cls.objects.all()}
+
     def get_absolute_url(self):
         return reverse('template_preview', kwargs={'id': self.id})
 
