@@ -363,7 +363,7 @@ class Thanks(TemplateView):
 
     def post(self, request, order):
         ticket = get_ticket_or_404(order=request.POST.get('ticket'), confirmed=True)
-        response = get_ticket_format(ticket, pf='custom')
+        response = get_ticket_format(ticket)
         return response
 
     def get_context_data(self, *args, **kwargs):
@@ -555,7 +555,7 @@ class TicketTemplatePreview(UserPassesTestMixin, View):
             end=timezone.now()
         )
 
-        response = get_ticket_format(ticket, pf='custom', attachment=False)
+        response = get_ticket_format(ticket, pf=None, attachment=False)
         return response
 
 template_preview = TicketTemplatePreview.as_view()

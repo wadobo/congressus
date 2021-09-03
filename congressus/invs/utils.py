@@ -61,11 +61,8 @@ def get_ticket_format(invs, pf):
         response['Content-Disposition'] = 'filename="invs.csv"'
         response.write(gen_csv_from_generators(invs))
 
-    try:
-        template = TicketTemplate.objects.get(pk=pf)
-    except TicketTemplate.DoesNotExist:
-        raise "Ticket format not found"
     else:
+        template = TicketTemplate.objects.filter(pk=pf).first()
         pdf = gen_pdf(invs, template)
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'filename="tickets.pdf"'
