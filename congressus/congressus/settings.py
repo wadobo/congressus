@@ -178,7 +178,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap3'
 STATIC_URL = env.get('STATIC_URL', '/static/static/')
 STATIC_ROOT = env.get('STATIC_ROOT', None)
 MEDIA_URL = env.get('MEDIA_URL', '/static/media/')
-MEDIA_ROOT = env.get('MEDIA_URL', os.path.join(BASE_DIR, 'static/media'))
+MEDIA_ROOT = env.get('MEDIA_ROOT', os.path.join(BASE_DIR, 'static/media'))
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
