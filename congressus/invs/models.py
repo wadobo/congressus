@@ -22,25 +22,34 @@ from django.db.models.signals import post_delete
 class InvitationType(models.Model):
     name = models.CharField(_('name'), max_length=200)
     is_pass = models.BooleanField(_('is pass'), default=False)
-    one_time_for_session = models.BooleanField(_('one time for session'),
-        default=False, help_text=_('This is used for passes that will be '
-                                   'only valid one time for each session. '
-                                   'Invitations always have only one use. '
-                                   'So this is ignored in invitations.'))
+    one_time_for_session = models.BooleanField(
+        _('one time for session'),
+        default=False,
+        help_text=_(
+            'This is used for passes that will be '
+            'only valid one time for each session. '
+            'Invitations always have only one use. '
+            'So this is ignored in invitations.'
+        )
+    )
 
-    event = models.ForeignKey(Event, related_name='invitation_types',
-                              verbose_name=_('event'), on_delete=models.CASCADE)
-    sessions = models.ManyToManyField(Session, related_name='invitation_types',
-                                      blank=True,
-                                      verbose_name=_('sessions'))
+    event = models.ForeignKey(
+        Event,
+        related_name='invitation_types',
+        verbose_name=_('event'),
+        on_delete=models.CASCADE
+    )
+    sessions = models.ManyToManyField(
+        Session,
+        related_name='invitation_types',
+        blank=True,
+        verbose_name=_('sessions')
+    )
 
-    gates = models.ManyToManyField(Gate, blank=True,
-                                   verbose_name=_('gates'))
-
+    gates = models.ManyToManyField(Gate, blank=True, verbose_name=_('gates'))
     start = models.DateTimeField(_('start date'), null=True, blank=True)
     end = models.DateTimeField(_('end date'), null=True, blank=True)
-
-    template = models.ForeignKey("events.TicketTemplate", blank=True, null=True, verbose_name=_('template'), on_delete=models.CASCADE)
+    template = models.ForeignKey("events.TicketTemplate", verbose_name=_('template'), on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = _('invitation type')
