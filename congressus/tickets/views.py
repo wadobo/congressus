@@ -156,6 +156,7 @@ class MultiPurchaseView(TemplateView):
 
         ctx = self.get_context_data()
         ctx['form'] = form
+        ctx['invalid_form'] = True
 
         return render(request, self.template_name, ctx)
 multipurchase = MultiPurchaseView.as_view()
@@ -584,7 +585,7 @@ class EmailConfirmPreview(UserPassesTestMixin, View):
                               start=timezone.now(),
                               end=timezone.now())
 
-            extra = json.loads(ticket.extra_data)
+            extra = json.loads(ticket.extra_data) if ticket.extra_data else {}
             subject = Template(event.email.subject).render(Context({'ticket': ticket, 'extra': extra}))
             body = Template(event.email.body).render(Context({'ticket': ticket, 'extra': extra}))
             sname = _("SUBJECT")

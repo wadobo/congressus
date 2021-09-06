@@ -63,7 +63,6 @@ class QRFlowable(Flowable):
         Flowable.__init__(self)
         self.qr_value = qr_value
         self.border = border
-        print('BORDER', self.border)
 
     def wrap(self, availWidth, availHeight):  # noqa
         # optionnal, here I ask for the biggest square available

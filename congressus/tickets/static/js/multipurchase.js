@@ -401,6 +401,10 @@ function preSubmit() {
 
 $(document).ready(function() {
 
+    if (invalid_form.length) {
+      window.location.hash = '#personal-info-form'
+    }
+
     $("#btn-continue").click(function() {
         confirms = preSubmit();
         if (confirms) {
