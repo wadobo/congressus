@@ -401,7 +401,7 @@ function preSubmit() {
 
 $(document).ready(function() {
 
-    if (invalid_form.length) {
+    if (invalid_form) {
       window.location.hash = '#personal-info-form'
     }
 
