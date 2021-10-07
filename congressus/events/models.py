@@ -281,7 +281,7 @@ class Session(models.Model):
     window_price = models.FloatField(_('price in the ticket window'), default=10)
     tax = models.IntegerField(_('ticket tax percentage'), default=21)
 
-    template = models.ForeignKey("TicketTemplate", blank=True, null=True, verbose_name=_('template'), on_delete=models.CASCADE)
+    template = models.ForeignKey("TicketTemplate", verbose_name=_('template'), on_delete=models.CASCADE)
     autoseat_mode = models.CharField(_('autoseat mode'), max_length=300, default='ASC',
             help_text="ASC, DESC, RANDOM or LIST: layout_name1,layout_name2")
 
@@ -506,6 +506,10 @@ class TicketTemplate(models.Model):
     @property
     def is_vertical(self) -> bool:
         return self.pagesize_width < self.pagesize_height
+
+    @classmethod
+    def get_all_templates_dict(cls) -> dict[int, str]:
+        return {tpl.id: tpl.name for tpl in cls.objects.all()}
 
     def get_absolute_url(self):
         return reverse('template_preview', kwargs={'id': self.id})

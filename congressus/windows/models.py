@@ -9,7 +9,7 @@ from django.conf import settings
 
 from autoslug import AutoSlugField
 
-from events.models import Event
+from events.models import Event, TicketTemplate
 from tickets.models import MultiPurchase
 
 from django.db.models.signals import post_delete
@@ -65,6 +65,7 @@ class TicketWindow(models.Model):
     number_of_calls = models.PositiveSmallIntegerField(_('number of call'),
             help_text=_('Number of calls created to singlerow when open ticket windows'),
             default=1)
+    templates = models.ManyToManyField(TicketTemplate)
 
     class Meta:
         verbose_name = _('ticket window')
@@ -104,6 +105,9 @@ class TicketWindow(models.Model):
 
     def get_price(self, session):
         return session.window_price + self.supplement
+
+    def get_available_templates(self) -> dict[int, str]:
+        return {tpl.id: tpl.name for tpl in self.templates.all()}
 
     def __str__(self):
         return "{0} - {1}".format(self.event.name, self.name)

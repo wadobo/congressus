@@ -158,7 +158,7 @@
         {% block personal_info %}
           <fieldset>
             <legend>{% trans "Personal info" %}</legend>
-            <div class="reg-form bootstrap">
+            <div id="personal-info-form" class="reg-form bootstrap">
               {{ form|crispy }}
               </div>
           </fieldset>
@@ -198,6 +198,7 @@
         var MAX_SEAT_BY_SESSION = '{{ max_seat_by_session }}';
 
         var client = '{{ client }}';
+        var invalid_form = {% if invalid_form %}true{% else %}false{% endif %};
         var session_expired = {% if session_expired %}true{% else %}false{% endif %};
         try {
             ws.init("{{ ws_server }}");

@@ -180,7 +180,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap3'
 STATIC_URL = env.get('STATIC_URL', '/static/static/')
 STATIC_ROOT = env.get('STATIC_ROOT', None)
 MEDIA_URL = env.get('MEDIA_URL', '/static/media/')
-MEDIA_ROOT = env.get('MEDIA_URL', os.path.join(BASE_DIR, 'static/media'))
+MEDIA_ROOT = env.get('MEDIA_ROOT', os.path.join(BASE_DIR, 'static/media'))
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
@@ -242,7 +242,6 @@ TIMESTEP_CHART = 'daily'
 MAX_STEP_CHART = 10
 
 INVITATION_ORDER_START = '01'
-PRINT_FORMATS = ['thermal', 'custom', 'csv']
 
 MAX_SEAT_BY_SESSION = 50
 EXPIRED_SEAT_H = 5*60 # 5 minutes

@@ -35,41 +35,39 @@ def gen_csv_from_generators(igs):
     return '\n'.join(out)
 
 
-def gen_pdf(igs):
+def gen_pdf(igs, template=None):
     from .models import Invitation
     files = []
     for inv in Invitation.objects.filter(generator__in=igs):
-        pdf = TicketPDF(inv, True).generate(asbuf=True)
+        pdf = TicketPDF(inv, is_invitation=True, template=template).generate(asbuf=True)
         files.append(pdf)
     return concat_pdf(files)
 
 
-def gen_invs_pdf(invs):
+def gen_invs_pdf(invs, template=None):
     files = []
     for inv in invs:
         pdf = TicketPDF(inv, True).generate(asbuf=True)
+        pdf = TicketPDF(inv, is_invitation=True, template=template).generate(asbuf=True)
         files.append(pdf)
     return concat_pdf(files)
 
 
 def get_ticket_format(invs, pf):
     """ With a list of invitations or invitations,generate ticket output """
+    from events.models import TicketTemplate
     if pf == 'csv':
         response = HttpResponse(content_type='application/csv')
         response['Content-Disposition'] = 'filename="invs.csv"'
         response.write(gen_csv_from_generators(invs))
-    elif pf == 'thermal':
-        pdf = gen_pdf(invs)
+
+    else:
+        template = TicketTemplate.objects.filter(pk=pf).first()
+        pdf = gen_pdf(invs, template)
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'filename="tickets.pdf"'
         response.write(pdf)
-    elif pf == 'custom':
-        pdf = gen_pdf(invs)
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="tickets.pdf"'
-        response.write(pdf)
-    else:
-        raise "Ticket format not found"
+
     return response
 
 def get_sold_invs(session):
@@ -78,4 +76,3 @@ def get_sold_invs(session):
     types = InvitationType.objects.filter(sessions__in=[session])
     types = types.filter(is_pass=False)
     return Invitation.objects.filter(type__in=types).count()
-
