@@ -63,7 +63,6 @@ class QRFlowable(Flowable):
         Flowable.__init__(self)
         self.qr_value = qr_value
         self.border = border
-        print('BORDER', self.border)
 
     def wrap(self, availWidth, availHeight):  # noqa
         # optionnal, here I ask for the biggest square available
@@ -96,12 +95,12 @@ def get_image(path, width):
 
 
 class TicketPDF:
-    def __init__(self, ticket, is_invitation=False):
+    def __init__(self, ticket, is_invitation=False, template=None):
         self.ticket = ticket
         self.code = ticket.order
         self.is_invitation = is_invitation
         self.story = []
-        self.template: TicketTemplate = self._calc_template()
+        self.template = template if template is not None else self._calc_template()
 
         if not self.template:
             raise Exception(_('Not found ticket template'))

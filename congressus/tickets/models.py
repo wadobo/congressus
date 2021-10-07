@@ -151,7 +151,7 @@ class BaseTicketMixing:
                 email.attach_file(att.attach.path)
 
         filename = 'ticket_%s.pdf' % self.order
-        email.attach(filename, self.gen_pdf(), 'application/pdf')
+        email.attach(filename, self.generate_pdf(), 'application/pdf')
         email.send(fail_silently=False)
 
     def get_absolute_url(self):
@@ -359,10 +359,10 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
     def is_mp(self):
         return True
 
-    def generate_pdf(self):
+    def generate_pdf(self, template=None):
         files = []
         for ticket in self.all_tickets():
-            pdf = TicketPDF(ticket).generate(asbuf=True)
+            pdf = TicketPDF(ticket, template=template).generate(asbuf=True)
             files.append(pdf)
         return concat_pdf(files)
 
@@ -514,8 +514,8 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
         self.update_mp_extra_data()
         self.save_extra_sessions()
 
-    def generate_pdf(self):
-        return TicketPDF(self).generate()
+    def generate_pdf(self, template=None):
+        return TicketPDF(self, template=template).generate()
 
     def window_code(self):
         '''
