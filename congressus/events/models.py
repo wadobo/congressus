@@ -133,8 +133,8 @@ class SeatMap(models.Model):
     def get_table(self):
         layouts = list(self.layouts.all())
         indexes = {(i.top, i.left): i  for i in layouts}
-        max_vertical = max(i.top for i in layouts)
-        max_horizontal = max(i.left for i in layouts)
+        max_vertical = max([i.top for i in layouts], default=0)
+        max_horizontal = max([i.left for i in layouts], default=0)
 
         for r in range(self.scene_top, self.scene_bottom + 1):
             for c in range(self.scene_left, self.scene_right + 1):

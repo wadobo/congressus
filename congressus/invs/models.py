@@ -101,7 +101,7 @@ class Invitation(models.Model, BaseExtraData):
 
     def gen_order(self, starts=''):
         """ Generate order for passes and invitations """
-        starts = settings.INVITATION_ORDER_START
+        starts = starts or settings.INVITATION_ORDER_START
         chars = string.ascii_uppercase + string.digits
         l = 8
         if hasattr(settings, 'ORDER_SIZE'):
@@ -117,6 +117,15 @@ class Invitation(models.Model, BaseExtraData):
             used = self.is_order_used(order)
         self.order = order
         self.save()
+
+    @staticmethod
+    def gen_orders(starts='', amount=10) -> tuple[str]:
+        length = 8
+        orders = set()
+        chars = string.ascii_uppercase + string.digits
+        while len(orders) < amount:
+            orders.add(starts + ''.join(random.choice(chars) for _ in range(length)))
+        return tuple(orders)
 
     def is_order_used(self, order):
         return Invitation.objects.filter(order=order).exists()
@@ -231,7 +240,7 @@ class InvitationGenerator(models.Model):
         return get_seats_by_str(self.type.sessions.all(), self.seats)
 
     def clean(self):
-        super(InvitationGenerator, self).clean()
+        super().clean()
         # only validate on creation
         if self.seats and not self.id:
             seats = 0
@@ -240,42 +249,63 @@ class InvitationGenerator(models.Model):
             if seats != self.amount:
                 raise ValidationError(_("Seats number should be equal to amount"))
 
+    def save(self, *args, **kwargs):
+        should_generate = not self.id
+        super().save(*args, **kwargs)
+        if should_generate:
+            self.generate()
+
     def generate(self):
+        # SEAT LAYOUTS
         seat_list = []
         if self.seats:
             seats = self.get_seats()
-            for k in seats.keys():
-                layout = SeatLayout.objects.get(name=k)
-                for v in seats.get(k):
-                    seat_list.append([layout, v])
+            layouts = SeatLayout.objects.filter(name__in=seats.keys())
+            for layout in layouts:
+                seat_list += [[layout, value] for value in seats.get(layout.name)]
+
+        # ORDERS
+        orders = Invitation.gen_orders(amount=self.amount)
+        invalid_orders = Invitation.objects.filter(order__in=orders).values_list('order', flat=True)
+
+        ## Extra sessions
+        data = []
+        session_first = self.type.sessions.first()
+        for session in self.type.sessions.all():
+            for extra in session.orig_sessions.all():
+                data.append({
+                    'session': extra.extra.id,
+                    'start': timezone.make_naive(extra.start).strftime(settings.DATETIME_FORMAT),
+                    'end': timezone.make_naive(extra.end).strftime(settings.DATETIME_FORMAT),
+                    'used': extra.used
+                })
+
+        invis = []
         for n in range(self.amount):
-            invi = Invitation(type=self.type, generator=self,
-                              is_pass=self.type.is_pass)
+            invi = Invitation(type=self.type, generator=self, is_pass=self.type.is_pass)
             if seat_list:
                 invi.seat_layout, invi.seat = seat_list[n]
-            invi.gen_order()
-            invi.save_extra_sessions()
-            invi.save()
+
+            invi.order = orders[n]
+            if invi.order in invalid_orders:
+                invi.gen_order()
+
+            invi.set_extra_data('extra_sessions', data)
+            invis.append(invi)
+
             if seat_list:
                 tsh, new = TicketSeatHold.objects.get_or_create(
-                    session=invi.type.sessions.first(),
+                    session=session_first,
                     layout=invi.seat_layout,
                     seat=invi.seat,
                     defaults={'type': 'R', 'client': 'INV'},
                 )
+                if not new:
+                    tsh.type = 'R'
+                    tsh.client = 'INV'
+                    tsh.save()
 
-                tsh.type = 'R'
-                tsh.client = 'INV'
-                tsh.save()
-
-    def save(self, *args, **kwargs):
-        should_generate = not self.id
-
-        super(InvitationGenerator, self).save(*args, **kwargs)
-
-        if should_generate:
-            self.generate()
-
+        Invitation.objects.bulk_create(invis)
 
 def remove_seatholds(sender, instance, using, **kwargs):
     instance.remove_hold_seats()

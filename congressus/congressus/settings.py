@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from os import environ as env
+from zoneinfo import ZoneInfo
 
 from django.contrib.messages import constants as messages
 
@@ -154,6 +155,7 @@ DATABASES = {'default': config_database}
 LANGUAGE_CODE = env.get('LANGUAGE_CODE', 'en-us')
 
 TIME_ZONE = 'Europe/Madrid'
+TZINFO = ZoneInfo(TIME_ZONE)
 
 USE_I18N = True
 
