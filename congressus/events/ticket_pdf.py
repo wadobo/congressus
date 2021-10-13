@@ -72,15 +72,15 @@ class QRFlowable(Flowable):
     def draw(self):
         # here standard and documented QrCodeWidget usage on
         # Flowable canva
-        qr_code = QrCodeWidget(self.qr_value, barBorder=self.border)
+        qr_code = QrCodeWidget(self.qr_value, barBorder=self.border, y=self.border)
         bounds = qr_code.getBounds()
         qr_width = (bounds[2] - bounds[0])
         qr_height = (bounds[3] - bounds[1])
-        _weight = float(self.width)
+        _width = float(self.width)
         drawing = Drawing(
-            _weight,
-            _weight,
-            transform=[_weight / qr_width, 0, 0, _weight / qr_height, 0, 0]
+            _width,
+            _width,
+            transform=[_width / qr_width, 0, 0, _width / qr_height, 0, 0]
         )
         drawing.add(qr_code)
         renderPDF.draw(drawing, self.canv, 0, 0)
@@ -250,7 +250,8 @@ class TicketPDF:
     @property
     def codeimg(self):
         if settings.QRCODE:
-            return QRFlowable(self.code, border=(0 if self.template.is_vertical else 4))
+            border = self.template.border_qr or (0 if self.template.is_vertical else 4)
+            return QRFlowable(self.code, border=border)
         return code128.Code128(self.code, barWidth=0.01 * inch, barHeight=0.5 * inch)
 
     @property
