@@ -268,7 +268,7 @@ class Payment(TemplateView):
 
     def get_redsys_context(self, ctx, tk):
         # Enabled by default
-        site_url = f'{self.request.scheme}://{self.request.get_host()}/'
+        site_url = f'https://{self.request.get_host()}'
         p = getattr(settings, 'REDSYS_ENABLED', True)
         if not p:
             return ctx
@@ -291,8 +291,8 @@ class Payment(TemplateView):
         data["DS_MERCHANT_TERMINAL"] = terminal
         data["DS_MERCHANT_MERCHANTURL"] = site_url + settings.TPV_MERCHANT_URL
         data["DS_MERCHANT_CONSUMERLANGUAGE"] = settings.TPV_LANG
-        data["DS_MERCHANT_URLOK"] = site_url + f'/ticket/{tk.order}/thanks/'
-        data["DS_MERCHANT_URLKO"] = site_url + f'/ticket/{tk.order}/payment/?error=1'
+        data["DS_MERCHANT_URLOK"] = f'{site_url}/ticket/{tk.order}/thanks/'
+        data["DS_MERCHANT_URLKO"] = f'{site_url}/ticket/{tk.order}/payment/?error=1'
 
         jsdata = json.dumps(data).replace(' ', '')
         mdata = b64encode(jsdata.encode()).decode()
