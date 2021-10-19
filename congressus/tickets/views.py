@@ -1,5 +1,6 @@
 import hmac
 import json
+import logging
 import random
 import string
 from base64 import b64encode, b64decode
@@ -44,6 +45,9 @@ from tickets.utils import get_ticket_format
 from tickets.utils import get_seats_by_str
 from tickets.utils import search_seats
 from invs.models import InvitationType
+
+
+logger = logging.getLogger(__name__)
 
 
 class EventView(TemplateView):
@@ -226,9 +230,11 @@ def get_ticket_or_404(**kwargs):
     try:
         tk = MultiPurchase.objects.get(**kwargs)
     except ObjectDoesNotExist:
+        logger.warning('MultiPurchase not found %s', kwargs)
         try:
             tk = Ticket.objects.get(**kwargs)
         except ObjectDoesNotExist:
+            logger.warning('Ticket not found %s', kwargs)
             raise Http404
     return tk
 

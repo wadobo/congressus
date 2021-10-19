@@ -11,3 +11,4 @@ class TicketFactory(DjangoModelFactory):
 
     session = SubFactory(SessionFactory)
     email = Faker('email')
+    order_tpv = Faker('pystr', min_chars=15, max_chars=15)
