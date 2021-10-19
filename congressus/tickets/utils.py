@@ -34,7 +34,10 @@ def get_ticket_format(mp, pf, attachment=True):
         response.write('\n'.join(csv))
 
     else:
-        template = TicketTemplate.objects.filter(pk=pf).first()
+        if pf is not None:
+            template = TicketTemplate.objects.filter(pk=pf).first()
+        else:
+            template = TicketTemplate.objects.first()
         pdf = mp.generate_pdf(template)
         response = HttpResponse(content_type='application/pdf')
         fname = 'filename="tickets.pdf"'

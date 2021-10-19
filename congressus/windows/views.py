@@ -105,6 +105,7 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
         templates = ticket_window.get_available_templates()
         if not templates:
             messages.warning(self.request, _('Templates not found, is necessary selected any template'))
+        pf = tuple(templates.keys())[0]
         ctx['print_formats'] = templates
 
         ctx['discounts'] = self.get_discounts()
@@ -127,7 +128,7 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
                     kwargs={
                         'ev': ticket_window.event.slug,
                         'w': ticket_window.slug,
-                        'pf': 'thermal',
+                        'pf': pf,
                         'order': str(last_sale.purchase)
                     }
                 )
