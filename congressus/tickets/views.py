@@ -27,7 +27,7 @@ from django.views.generic.edit import CreateView
 from pyDes import triple_des, CBC
 
 from .models import Ticket
-from .models import MultiPurchase
+from tickets.models import MultiPurchase
 from .models import TicketSeatHold
 from events.models import (
     Event,
@@ -39,8 +39,8 @@ from events.models import (
 
 from windows.utils import online_sale
 
-from .forms import RegisterForm
-from .forms import MPRegisterForm
+from tickets.forms import RegisterForm
+from tickets.forms import MPRegisterForm
 from tickets.utils import get_ticket_format
 from tickets.utils import get_seats_by_str
 from tickets.utils import search_seats

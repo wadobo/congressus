@@ -362,7 +362,7 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
     def generate_pdf(self, template=None):
         files = []
         for ticket in self.all_tickets():
-            pdf = TicketPDF(ticket, template=template).generate(asbuf=True)
+            pdf = TicketPDF(ticket, template=template or ticket.session.template).generate(asbuf=True)
             files.append(pdf)
         return concat_pdf(files)
 

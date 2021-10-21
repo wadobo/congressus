@@ -19,7 +19,7 @@ def concat_pdf(files):
     return pdf
 
 
-def get_ticket_format(mp, pf, attachment=True):
+def get_ticket_format(mp, pf=None, attachment=True):
     """ With a list of invitations or invitations,generate ticket output """
     from events.models import TicketTemplate
     if pf == 'csv':
@@ -34,10 +34,10 @@ def get_ticket_format(mp, pf, attachment=True):
         response.write('\n'.join(csv))
 
     else:
-        if pf is not None:
-            template = TicketTemplate.objects.filter(pk=pf).first()
+        if pf is None:
+            template = None
         else:
-            template = TicketTemplate.objects.first()
+            template = TicketTemplate.objects.filter(pk=pf).first()
         pdf = mp.generate_pdf(template)
         response = HttpResponse(content_type='application/pdf')
         fname = 'filename="tickets.pdf"'
