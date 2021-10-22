@@ -3,7 +3,7 @@ from django.conf import settings
 from .models import Ticket
 from .models import MultiPurchase
 
-from events.models import Session, InvCode
+from events.models import Session
 
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -91,7 +91,6 @@ class MPRegisterForm(forms.ModelForm):
 
             if field.type == 'html':
                 self.fields[field.label].label = False
-
 
         # Adding html5 required attr to required fields
         for f in self.fields.values():

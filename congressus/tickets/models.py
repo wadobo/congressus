@@ -131,7 +131,10 @@ class BaseTicketMixing:
         # email to user
         e = self.event().get_email()
 
-        extra = json.loads(self.extra_data)
+        extra = {}
+        if self.extra_data:
+            extra = json.loads(self.extra_data)
+
         if e:
             subject = Template(e.subject).render(Context({'ticket': self, 'extra': extra}))
             body = Template(e.body).render(Context({'ticket': self, 'extra': extra}))
@@ -323,7 +326,7 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
             if self.confirmed:
                 self.confirmed_date = timezone.now()
 
-        super(MultiPurchase, self).save(*args, **kw)
+        super().save(*args, **kw)
 
     def space(self):
         ''' Multiple spaces '''
@@ -465,7 +468,7 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
         if confirm and self.confirmed:
             self.confirmed_date = timezone.now()
 
-        super(Ticket, self).save(*args, **kw)
+        super().save(*args, **kw)
 
     def delete(self, *args, **kwargs):
         self.remove_hold_seats()

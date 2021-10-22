@@ -148,7 +148,7 @@ class TicketPDF:
     def _add_previous_note(self) -> None:
         previous_note = self.template.previous_note
         if previous_note:
-            self.story.append(Paragraph(previous_note, STYLE_NORMAL))
+            self.story.append(Paragraph(previous_note, STYLE_CENTER))
 
     def _add_ticket_info(self) -> None:
         price = Paragraph(self.price, STYLE_NORMAL)
@@ -235,7 +235,7 @@ class TicketPDF:
 
         if not links and next_note:
             self._add_spacer(height=0.5 * cm)
-            self.story.append(Paragraph(next_note, STYLE_RIGHT))
+            self.story.append(Paragraph(next_note, STYLE_LEFT))
 
     def _on_first_page(self, canvas, doc) -> None:
         canvas.saveState()

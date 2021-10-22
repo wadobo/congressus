@@ -26,9 +26,6 @@ from django.views.generic import TemplateView, View
 from django.views.generic.edit import CreateView
 from pyDes import triple_des, CBC
 
-from .models import Ticket
-from tickets.models import MultiPurchase
-from .models import TicketSeatHold
 from events.models import (
     Event,
     SeatLayout,
@@ -36,15 +33,11 @@ from events.models import (
     Session,
     Space,
 )
-
-from windows.utils import online_sale
-
-from tickets.forms import RegisterForm
-from tickets.forms import MPRegisterForm
-from tickets.utils import get_ticket_format
-from tickets.utils import get_seats_by_str
-from tickets.utils import search_seats
 from invs.models import InvitationType
+from tickets.forms import MPRegisterForm, RegisterForm
+from tickets.models import Ticket, MultiPurchase, TicketSeatHold
+from tickets.utils import get_ticket_format, get_seats_by_str, search_seats
+from windows.utils import online_sale
 
 
 logger = logging.getLogger(__name__)
@@ -562,7 +555,7 @@ class TicketTemplatePreview(UserPassesTestMixin, View):
             end=timezone.now()
         )
 
-        response = get_ticket_format(ticket, pf=None, attachment=False)
+        response = get_ticket_format(ticket, pf=id, attachment=False)
         return response
 
 template_preview = TicketTemplatePreview.as_view()
