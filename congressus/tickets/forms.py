@@ -3,7 +3,7 @@ from django.conf import settings
 from .models import Ticket
 from .models import MultiPurchase
 
-from events.models import Session, InvCode
+from events.models import Session
 
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -84,14 +84,13 @@ class MPRegisterForm(forms.ModelForm):
         self.seats = kwargs.pop('seats', [])
         self.client = kwargs.pop('client', '')
 
-        super(MPRegisterForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         for field in self.event.fields.all():
             self.fields[field.label] = field.form_type()
 
             if field.type == 'html':
                 self.fields[field.label].label = False
-
 
         # Adding html5 required attr to required fields
         for f in self.fields.values():
@@ -102,7 +101,7 @@ class MPRegisterForm(forms.ModelForm):
         if not self.event.ticket_sale_enabled:
             raise forms.ValidationError(_("Ticket sale isn't enabled"))
 
-        data = super(MPRegisterForm, self).clean()
+        data = super().clean()
 
         confirm_email = data.get('confirm_email', None)
         if confirm_email and not data.get('email') == confirm_email:
@@ -179,7 +178,7 @@ class MPRegisterForm(forms.ModelForm):
         return mp
 
     def save(self, *args, **kwargs):
-        obj = super(MPRegisterForm, self).save(commit=False)
+        obj = super().save(commit=False)
         obj.ev = self.event
         obj.gen_order()
         obj.gen_order_tpv()
