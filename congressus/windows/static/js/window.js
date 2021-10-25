@@ -2,6 +2,16 @@ var ticket_log = [];
 var opened_log = false;
 // autocall_singlerow: load in multipurchase.html
 
+
+function get_template_id(tk) {
+  var tpl_id = 1;
+  var tpl = tk.session.template;
+  if (tpl) {
+      tpl_id = tpl.id;
+  }
+  return tpl_id;
+}
+
 function showLog(mode) {
     length = ticket_log.length;
     if (length < 1) {
@@ -14,13 +24,13 @@ function showLog(mode) {
     if (mode) {
         ticket_log.forEach(function(tk) {
             name = tk.n + ' - ' + tk.code + ' - ' + tk.mp + ' - ' + tk.price + tail;
-            link = "/window/" + window.ev + "/" + window_name + "/thermal/" + tk.mp + "/";
+            link = "/window/" + window.ev + "/" + window_name + "/" + get_template_id(tk) + "/" + tk.mp + "/";
             res += "<a href='" + link + "' target='_blank'>" + name + "</a>";
         });
     } else {
         tk = ticket_log[length - 1];
         name = tk.n + ' - ' + tk.code + ' - ' + tk.mp + ' - ' + tk.price + tail;
-        link = "/window/" + window.ev + "/" + window_name + "/thermal/" + tk.mp + "/";
+        link = "/window/" + window.ev + "/" + window_name + "/" + get_template_id(tk) + "/" + tk.mp + "/";
         res += "<a href='" + link + "' target='_blank'>" + name + "</a>";
     }
     $("#floating-log-input").html(res);
@@ -149,10 +159,8 @@ function recalcTotal() {
         var n = parseInt($(this).val(), 10);
         ntickets += n;
         var price = parseFloat($(this).data("price").replace(",", "."));
-        console.log("price", price);
         sum += price * n;
     });
-    console.log("TOTAL", sum);
     sum = apply_discount(sum, ntickets);
     $("#total").val(sum);
     if (sum <= 0) {

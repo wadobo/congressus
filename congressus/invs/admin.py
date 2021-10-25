@@ -65,30 +65,7 @@ def get_pdf(modeladmin, request, queryset):
     response['Content-Disposition'] = 'filename="invs.pdf"'
     response.write(pdfs)
     return response
-get_pdf.short_description = _("Download A4")
-
-
-def get_thermal(modeladmin, request, queryset):
-    files = []
-
-    def fillfiles(q):
-        for inv in q:
-            pdf = TicketPDF(inv, True).generate(asbuf=True)
-            files.append(pdf)
-
-    if modeladmin.model == InvitationGenerator:
-        for ig in queryset:
-            fillfiles(ig.invitations.all())
-    else:
-        fillfiles(queryset)
-
-    pdfs = concat_pdf(files)
-
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'filename="invs.pdf"'
-    response.write(pdfs)
-    return response
-get_thermal.short_description = _("Download thermal")
+get_pdf.short_description = _("Download pdf")
 
 
 class InvitationTypeAdmin(EventMixin, admin.ModelAdmin):
@@ -126,7 +103,7 @@ class InvitationAdmin(CSVMixin, admin.ModelAdmin):
         ('generator', RelatedOnlyDropdownFilter),
     )
 
-    actions = [get_csv, get_pdf, get_thermal]
+    actions = [get_csv, get_pdf]
     inlines = [InvUsedInSessionInline]
 
     csv_fields = [
@@ -171,7 +148,7 @@ class InvitationAdmin(CSVMixin, admin.ModelAdmin):
 
 class InvitationGeneratorAdmin(admin.ModelAdmin):
     list_display = ('type', 'amount', 'price', 'concept', 'created')
-    actions = [get_csv, get_pdf, get_thermal]
+    actions = [get_csv, get_pdf]
 
     class Media:
         js = [
