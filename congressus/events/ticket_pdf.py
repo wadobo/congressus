@@ -350,7 +350,6 @@ class TicketPDF:
                 'col': ticket.seat_column()
             }
             seatinfo = _('SECTOR: %(layout)s ROW: %(row)s SEAT: %(col)s') % seatdata
-            seatinfo = f'<font size=11><b>{seatinfo}</b></font><br/>'
         return seatinfo
 
     @property
