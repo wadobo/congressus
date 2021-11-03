@@ -161,7 +161,7 @@ class TicketPDF:
                     [self.initials],
                     [self.text],
                     [self.date],
-                    [self.seatinfo],
+                    [Paragraph(self.seatinfo, STYLE_CENTER)],
                     [price],
                 ],
                 rowHeights=[None, None, 2.5 * cm, None, None, None, None],
@@ -350,6 +350,7 @@ class TicketPDF:
                 'col': ticket.seat_column()
             }
             seatinfo = _('SECTOR: %(layout)s ROW: %(row)s SEAT: %(col)s') % seatdata
+            seatinfo = f'<b>{seatinfo}</b>'
         return seatinfo
 
     @property
