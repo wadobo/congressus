@@ -3,15 +3,6 @@ var opened_log = false;
 // autocall_singlerow: load in multipurchase.html
 
 
-function get_template_id(tk) {
-  var tpl_id = 1;
-  var tpl = tk.session.template;
-  if (tpl) {
-      tpl_id = tpl.id;
-  }
-  return tpl_id;
-}
-
 function showLog(mode) {
     length = ticket_log.length;
     if (length < 1) {
@@ -24,30 +15,31 @@ function showLog(mode) {
     if (mode) {
         ticket_log.forEach(function(tk) {
             name = tk.n + ' - ' + tk.code + ' - ' + tk.mp + ' - ' + tk.price + tail;
-            link = "/window/" + window.ev + "/" + window_name + "/" + get_template_id(tk) + "/" + tk.mp + "/";
+            link = "/window/" + window.ev + "/" + window_name + "/" + tk.template + "/" + tk.mp + "/";
             res += "<a href='" + link + "' target='_blank'>" + name + "</a>";
         });
     } else {
         tk = ticket_log[length - 1];
         name = tk.n + ' - ' + tk.code + ' - ' + tk.mp + ' - ' + tk.price + tail;
-        link = "/window/" + window.ev + "/" + window_name + "/" + get_template_id(tk) + "/" + tk.mp + "/";
+        link = "/window/" + window.ev + "/" + window_name + "/" + tk.template + "/" + tk.mp + "/";
         res += "<a href='" + link + "' target='_blank'>" + name + "</a>";
     }
     $("#floating-log-input").html(res);
 }
 
-function update_ticket_log(mp, code, amount) {
+function update_ticket_log(mp, code, amount, tpl) {
     if (ticket_log.length >= 10) {
         ticket_log.shift();
     }
-    ticket_log.push({mp: mp, code: code, n: amount, price: $("#total").val() + '€'});
+    ticket_log.push({mp: mp, template: tpl, code: code, n: amount, price: $("#total").val() + '€'});
     showLog(false);
 }
 
-function notifysale(resp) {
+function notifysale(resp, print_format) {
     var mp = resp.mp;
     var wc = resp.wc;
     var nt = resp.nt;
+    var tpl = print_format;
 
     args = ' ' + window.windows;
     args += ' ' + moment().format('YYYY-MM-DDTHH:mm:ss.SSSSSSZ');
@@ -59,15 +51,16 @@ function notifysale(resp) {
     args += ' ' + $("#total").val();
     ws.send('add_sale' + args);
 
-    update_ticket_log(mp, wc, nt);
+    update_ticket_log(mp, wc, nt, tpl);
 
     clean();
 }
 
 function ajaxsend() {
+    var print_format = $('select#print-format')[0].value;
     var q = $.post($("form").attr('action'), $("form").serialize(),
         function(response) {
-            notifysale(response);
+            notifysale(response, print_format);
 
             var pdf = window.open(response.url);
             setTimeout(function() {
