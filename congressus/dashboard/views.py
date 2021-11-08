@@ -487,3 +487,37 @@ class ReportListView(TemplateView):
         ctx['ev'] = ev
         return ctx
 report_list = staff_member_required(ReportListView.as_view())
+
+
+class AccessReportView(TemplateView):
+    template_name = 'dashboard/access_report.html'
+
+    def get_context_data(self, *args, **kwargs):
+        ctx = {}
+        self.ev = get_object_or_404(Event, slug=self.kwargs.get('ev'))
+        days = self.event_days()
+        self.access = self.ev.access.filter(mark_used=True)
+
+        table = []
+        table.append(['Puntos de control'] + [f'Accesos día {day.day}' for day in days])
+        table.append(['TOTALES'] + [0 for day in days])
+
+        for access in self.access:
+            row = [access.name]
+            for num, day in enumerate(days):
+                amount_access = access.log_access.filter(date__date=day, status='ok').count()
+                row.append(amount_access)
+                table[1][num + 1] += amount_access
+            table.append(row)
+
+        ctx['ev'] = self.ev
+        ctx['days'] = days
+        ctx['table'] = table
+        ctx['menuitem'] = 'report'
+        return ctx
+
+    def event_days(self) -> list[datetime.date]:
+        sessions = self.ev.get_sessions().order_by('start')
+        first_date = sessions.first().start.date()
+        last_date = sessions.last().start.date()
+        return [first_date + timedelta(days=days) for days in range(0, (last_date - first_date).days + 1)]

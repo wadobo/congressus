@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from dashboard import views
 
 
 urlpatterns = [
@@ -9,4 +9,5 @@ urlpatterns = [
     path('<str:ev>/window/', views.report_window, name='window_report'),
     path('<str:ev>/online/', views.report_online, name='online_report'),
     path('<str:ev>/count/', views.report_count, name='count_report'),
+    path('<str:ev>/access/', views.AccessReportView.as_view(), name='access_report'),
 ]
