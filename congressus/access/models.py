@@ -38,6 +38,7 @@ class AccessControl(models.Model):
 
 AC_TYPES = (
     ('ok', _('ok')),
+    ('right', _('ok')),
     ('wrong', _('wrong')),
     ('incorrect', _('incorrect')),
     ('used', _('used')),
@@ -50,7 +51,7 @@ class LogAccessControl(models.Model):
         'access control'), on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(
-        _('status'), max_length=10, choices=AC_TYPES, default="ok")
+        _('status'), max_length=10, choices=AC_TYPES, default='right')
 
     class Meta:
         verbose_name = _('access control point log')

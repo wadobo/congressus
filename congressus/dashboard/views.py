@@ -505,7 +505,7 @@ class AccessReportView(TemplateView):
         for access in self.access:
             row = [access.name]
             for num, day in enumerate(days):
-                amount_access = access.log_access.filter(date__date=day, status='ok').count()
+                amount_access = access.log_access.filter(date__date=day, status__in=['ok', 'right']).count()
                 row.append(amount_access)
                 table[1][num + 1] += amount_access
             table.append(row)
