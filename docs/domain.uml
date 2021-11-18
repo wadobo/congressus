@@ -18,8 +18,6 @@ class TicketWindow
 class TicketWindowSale
 class TicketWindowCashMovement
 
-class BaseTicketMixing
-class BaseExtraData
 class MultiPurchase
 class Ticket
 class TicketWarning
@@ -35,36 +33,41 @@ class Dashboard
 class AccessControl
 
 
-Ticket *--> Session
-Ticket *--> SeatLayout
-Ticket *--> MultiPurchase
-
-Event *--> ConfirmEmail
+Event *--> "0..n" MultiPurchase
+Event *--> "0..n" TicketWindow
 Event *--> "1..n" Discount
+Event *--> "0..n" TicketWarning
+Event *--> "0..n" SingleRowConfig
+Event *--> "0..n" SingleRowTail
+Event *--> "0..n" InvitationType
+Event *--> "0..n" Dashboard
+Event *--> "0..n" AccessControl
+Event *--> "0..n" Space
+Event *--> ConfirmEmail
+Event *--> "0..n" Gate
+Event *--> "0..n" InvCode
+Event *--> "0..n" TicketField
+
+MultiPurchase *--> "0..n" Ticket
+MultiPurchase *--> "0..n" TicketWindowSale
+TicketWindow *--> "0..n" TicketWindowSale
+TicketWindow *--> "0..n" TicketWindowCashMovement
+TicketWindow *--> "0..n" SingleRowTail
+TicketWindow *--> "0..n" SingleRowConfig
+
+Space *--> "0..n" Session
+TicketTemplate *--> "0..n" Session
+Session *--> "0..n" Ticket
+
+Ticket *--> SeatLayout
 
 SeatLayout *--> SeatMap
 SeatLayout *--> Gate
 
-Space *--> Event
 Space *--> SeatMap
 
-Session *--> Space
-Session o--> TicketTemplate
 ExtraSession *--> "2" Session
 
 EmailAttachment *--> ConfirmEmail
-
-Gate *--> Event
-InvCode *--> Event
-TicketField *--> Event
-
-TicketWindow *--> Event
-MultiPurchase *--> Event
-TicketWarning *--> Event
-SingleRowConfig *--> Event
-SingleRowTail *--> Event
-InvitationType *--> Event
-Dashboard *--> Event
-AccessControl *--> Event
 
 @enduml

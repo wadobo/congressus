@@ -3,15 +3,13 @@ import random
 import json
 from django.utils import timezone
 from django.db import models
+from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
 from django.core.mail import EmailMessage
 from django.conf import settings
 from django.template import Context
 from django.template import Template
 from django.template.loader import get_template
-
-from django.db.models.signals import post_save
-
 from django.urls import reverse
 
 from events.models import Event, InvCode
@@ -94,11 +92,8 @@ class BaseTicketMixing:
 
     def get_window_price(self, window=None):
         if not window:
-            from windows.models import TicketWindowSale
-            sale = TicketWindowSale.objects.get(purchase__tickets=self)
-            total = sale.window.get_price(self.session)
-        else:
-            total = window.get_price(self.session)
+            window = self.mp.sales.first().window
+        total = window.get_price(self.session)
 
         if self.mp and self.mp.discount and self.mp.discount.unit:
             total = self.mp.discount.apply_to(total)
@@ -336,25 +331,26 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
         return self.ev
 
     def get_price(self):
-        total = sum(i.get_price() for i in self.tickets.all())
+        total = sum(i.get_price() for i in self.all_tickets())
         if self.discount and not self.discount.unit:
             total = self.discount.apply_to(total)
         return total
 
     def get_window_price(self):
-        total = sum(i.get_window_price() for i in self.tickets.all())
+        total = sum(i.get_window_price() for i in self.all_tickets())
         if self.discount and not self.discount.unit:
             total = self.discount.apply_to(total)
         return total
 
     def get_real_price(self):
-        if not self.tickets.count():
+        all_tickets = self.all_tickets()
+        if not len(all_tickets):
             return 0
 
-        if self.tickets.first().sold_in_window:
-            total = sum(i.get_window_price() for i in self.tickets.all())
+        if all_tickets[0].sold_in_window:
+            total = sum(i.get_window_price() for i in all_tickets)
         else:
-            total = sum(i.get_price() for i in self.tickets.all())
+            total = sum(i.get_price() for i in all_tickets)
         if self.discount and not self.discount.unit:
             total = self.discount.apply_to(total)
         return total
@@ -370,7 +366,7 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
         return concat_pdf(files)
 
     def all_tickets(self):
-        return self.tickets.all().order_by('session__start')
+        return self.tickets.all().select_related('session', 'session__template').order_by('session__start')
 
     def delete(self, *args, **kwargs):
         self.remove_hold_seats()
@@ -384,8 +380,7 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
         prefix = 'ONL'
         postfix = timezone.localtime(self.created).strftime('%m%d%H%M')
 
-        from windows.models import TicketWindowSale
-        prefix = TicketWindowSale.objects.values_list("window__code", flat=True).get(purchase=self)
+        self.sales.values_list("window__code", flat=True)
 
         return prefix + postfix
 

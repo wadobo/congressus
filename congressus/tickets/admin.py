@@ -10,22 +10,26 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from tinymce.widgets import TinyMCE
 
-from .models import Ticket
-from .models import MultiPurchase
-from .models import TicketWarning
-from .models import TicketSeatHold
+from tickets.models import (
+    MultiPurchase,
+    Ticket,
+    TicketSeatHold,
+    TicketWarning,
+)
 from admin_csv import CSVMixin
 
 from .filters import TicketWindowFilter
 from .filters import SingleTicketWindowFilter
 from windows.models import TicketWindowSale
-from django.core.exceptions import MultipleObjectsReturned
 from windows.utils import online_sale
 
 from events.models import TicketField
 
 from extended_filters.filters import DateRangeFilter
 from congressus.admin import register
+
+
+CACHE_TICKET_FIELDS = {tf.id: tf.label for tf in TicketField.objects.filter(pk__in=settings.CSV_TICKET_FIELDS)}
 
 
 def confirm(modeladmin, request, queryset):
@@ -79,44 +83,21 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
                        'start', 'end')
         }),
     )
-
-    @property
-    def csv_fields(self):
-        data = [
-            'email',
-
-            'order',
-            'order_tpv',
-
-            'confirmed',
-            'confirmed_date',
-
-            'price2',
-            'cseat',
-            'mp',
-            'twin',
-
-            'event_name',
-            'space_name',
-            'session_name',
-            'created',
-
-            'used',
-            'used_at',
-        ]
-
-        if getattr(settings, 'CSV_TICKET_FIELDS'):
-            data += ['ticket_field_' + i for i in settings.CSV_TICKET_FIELDS]
-
-        return data
+    csv_fields = [
+        'email',
+        'order', 'order_tpv',
+        'confirmed', 'confirmed_date',
+        'price2', 'cseat', 'mp', 'twin',
+        'event_name', 'space_name', 'session_name', 'created',
+        'used', 'used_at',
+    ] + ['ticket_field_' + i for i in settings.CSV_TICKET_FIELDS]
 
     def __getattr__(self, value):
         if value.startswith('ticket_field_'):
-            pk = value.split("_")[-1]
-            field = TicketField.objects.get(pk=pk)
+            label = CACHE_TICKET_FIELDS.get(value.split("_")[-1])
             def f(obj):
-                return obj.get_extra_data(field.label)
-            f.short_description = field.label
+                return obj.get_extra_data(label)
+            f.short_description = label
             return f
         raise AttributeError
 
@@ -244,39 +225,28 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
     date_hierarchy = 'created'
     actions = [confirm, unconfirm, link_online_sale]
     inlines = [TicketInline, ]
+    csv_fields = [
+        'email',
+        'order', 'order_tpv',
+        'confirmed', 'confirmed_date',
+        'price', 'ntickets', 'twin', 'payment_method',
+        'ev', 'created',
+    ] + ['ticket_field_' + i for i in settings.CSV_TICKET_FIELDS]
 
-    @property
-    def csv_fields(self):
-        data = [
-            'email',
-
-            'order',
-            'order_tpv',
-
-            'confirmed',
-            'confirmed_date',
-
-            'price',
-            'ntickets',
-            'twin',
-            'payment_method',
-
-            'ev',
-            'created',
-        ]
-
-        if getattr(settings, 'CSV_TICKET_FIELDS'):
-            data += ['ticket_field_' + i for i in settings.CSV_TICKET_FIELDS]
-
-        return data
+    def get_queryset(self, request):
+        query = (
+            super().get_queryset(request)
+            .select_related('ev', 'discount')
+            .prefetch_related('sales', 'tickets')
+        )
+        return query
 
     def __getattr__(self, value):
         if value.startswith('ticket_field_'):
-            pk = value.split("_")[-1]
-            field = TicketField.objects.get(pk=pk)
+            label = CACHE_TICKET_FIELDS.get(value.split("_")[-1])
             def f(obj):
-                return obj.get_extra_data(field.label)
-            f.short_description = field.label
+                return obj.get_extra_data(label)
+            f.short_description = label
             return f
         raise AttributeError
 
@@ -316,9 +286,8 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
 
 
     def payment(self, obj):
-        try:
-            tws = TicketWindowSale.objects.get(purchase=obj)
-        except:
+        tws = obj.sales.first()
+        if not tws:
             return '-'
         return tws.get_payment_display()
     payment.short_description = _('payment')
@@ -328,18 +297,10 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
     ntickets.short_description = _('ntickets')
 
     def twin(self, obj):
-        try:
-            tws = TicketWindowSale.objects.get(purchase=obj)
-        except MultipleObjectsReturned:
-            tws = TicketWindowSale.objects.filter(purchase=obj).first()
-            tws.id = None
-
-            TicketWindowSale.objects.filter(purchase=obj).delete()
-            tws.save()
-        except:
+        tws = obj.sales.all().values_list('window__code', flat=True)
+        if not tws:
             return '-'
-        prefix = tws.window.code
-        return prefix
+        return tws[0]
     twin.short_description = _('ticket window')
 
     def price(self, obj):
