@@ -112,6 +112,9 @@ class Event(models.Model):
     def sold(self):
         return sum(i.sold() for i in self.get_sessions())
 
+    def ticket_fields(self, exclude_html: bool = True) -> list[str]:
+        return list(self.fields.exclude(type='html').values_list('label', flat=True))
+
 
 class SeatMap(models.Model):
     name = models.CharField(_('name'), max_length=300)
