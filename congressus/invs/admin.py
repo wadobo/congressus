@@ -1,4 +1,6 @@
-from admin_csv import CSVMixin
+import csv
+from io import StringIO
+
 from django.conf import settings
 from django.contrib import admin
 from django.db.models import Q
@@ -7,11 +9,13 @@ from django.utils import timezone
 from django.utils.formats import date_format
 from django.utils.translation import ugettext_lazy as _
 
-from .filters import UsedFilter
-from .models import InvitationGenerator
-from .models import Invitation
-from .models import InvitationType
-from .models import InvUsedInSession
+from invs.filters import UsedFilter
+from invs.models import (
+    InvUsedInSession,
+    Invitation,
+    InvitationGenerator,
+    InvitationType,
+)
 from congressus.admin import register
 from events.admin import EventMixin, EVFilter
 from events.ticket_pdf import TicketPDF
@@ -23,24 +27,29 @@ class RelatedOnlyDropdownFilter(admin.RelatedOnlyFieldListFilter):
 
 
 def get_csv(modeladmin, request, queryset):
-    csv = []
+    content = StringIO()
+    writer = csv.writer(content, delimiter=',')
 
-    def fillcsv(q):
-        for i, inv in enumerate(q):
-            row = '%d,%s,%s' % (i+1, inv.order, inv.type.name)
-            if inv.seat:
-                row += ',%s,%s,%s' % (inv.seat_layout.name, inv.seat_row(), inv.seat_column())
-            csv.append(row)
+    def fillcsv(query):
+        for inv in query:
+            seat_layout = ['', '', '']
+            if inv.seat_layout:
+                seat_layout = [inv.seat_layout.name, inv.seat_row(), inv.seat_column()]
+
+            row = [inv.order, inv.type.name] + seat_layout + [inv.used_date]
+            writer.writerow(row)
 
     if modeladmin.model == InvitationGenerator:
+        queryset = queryset.select_related('type').all()
         for ig in queryset:
             fillcsv(ig.invitations.all())
     else:
+        queryset = queryset.select_related('type', 'generator', 'generator__type', 'seat_layout').prefetch_related('usedin').all()
         fillcsv(queryset)
 
     response = HttpResponse(content_type='application/csv')
     response['Content-Disposition'] = 'filename="invs.csv"'
-    response.write('\n'.join(csv))
+    response.write(content.getvalue().strip('\r\n'))
     return response
 get_csv.short_description = _("Download csv")
 
@@ -91,7 +100,7 @@ class InvUsedInSessionInline(admin.TabularInline):
         return False
 
 
-class InvitationAdmin(CSVMixin, admin.ModelAdmin):
+class InvitationAdmin(admin.ModelAdmin):
     list_display = ('order', 'type', 'is_pass', 'created', 'iused', 'concept', 'cseat')
     date_hierarchy = 'created'
     search_fields = ('order', 'generator__concept', 'name')
@@ -106,16 +115,12 @@ class InvitationAdmin(CSVMixin, admin.ModelAdmin):
     actions = [get_csv, get_pdf]
     inlines = [InvUsedInSessionInline]
 
-    csv_fields = [
-        'order',
-        'type',
-        'is_pass',
-        'created',
-        'iused',
-        'concept',
-        'cseat',
-        'used_at',
-    ]
+    def get_queryset(self, request):
+        return (
+            super().get_queryset(request)
+            .select_related('type', 'generator', 'generator__type', 'seat_layout')
+            .prefetch_related('usedin')
+        )
 
     def concept(self, obj):
         if not obj.generator:
@@ -137,7 +142,7 @@ class InvitationAdmin(CSVMixin, admin.ModelAdmin):
 
     def event_filter(self, request, slug):
         qs = super().get_queryset(request)
-        return qs.filter(type__event__slug=slug)
+        return qs.filter(type__event__slug=slug).select_related('type', 'generator', 'generator__type', 'seat_layout').prefetch_related('usedin')
 
     def event_filter_fields(self, slug):
         return {
