@@ -52,10 +52,6 @@ unconfirm.short_description = _("Manual unconfirm")
 
 
 def get_csv(modeladmin, request, queryset):
-    queryset = queryset.select_related('ev', 'discount').prefetch_related(
-        Prefetch('sales', queryset=TicketWindowSale.objects.select_related('window')),
-        Prefetch('tickets', queryset=Ticket.objects.select_related('session', 'session__template').order_by('session__start')),
-    ).all()
     csv_fields = [
         'email',
         'order', 'order_tpv',
