@@ -1,7 +1,7 @@
 import string
 import random
 import json
-from django.utils import timezone
+from django.utils import formats, timezone
 from django.db import models
 from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
@@ -38,6 +38,12 @@ PAYMENT_TYPES = (
     ('twcash', _('Cash, Ticket Window')),
     ('twtpv', _('TPV, Ticket Window')),
 )
+
+
+def short_hour(date_time):
+    if timezone.is_aware(date_time):
+        date_time = timezone.localtime(date_time)
+    return formats.date_format(date_time, 'H:i')
 
 
 class BaseTicketMixing:
@@ -421,6 +427,82 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
 
         return prefix + postfix
 
+    @property
+    def wcode(self) -> str:
+        return self.window_code()
+
+    @property
+    def initials(self):
+        space = self.session.space.name
+        session = self.session.name
+
+        if self.session.short_name:
+            return self.session.short_name
+        return _('T') + space[0].upper() + session[0].upper()
+
+    @property
+    def text(self):
+        data = {
+            'space': self.session.space.name.capitalize(),
+            'session': self.session.name.capitalize()
+        }
+        return _('Ticket %(space)s %(session)s') % data
+
+    @property
+    def date(self):
+        sstart = self.session.start
+        send = self.session.end
+
+        start = formats.date_format(sstart, "l d/m/Y")
+
+        dateformats = {
+            'start': _('%(date)s (%(start)s)'),
+            'complete': _('%(date)s (%(start)s to %(end)s)'),
+            'onlydate': _('%(date)s'),
+        }
+        strdate = dateformats[self.session.dateformat]
+
+        return strdate % {
+            'date': start,
+            'start': short_hour(sstart),
+            'end': short_hour(send),
+        }
+
+    #@property
+    #def order(self):
+    #    if self.mp:
+    #        return self.mp.order_tpv or ''
+    #    return ''
+
+    @property
+    def seatinfo(self):
+        seatinfo = ''
+        if self.seat:
+            seatdata = {
+                'layout': self.seat_layout.name,
+                'row': self.seat_row(),
+                'col': self.seat_column()
+            }
+            seatinfo = _('SECTOR: %(layout)s ROW: %(row)s SEAT: %(col)s') % seatdata
+            seatinfo = f'<font size=11><b>{seatinfo}</b></font><br/>'
+        return seatinfo
+
+    @property
+    def total_price(self) -> str:
+        if self.sold_in_window:
+            price = self.get_window_price()
+        else:
+            price = self.get_price()
+
+        if not price:
+            return ''
+
+        price = _('%4.2f €') % price
+        tax = self.get_tax()
+
+        taxtext = _('TAX INC.')
+        return f'<font class="price">{price}</font>   <font class="tax">{tax}% {taxtext}</font>'
+
     class Meta:
         ordering = ['-created']
         verbose_name = _('multipurchase')
@@ -481,6 +563,76 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
 
     def __str__(self):
         return self.order
+
+    @property
+    def wcode(self) -> str:
+        return self.window_code()
+
+    @property
+    def initials(self):
+        space = self.session.space.name
+        session = self.session.name
+
+        if self.session.short_name:
+            return self.session.short_name
+        return _('T') + space[0].upper() + session[0].upper()
+
+    @property
+    def text(self):
+        data = {
+            'space': self.session.space.name.capitalize(),
+            'session': self.session.name.capitalize()
+        }
+        return _('Ticket %(space)s %(session)s') % data
+
+    @property
+    def date(self):
+        sstart = self.session.start
+        send = self.session.end
+
+        start = formats.date_format(sstart, "l d/m/Y")
+
+        dateformats = {
+            'start': _('%(date)s (%(start)s)'),
+            'complete': _('%(date)s (%(start)s to %(end)s)'),
+            'onlydate': _('%(date)s'),
+        }
+        strdate = dateformats[self.session.dateformat]
+
+        return strdate % {
+            'date': start,
+            'start': short_hour(sstart),
+            'end': short_hour(send),
+        }
+
+    @property
+    def seatinfo(self):
+        seatinfo = ''
+        if self.seat:
+            seatdata = {
+                'layout': self.seat_layout.name,
+                'row': self.seat_row(),
+                'col': self.seat_column()
+            }
+            seatinfo = _('SECTOR: %(layout)s ROW: %(row)s SEAT: %(col)s') % seatdata
+            seatinfo = f'<font size=11><b>{seatinfo}</b></font><br/>'
+        return seatinfo
+
+    @property
+    def total_price(self) -> str:
+        if self.sold_in_window:
+            price = self.get_window_price()
+        else:
+            price = self.get_price()
+
+        if not price:
+            return ''
+
+        price = _('%4.2f €') % price
+        tax = self.get_tax()
+
+        taxtext = _('TAX INC.')
+        return f'<font class="price">{price}</font>   <font class="tax">{tax}% {taxtext}</font>'
 
     def get_gate_name(self):
         return self.gate_name

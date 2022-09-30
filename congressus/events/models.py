@@ -489,7 +489,14 @@ class TicketTemplate(models.Model):
     right_margin = models.FloatField(_('right margin'), help_text=_('in cm'), default=2.54)
     bottom_margin = models.FloatField(_('bottom margin'), help_text=_('in cm'), default=2.54)
     top_margin = models.FloatField(_('top margin'), help_text=_('in cm'), default=2.54)
-    border_qr = models.FloatField(_('border qr'), default=0)
+    border_qr = models.FloatField(_('border qr'), default=4)
+    qr_size = models.FloatField(_('qr size'), help_text=_('in cm'), default=10)
+    extra_style = models.TextField(
+        _('extra style'),
+        help_text=_('Extra style in css for configure template'),
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         verbose_name = _('ticket template')

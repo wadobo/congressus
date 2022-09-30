@@ -1,9 +1,15 @@
+from __future__ import annotations
+
 import random
 from io import BytesIO
+from typing import TYPE_CHECKING, Union
 
 from django.conf import settings
 from django.http import HttpResponse
 from PyPDF2 import PdfFileMerger
+
+if TYPE_CHECKING:
+    from tickets.models import MultiPurchase, Ticket
 
 
 def concat_pdf(files):
@@ -19,7 +25,7 @@ def concat_pdf(files):
     return pdf
 
 
-def get_ticket_format(mp, pf=None, attachment=True):
+def get_ticket_format(mp: Union["MultiPurchase", "Ticket"], pf, attachment=True):
     """ With a list of invitations or invitations,generate ticket output """
     from events.models import TicketTemplate
     if pf == 'csv':

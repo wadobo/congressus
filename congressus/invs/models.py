@@ -1,10 +1,9 @@
 import string
 import random
 from django.db import models
-from django.utils import timezone
 from django.conf import settings
 from django.core.exceptions import ValidationError
-
+from django.utils import formats, timezone
 from django.utils.translation import ugettext_lazy as _
 
 from events.models import Event
@@ -17,6 +16,12 @@ from tickets.models import TicketSeatHold
 from tickets.utils import get_seats_by_str
 
 from django.db.models.signals import post_delete
+
+
+def short_hour(date_time):
+    if timezone.is_aware(date_time):
+        date_time = timezone.localtime(date_time)
+    return formats.date_format(date_time, 'H:i')
 
 
 class InvitationType(models.Model):
@@ -91,6 +96,69 @@ class Invitation(models.Model, BaseExtraData):
             return self.usedin.all()[0].date
         except:
             return None
+
+    @property
+    def wcode(self) -> str:
+        if self.generator:
+            return 'GEN' + str(self.generator.id)
+
+        return 'INV'
+
+    @property
+    def initials(self):
+        if self.type.is_pass:
+            return "PAS"
+
+        return "INV"
+
+    @property
+    def text(self):
+        if self.generator:
+            return self.generator.concept
+
+        return self.type.name
+
+    @property
+    def date(self):
+        sstart = self.type.start
+        send = self.type.end
+
+        if not sstart or not send:
+            return ''
+
+        return _('%(date)s (%(start)s)') % {
+            'date': formats.date_format(sstart, "l d/m/Y"),
+            'start': short_hour(sstart),
+        }
+
+    @property
+    def seatinfo(self):
+        seatinfo = ''
+        if self.seat:
+            seatdata = {
+                'layout': self.seat_layout.name,
+                'row': self.seat_row(),
+                'col': self.seat_column()
+            }
+            seatinfo = _('SECTOR: %(layout)s ROW: %(row)s SEAT: %(col)s') % seatdata
+            seatinfo = f'<font size=11><b>{seatinfo}</b></font><br/>'
+        return seatinfo
+
+    @property
+    def total_price(self) -> str:
+        if self.sold_in_window:
+            price = self.get_window_price()
+        else:
+            price = self.get_price()
+
+        if not price:
+            return ''
+
+        price = _('%4.2f €') % price
+        tax = self.get_tax()
+
+        taxtext = _('TAX INC.')
+        return f'<font class="price">{price}</font>   <font class="tax">{tax}% {taxtext}</font>'
 
     def is_used(self, session):
         return self.usedin.filter(session=session).exists()
