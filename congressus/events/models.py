@@ -494,6 +494,12 @@ class TicketTemplate(models.Model):
         blank=True,
         null=True,
     )
+    extra_js = models.TextField(
+        _('extra js'),
+        help_text=_('Extra js for configure template'),
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         verbose_name = _('ticket template')
