@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 
+from events.ticket_html import TicketHTML
 from events.ticket_pdf import TicketPDF
 from tickets.utils import concat_pdf
 
@@ -36,7 +37,7 @@ def gen_csv_from_generators(igs):
 
 
 def gen_pdf(igs, template=None):
-    from .models import Invitation
+    from invs.models import Invitation
     files = []
     for inv in Invitation.objects.filter(generator__in=igs):
         pdf = TicketPDF(inv, is_invitation=True, template=template).generate(asbuf=True)
@@ -60,19 +61,20 @@ def get_ticket_format(invs, pf):
         response = HttpResponse(content_type='application/csv')
         response['Content-Disposition'] = 'filename="invs.csv"'
         response.write(gen_csv_from_generators(invs))
+        return response
 
-    else:
-        template = TicketTemplate.objects.filter(pk=pf).first()
-        pdf = gen_pdf(invs, template)
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'filename="tickets.pdf"'
-        response.write(pdf)
+    template = TicketTemplate.objects.filter(pk=pf).first()
+    if template.is_html_format:
+        return HttpResponse(TicketHTML(invs, is_invitation=True, template=template).generate())
 
+    pdf = gen_pdf(invs, template)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'filename="tickets.pdf"'
+    response.write(pdf)
     return response
 
 def get_sold_invs(session):
-    from .models import InvitationType
-    from .models import Invitation
+    from invs.models import Invitation, InvitationType
     types = InvitationType.objects.filter(sessions__in=[session])
     types = types.filter(is_pass=False)
     return Invitation.objects.filter(type__in=types).count()

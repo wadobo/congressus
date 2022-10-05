@@ -1,4 +1,3 @@
-import base64
 import hmac
 import json
 import random
@@ -6,9 +5,7 @@ import string
 from base64 import b64encode, b64decode
 from collections import OrderedDict
 from hashlib import sha256
-from io import BytesIO
 
-import qrcode
 import redsystpv
 from django.conf import settings
 from django.contrib import messages
@@ -544,43 +541,7 @@ class TicketTemplatePreview(UserPassesTestMixin, View):
         u = self.request.user
         return u.is_authenticated and u.is_superuser
 
-    def get(self, request, id):
-        from events.models import TicketTemplate
-        template = get_object_or_404(TicketTemplate, pk=id)
-
-        # fake ticket
-        ticket = Ticket(email='test@email.com', price=12, tax=21, confirm_sent=True)
-        ticket.gen_order(save=False)
-        ticket.created = timezone.now()
-
-        ticket.session = Session(
-            name=formats.date_format(timezone.now(), "l"),
-            template=template,
-            space=random.choice(list(Space.objects.all())),
-            start=timezone.now(),
-            end=timezone.now()
-        )
-
-        response = get_ticket_format(ticket, pf=None, attachment=False)
-        return response
-
-
-class TicketTemplatePreview2(UserPassesTestMixin, TemplateView):
-    template_name = "tickets/preview.html"
-    QR_SQUARES = 21
-
-    def test_func(self):
-        u = self.request.user
-        return u.is_authenticated and u.is_superuser
-
-    def get_context_data(self, **kwargs):
-        template_id = kwargs.get("id", None)
-        context = super().get_context_data(**kwargs)
-        from events.models import TicketTemplate
-        self.template = get_object_or_404(TicketTemplate, pk=template_id)
-
-        QR_SIZE = 10
-
+    def _fake_ticket(self) -> Ticket:
         # fake ticket
         ticket = Ticket(email='test@email.com', price=12, tax=21, confirm_sent=True)
         ticket.gen_order(save=False)
@@ -594,23 +555,18 @@ class TicketTemplatePreview2(UserPassesTestMixin, TemplateView):
             start=timezone.now(),
             end=timezone.now()
         )
+        return ticket
 
-        context["template"] = self.template
-        context["ticket"] = ticket
-        context["qr"] = self.gen_qr(ticket.order, qr_size=QR_SIZE)
-        context["qr_size"] = QR_SIZE
-        return context
+    def get(self, request, id):
+        from events.models import TicketTemplate
+        self.template = get_object_or_404(TicketTemplate, pk=id)
+        ticket = self._fake_ticket()
 
-    def gen_qr(self, code: str, qr_size: float):
-        BORDER = 4  # default is 4, which is the minimum according to the specs
-        stream = BytesIO()
-        img = qrcode.make(
-            code,
-            box_size=qr_size + 2 * BORDER,
-            border=BORDER,
-        )
-        img.save(stream, format="png")
-        return base64.b64encode(stream.getvalue()).decode("utf8")
+        if self.template.is_html_format:
+            return HttpResponse(ticket.generate_html(self.template))
+
+        response = get_ticket_format(ticket, pf=None, attachment=False)
+        return response
 
 
 class EmailConfirmPreview(UserPassesTestMixin, View):
