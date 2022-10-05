@@ -1,5 +1,9 @@
+import base64
 import string
 import random
+from io import BytesIO
+
+import qrcode
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -276,6 +280,19 @@ class Invitation(models.Model, BaseExtraData):
                         seat=self.seat)
                 if tsh:
                     tsh.delete()
+
+    def gen_qr(self, qr_size: float = 10, border: int = 4):
+        """
+        border: default is 4, which is the minimum according to the specs
+        """
+        stream = BytesIO()
+        img = qrcode.make(
+            self.order,
+            box_size=qr_size + 2 * border,
+            border=border,
+        )
+        img.save(stream, format="png")
+        return base64.b64encode(stream.getvalue()).decode("utf8")
 
     def __str__(self):
         return self.order

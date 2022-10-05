@@ -468,6 +468,7 @@ def gencode(sender, instance, created, raw, using, update_fields, **kwargs):
 
 class TicketTemplate(models.Model):
     name = models.CharField(_('name'), max_length=200, unique=True)
+    is_html_format = models.BooleanField(_("is html format"), default=False)
     header = models.ImageField(_('header'), upload_to='templheader', blank=True, null=True)
     sponsors = models.ImageField(_('sponsors'), upload_to='templsponsors', blank=True, null=True)
     note = models.CharField(_('previous note'), max_length=200, blank=True, null=True)
@@ -494,6 +495,12 @@ class TicketTemplate(models.Model):
     extra_style = models.TextField(
         _('extra style'),
         help_text=_('Extra style in css for configure template'),
+        blank=True,
+        null=True,
+    )
+    extra_js = models.TextField(
+        _('extra js'),
+        help_text=_('Extra js for configure template'),
         blank=True,
         null=True,
     )

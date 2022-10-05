@@ -18,6 +18,7 @@ from invs.models import (
 )
 from congressus.admin import register
 from events.admin import EventMixin, EVFilter
+from events.ticket_html import TicketHTML
 from events.ticket_pdf import TicketPDF
 from tickets.utils import concat_pdf
 
@@ -77,6 +78,18 @@ def get_pdf(modeladmin, request, queryset):
 get_pdf.short_description = _("Download pdf")
 
 
+def get_html(modeladmin, request, queryset):
+    invs = []
+    if modeladmin.model == InvitationGenerator:
+        invs = [list(ig.invitations.all()) for ig in queryset]
+    else:
+        invs = queryset
+
+    return HttpResponse(TicketHTML(invs, is_invitation=True).generate())
+get_html.short_description = _("Download HTML")
+
+
+
 class InvitationTypeAdmin(EventMixin, admin.ModelAdmin):
     list_display = ('name', 'event', 'is_pass', 'start', 'end')
     list_filter = ('is_pass', EVFilter)
@@ -112,7 +125,7 @@ class InvitationAdmin(admin.ModelAdmin):
         ('generator', RelatedOnlyDropdownFilter),
     )
 
-    actions = [get_csv, get_pdf]
+    actions = [get_csv, get_pdf, get_html]
     inlines = [InvUsedInSessionInline]
 
     def get_queryset(self, request):
@@ -153,7 +166,7 @@ class InvitationAdmin(admin.ModelAdmin):
 
 class InvitationGeneratorAdmin(admin.ModelAdmin):
     list_display = ('type', 'amount', 'price', 'concept', 'created')
-    actions = [get_csv, get_pdf]
+    actions = [get_csv, get_pdf, get_html]
 
     class Media:
         js = [
