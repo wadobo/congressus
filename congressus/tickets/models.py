@@ -656,6 +656,9 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
         taxtext = _('TAX INC.')
         return f'<font class="price">{price}</font>   <font class="tax">{tax}% {taxtext}</font>'
 
+    def get_first_ticket_window_sale(self) -> TicketWindowSale:
+        return self.mp.sales.first()
+
     def get_gate_name(self):
         return self.gate_name
 
