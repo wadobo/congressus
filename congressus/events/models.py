@@ -373,7 +373,6 @@ class ConfirmEmail(models.Model):
     def get_absolute_url(self):
         return reverse('email_confirm_preview', kwargs={'id': self.id})
 
-
     def __str__(self):
         return "ConfirmEmail - %s" % self.event
 

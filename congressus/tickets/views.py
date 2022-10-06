@@ -366,7 +366,14 @@ class Thanks(TemplateView):
 
     def post(self, request, order):
         ticket = get_ticket_or_404(order=request.POST.get('ticket'), confirmed=True)
-        response = get_ticket_format(ticket, pf=None)
+        pf = None
+        sale = ticket.get_first_ticket_window_sale()
+        if sale:
+            template = sale.get_first_template()
+            if template and hasattr(template, "id"):
+                pf = template.id
+
+        response = get_ticket_format(ticket, pf=pf)
         return response
 
     def get_context_data(self, *args, **kwargs):

@@ -1,3 +1,5 @@
+from typing import Optional
+
 import websocket
 from datetime import datetime
 from django.db import models
@@ -128,6 +130,9 @@ class TicketWindowSale(models.Model):
     class Meta:
         verbose_name = _('ticket window sale')
         verbose_name_plural = _('ticket window sales')
+
+    def get_first_template(self) -> Optional[TicketTemplate]:
+        return self.window.templates.first()
 
     def __str__(self):
         return '%s - %s - %s' % (self.user, self.window, self.purchase)

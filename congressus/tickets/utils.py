@@ -33,6 +33,7 @@ def get_ticket_template(pf) -> TicketTemplate:
 
     return TicketTemplate.objects.filter(pk=pf).first()
 
+
 def get_ticket_format(mp: Union["MultiPurchase", "Ticket"], pf, attachment=True):
     """ With a list of invitations or invitations,generate ticket output """
     if pf == 'csv':
