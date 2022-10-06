@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import base64
 import json
 import random
 import string
 from io import BytesIO
+from typing import TYPE_CHECKING
 
 import qrcode
 from django.conf import settings
@@ -23,6 +26,9 @@ from events.models import SeatLayout
 from events.ticket_pdf import TicketPDF
 from events.ticket_html import TicketHTML
 from tickets.utils import concat_pdf
+
+if TYPE_CHECKING:
+    from windows.models import TicketWindowSale
 
 
 WARNING_TYPES = (
@@ -384,6 +390,9 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
             total = self.discount.apply_to(total)
         return total
 
+    def get_first_ticket_window_sale(self) -> TicketWindowSale:
+        return self.sales.first()
+
     def get_window_price(self):
         total = sum(i.get_window_price() for i in self.all_tickets())
         if self.discount and not self.discount.unit:
@@ -407,6 +416,11 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
         return True
 
     def generate_pdf(self, template=None):
+        if not template:
+            sale = self.get_first_ticket_window_sale()
+            if sale:
+                template = sale.get_first_template()
+
         files = []
         for ticket in self.all_tickets():
             pdf = TicketPDF(ticket, template=template or ticket.session.template).generate(asbuf=True)
