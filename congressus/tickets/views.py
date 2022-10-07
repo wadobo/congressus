@@ -573,7 +573,7 @@ class TicketTemplatePreview(UserPassesTestMixin, View):
         if self.template.is_html_format:
             return HttpResponse(ticket.generate_html(self.template))
 
-        response = get_ticket_format(ticket, pf=None, attachment=False)
+        response = get_ticket_format(ticket, pf=id, attachment=False)
         return response
 
 
