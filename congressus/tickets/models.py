@@ -1,25 +1,34 @@
-import string
-import random
+from __future__ import annotations
+
+import base64
 import json
-from django.utils import timezone
-from django.db import models
-from django.utils.translation import ugettext_lazy as _
-from django.core.mail import EmailMessage
+import random
+import string
+from io import BytesIO
+from typing import TYPE_CHECKING
+
+import qrcode
 from django.conf import settings
+from django.core.mail import EmailMessage
+from django.db import models
+from django.db.models.signals import post_save
 from django.template import Context
 from django.template import Template
 from django.template.loader import get_template
-
-from django.db.models.signals import post_save
-
 from django.urls import reverse
+from django.utils import formats, timezone
+from django.utils.translation import ugettext_lazy as _
 
 from events.models import Event, InvCode
 from events.models import Session
 from events.models import Discount
 from events.models import SeatLayout
 from events.ticket_pdf import TicketPDF
+from events.ticket_html import TicketHTML
 from tickets.utils import concat_pdf
+
+if TYPE_CHECKING:
+    from windows.models import TicketWindowSale
 
 
 WARNING_TYPES = (
@@ -40,6 +49,12 @@ PAYMENT_TYPES = (
     ('twcash', _('Cash, Ticket Window')),
     ('twtpv', _('TPV, Ticket Window')),
 )
+
+
+def short_hour(date_time):
+    if timezone.is_aware(date_time):
+        date_time = timezone.localtime(date_time)
+    return formats.date_format(date_time, 'H:i')
 
 
 class BaseTicketMixing:
@@ -338,6 +353,9 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
             total = self.discount.apply_to(total)
         return total
 
+    def get_first_ticket_window_sale(self) -> TicketWindowSale:
+        return self.sales.first()
+
     def get_window_price(self):
         total = sum(i.get_window_price() for i in self.tickets.all())
         if self.discount and not self.discount.unit:
@@ -360,11 +378,19 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
         return True
 
     def generate_pdf(self, template=None):
+        if not template:
+            sale = self.get_first_ticket_window_sale()
+            if sale:
+                template = sale.get_first_template()
+
         files = []
         for ticket in self.all_tickets():
             pdf = TicketPDF(ticket, template=template).generate(asbuf=True)
             files.append(pdf)
         return concat_pdf(files)
+
+    def generate_html(self, template=None):
+        return TicketHTML(self.all_tickets(), template=template).generate()
 
     def all_tickets(self):
         return self.tickets.all().order_by('session__start')
@@ -385,6 +411,82 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
         prefix = TicketWindowSale.objects.values_list("window__code", flat=True).get(purchase=self)
 
         return prefix + postfix
+
+    @property
+    def wcode(self) -> str:
+        return self.window_code()
+
+    @property
+    def initials(self):
+        space = self.session.space.name
+        session = self.session.name
+
+        if self.session.short_name:
+            return self.session.short_name
+        return _('T') + space[0].upper() + session[0].upper()
+
+    @property
+    def text(self):
+        data = {
+            'space': self.session.space.name.capitalize(),
+            'session': self.session.name.capitalize()
+        }
+        return _('Ticket %(space)s %(session)s') % data
+
+    @property
+    def date(self):
+        sstart = self.session.start
+        send = self.session.end
+
+        start = formats.date_format(sstart, "l d/m/Y")
+
+        dateformats = {
+            'start': _('%(date)s (%(start)s)'),
+            'complete': _('%(date)s (%(start)s to %(end)s)'),
+            'onlydate': _('%(date)s'),
+        }
+        strdate = dateformats[self.session.dateformat]
+
+        return strdate % {
+            'date': start,
+            'start': short_hour(sstart),
+            'end': short_hour(send),
+        }
+
+    #@property
+    #def order(self):
+    #    if self.mp:
+    #        return self.mp.order_tpv or ''
+    #    return ''
+
+    @property
+    def seatinfo(self):
+        seatinfo = ''
+        if self.seat:
+            seatdata = {
+                'layout': self.seat_layout.name,
+                'row': self.seat_row(),
+                'col': self.seat_column()
+            }
+            seatinfo = _('SECTOR: %(layout)s ROW: %(row)s SEAT: %(col)s') % seatdata
+            seatinfo = f'<font size=11><b>{seatinfo}</b></font><br/>'
+        return seatinfo
+
+    @property
+    def total_price(self) -> str:
+        if self.sold_in_window:
+            price = self.get_window_price()
+        else:
+            price = self.get_price()
+
+        if not price:
+            return ''
+
+        price = _('%4.2f €') % price
+        tax = self.get_tax()
+
+        taxtext = _('TAX INC.')
+        return f'<font class="price">{price}</font>   <font class="tax">{tax}% {taxtext}</font>'
 
     class Meta:
         ordering = ['-created']
@@ -446,6 +548,79 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
 
     def __str__(self):
         return self.order
+
+    @property
+    def wcode(self) -> str:
+        return self.window_code()
+
+    @property
+    def initials(self):
+        space = self.session.space.name
+        session = self.session.name
+
+        if self.session.short_name:
+            return self.session.short_name
+        return _('T') + space[0].upper() + session[0].upper()
+
+    @property
+    def text(self):
+        data = {
+            'space': self.session.space.name.capitalize(),
+            'session': self.session.name.capitalize()
+        }
+        return _('Ticket %(space)s %(session)s') % data
+
+    @property
+    def date(self):
+        sstart = self.session.start
+        send = self.session.end
+
+        start = formats.date_format(sstart, "l d/m/Y")
+
+        dateformats = {
+            'start': _('%(date)s (%(start)s)'),
+            'complete': _('%(date)s (%(start)s to %(end)s)'),
+            'onlydate': _('%(date)s'),
+        }
+        strdate = dateformats[self.session.dateformat]
+
+        return strdate % {
+            'date': start,
+            'start': short_hour(sstart),
+            'end': short_hour(send),
+        }
+
+    @property
+    def seatinfo(self):
+        seatinfo = ''
+        if self.seat:
+            seatdata = {
+                'layout': self.seat_layout.name,
+                'row': self.seat_row(),
+                'col': self.seat_column()
+            }
+            seatinfo = _('SECTOR: %(layout)s ROW: %(row)s SEAT: %(col)s') % seatdata
+            seatinfo = f'<font size=11><b>{seatinfo}</b></font><br/>'
+        return seatinfo
+
+    @property
+    def total_price(self) -> str:
+        if self.sold_in_window:
+            price = self.get_window_price()
+        else:
+            price = self.get_price()
+
+        if not price:
+            return ''
+
+        price = _('%4.2f €') % price
+        tax = self.get_tax()
+
+        taxtext = _('TAX INC.')
+        return f'<font class="price">{price}</font>   <font class="tax">{tax}% {taxtext}</font>'
+
+    def get_first_ticket_window_sale(self) -> TicketWindowSale:
+        return self.mp.sales.first()
 
     def get_gate_name(self):
         return self.gate_name
@@ -517,6 +692,9 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
     def generate_pdf(self, template=None):
         return TicketPDF(self, template=template).generate()
 
+    def generate_html(self, template=None):
+        return TicketHTML([self], template=template).generate()
+
     def window_code(self):
         '''
         ONLMMDDHHMM
@@ -535,6 +713,19 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
             return self.get_window_price()
         else:
             return self.get_price()
+
+    def gen_qr(self, qr_size: float = 10, border: int = 4):
+        """
+        border: default is 4, which is the minimum according to the specs
+        """
+        stream = BytesIO()
+        img = qrcode.make(
+            self.order,
+            box_size=qr_size + 2 * border,
+            border=border,
+        )
+        img.save(stream, format="png")
+        return base64.b64encode(stream.getvalue()).decode("utf8")
 
 
 class TicketWarning(models.Model):

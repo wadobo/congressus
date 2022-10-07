@@ -373,7 +373,6 @@ class ConfirmEmail(models.Model):
     def get_absolute_url(self):
         return reverse('email_confirm_preview', kwargs={'id': self.id})
 
-
     def __str__(self):
         return "ConfirmEmail - %s" % self.event
 
@@ -465,6 +464,7 @@ def gencode(sender, instance, created, raw, using, update_fields, **kwargs):
 
 class TicketTemplate(models.Model):
     name = models.CharField(_('name'), max_length=200, unique=True)
+    is_html_format = models.BooleanField(_("is html format"), default=False)
     header = models.ImageField(_('header'), upload_to='templheader', blank=True, null=True)
     sponsors = models.ImageField(_('sponsors'), upload_to='templsponsors', blank=True, null=True)
     note = models.CharField(_('previous note'), max_length=200, blank=True, null=True)
@@ -486,7 +486,20 @@ class TicketTemplate(models.Model):
     right_margin = models.FloatField(_('right margin'), help_text=_('in cm'), default=2.54)
     bottom_margin = models.FloatField(_('bottom margin'), help_text=_('in cm'), default=2.54)
     top_margin = models.FloatField(_('top margin'), help_text=_('in cm'), default=2.54)
-    border_qr = models.FloatField(_('border qr'), default=0)
+    border_qr = models.FloatField(_('border qr'), default=4)
+    qr_size = models.FloatField(_('qr size'), help_text=_('in cm'), default=10)
+    extra_style = models.TextField(
+        _('extra style'),
+        help_text=_('Extra style in css for configure template'),
+        blank=True,
+        null=True,
+    )
+    extra_js = models.TextField(
+        _('extra js'),
+        help_text=_('Extra js for configure template'),
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         verbose_name = _('ticket template')

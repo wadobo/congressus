@@ -1,0 +1,121 @@
+<!doctype html>
+
+{% load static %}
+{% load l10n %}
+
+<style>
+  @page {
+    size: {{ template.pagesize_width|unlocalize }}cm {{ template.pagesize_height|unlocalize }}cm;
+    margin: 0 0 0 0;
+  }
+
+  body {
+    width: {{ template.pagesize_width|unlocalize }}cm;
+    height: {{ template.pagesize_height|unlocalize }}cm;
+    margin: 0 0 0 0;
+  }
+
+  .page {
+    width: {{ template.pagesize_width|unlocalize }}cm;
+    height: {{ template.pagesize_height|unlocalize }}cm;
+    padding: {{ template.top_margin|unlocalize }}cm {{ template.right_margin|unlocalize }}cm {{ template.bottom_margin|unlocalize }}cm {{ template.left_margin|unlocalize }}cm;
+    box-sizing: border-box;
+
+    display: grid;
+    justify-items: stretch;
+    justify-content: stretch;
+    align-items: stretch;
+    page-break-inside: avoid;
+    page-break-after: always;
+  }
+
+  .header {
+    grid-area: header;
+    width: 100%;
+  }
+
+  img {
+    width: 100%;
+  }
+
+  .sponsors {
+    grid-area: sponsors;
+  }
+
+  .note {
+    grid-area: note;
+  }
+
+  .total_price {
+    grid-area: total_price;
+  }
+
+  .price {
+    font-size: large;
+  }
+
+  .tax {
+    font-size: small;
+  }
+
+  .codeimg {
+    margin: auto;
+    grid-area: codeimg;
+  }
+
+  .order {
+    grid-area: order;
+  }
+
+  .wcode {
+    grid-area: wcode;
+    text-align: end;
+  }
+
+  .initials {
+    grid-area: initials;
+    text-align: center;
+    font-size: xxx-large;
+  }
+
+  .text {
+    grid-area: text;
+    text-align: center;
+  }
+
+  .date {
+    grid-area: date;
+    text-align: center;
+  }
+
+  .seatinfo {
+    height: 100%;
+    grid-area: seatinfo;
+    text-align: end;
+  }
+
+  .next_note {
+    grid-area: next_note;
+  }
+
+  .footer {
+    grid-area: footer;
+    width: 100%;
+  }
+
+  {{ template.extra_style|safe }}
+</style>
+
+<html>
+  <head>
+    <title>Ticket preview</title>
+  </head>
+  <body>
+    {% for ticket in tickets %}
+        {% include "tickets/ticket-preview.html" with template=template ticket=ticket %}
+    {% endfor %}
+    <script>
+        {{ template.extra_js|safe }}
+    </script>
+  </body>
+</html>

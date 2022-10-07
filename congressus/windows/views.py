@@ -77,7 +77,7 @@ window_login = WindowLogin.as_view()
 class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
     template_name = 'windows/multipurchase.html'
 
-    def get_window(self):
+    def get_window(self) -> TicketWindow:
         ev = self.kwargs['ev']
         w = self.kwargs['w']
         w = get_object_or_404(TicketWindow, event__slug=ev, slug=w)
@@ -214,11 +214,14 @@ window_multipurchase = csrf_exempt(WindowMultiPurchase.as_view())
 
 
 class WindowTicket(WindowMultiPurchase):
+    def get_mp(self, order) -> MultiPurchase:
+        return get_object_or_404(MultiPurchase, Q(order=order) | Q(order_tpv=order))
+
     def get(self, request, ev=None, pf=None, order=None, w=None):
-        mp = get_object_or_404(MultiPurchase, Q(order=order) | Q(order_tpv=order))
+        mp = self.get_mp(order)
         response = get_ticket_format(mp, pf=pf, attachment=False)
         return response
-window_ticket = csrf_exempt(WindowTicket.as_view())
+window_ticket = WindowTicket.as_view()
 
 
 class WindowLogout(View):

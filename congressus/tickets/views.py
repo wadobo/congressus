@@ -25,9 +25,11 @@ from django.views.generic import TemplateView, View
 from django.views.generic.edit import CreateView
 from pyDes import triple_des, CBC
 
-from .models import Ticket
-from .models import MultiPurchase
-from .models import TicketSeatHold
+from tickets.models import (
+    MultiPurchase,
+    Ticket,
+    TicketSeatHold,
+)
 from events.models import (
     Event,
     SeatLayout,
@@ -364,7 +366,14 @@ class Thanks(TemplateView):
 
     def post(self, request, order):
         ticket = get_ticket_or_404(order=request.POST.get('ticket'), confirmed=True)
-        response = get_ticket_format(ticket, pf=None)
+        pf = None
+        sale = ticket.get_first_ticket_window_sale()
+        if sale:
+            template = sale.get_first_template()
+            if template and hasattr(template, "id"):
+                pf = template.id
+
+        response = get_ticket_format(ticket, pf=pf)
         return response
 
     def get_context_data(self, *args, **kwargs):
@@ -539,10 +548,7 @@ class TicketTemplatePreview(UserPassesTestMixin, View):
         u = self.request.user
         return u.is_authenticated and u.is_superuser
 
-    def get(self, request, id):
-        from events.models import TicketTemplate
-        template = get_object_or_404(TicketTemplate, pk=id)
-
+    def _fake_ticket(self) -> Ticket:
         # fake ticket
         ticket = Ticket(email='test@email.com', price=12, tax=21, confirm_sent=True)
         ticket.gen_order(save=False)
@@ -550,16 +556,24 @@ class TicketTemplatePreview(UserPassesTestMixin, View):
 
         ticket.session = Session(
             name=formats.date_format(timezone.now(), "l"),
-            template=template,
+            template=self.template,
             space=random.choice(list(Space.objects.all())),
+            # TODO: make fake space
             start=timezone.now(),
             end=timezone.now()
         )
+        return ticket
 
-        response = get_ticket_format(ticket, pf=None, attachment=False)
+    def get(self, request, id):
+        from events.models import TicketTemplate
+        self.template = get_object_or_404(TicketTemplate, pk=id)
+        ticket = self._fake_ticket()
+
+        if self.template.is_html_format:
+            return HttpResponse(ticket.generate_html(self.template))
+
+        response = get_ticket_format(ticket, pf=id, attachment=False)
         return response
-
-template_preview = TicketTemplatePreview.as_view()
 
 
 class EmailConfirmPreview(UserPassesTestMixin, View):

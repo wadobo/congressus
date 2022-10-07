@@ -1,9 +1,16 @@
+from __future__ import annotations
+
 import random
 from io import BytesIO
+from typing import TYPE_CHECKING, Union
 
 from django.conf import settings
 from django.http import HttpResponse
 from PyPDF2 import PdfFileMerger
+
+if TYPE_CHECKING:
+    from events.models import TicketTemplate
+    from tickets.models import MultiPurchase, Ticket
 
 
 def concat_pdf(files):
@@ -19,9 +26,16 @@ def concat_pdf(files):
     return pdf
 
 
-def get_ticket_format(mp, pf, attachment=True):
-    """ With a list of invitations or invitations,generate ticket output """
+def get_ticket_template(pf) -> TicketTemplate:
     from events.models import TicketTemplate
+    if pf is None:
+        return TicketTemplate.objects.first()
+
+    return TicketTemplate.objects.filter(pk=pf).first()
+
+
+def get_ticket_format(mp: Union["MultiPurchase", "Ticket"], pf, attachment=True):
+    """ With a list of invitations or invitations,generate ticket output """
     if pf == 'csv':
         csv = []
         if hasattr(mp, 'all_tickets'): # is MultiPurchase
@@ -32,19 +46,20 @@ def get_ticket_format(mp, pf, attachment=True):
         response = HttpResponse(content_type='application/csv')
         response['Content-Disposition'] = 'filename="invs.csv"'
         response.write('\n'.join(csv))
+        return response
 
-    else:
-        if pf is not None:
-            template = TicketTemplate.objects.filter(pk=pf).first()
-        else:
-            template = TicketTemplate.objects.first()
-        pdf = mp.generate_pdf(template)
-        response = HttpResponse(content_type='application/pdf')
-        fname = 'filename="tickets.pdf"'
-        if attachment:
-            fname = 'attachment; ' + fname
-        response['Content-Disposition'] = fname
-        response.write(pdf)
+    template = get_ticket_template(pf)
+
+    if template.is_html_format:
+        return HttpResponse(mp.generate_html(template))
+
+    pdf = mp.generate_pdf(template)
+    response = HttpResponse(content_type='application/pdf')
+    fname = 'filename="tickets.pdf"'
+    if attachment:
+        fname = 'attachment; ' + fname
+    response['Content-Disposition'] = fname
+    response.write(pdf)
 
     return response
 

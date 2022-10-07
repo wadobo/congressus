@@ -14,7 +14,7 @@ urlpatterns = [
     path('ticket/confirm/paypal/', views.confirm_paypal, name='confirm_paypal'),
     path('ticket/<str:order>/confirm/stripe/', views.confirm_stripe, name='confirm_stripe'),
 
-    path('ticket/template/<int:id>/preview/', views.template_preview, name='template_preview'),
+    path('ticket/template/<int:id>/preview/', views.TicketTemplatePreview.as_view(), name='template_preview'),
     path('ticket/email-confirm/<int:id>/preview/', views.email_confirm_preview, name='email_confirm_preview'),
 
     path('<str:ev>/', views.multipurchase, name='multipurchase'),
@@ -24,4 +24,3 @@ urlpatterns = [
     path('seats/auto/', views.autoseats, name='autoseats'),
     path('seats/bystr/', views.seats_by_str, name='seats_by_str'),
 ]
-
