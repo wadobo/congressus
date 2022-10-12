@@ -20,6 +20,7 @@ from congressus.admin import register
 from events.admin import EventMixin, EVFilter
 from events.ticket_html import TicketHTML
 from events.ticket_pdf import TicketPDF
+from events.models import TicketTemplate
 from tickets.utils import concat_pdf
 
 
@@ -94,6 +95,12 @@ class InvitationTypeAdmin(EventMixin, admin.ModelAdmin):
     list_display = ('name', 'event', 'is_pass', 'start', 'end')
     list_filter = ('is_pass', EVFilter)
     filter_horizontal = ('sessions', 'gates')
+
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        field = super().formfield_for_dbfield(db_field, **kwargs)
+        if db_field.name == 'template':
+            field.queryset = TicketTemplate.objects.all().order_by('name')
+        return field
 
     def event_filter_fields(self, slug):
         f = super().event_filter_fields(slug)
