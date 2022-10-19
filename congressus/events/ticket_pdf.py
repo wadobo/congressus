@@ -37,6 +37,10 @@ STYLE_CENTER = ParagraphStyle(name='center', fontSize=8, alignment=TA_CENTER)
 STYLE_LINK = ParagraphStyle(name='link', fontSize=14, alignment=TA_CENTER, textColor=colors.gray)
 STYLE_INFO = ParagraphStyle(name='info', alignment=TA_JUSTIFY, fontSize=7, textColor=colors.gray)
 STYLE_PARAGRAPH = ParagraphStyle(name='paragraph', fontSize=8, textColor=colors.gray)
+STYLE_SEAT = ParagraphStyle(name='seat', fontSize=12, alignment=TA_CENTER)
+STYLE_SEAT_CONTAIN = ParagraphStyle(name='seat', fontSize=16, alignment=TA_CENTER)
+STYLE_SEAT_H = ParagraphStyle(name='seat', fontSize=9, leading=8, alignment=TA_LEFT)
+STYLE_PRICE = ParagraphStyle(name='normal', fontSize=10)
 
 
 def short_hour(date_time):
@@ -151,8 +155,11 @@ class TicketPDF:
             self.story.append(Paragraph(previous_note, STYLE_CENTER))
 
     def _add_ticket_info(self) -> None:
-        price = Paragraph(self.price, STYLE_NORMAL)
+        price = Paragraph(self.price, STYLE_PRICE)
 
+        layout_name = self.ticket.seat_layout_name or ""
+        row = self.ticket.seat_row() or ""
+        col = self.ticket.seat_column() or ""
         if self.template.is_vertical:
             table = Table(
                 [
@@ -161,7 +168,20 @@ class TicketPDF:
                     [self.initials],
                     [self.text],
                     [self.date],
-                    [Paragraph(self.seatinfo, STYLE_CENTER)],
+                    [
+                        Table([
+                            [
+                                Paragraph(_("SECTOR"), STYLE_SEAT),
+                                Paragraph(_("ROW"), STYLE_SEAT),
+                                Paragraph(_("SEAT"), STYLE_SEAT),
+                            ],
+                            [
+                                Paragraph(layout_name, STYLE_SEAT_CONTAIN),
+                                Paragraph(col, STYLE_SEAT_CONTAIN),
+                                Paragraph(row, STYLE_SEAT_CONTAIN),
+                            ],
+                        ]),
+                    ],
                     [price],
                 ],
                 rowHeights=[None, None, 2.5 * cm, None, None, None, None],
@@ -185,7 +205,19 @@ class TicketPDF:
                     [self.codeimg, TTR(self.code), initials, price, self.codeimg],
                     ['', '', Paragraph(self.text, STYLE_NORMAL), '', ''],
                     ['', '', Paragraph(self.date, STYLE_NORMAL), '', ''],
-                    ['', '', Paragraph(self.seatinfo, STYLE_NORMAL), '', ''],
+                    ['', '', Table([
+                            [
+                                Paragraph(_("SECTOR"), STYLE_SEAT_H),
+                                Paragraph(_("ROW"), STYLE_SEAT_H),
+                                Paragraph(_("SEAT"), STYLE_SEAT_H),
+                            ],
+                            [
+                                Paragraph(layout_name, STYLE_SEAT_H),
+                                Paragraph(col, STYLE_SEAT_H),
+                                Paragraph(row, STYLE_SEAT_H),
+                            ],
+                        ]),
+                     '', ''],
                     ['', '', '', '', self.wcode],
                 ],
                 colWidths=[5 * cm, 0.5 * cm, 5.5 * cm, 2.3 * cm, 5 * cm],
@@ -338,20 +370,6 @@ class TicketPDF:
             return self.ticket.mp.order_tpv or ''
 
         return self.ticket.order_tpv or ''
-
-    @property
-    def seatinfo(self):
-        ticket = self.ticket
-        seatinfo = ''
-        if ticket.seat:
-            seatdata = {
-                'layout': ticket.seat_layout.name,
-                'row': ticket.seat_row(),
-                'col': ticket.seat_column()
-            }
-            seatinfo = _('SECTOR: %(layout)s ROW: %(row)s SEAT: %(col)s') % seatdata
-            seatinfo = f'<b>{seatinfo}</b>'
-        return seatinfo
 
     @property
     def price(self):

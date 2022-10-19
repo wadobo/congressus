@@ -324,7 +324,7 @@ class Session(models.Model):
         holded = self.is_seat_holded(layout, row, column, client)
         return not holded
 
-    def is_seat_holded(self, layout, row, column, client=None):
+    def is_seat_holded(self, layout, row: str, column: str, client=None):
         seat = row + '-' + column
         holds = self.seat_holds.filter(layout=layout, seat=seat)
         if client:
