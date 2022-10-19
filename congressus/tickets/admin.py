@@ -301,6 +301,10 @@ class MPAdmin(admin.ModelAdmin):
         }),
     )
 
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            obj.delete()
+
     def confirmed2(self, obj):
         icon = 'icon-no.svg'
         if obj.confirmed:
