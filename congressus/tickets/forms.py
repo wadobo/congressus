@@ -37,6 +37,9 @@ class RegisterForm(forms.ModelForm):
     def clean(self):
         data = super(RegisterForm, self).clean()
 
+        if self.request.user.is_admin:
+            return data
+
         if not self.session.event().ticket_sale_enabled:
             raise forms.ValidationError(_("Ticket sale isn't enabled"))
 
