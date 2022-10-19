@@ -136,19 +136,6 @@ class Invitation(models.Model, BaseExtraData):
         }
 
     @property
-    def seatinfo(self):
-        seatinfo = ''
-        if self.seat:
-            seatdata = {
-                'layout': self.seat_layout.name,
-                'row': self.seat_row(),
-                'col': self.seat_column()
-            }
-            seatinfo = _('SECTOR: %(layout)s ROW: %(row)s SEAT: %(col)s') % seatdata
-            seatinfo = f'<font size=11><b>{seatinfo}</b></font><br/>'
-        return seatinfo
-
-    @property
     def total_price(self) -> str:
         if self.sold_in_window:
             price = self.get_window_price()

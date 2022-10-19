@@ -1,12 +1,10 @@
 from django import forms
 from django.conf import settings
-from .models import Ticket
-from .models import MultiPurchase
-
-from events.models import Session, InvCode
-
-from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
+
+from events.models import Session
+from tickets.models import MultiPurchase, Ticket
 
 
 class RegisterForm(forms.ModelForm):

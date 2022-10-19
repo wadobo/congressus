@@ -30,6 +30,8 @@ from tickets.models import (
     Ticket,
     TicketSeatHold,
 )
+from tickets.factories import TicketFactory
+from tickets.factories import MultiPurchaseFactory
 from events.models import (
     Event,
     SeatLayout,
@@ -37,15 +39,14 @@ from events.models import (
     Session,
     Space,
 )
-
-from windows.utils import online_sale
-
-from .forms import RegisterForm
-from .forms import MPRegisterForm
-from tickets.utils import get_ticket_format
-from tickets.utils import get_seats_by_str
-from tickets.utils import search_seats
+from events.factories import SeatLayoutFactory, SessionFactory
 from invs.models import InvitationType
+from tickets.forms import MPRegisterForm
+from tickets.forms import RegisterForm
+from tickets.utils import get_seats_by_str
+from tickets.utils import get_ticket_format
+from tickets.utils import search_seats
+from windows.utils import online_sale
 
 
 class EventView(TemplateView):
@@ -549,19 +550,19 @@ class TicketTemplatePreview(UserPassesTestMixin, View):
         return u.is_authenticated and u.is_superuser
 
     def _fake_ticket(self) -> Ticket:
-        # fake ticket
-        ticket = Ticket(email='test@email.com', price=12, tax=21, confirm_sent=True)
-        ticket.gen_order(save=False)
-        ticket.created = timezone.now()
-
-        ticket.session = Session(
+        session = SessionFactory.build(
             name=formats.date_format(timezone.now(), "l"),
             template=self.template,
-            space=random.choice(list(Space.objects.all())),
-            # TODO: make fake space
-            start=timezone.now(),
-            end=timezone.now()
         )
+        seat_layout = SeatLayoutFactory.build(
+            map=session.space.seat_map,
+            name="C10",
+            gate__event=session.space.event,
+        )
+        ticket = TicketFactory.build(seat_layout=seat_layout, seat="150-100")
+        ticket.gen_order(save=False)
+        ticket.created = timezone.now()
+        ticket.session = session
         return ticket
 
     def get(self, request, id):
@@ -570,9 +571,9 @@ class TicketTemplatePreview(UserPassesTestMixin, View):
         ticket = self._fake_ticket()
 
         if self.template.is_html_format:
-            return HttpResponse(ticket.generate_html(self.template))
-
-        response = get_ticket_format(ticket, pf=id, attachment=False)
+            response = HttpResponse(ticket.generate_html(self.template))
+        else:
+            response = get_ticket_format(ticket, pf=id, attachment=False)
         return response
 
 
