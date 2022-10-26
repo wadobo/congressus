@@ -47,9 +47,9 @@
     {{ ticket.seatinfo }}
   </div>
 
-  {% if ticket.seat_layout_name %}
+  {% if ticket.seat_layout and ticket.seat_layout.name %}
     <div class="seatinfo_sector">
-      {{ ticket.seat_layout_name }}
+      {{ ticket.seat_layout.name }}
     </div>
   {% endif %}
 
