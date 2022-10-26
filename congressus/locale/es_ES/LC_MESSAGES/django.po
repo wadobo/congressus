@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-26 08:19+0200\n"
+"POT-Creation-Date: 2022-10-26 10:59+0200\n"
 "PO-Revision-Date: 2018-11-08 12:47+0100\n"
 "Last-Translator: danigm <danigm@gnome.org>\n"
 "Language-Team: Spanish; Castilian <es@gnome.org>\n"
@@ -913,50 +913,50 @@ msgstr "plantillas de entrada"
 msgid "Not found ticket template"
 msgstr "plantilla de entrada no encontrada"
 
-#: events/ticket_pdf.py:174 events/ticket_pdf.py:210 tickets/models.py:244
+#: events/ticket_pdf.py:176 events/ticket_pdf.py:212 tickets/models.py:244
 msgid "SECTOR"
 msgstr "SECTOR"
 
-#: events/ticket_pdf.py:175 events/ticket_pdf.py:211 tickets/models.py:245
+#: events/ticket_pdf.py:177 events/ticket_pdf.py:213 tickets/models.py:245
 msgid "ROW"
 msgstr "FILA"
 
-#: events/ticket_pdf.py:176 events/ticket_pdf.py:212 tickets/models.py:246
+#: events/ticket_pdf.py:178 events/ticket_pdf.py:214 tickets/models.py:246
 msgid "SEAT"
 msgstr "ASIENTO"
 
-#: events/ticket_pdf.py:304 tickets/models.py:434 tickets/models.py:558
+#: events/ticket_pdf.py:306 tickets/models.py:434 tickets/models.py:558
 msgid "T"
 msgstr "E"
 
-#: events/ticket_pdf.py:318 tickets/models.py:442 tickets/models.py:566
+#: events/ticket_pdf.py:320 tickets/models.py:442 tickets/models.py:566
 #, python-format
 msgid "Ticket %(space)s %(session)s"
 msgstr "Entrada %(space)s %(session)s"
 
-#: events/ticket_pdf.py:337 invs/models.py:133 tickets/models.py:452
+#: events/ticket_pdf.py:339 invs/models.py:133 tickets/models.py:452
 #: tickets/models.py:576
 #, python-format
 msgid "%(date)s (%(start)s)"
 msgstr "%(date)s (%(start)s)"
 
-#: events/ticket_pdf.py:338 tickets/models.py:453 tickets/models.py:577
+#: events/ticket_pdf.py:340 tickets/models.py:453 tickets/models.py:577
 #, python-format
 msgid "%(date)s (%(start)s to %(end)s)"
 msgstr "%(date)s (%(start)s a %(end)s)"
 
-#: events/ticket_pdf.py:339 tickets/models.py:454 tickets/models.py:578
+#: events/ticket_pdf.py:341 tickets/models.py:454 tickets/models.py:578
 #, python-format
 msgid "%(date)s"
 msgstr "%(date)s"
 
-#: events/ticket_pdf.py:385 invs/models.py:148 tickets/models.py:480
+#: events/ticket_pdf.py:387 invs/models.py:148 tickets/models.py:480
 #: tickets/models.py:598
 #, python-format
 msgid "%4.2f €"
 msgstr "%4.2f €"
 
-#: events/ticket_pdf.py:388 invs/models.py:151 tickets/models.py:483
+#: events/ticket_pdf.py:390 invs/models.py:151 tickets/models.py:483
 #: tickets/models.py:601
 msgid "TAX INC."
 msgstr "IVA INC."
