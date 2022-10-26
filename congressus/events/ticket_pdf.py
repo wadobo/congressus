@@ -157,7 +157,9 @@ class TicketPDF:
     def _add_ticket_info(self) -> None:
         price = Paragraph(self.price, STYLE_PRICE)
 
-        layout_name = self.ticket.seat_layout_name or ""
+        layout_name = ""
+        if self.ticket.seat_layout and self.ticket.seat_layout.name:
+            layout_name = self.ticket.seat_layout.name
         row = self.ticket.seat_row() or ""
         col = self.ticket.seat_column() or ""
         if self.template.is_vertical:
@@ -177,8 +179,8 @@ class TicketPDF:
                             ],
                             [
                                 Paragraph(layout_name, STYLE_SEAT_CONTAIN),
-                                Paragraph(col, STYLE_SEAT_CONTAIN),
                                 Paragraph(row, STYLE_SEAT_CONTAIN),
+                                Paragraph(col, STYLE_SEAT_CONTAIN),
                             ],
                         ]),
                     ],
@@ -213,8 +215,8 @@ class TicketPDF:
                             ],
                             [
                                 Paragraph(layout_name, STYLE_SEAT_H),
-                                Paragraph(col, STYLE_SEAT_H),
                                 Paragraph(row, STYLE_SEAT_H),
+                                Paragraph(col, STYLE_SEAT_H),
                             ],
                         ]),
                      '', ''],
