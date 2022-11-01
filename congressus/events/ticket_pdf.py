@@ -170,7 +170,7 @@ class TicketPDF:
                     [self.initials],
                     [self.text],
                     [self.date],
-                    [
+                    [] if not self.ticket.seat else [
                         Table([
                             [
                                 Paragraph(_("SECTOR"), STYLE_SEAT),
@@ -207,7 +207,7 @@ class TicketPDF:
                     [self.codeimg, TTR(self.code), initials, price, self.codeimg],
                     ['', '', Paragraph(self.text, STYLE_NORMAL), '', ''],
                     ['', '', Paragraph(self.date, STYLE_NORMAL), '', ''],
-                    ['', '', Table([
+                    ['', '', '' if not self.ticket.seat else Table([
                             [
                                 Paragraph(_("SECTOR"), STYLE_SEAT_H),
                                 Paragraph(_("ROW"), STYLE_SEAT_H),
