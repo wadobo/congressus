@@ -206,7 +206,7 @@ class BaseTicketMixing:
                 seat=t.seat, type__in=['H', 'C', 'P']).delete()
 
     def remove_hold_seats(self):
-        all_tk = []
+        all_tk: list[Ticket] = []
         if self.is_mp():
             all_tk = self.tickets.filter(session__space__numbered=True)
         elif self.session.space.numbered:
@@ -238,6 +238,14 @@ class BaseTicketMixing:
 
 
 class BaseExtraData:
+    def seatinfo(self):
+        seatinfo = ""
+        if self.seat:
+            seatinfo += _('SECTOR') + ": " + self.seat_layout.name
+            seatinfo += _('ROW') + ": " + self.seat_row()
+            seatinfo += _('SEAT') + ": " + self.seat_column()
+        return seatinfo
+
     def get_extra_data(self, key):
         data = {}
         if not self.extra_data:
@@ -338,7 +346,7 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
             if self.confirmed:
                 self.confirmed_date = timezone.now()
 
-        super(MultiPurchase, self).save(*args, **kw)
+        super().save(*args, **kw)
 
     def space(self):
         ''' Multiple spaces '''
@@ -460,19 +468,6 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
     #    return ''
 
     @property
-    def seatinfo(self):
-        seatinfo = ''
-        if self.seat:
-            seatdata = {
-                'layout': self.seat_layout.name,
-                'row': self.seat_row(),
-                'col': self.seat_column()
-            }
-            seatinfo = _('SECTOR: %(layout)s ROW: %(row)s SEAT: %(col)s') % seatdata
-            seatinfo = f'<font size=11><b>{seatinfo}</b></font><br/>'
-        return seatinfo
-
-    @property
     def total_price(self) -> str:
         if self.sold_in_window:
             price = self.get_window_price()
@@ -589,19 +584,6 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
             'start': short_hour(sstart),
             'end': short_hour(send),
         }
-
-    @property
-    def seatinfo(self):
-        seatinfo = ''
-        if self.seat:
-            seatdata = {
-                'layout': self.seat_layout.name,
-                'row': self.seat_row(),
-                'col': self.seat_column()
-            }
-            seatinfo = _('SECTOR: %(layout)s ROW: %(row)s SEAT: %(col)s') % seatdata
-            seatinfo = f'<font size=11><b>{seatinfo}</b></font><br/>'
-        return seatinfo
 
     @property
     def total_price(self) -> str:

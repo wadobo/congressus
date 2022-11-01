@@ -133,7 +133,8 @@ class GateAdmin(EventMixin, admin.ModelAdmin):
 
 
 class TicketTemplateAdmin(admin.ModelAdmin):
-    list_display = ('name', )
+    list_display = ('name', 'is_html_format')
+    list_filter = ('is_html_format',)
 
 
 class DiscountAdmin(admin.ModelAdmin):

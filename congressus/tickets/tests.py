@@ -1,14 +1,19 @@
 import pytest
 from unittest.mock import patch
 
+from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
+from django.contrib.auth.models import User
 from django.test import Client
 from django.urls import reverse
 
 import tickets.utils
 import tickets.views
 from events.factories import EventFactory, TicketTemplateFactory
-from tickets.factories import MultiPurchaseFactory
+from events.factories import SessionFactory
+from events.factories import SeatLayoutFactory
+from tickets.factories import MultiPurchaseFactory, TicketFactory
 from tickets.models import MultiPurchase
+from tickets.models import TicketSeatHold
 from windows.factories import TicketWindowFactory, TicketWindowSaleFactory
 from windows.models import TicketWindowSale
 
@@ -33,3 +38,46 @@ def test_ticket_thanks_template_from_window_ticket():
         response = client.post(reverse('thanks', kwargs={"order": mp.order }), {"ticket": mp.order})
         assert response.status_code == 200
         mock.assert_called_with(ticket_template)
+
+
+@pytest.mark.django_db
+def test_remove_mp_from_admin_should_free_seat():
+    session = SessionFactory(space__numbered=True)
+    seat_layout = SeatLayoutFactory(
+        map=session.space.seat_map,
+        gate__event=session.space.event,
+    )
+    mp = MultiPurchaseFactory(ev=session.space.event, confirmed=False)
+    TicketFactory(mp=mp, session=session, seat_layout=seat_layout, seat="1-1")
+    ticket_hold = TicketSeatHold(
+        session=session,
+        layout=seat_layout,
+        seat="1-1",
+        type='R',
+    )
+    ticket_hold.save()
+
+    # Seat busy
+    assert MultiPurchase.objects.count() == 1
+    assert session.is_seat_available(seat_layout.id, "1", "1") == False
+
+    delete_confirmation_data = {
+        ACTION_CHECKBOX_NAME: mp.pk,
+        "action": "delete_selected",
+        "post": "yes",
+    }
+    client = Client()
+    superuser = User.objects.create_superuser(
+        username="super",
+        password="secret",
+        email="super@example.com",
+    )
+    client.force_login(superuser)
+
+    url = reverse('admin:tickets_multipurchase_changelist')
+    response = client.post(url, delete_confirmation_data, follow=True)
+    assert response.status_code == 200
+
+    # Seat free
+    assert MultiPurchase.objects.count() == 0
+    assert session.is_seat_available(seat_layout.id, "1", "1") == True
