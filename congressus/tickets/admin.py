@@ -24,7 +24,7 @@ from tickets.models import (
 from admin_csv import CSVMixin
 
 from .filters import TicketWindowFilter
-from .filters import SingleTicketWindowFilter
+from tickets.filters import SessionFilter, SingleTicketWindowFilter
 from windows.models import TicketWindowSale
 from windows.utils import online_sale
 
@@ -84,10 +84,17 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
     list_display = ('order', 'order_tpv2', 'session2', 'cseat', 'twin',
                     'created2', 'confirmed', 'used',
                     'email', 'payment', 'payment_method', 'price2', 'event')
-    list_filter = (('created', DateRangeFilter), 'confirmed',
-                   'payment_method', 'used', SingleTicketWindowFilter,
-                   'event_name', 'seat_layout', 'session',
-                   ('session__space', admin.RelatedOnlyFieldListFilter))
+    list_filter = (
+        ('created', DateRangeFilter),
+        'confirmed',
+        'payment_method',
+        'used',
+        SingleTicketWindowFilter,
+        'event_name',
+        'seat_layout',
+        SessionFilter,
+        ('session__space', admin.RelatedOnlyFieldListFilter),
+    )
     search_fields = ('order', 'order_tpv', 'email', 'mp__order', 'mp__order_tpv', 'seat')
     date_hierarchy = 'created'
     actions = [confirm, unconfirm, 'mark_used', 'mark_no_used']
@@ -282,12 +289,12 @@ class MPAdmin(admin.ModelAdmin):
         'confirmed', 'confirmed_date',
         'num_tickets', 'real_price', 'payment',
         'formated_extra_data',
-        'tpv_error', 'tpv_error_info', 'ticket_window_code'
+        'tpv_error', 'tpv_error_info', 'ticket_window_code', 'created',
     )
 
     fieldsets = (
         (None, {
-            'fields': ('order_tpv', 'order', 'ev', 'ticket_window_code')
+            'fields': ('order_tpv', 'order', 'ev', 'ticket_window_code', 'created')
         }),
         (_('Personal info'), {
             'fields': (('email', 'confirm_sent'), 'formated_extra_data')
