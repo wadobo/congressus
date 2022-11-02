@@ -44,10 +44,10 @@ class SessionFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         if hasattr(model_admin, "EVENT"):
-            sessions = Session.objects.filter(space__event__slug=model_admin.EVENT)
+            sessions = Session.objects.filter(space__event__slug=model_admin.EVENT).select_related("space")
         else:
-            sessions = Session.objects.all()
-        return [(session.id, session.name) for session in sessions]
+            sessions = Session.objects.select_related("space")
+        return [(session.id, f"{session.name} {session.space.name}") for session in sessions]
 
     def queryset(self, request, queryset):
         if not self.value():
