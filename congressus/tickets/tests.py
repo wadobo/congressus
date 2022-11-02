@@ -1,21 +1,42 @@
-import pytest
+import logging
 from unittest.mock import patch
+
+import pytest
 
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.auth.models import User
 from django.test import Client
 from django.urls import reverse
+from django.http.response import Http404
 
 import tickets.utils
 import tickets.views
 from events.factories import EventFactory, TicketTemplateFactory
-from events.factories import SessionFactory
 from events.factories import SeatLayoutFactory
+from events.factories import SessionFactory
 from tickets.factories import MultiPurchaseFactory, TicketFactory
-from tickets.models import MultiPurchase
+from tickets.models import MultiPurchase, Ticket
 from tickets.models import TicketSeatHold
+from tickets.views import get_ticket_or_404
 from windows.factories import TicketWindowFactory, TicketWindowSaleFactory
 from windows.models import TicketWindowSale
+
+
+@pytest.mark.django_db
+def test_get_ticket_error(caplog):
+    caplog.set_level(logging.INFO)
+
+    with pytest.raises(Http404):
+        get_ticket_or_404(order_tpv='2110999834')
+
+
+@pytest.mark.django_db
+def test_get_ticket_ok():
+    ticket_db = TicketFactory()
+
+    ticket = get_ticket_or_404(order_tpv=ticket_db.order_tpv)
+    assert isinstance(ticket, Ticket)
+
 
 
 @pytest.mark.django_db

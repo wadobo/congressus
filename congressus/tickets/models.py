@@ -98,25 +98,26 @@ class BaseTicketMixing:
         self.order_tpv += ''.join(random.choice(chars) for _ in range(6))
         self.save()
 
-    def get_price(self):
+    def get_price(self, mp=None):
         total = self.session.price
-        if self.mp and self.mp.discount and self.mp.discount.unit:
-            total = self.mp.discount.apply_to(total)
+        if mp is None:
+            mp = self.mp
+        if mp and mp.discount and mp.discount.unit:
+            total = mp.discount.apply_to(total)
         return total
 
     def get_tax(self):
         return self.session.tax
 
-    def get_window_price(self, window=None):
+    def get_window_price(self, window=None, mp=None):
         if not window:
-            from windows.models import TicketWindowSale
-            sale = TicketWindowSale.objects.get(purchase__tickets=self)
-            total = sale.window.get_price(self.session)
-        else:
-            total = window.get_price(self.session)
+            window = self.mp.sales.first().window
+        total = window.get_price(self.session)
 
-        if self.mp and self.mp.discount and self.mp.discount.unit:
-            total = self.mp.discount.apply_to(total)
+        if mp is None:
+            mp = self.mp
+        if mp and mp.discount and mp.discount.unit:
+            total = mp.discount.apply_to(total)
         return total
 
     def send_reg_email(self):
@@ -146,7 +147,10 @@ class BaseTicketMixing:
         # email to user
         e = self.event().get_email()
 
-        extra = json.loads(self.extra_data)
+        extra = {}
+        if self.extra_data:
+            extra = json.loads(self.extra_data)
+
         if e:
             subject = Template(e.subject).render(Context({'ticket': self, 'extra': extra}))
             body = Template(e.body).render(Context({'ticket': self, 'extra': extra}))
@@ -348,6 +352,39 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
 
         super().save(*args, **kw)
 
+    @property
+    def price(self):
+        total = sum([i.get_price(mp=self) for i in self.tickets.all()])
+        if self.discount and not self.discount.unit:
+            total = self.discount.apply_to(total)
+        return total
+
+    @property
+    def real_price(self):
+        tickets = self.tickets.all()
+        if not len(tickets):
+            return 0
+
+        if tickets[0].sold_in_window:
+            sale = self.sales.all()[0]
+            total = sum(i.get_window_price(window=sale.window, mp=self) for i in tickets)
+        else:
+            total = sum(i.get_price(mp=self) for i in tickets)
+        if self.discount and not self.discount.unit:
+            total = self.discount.apply_to(total)
+        return total
+
+    @property
+    def num_tickets(self) -> int:
+        return len(self.tickets.all())
+
+    @property
+    def ticket_window_code(self) -> str:
+        tws = [sale.window.code for sale in self.sales.all()]
+        if not tws:
+            return '-'
+        return tws[0]
+
     def space(self):
         ''' Multiple spaces '''
         return None
@@ -356,7 +393,7 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
         return self.ev
 
     def get_price(self):
-        total = sum(i.get_price() for i in self.tickets.all())
+        total = sum(i.get_price(mp=self) for i in self.all_tickets())
         if self.discount and not self.discount.unit:
             total = self.discount.apply_to(total)
         return total
@@ -365,19 +402,20 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
         return self.sales.first()
 
     def get_window_price(self):
-        total = sum(i.get_window_price() for i in self.tickets.all())
+        total = sum(i.get_window_price() for i in self.all_tickets())
         if self.discount and not self.discount.unit:
             total = self.discount.apply_to(total)
         return total
 
     def get_real_price(self):
-        if not self.tickets.count():
+        all_tickets = self.all_tickets()
+        if not len(all_tickets):
             return 0
 
-        if self.tickets.first().sold_in_window:
-            total = sum(i.get_window_price() for i in self.tickets.all())
+        if all_tickets[0].sold_in_window:
+            total = sum(i.get_window_price() for i in all_tickets)
         else:
-            total = sum(i.get_price() for i in self.tickets.all())
+            total = sum(i.get_price(mp=self) for i in all_tickets)
         if self.discount and not self.discount.unit:
             total = self.discount.apply_to(total)
         return total
@@ -393,7 +431,7 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
 
         files = []
         for ticket in self.all_tickets():
-            pdf = TicketPDF(ticket, template=template).generate(asbuf=True)
+            pdf = TicketPDF(ticket, template=template or ticket.session.template).generate(asbuf=True)
             files.append(pdf)
         return concat_pdf(files)
 
@@ -401,7 +439,7 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
         return TicketHTML(self.all_tickets(), template=template).generate()
 
     def all_tickets(self):
-        return self.tickets.all().order_by('session__start')
+        return self.tickets.select_related('session', 'session__template').order_by('session__start')
 
     def delete(self, *args, **kwargs):
         self.remove_hold_seats()
@@ -415,8 +453,7 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
         prefix = 'ONL'
         postfix = timezone.localtime(self.created).strftime('%m%d%H%M')
 
-        from windows.models import TicketWindowSale
-        prefix = TicketWindowSale.objects.values_list("window__code", flat=True).get(purchase=self)
+        self.sales.values_list("window__code", flat=True)
 
         return prefix + postfix
 
@@ -622,7 +659,7 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
         if confirm and self.confirmed:
             self.confirmed_date = timezone.now()
 
-        super(Ticket, self).save(*args, **kw)
+        super().save(*args, **kw)
 
     def delete(self, *args, **kwargs):
         self.remove_hold_seats()

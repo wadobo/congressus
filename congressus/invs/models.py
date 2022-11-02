@@ -188,7 +188,13 @@ class Invitation(models.Model, BaseExtraData):
 
     @staticmethod
     def gen_orders(starts='', amount=10) -> tuple[str]:
+        starts = starts or settings.INVITATION_ORDER_START
+
         length = 8
+        if hasattr(settings, 'ORDER_SIZE'):
+            length = settings.ORDER_SIZE
+        length -= len(starts)
+
         orders = set()
         chars = string.ascii_uppercase + string.digits
         while len(orders) < amount:
@@ -300,7 +306,7 @@ class InvitationGenerator(models.Model):
     created = models.DateTimeField(_('created at'), auto_now_add=True)
 
     def __str__(self):
-        return '{} -{} - {}'.format(self.type, self.amount, self.concept)
+        return '{} -{} - {}'.format(self.type.name, self.amount, self.concept)
 
     class Meta:
         verbose_name = _('invitation generator')

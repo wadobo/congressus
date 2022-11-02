@@ -280,6 +280,7 @@ CACHES = {
         'LOCATION': 'session_cache',
     }
 }
+CSV_TICKET_FIELDS = env_list('CSV_TICKET_FIELDS', [])
 
 # Debug toolbar options
 DEBUG_TOOLS = env.get('DEBUG_TOOLS', 'True') == 'True'

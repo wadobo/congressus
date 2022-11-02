@@ -1,8 +1,13 @@
+import csv
+from io import StringIO
+
 from django import forms
+from django.db.models import Prefetch
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.flatpages.admin import FlatpageForm, FlatPageAdmin
 from django.contrib.flatpages.models import FlatPage
+from django.http import HttpResponse
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import date_format
@@ -10,22 +15,26 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from tinymce.widgets import TinyMCE
 
-from .models import Ticket
-from .models import MultiPurchase
-from .models import TicketWarning
-from .models import TicketSeatHold
+from tickets.models import (
+    MultiPurchase,
+    Ticket,
+    TicketSeatHold,
+    TicketWarning,
+)
 from admin_csv import CSVMixin
 
 from .filters import TicketWindowFilter
 from .filters import SingleTicketWindowFilter
 from windows.models import TicketWindowSale
-from django.core.exceptions import MultipleObjectsReturned
 from windows.utils import online_sale
 
 from events.models import TicketField
 
 from extended_filters.filters import DateRangeFilter
 from congressus.admin import register
+
+
+CACHE_TICKET_FIELDS = {tf.id: tf.label for tf in TicketField.objects.filter(pk__in=settings.CSV_TICKET_FIELDS)}
 
 
 def confirm(modeladmin, request, queryset):
@@ -42,6 +51,33 @@ def unconfirm(modeladmin, request, queryset):
 unconfirm.short_description = _("Manual unconfirm")
 
 
+def get_csv(modeladmin, request, queryset):
+    csv_fields = [
+        'email',
+        'order', 'order_tpv',
+        'confirmed', 'confirmed_date',
+        'price', 'num_tickets', 'ticket_window_code', 'payment_method',
+        'ev', 'created'
+    ]
+    extra_data = queryset[0].ev.ticket_fields() if len(queryset) else []
+    header = [_(field) for field in csv_fields + extra_data]
+
+    content = StringIO()
+    writer = csv.writer(content, delimiter=',')
+    writer.writerow(header)
+
+    for mp in queryset:
+        row = [str(getattr(mp, field)) for field in csv_fields]
+        row += [mp.get_extra_data(label) for label in extra_data]
+        writer.writerow(row)
+
+    response = HttpResponse(content_type='application/csv')
+    response['Content-Disposition'] = 'filename="compras_multiples.csv"'
+    response.write(content.getvalue().strip('\r\n'))
+    return response
+get_csv.short_description = _("Download csv")
+
+
 class TicketAdmin(CSVMixin, admin.ModelAdmin):
     list_per_page = 20
     list_max_show_all = 800
@@ -50,9 +86,9 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
                     'email', 'payment', 'payment_method', 'price2', 'event')
     list_filter = (('created', DateRangeFilter), 'confirmed',
                    'payment_method', 'used', SingleTicketWindowFilter,
-                   'event_name',
+                   'event_name', 'seat_layout', 'session',
                    ('session__space', admin.RelatedOnlyFieldListFilter))
-    search_fields = ('order', 'order_tpv', 'email', 'mp__order', 'mp__order_tpv')
+    search_fields = ('order', 'order_tpv', 'email', 'mp__order', 'mp__order_tpv', 'seat')
     date_hierarchy = 'created'
     actions = [confirm, unconfirm, 'mark_used', 'mark_no_used']
 
@@ -79,44 +115,21 @@ class TicketAdmin(CSVMixin, admin.ModelAdmin):
                        'start', 'end')
         }),
     )
-
-    @property
-    def csv_fields(self):
-        data = [
-            'email',
-
-            'order',
-            'order_tpv',
-
-            'confirmed',
-            'confirmed_date',
-
-            'price2',
-            'cseat',
-            'mp',
-            'twin',
-
-            'event_name',
-            'space_name',
-            'session_name',
-            'created',
-
-            'used',
-            'used_at',
-        ]
-
-        if getattr(settings, 'CSV_TICKET_FIELDS'):
-            data += ['ticket_field_' + i for i in settings.CSV_TICKET_FIELDS]
-
-        return data
+    csv_fields = [
+        'email',
+        'order', 'order_tpv',
+        'confirmed', 'confirmed_date',
+        'price2', 'cseat', 'mp', 'twin',
+        'event_name', 'space_name', 'session_name', 'created',
+        'used', 'used_at',
+    ] + ['ticket_field_' + i for i in settings.CSV_TICKET_FIELDS]
 
     def __getattr__(self, value):
         if value.startswith('ticket_field_'):
-            pk = value.split("_")[-1]
-            field = TicketField.objects.get(pk=pk)
+            label = CACHE_TICKET_FIELDS.get(value.split("_")[-1])
             def f(obj):
-                return obj.get_extra_data(field.label)
-            f.short_description = field.label
+                return obj.get_extra_data(label)
+            f.short_description = label
             return f
         raise AttributeError
 
@@ -232,72 +245,56 @@ def link_online_sale(modeladmin, request, queryset):
 link_online_sale.short_description = _("Link online sale")
 
 
-class MPAdmin(CSVMixin, admin.ModelAdmin):
+class MPAdmin(admin.ModelAdmin):
     list_per_page = 20
     list_max_show_all = 800
-    list_display = ('order_tpv', 'twin', 'created', 'confirmed2', 'email', 'ntickets', 'price', 'payment_method', 'event')
+    list_display = ('order_tpv', 'ticket_window_code', 'created', 'confirmed2', 'email', 'num_tickets', 'price', 'payment_method', 'event')
     list_filter = (('created', DateRangeFilter), 'confirmed', 'payment_method',
                    TicketWindowFilter,
                    ('ev', admin.RelatedOnlyFieldListFilter), 'tpv_error')
 
     search_fields = ('order', 'order_tpv', 'email', 'extra_data')
     date_hierarchy = 'created'
-    actions = [confirm, unconfirm, link_online_sale]
+    actions = [confirm, unconfirm, link_online_sale, get_csv]
     inlines = [TicketInline, ]
 
-    @property
-    def csv_fields(self):
-        data = [
-            'email',
-
-            'order',
-            'order_tpv',
-
-            'confirmed',
-            'confirmed_date',
-
-            'price',
-            'ntickets',
-            'twin',
-            'payment_method',
-
-            'ev',
-            'created',
-        ]
-
-        if getattr(settings, 'CSV_TICKET_FIELDS'):
-            data += ['ticket_field_' + i for i in settings.CSV_TICKET_FIELDS]
-
-        return data
+    def get_queryset(self, request):
+        return (
+            super().get_queryset(request)
+            .select_related('ev', 'discount')
+            .prefetch_related(
+                Prefetch('sales', queryset=TicketWindowSale.objects.select_related('window')),
+                Prefetch('tickets', queryset=Ticket.objects.select_related('session', 'session__template', 'session__space').order_by('session__start')),
+            ).all()
+        )
 
     def __getattr__(self, value):
         if value.startswith('ticket_field_'):
-            pk = value.split("_")[-1]
-            field = TicketField.objects.get(pk=pk)
+            label = CACHE_TICKET_FIELDS.get(value.split("_")[-1])
             def f(obj):
-                return obj.get_extra_data(field.label)
-            f.short_description = field.label
+                return obj.get_extra_data(label)
+            f.short_description = label
             return f
         raise AttributeError
 
     readonly_fields = (
         'order_tpv', 'order', 'ev',
         'confirmed', 'confirmed_date',
-        'ntickets', 'price', 'payment',
+        'num_tickets', 'real_price', 'payment',
         'formated_extra_data',
-        'tpv_error', 'tpv_error_info', 'twin'
+        'tpv_error', 'tpv_error_info', 'ticket_window_code'
     )
 
     fieldsets = (
         (None, {
-            'fields': ('order_tpv', 'order', 'ev', 'twin')
+            'fields': ('order_tpv', 'order', 'ev', 'ticket_window_code')
         }),
         (_('Personal info'), {
             'fields': (('email', 'confirm_sent'), 'formated_extra_data')
         }),
         (_('Extra info'), {
             'fields': (('confirmed', 'confirmed_date'),
-                       ('ntickets', 'price'),
+                       ('num_tickets', 'real_price'),
                        'discount', 'payment', 'payment_method',
                        'tpv_error', 'tpv_error_info',
                       )
@@ -320,35 +317,11 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
 
 
     def payment(self, obj):
-        try:
-            tws = TicketWindowSale.objects.get(purchase=obj)
-        except:
+        tws = obj.sales.all()
+        if not tws:
             return '-'
-        return tws.get_payment_display()
+        return tws[0].get_payment_display()
     payment.short_description = _('payment')
-
-    def ntickets(self, obj):
-        return obj.tickets.count()
-    ntickets.short_description = _('ntickets')
-
-    def twin(self, obj):
-        try:
-            tws = TicketWindowSale.objects.get(purchase=obj)
-        except MultipleObjectsReturned:
-            tws = TicketWindowSale.objects.filter(purchase=obj).first()
-            tws.id = None
-
-            TicketWindowSale.objects.filter(purchase=obj).delete()
-            tws.save()
-        except:
-            return '-'
-        prefix = tws.window.code
-        return prefix
-    twin.short_description = _('ticket window')
-
-    def price(self, obj):
-        return obj.get_real_price()
-    price.short_description = _('price')
 
     def formated_extra_data(self, obj):
         extras = obj.get_extras_dict()
@@ -360,8 +333,14 @@ class MPAdmin(CSVMixin, admin.ModelAdmin):
     formated_extra_data.short_description = _('extra data')
 
     def event_filter(self, request, slug):
-        qs = super().get_queryset(request)
-        return qs.filter(ev__slug=slug)
+        return (
+            super().get_queryset(request).filter(ev__slug=slug)
+            .select_related('ev', 'discount')
+            .prefetch_related(
+                Prefetch('sales', queryset=TicketWindowSale.objects.select_related('window')),
+                Prefetch('tickets', queryset=Ticket.objects.select_related('session', 'session__template', 'session__space').order_by('session__start')),
+            ).all()
+        )
 
 
 class TicketWarningAdmin(admin.ModelAdmin):

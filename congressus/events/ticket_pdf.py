@@ -152,7 +152,7 @@ class TicketPDF:
     def _add_previous_note(self) -> None:
         previous_note = self.template.previous_note
         if previous_note:
-            self.story.append(Paragraph(previous_note, STYLE_NORMAL))
+            self.story.append(Paragraph(previous_note, STYLE_CENTER))
 
     def _add_ticket_info(self) -> None:
         price = Paragraph(self.price, STYLE_PRICE)

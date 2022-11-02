@@ -9,21 +9,21 @@ class TicketWindowFilter(admin.SimpleListFilter):
     parameter_name = 'twin'
 
     def lookups(self, request, model_admin):
-        q = TicketWindow.objects.all()
+        ticket_windows = TicketWindow.objects.select_related('event')
         if hasattr(model_admin, "EVENT"):
-            q = q.filter(event__slug=model_admin.EVENT)
-        ws = [(w.id, '%s - %s' % (w.event, w.name)) for w in q]
+            ticket_windows = ticket_windows.filter(event__slug=model_admin.EVENT)
+        ws = [(tw.id, '%s - %s' % (tw.event, tw.name)) for tw in ticket_windows]
         ws = [('--', _('without ticket window'))] + ws
         return ws
 
     def queryset(self, request, queryset):
         if not self.value():
-            return queryset
+            return queryset.select_related('ev')
 
         if self.value() != '--':
-            return queryset.filter(sales__window__id=self.value())
+            return queryset.filter(sales__window__id=self.value()).select_related('ev')
         else:
-            return queryset.filter(sales__window=None)
+            return queryset.filter(sales__window=None).select_related('ev')
 
 
 class SingleTicketWindowFilter(TicketWindowFilter):

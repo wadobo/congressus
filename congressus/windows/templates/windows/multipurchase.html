@@ -170,7 +170,6 @@
       var staff = '{{ request.user.is_staff }}' == 'True' ? true : false;
 
       function singlerow_ajax(command) {
-          console.log("STAFF", staff);
           $.ajax({
               type: "POST",
               url: '/singlerow/',

@@ -1,0 +1,45 @@
+{% extends "base-admin.html" %}
+{% load i18n %}
+{% load static %}
+{% load dashboard %}
+
+{% block extrahead %}
+<link href="{% static "css/report.css" %}?v=4.0" rel="stylesheet">
+{% endblock %}
+
+{% block extrabody %}
+<style>
+.grid {
+    display: grid;
+    grid-template-columns: repeat({{ table.0|length }}, auto);
+}
+.col {
+    border: 1px solid #ddd;
+    padding: 5px;
+}
+.thead {
+    background-color: #337ab7;
+    color: white;
+}
+.chead {
+    font-weight: bold;
+}
+</style>
+{% endblock %}
+
+{% block title %} {% trans "Access Report" %} {% endblock %}
+
+{% block content %}
+<h1>{% trans "Access Report" %}</h1>
+
+<div class="grid">
+    {% for row in table %}
+        {% for col in row %}
+            <div class="col {% if forloop.parentloop.first %}thead{% elif forloop.first %}chead{% else %}tbody{% endif %}" >
+                {{ col }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+</div>
+
+{% endblock %}

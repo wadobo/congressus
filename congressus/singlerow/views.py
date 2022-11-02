@@ -1,19 +1,12 @@
-import datetime
-import json
-import os
-
 from django.db.models import Count
 from django.conf import settings
-from django.contrib import messages
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect, render
-from django.utils import timezone
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, View
 
-from .models import SingleRowTail, SingleRowConfig
+from singlerow.models import SingleRowTail, SingleRowConfig
 from events.models import Event
 from windows.models import TicketWindow
 
