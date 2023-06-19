@@ -1,9 +1,9 @@
 from django.contrib import admin
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 try:
     import theme
-except:
+except Exception:
     admin.site.site_title = _('Congressus admin')
     admin.site.site_header = _('Congressus admin')

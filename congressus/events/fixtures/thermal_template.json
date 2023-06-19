@@ -1,7 +1,7 @@
 [
     {
         "model": "events.tickettemplate",
-        "pk": "null",
+        "pk": 1,
         "fields": {
             "name": "thermal",
             "header": "",

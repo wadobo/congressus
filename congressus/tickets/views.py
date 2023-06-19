@@ -20,7 +20,7 @@ from django.template import Context
 from django.template import Template
 from django.urls import reverse
 from django.utils import formats, timezone
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, View
 from django.views.generic.edit import CreateView
@@ -65,7 +65,7 @@ class LastEventView(View):
     def get(self, request):
         try:
             ev = Event.objects.filter(active=True)[0]
-        except:
+        except Exception:
             raise Http404
 
         return redirect('multipurchase', ev=ev.slug)
@@ -453,7 +453,7 @@ class ConfirmPaypal(View):
         try:
             payment_id = request.POST['payment_id']
             p = paypalrestsdk.Payment.find(payment_id)
-        except:
+        except Exception:
             raise Http404
 
         tr = p.transactions[0]
@@ -517,7 +517,7 @@ class AutoSeats(View):
 
         try:
             amount = int(req.get('amount_seats'))
-        except:
+        except Exception:
             return HttpResponse(json.dumps(ctx), content_type="application/json")
 
         session = Session.objects.get(id=session)
@@ -633,7 +633,7 @@ class SeatsByStr(View):
                     total += len(val)
                 ctx['total'] = total
                 ctx['values'] = dic.__str__()
-            except:
+            except Exception:
                 ctx['error'] = 'invalid'
         else:
             ctx['error'] = _('neccessary select invitation type')

@@ -67,8 +67,6 @@ INSTALLED_APPS = [
 
     # 3rd party
     'crispy_forms',
-    'admin_csv',
-    'autoslug',
     'maintenancemode',
     'tinymce',
 
@@ -268,7 +266,7 @@ if os.path.exists(os.path.join(BASE_DIR, 'theme')):
     try:
         from theme.settings import *
         REAL_EXTRA_APPS += [i for i in EXTRA_APPS if not i in REAL_EXTRA_APPS]
-    except:
+    except Exception:
         pass
 
 if REAL_EXTRA_APPS:
@@ -281,6 +279,8 @@ CACHES = {
     }
 }
 CSV_TICKET_FIELDS = env_list('CSV_TICKET_FIELDS', [])
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # Debug toolbar options
 DEBUG_TOOLS = env.get('DEBUG_TOOLS', 'True') == 'True'
