@@ -220,7 +220,7 @@ function recalcSums(obj) {
         obj.val(max);
     }
 
-    var price = parseFloat(obj.data("price").replace(",", "."));
+    var price = parseFloat(obj.data("price").toString().replace(",", "."));
     $("#"+session+"-subtotal-price").html((val * price).toFixed(2));
 }
 
@@ -228,7 +228,7 @@ function recalcTotal() {
     var sum = 0;
     $(".sessioninput").each(function() {
         var n = parseInt($(this).val(), 10);
-        var price = parseFloat($(this).data("price").replace(",", "."));
+        var price = parseFloat($(this).data("price").toString().replace(",", "."));
         sum += price * n;
     });
     $("#total").html(sum.toFixed(2));

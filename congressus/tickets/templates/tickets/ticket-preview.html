@@ -47,23 +47,25 @@
     {{ ticket.seatinfo }}
   </div>
 
-  {% if ticket.seat_layout and ticket.seat_layout.name %}
-    <div class="seatinfo_sector">
-      {{ ticket.seat_layout.name }}
-    </div>
-  {% endif %}
+  <div class="seatinfo2">
+    {% if ticket.seat_layout and ticket.seat_layout.name %}
+      <div class="seatinfo_sector">
+        {{ ticket.seat_layout.name }}
+      </div>
+    {% endif %}
 
-  {% if ticket.seat_row %}
-    <div class="seatinfo_row">
-      {{ ticket.seat_row }}
-    </div>
-  {% endif %}
+    {% if ticket.seat_row %}
+      <div class="seatinfo_row">
+        {{ ticket.seat_row }}
+      </div>
+    {% endif %}
 
-  {% if ticket.seat_column %}
-    <div class="seatinfo_seat">
-      {{ ticket.seat_column }}
-    </div>
-  {% endif %}
+    {% if ticket.seat_column %}
+      <div class="seatinfo_seat">
+        {{ ticket.seat_column }}
+      </div>
+    {% endif %}
+  </div>
 
   <div class="next_note">
     {{ ticket.next_note }}

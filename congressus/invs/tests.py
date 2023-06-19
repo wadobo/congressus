@@ -1,5 +1,6 @@
 import pytest
 from django.db import connection, reset_queries
+from django.conf import settings
 
 from events.factories import (
     ExtraSessionFactory,
@@ -45,3 +46,25 @@ def test_payment(invitation_number, seat_layouts, col):
 
     assert Invitation.objects.count() == invitation_number
     assert db_queries < invitation_number * 4
+
+
+@pytest.mark.django_db
+def test_generate_invitation():
+    event = EventFactory()
+    session = SessionFactory()
+    ExtraSessionFactory.create_batch(3, orig=session)
+    invitation_type = InvitationTypeFactory(event=event)
+    invitation_type.sessions.add(session)
+
+    generator = InvitationGenerator(
+        type=invitation_type,
+        amount=1,
+        price=100,
+        tax=21,
+        concept='test',
+    )
+    generator.save()
+
+    invs = Invitation.objects.all()
+    assert invs.count() == 1
+    assert len(invs.first().order) == settings.ORDER_SIZE
