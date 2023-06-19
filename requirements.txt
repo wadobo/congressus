@@ -5,6 +5,7 @@ django-crispy-forms==1.14.0
 django-extended-filters==0.7
 django-maintenancemode-2==2.0
 django-tinymce==3.6.1
+factory-boy
 gTTS==2.0.1
 numpy>=1.25,<1.26
 paypalrestsdk==1.13.1

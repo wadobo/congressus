@@ -28,6 +28,8 @@ def clean_holds(ws):
 
 
 class Command(BaseCommand):
+    help = 'Start websocket server'
+
     def add_arguments(self, parser):
         parser.add_argument('--port', action='store', type=int, default=9007)
 

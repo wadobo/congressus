@@ -45,6 +45,7 @@ class TicketWindowSaleAdmin(admin.ModelAdmin):
     search_fields = ("window__name", "user__username", "window__event__name")
     date_hierarchy = "date"
     autocomplete_fields = ("purchase",)
+    readonly_fields = ["purchase"]
 
     def event_filter(self, request, slug):
         qs = super().get_queryset(request)
