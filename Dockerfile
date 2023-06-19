@@ -1,4 +1,4 @@
-FROM python:3.10-bullseye
+FROM python:3.11-bullseye
 
 RUN apt update
 RUN apt-get install -y\
@@ -16,12 +16,11 @@ RUN apt-get install -y\
     shared-mime-info
 
 COPY requirements.txt .
-COPY requirements-dev.txt .
+COPY theme/requirements.txt requirements-theme.txt
 
-RUN pip install -r requirements-dev.txt
-# THEME extra
-RUN pip install django-simple-captcha==0.5.9
-RUN pip install gunicorn==20.1.0
+RUN pip install gunicorn uvicorn
+RUN pip install -r requirements.txt
+RUN pip install -r requirements-theme.txt
 RUN mkdir -p /app/congressus/congressus
 RUN ln -s /theme /app/congressus/congressus/theme
 
@@ -29,8 +28,9 @@ WORKDIR /app/congressus
 
 CMD ["gunicorn", \
     "--bind", "0.0.0.0:8000", \
+    "-k uvicorn.workers.UvicornWorker", \
     "--workers", "4", \
     "--timeout", "30", \
     "--access-logfile", "-", \
     "--error-logfile", "-", \
-    "congressus.wsgi:application"]
+    "congressus.asgi:application"]
