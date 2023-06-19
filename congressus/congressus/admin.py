@@ -59,5 +59,6 @@ def register(model, modeladmin):
         else:
             s.register(model, modeladmin)
 
+
 def context_processor(request):
     return {'SITES': SITES}

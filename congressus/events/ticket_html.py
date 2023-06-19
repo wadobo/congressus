@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from django.template import loader
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 if TYPE_CHECKING:
     from events.models import TicketTemplate

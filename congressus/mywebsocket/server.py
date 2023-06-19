@@ -2,7 +2,7 @@ import json
 import datetime
 from django.core import serializers
 from django.utils import timezone
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.db import connection
 
 from threading import Lock
@@ -179,7 +179,7 @@ class WSServer:
                                             seat=seat,
                                             session=session)
             self.drop_seat(sh)
-        except:
+        except Exception:
             pass
 
     def internal_ws_add_ac(self, client, control, date, st):

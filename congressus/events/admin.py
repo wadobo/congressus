@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.db.models.query import Prefetch
 from django.contrib import admin
 
 from congressus.admin import register
@@ -17,9 +18,10 @@ from events.models import (
     TicketField,
     TicketTemplate,
 )
+from tickets.models import Ticket
 
 
-EVFilter = ('event', admin.RelatedOnlyFieldListFilter)
+EVFilter = ("event", admin.RelatedOnlyFieldListFilter)
 
 
 class EventMixin:
@@ -28,7 +30,9 @@ class EventMixin:
         return qs.filter(event__slug=slug)
 
     def event_filter_fields(self, slug):
-        return { 'event': Q(slug=slug), }
+        return {
+            "event": Q(slug=slug),
+        }
 
 
 class SpaceMixin:
@@ -37,7 +41,9 @@ class SpaceMixin:
         return qs.filter(space__event__slug=slug)
 
     def event_filter_fields(self, slug):
-        return { 'space': Q(event__slug=slug), }
+        return {
+            "space": Q(event__slug=slug),
+        }
 
 
 class InvCodeInline(admin.TabularInline):
@@ -45,9 +51,9 @@ class InvCodeInline(admin.TabularInline):
 
 
 class InvCodeAdmin(EventMixin, admin.ModelAdmin):
-    list_display = ('event', 'person', 'code', 'type', 'used')
-    list_filter = (EVFilter, 'used', 'type')
-    search_fields = ('event', 'person', 'code')
+    list_display = ("event", "person", "code", "type", "used")
+    list_filter = (EVFilter, "used", "type")
+    search_fields = ("event", "person", "code")
 
 
 class SpaceInline(admin.TabularInline):
@@ -55,9 +61,10 @@ class SpaceInline(admin.TabularInline):
 
 
 class SpaceAdmin(EventMixin, admin.ModelAdmin):
-    list_display = ('event', 'order', 'name', 'capacity', 'numbered')
-    list_filter = (EVFilter, 'capacity', 'numbered')
-    search_fields = ('event__name', 'name')
+    list_display = ("event", "order", "name", "capacity", "numbered")
+    list_filter = (EVFilter, "capacity", "numbered")
+    search_fields = ("event__name", "name")
+    prepopulated_fields = {"slug": ["name"]}
 
 
 class TicketFieldInline(admin.TabularInline):
@@ -66,9 +73,10 @@ class TicketFieldInline(admin.TabularInline):
 
 class EventAdmin(admin.ModelAdmin):
     inlines = [SpaceInline, TicketFieldInline, InvCodeInline]
-    list_display = ('name', 'active', 'ticket_sale_enabled', 'sold')
-    list_filter = ('active',)
-    filter_horizontal = ('discounts',)
+    list_display = ("name", "active", "ticket_sale_enabled", "sold")
+    list_filter = ("active",)
+    filter_horizontal = ("discounts",)
+    prepopulated_fields = {"slug": ["name"]}
 
     def sold(self, obj):
         return obj.sold()
@@ -80,20 +88,23 @@ class Attachments(admin.TabularInline):
 
 class ConfirmEmailAdmin(EventMixin, admin.ModelAdmin):
     inlines = [Attachments]
-    list_display = ('event', 'subject')
+    list_display = ("event", "subject")
     list_filter = (EVFilter,)
-    search_fields = ('event', 'subject', 'body')
+    search_fields = ("event", "subject", "body")
 
 
 class ExtraSessionInline(admin.TabularInline):
     model = ExtraSession
-    fk_name = 'orig'
+    fk_name = "orig"
 
     def event_filter_fields(self, slug):
-        return { 'extra': Q(space__event__slug=slug), }
+        return {
+            "extra": Q(space__event__slug=slug),
+        }
+
 
 class ExtraSessionAdmin(admin.ModelAdmin):
-    list_display = ('orig', 'extra', 'start', 'end', 'used')
+    list_display = ("orig", "extra", "start", "end", "used")
 
     def event_filter(self, request, slug):
         qs = super().get_queryset(request)
@@ -101,44 +112,45 @@ class ExtraSessionAdmin(admin.ModelAdmin):
 
     def event_filter_fields(self, slug):
         return {
-            'orig': Q(space__event__slug=slug),
-            'extra': Q(space__event__slug=slug),
+            "orig": Q(space__event__slug=slug),
+            "extra": Q(space__event__slug=slug),
         }
 
 
 class SessionAdmin(SpaceMixin, admin.ModelAdmin):
     inlines = [ExtraSessionInline]
-    list_display = ('space', 'name', 'start', 'end', 'price', 'tax')
-    list_filter = (('space', admin.RelatedOnlyFieldListFilter), )
-    search_fields = ('space__name', 'name', 'space__event__name')
+    list_display = ("space", "name", "start", "end", "price", "tax")
+    list_filter = (("space", admin.RelatedOnlyFieldListFilter),)
+    search_fields = ("space__name", "name", "space__event__name")
+    prepopulated_fields = {"slug": ["name"]}
 
-    date_hierarchy = 'start'
+    date_hierarchy = "start"
 
 
 class SeatMapAdmin(admin.ModelAdmin):
-    list_display = ('name', )
-    list_filter = ('name', )
-    search_fields = ('name', )
+    list_display = ("name",)
+    list_filter = ("name",)
+    search_fields = ("name",)
 
 
 class SeatLayoutAdmin(admin.ModelAdmin):
-    list_display = ('name', 'map', 'top', 'left', 'direction')
-    list_filter = ('map', )
-    search_fields = ('map__name', 'name')
+    list_display = ("name", "map", "top", "left", "direction")
+    list_filter = ("map",)
+    search_fields = ("map__name", "name")
 
 
 class GateAdmin(EventMixin, admin.ModelAdmin):
-    list_display = ('event', 'name')
-    list_filter = (EVFilter, )
+    list_display = ("event", "name")
+    list_filter = (EVFilter,)
 
 
 class TicketTemplateAdmin(admin.ModelAdmin):
-    list_display = ('name', 'is_html_format')
-    list_filter = ('is_html_format',)
+    list_display = ("name", "is_html_format")
+    list_filter = ("is_html_format",)
 
 
 class DiscountAdmin(admin.ModelAdmin):
-    list_display = ('name', 'type', 'value')
+    list_display = ("name", "type", "value")
 
 
 register(Event, EventAdmin)

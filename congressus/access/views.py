@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils import timezone
 from django.utils import formats
 from django.shortcuts import redirect, render
@@ -172,7 +172,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
     def check_inv(self, order, s, g):
         try:
             inv = Invitation.objects.get(order=order)
-        except:
+        except Exception:
             return self.response_json(_('Not exists'), st='wrong')
 
         session = Session.objects.get(pk=s)
@@ -210,7 +210,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
     def check_ticket(self, order, s, g):
         try:
             ticket = self.get_ticket(order)
-        except:
+        except Exception:
             return self.response_json(_('Not exists'), st='wrong')
 
         valid_session = ticket.session_id == s

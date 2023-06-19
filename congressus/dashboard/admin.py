@@ -11,6 +11,7 @@ class ConfigChartAdmin(admin.ModelAdmin):
 class DashboardAdmin(admin.ModelAdmin):
     list_display = ('event', 'num_cols', 'name')
     filter_horizontal = ('charts',)
+    prepopulated_fields = {"slug": ["name"]}
 
 
 admin.site.register(ConfigChart, ConfigChartAdmin)

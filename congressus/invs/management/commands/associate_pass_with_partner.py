@@ -1,15 +1,14 @@
 import csv
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from invs.models import Invitation
 
 
 class Command(BaseCommand):
     help = '''Load csv file with orders and names for associate. '''
-    
+
     def add_arguments(self, parser):
         parser.add_argument('filename', type=str)
-
 
     def handle(self, *args, **options):
         filename = options['filename']
@@ -24,7 +23,7 @@ class Command(BaseCommand):
         for code, name in rows:
             try:
                 invs = Invitation.objects.get(order=code, is_pass=True)
-            except:
+            except Exception:
                 print("Not found order: {0}".format(code))
                 total -= 1
                 continue
