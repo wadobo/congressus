@@ -14,5 +14,6 @@ pytz==2018.4
 qrcode==7.3.1
 reportlab>=4.0,<4.1
 stripe==1.82.1
+weasyprint==59.0
 websocket-client==0.48.0
 websocket-server==0.4

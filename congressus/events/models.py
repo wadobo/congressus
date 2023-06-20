@@ -6,7 +6,6 @@ from django.urls import reverse
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import Q
-from django.db.models.query import Prefetch
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
