@@ -185,6 +185,10 @@ STATICFILES_DIRS = (
 )
 
 CSRF_FAILURE_VIEW = 'tickets.views.csrf_failure'
+CSRF_COOKIE_SECURE = env.get('CSRF_COOKIE_SECURE', 'False') == 'True'
+CSRF_COOKIE_SAMESITE = env.get('CSRF_COOKIE_SAMESITE', 'strict')
+CSRF_TRUSTED_ORIGINS = env_list('CSRF_TRUSTED_ORIGINS', [])
+CSRF_COOKIE_MASKED = env.get('CSRF_COOKIE_MASKED', 'True') == 'True'
 
 INTERNAL_IPS = ['127.0.0.1']
 
