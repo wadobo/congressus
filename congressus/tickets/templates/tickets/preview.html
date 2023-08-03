@@ -135,9 +135,7 @@
     <title>Ticket preview</title>
   </head>
   <body>
-    {% for ticket in tickets %}
-        {% include "tickets/ticket-preview.html" with template=template ticket=ticket %}
-    {% endfor %}
+    {{ preview|safe }}
     <script>
         {{ template.extra_js|safe }}
     </script>

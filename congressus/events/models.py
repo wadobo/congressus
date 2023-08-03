@@ -46,6 +46,88 @@ DIRECTIONS = (
     ("d", _("Down")),
 )
 
+CHILD_TEMPLATE = """
+<div class="page">
+  {% if template.header %}
+    <div class="header">
+      <img src={{ template.header.url }} />
+    </div>
+  {% endif %}
+
+  {% if template.sponsors %}
+    <div class="sponsors">
+      <img src={{ template.sponsors.url }} />
+    </div>
+  {% endif %}
+
+  <div class="note">
+    {{ template.previous_note }}
+  </div>
+
+  <div class="total_price">
+    {{ ticket.total_price|safe }}
+  </div>
+
+  <div class="codeimg">
+    <img src="data:image/png;base64,{{ ticket.gen_qr }}" />
+  </div>
+
+  <div class="order">
+    {{ ticket.order }}
+  </div>
+
+  <div class="wcode">
+    {{ ticket.wcode }}
+  </div>
+
+  <div class="initials">
+    {{ ticket.initials }}
+  </div>
+
+  <div class="text">
+    {{ ticket.text }}
+  </div>
+
+  <div class="date">
+    {{ ticket.date }}
+  </div>
+
+  <div class="seatinfo">
+    {{ ticket.seatinfo }}
+  </div>
+
+  <div class="seatinfo2">
+    {% if ticket.seat_layout and ticket.seat_layout.name %}
+      <div class="seatinfo_sector">
+        {{ ticket.seat_layout.name }}
+      </div>
+    {% endif %}
+
+    {% if ticket.seat_row %}
+      <div class="seatinfo_row">
+        {{ ticket.seat_row }}
+      </div>
+    {% endif %}
+
+    {% if ticket.seat_column %}
+      <div class="seatinfo_seat">
+        {{ ticket.seat_column }}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="next_note">
+    {{ ticket.next_note }}
+  </div>
+
+  {% if template.footer %}
+    <div class="footer">
+      <img src={{ template.footer.url }} />
+    </div>
+  {% endif %}
+</div>
+"""
+
 
 class Discount(models.Model):
     DISCOUNT_TYPES = (
@@ -594,6 +676,11 @@ class TicketTemplate(models.Model):
         help_text=_("Extra js for configure template"),
         blank=True,
         null=True,
+    )
+    extra_html = models.TextField(
+        _("extra html"),
+        help_text=_("Extra html for configure template"),
+        default=CHILD_TEMPLATE,
     )
 
     class Meta:
