@@ -647,7 +647,7 @@ class TicketTemplatePreviewPDF(TicketTemplatePreview):
 
         html_code = ticket.generate_html(self.template)
 
-        pdf = HTML(string=html_code).write_pdf()
+        pdf = HTML(string=html_code, base_url=request.build_absolute_uri()).write_pdf()
 
         # Devolver el PDF generado para su descarga
         response = HttpResponse(pdf, content_type="application/pdf")
