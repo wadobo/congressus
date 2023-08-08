@@ -128,6 +128,106 @@ CHILD_TEMPLATE = """
 </div>
 """
 
+DEFAULT_STYLE = """
+.header {
+  grid-area: header;
+  width: 100%;
+}
+
+img {
+  width: 100%;
+}
+
+.sponsors {
+  grid-area: sponsors;
+}
+
+.note {
+  grid-area: note;
+}
+
+.total_price {
+  grid-area: total_price;
+}
+
+.price {
+  font-size: large;
+}
+
+.tax {
+  font-size: small;
+}
+
+.codeimg {
+  margin: auto;
+  grid-area: codeimg;
+}
+
+.order {
+  grid-area: order;
+}
+
+.wcode {
+  grid-area: wcode;
+  text-align: end;
+}
+
+.initials {
+  grid-area: initials;
+  text-align: center;
+  font-size: xxx-large;
+}
+
+.text {
+  grid-area: text;
+  text-align: center;
+}
+
+.date {
+  grid-area: date;
+  text-align: center;
+}
+
+.seatinfo {
+  height: 100%;
+  grid-area: seatinfo;
+  text-align: end;
+}
+
+.seatinfo2 {
+  height: 100%;
+  grid-area: seatinfo2;
+  display: none;
+}
+
+.seatinfo_sector {
+  height: 100%;
+  grid-area: seatinfo_sector;
+  display: none;
+}
+
+.seatinfo_row {
+  height: 100%;
+  grid-area: seatinfo_row;
+  display: none;
+}
+
+.seatinfo_seat {
+  height: 100%;
+  grid-area: seatinfo_seat;
+  display: none;
+}
+
+.next_note {
+  grid-area: next_note;
+}
+
+.footer {
+  grid-area: footer;
+  width: 100%;
+}
+"""
+
 
 class Discount(models.Model):
     DISCOUNT_TYPES = (
@@ -668,6 +768,7 @@ class TicketTemplate(models.Model):
     extra_style = models.TextField(
         _("extra style"),
         help_text=_("Extra style in css for configure template"),
+        default=DEFAULT_STYLE,
         blank=True,
         null=True,
     )
