@@ -56,12 +56,13 @@ class GenInvitationsView(UserPassesTestMixin, TemplateView):
             ig.save()
             igs.append(ig)
 
-        response = get_ticket_format(igs, pf=print_format)
+        response = get_ticket_format(igs, pf=print_format, request=request)
         return response
 
     def _get_print_formats(self):
         print_formats = TicketTemplate.get_all_templates_dict()
         print_formats.update({'csv': 'csv'})
         return print_formats
+
 
 gen_invitations = GenInvitationsView.as_view()

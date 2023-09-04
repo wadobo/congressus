@@ -123,21 +123,19 @@ class MultiPurchaseView(TemplateView):
         ctx["client"] = client
         ctx["ws_server"] = settings.WS_SERVER
         ctx["max_seat_by_session"] = settings.MAX_SEAT_BY_SESSION
-        ctx["is_windowsale"] = (
-            True if self.template_name != "tickets/multipurchase.html" else False
-        )
+        ctx["is_windowsale"] = False
         return ctx
 
     def post(self, request, ev=None):
         ev = get_object_or_404(Event, slug=ev)
 
         ids = [
-            (i[len("number_") :], request.POST[i])
+            (i[len("number_"):], request.POST[i])
             for i in request.POST
             if i.startswith("number_")
         ]
         seats = [
-            (i[len("seats_") :], request.POST[i].split(","))
+            (i[len("seats_"):], request.POST[i].split(","))
             for i in request.POST
             if i.startswith("seats_")
         ]
@@ -413,7 +411,7 @@ class Thanks(TemplateView):
             if template and hasattr(template, "id"):
                 pf = template.id
 
-        response = get_ticket_format(ticket, pf=pf)
+        response = get_ticket_format(ticket, pf=pf, force_pdf=True, request=request)
         return response
 
     def get_context_data(self, *args, **kwargs):
@@ -631,7 +629,7 @@ class TicketTemplatePreview(UserPassesTestMixin, View):
         if self.template.is_html_format:
             response = HttpResponse(ticket.generate_html(self.template))
         else:
-            response = get_ticket_format(ticket, pf=id, attachment=False)
+            response = get_ticket_format(ticket, pf=id, attachment=False, request=request)
         return response
 
 
