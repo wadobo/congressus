@@ -46,102 +46,106 @@
 
       {% block form %}
       <form method="POST" action="" {% block extraform %}{% endblock %}>
+        {% csrf_token %}
+        <div class="grid-container">
+          {% for space in ev.spaces.all %}
 
-      {% csrf_token %}
-      <div class="row">
-      {% for space in ev.spaces.all %}
-
-        {% get_value seat_maps_table space.seat_map.id as seat_map_table %}
-        <div class="col-sm-6">
-            {% block pre_session %}{% endblock %}
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    {{ space.name }}
-                </div>
-                <div class="panel-body">
-                    <div class="sessions-table">
-                        {% for session in space.get_next_sessions %}
-                            {% if window %}
-                              {% session_price window session as price %}
-                            {% else %}
-                              {% session_price None session as price %}
-                            {% endif %}
-                            <div class="row session-row {% cycle 'odd' 'even' %}">
-                                {% if session.space.numbered %}
-                                {% block col-session-num-1 %}<div class="col-md-5 col-xs-9">{% endblock %}
+            {% get_value seat_maps_table space.seat_map.id as seat_map_table %}
+            <div class="item" style="{{ space.calc_grid_style }}">
+              <details {% if not space.is_folding %}open{% endif %}>
+                <summary class="title">{{ space.title|safe }}</summary>
+                <div class="description">{{ space.description|safe }}</div>
+                {% block pre_session %}{% endblock %}
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        {{ space.name }}
+                    </div>
+                    <div class="panel-body">
+                        <div class="sessions-table">
+                            {% for session in space.get_next_sessions %}
+                                {% if window %}
+                                  {% session_price window session as price %}
                                 {% else %}
-                                {% block col-session %}<div class="col-md-6 col-xs-12">{% endblock %}
+                                  {% session_price None session as price %}
                                 {% endif %}
-                                    <span class="session-name">{{ session.name }}</span>
-                                    <div class="text-muted text-date">
-                                        {% block session-hour %}
-                                        {{ session.start|date:"d/m/Y" }}
-                                        {% endblock %}
-                                        <span class="session-hour">({{ session.start|date:"H:i" }})</span>
+                                <div class="row session-row {% cycle 'odd' 'even' %}">
+                                    {% if session.space.numbered %}
+                                    {% block col-session-num-1 %}<div class="col-md-5 col-xs-9">{% endblock %}
+                                    {% else %}
+                                    {% block col-session %}<div class="col-md-6 col-xs-12">{% endblock %}
+                                    {% endif %}
+                                        <span class="session-name">{{ session.name }}</span>
+                                        <div class="text-muted text-date">
+                                            {% block session-hour %}
+                                            {{ session.start|date:"d/m/Y" }}
+                                            {% endblock %}
+                                            <span class="session-hour">({{ session.start|date:"H:i" }})</span>
+                                        </div>
                                     </div>
-                                </div>
-                                {% if session.space.numbered %}
-                                {% block col-session-num-2 %}<div class="col-md-1 col-xs-3 text-center">{% endblock %}
-                                    {% include "tickets/seat_select.html" %}
-                                    <input id="seats-{{ session.id }}" class="hidden seats-input" data-session="{{ session.id }}" type="text" name="seats_{{ session.id }}"
-                                       value="{% key request.POST session.id "seats_" %}"
-                                    />
-                                </div>
-                                {% endif %}
-                                {% block col-input %}<div class="sessioninput-td col-md-6 col-xs-12">{% endblock %}
-                                    <div class="sessioninput-group input-group">
-                                        <input id="{{ session.id }}" class="sessioninput form-control"
-                                                 min='0' max='{{ max_seat_by_session }}' type="text"
-                                            data-session="{{ session.id }}"
-                                            data-price="{{ price }}"
-                                            {% if not session.space.numbered %}
-                                            name="number_{{ session.id }}"
-                                            {% elif not window %}
-                                            readonly
-                                            {% endif %}
-                                            value="{% key request.POST session.id "number_" "0" %}"
-                                            {% if forloop.first and forloop.parentloop.first and is_windowsale %}onfocus="this.select()" autofocus{% endif %}
-                                            data-index="{{ forloop.parentloop.counter0 }},{{ forloop.counter0 }}"
+                                    {% if session.space.numbered %}
+                                    {% block col-session-num-2 %}<div class="col-md-1 col-xs-3 text-center">{% endblock %}
+                                        {% include "tickets/seat_select.html" %}
+                                        <input id="seats-{{ session.id }}" class="hidden seats-input" data-session="{{ session.id }}" type="text" name="seats_{{ session.id }}"
+                                           value="{% key request.POST session.id "seats_" %}"
                                         />
-                                        {% if not window and session.space.numbered %}
-                                        {% else %}
-                                        <span class="buttons input-group-btn">
-                                            <button data-id="{{ session.id }}" class="plus btn btn-default" type="button">
-                                                <span class="glyphicon glyphicon-plus" ahire-hidden="true"></span>
-                                            </button>
-                                            <button data-id="{{ session.id }}" class="minus btn btn-default" type="button">
-                                                <span class="glyphicon glyphicon-minus" ahire-hidden="true"></span>
-                                            </button>
-                                        </span>
-                                        {% endif %}
-                                        <span class="ticket-price input-group-addon">
-                                            {% if window %}
-                                                x{{ price|floatformat:"-2" }} €
-                                            {% else %}
-                                                {{ price|floatformat:"-2" }} €
-                                                <span>/ {% trans "u" %}</span>
-                                            {% endif %}
-                                        </span>
-                                        {% if subsum %}
-                                        <span class="input-group-addon">
-                                            <span class="subtotal" id="{{ session.id }}-subtotal-price">0</span>
-                                            €
-                                        </span>
-                                        {% endif %}
                                     </div>
-                                </div>
+                                    {% endif %}
+                                    {% block col-input %}<div class="sessioninput-td col-md-6 col-xs-12">{% endblock %}
+                                        <div class="sessioninput-group input-group">
+                                            <input id="{{ session.id }}" class="sessioninput form-control"
+                                                     min='0' max='{{ max_seat_by_session }}' type="text"
+                                                data-session="{{ session.id }}"
+                                                data-price="{{ price }}"
+                                                {% if not session.space.numbered %}
+                                                name="number_{{ session.id }}"
+                                                {% elif not window %}
+                                                readonly
+                                                {% endif %}
+                                                value="{% key request.POST session.id "number_" "0" %}"
+                                                {% if forloop.first and forloop.parentloop.first and is_windowsale %}onfocus="this.select()" autofocus{% endif %}
+                                                data-index="{{ forloop.parentloop.counter0 }},{{ forloop.counter0 }}"
+                                            />
+                                            {% if not window and session.space.numbered %}
+                                            {% else %}
+                                            <span class="buttons input-group-btn">
+                                                <button data-id="{{ session.id }}" class="plus btn btn-default" type="button">
+                                                    <span class="glyphicon glyphicon-plus" ahire-hidden="true"></span>
+                                                </button>
+                                                <button data-id="{{ session.id }}" class="minus btn btn-default" type="button">
+                                                    <span class="glyphicon glyphicon-minus" ahire-hidden="true"></span>
+                                                </button>
+                                            </span>
+                                            {% endif %}
+                                            <span class="ticket-price input-group-addon">
+                                                {% if window %}
+                                                    x{{ price|floatformat:"-2" }} €
+                                                {% else %}
+                                                    {{ price|floatformat:"-2" }} €
+                                                    <span>/ {% trans "u" %}</span>
+                                                {% endif %}
+                                            </span>
+                                            {% if subsum %}
+                                            <span class="input-group-addon">
+                                                <span class="subtotal" id="{{ session.id }}-subtotal-price">0</span>
+                                                €
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
 
-                            </div> <!-- endof row -->
-                        {% endfor %}
-                    </div> <!-- session-table close -->
-                </div> <!-- panel body close -->
-            </div> <!-- panel close -->
-            {% block space_extra %}
-            {% endblock %}
-        </div> <!-- endof col -->
+                                </div> <!-- endof row -->
+                            {% endfor %}
+                        </div> <!-- session-table close -->
+                    </div> <!-- panel body close -->
+                </div> <!-- panel close -->
+                {% block space_extra %}
+                {% endblock %}
+                <div class="foot_description">{{ space.foot_description|safe }}</div>
+              </details>
+            </div> <!-- endof col -->
 
-      {% endfor %} <!-- endfor spaces -->
-      </div> <!-- close spaces row -->
+          {% endfor %} <!-- endfor spaces -->
+        </div>
 
         {% block after_sessions %}{% endblock %}
         {% block total %}

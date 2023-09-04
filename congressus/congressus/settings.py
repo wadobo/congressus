@@ -255,8 +255,18 @@ ROW_RAND = 3
 ACCESS_VALIDATE_INV_HOURS = env.get('ACCESS_VALIDATE_INV_HOURS', 'True') == 'True'
 
 TINYMCE_DEFAULT_CONFIG = {
-    "height": 500,
+    "height": 400,
     "width": "100%",
+    "plugins": "code advlist link image lists",
+    "force_br_newlines": True,
+    "force_p_newlines": False,
+    "forced_root_block": False,
+    "verify_html": False,
+    "extended_valid_elements": "*[*]",
+    "toolbar": (
+        "code | undo redo | styleselect | bold italic | alignleft aligncenter "
+        "alignright alignjustify | bullist numlist outdent indent | link image",
+    ),
 }
 
 REAL_EXTRA_APPS = []

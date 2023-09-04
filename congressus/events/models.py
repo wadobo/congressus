@@ -11,6 +11,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
+from tinymce.models import HTMLField
 
 from invs.utils import get_sold_invs
 from .widgets import HTMLWidget
@@ -455,6 +456,31 @@ class Space(models.Model):
     name = models.CharField(_("name"), max_length=300)
     slug = models.SlugField()
 
+    title = HTMLField(
+        _("title"),
+        default="",
+        help_text=(
+            "Por defecto, el título se mostrará sin estilos, si queremos aplicar algún "
+            "estilo al título, tendremos que hacerlo desde el panel de administración, "
+            "en theme --> theme config --> custom css, usando la class 'title'"
+        ),
+    )
+    description = HTMLField(
+        _("description"),
+        default="",
+        blank=True,
+        help_text=(
+            "Igual que el campo título, aunque como el css lo añadimos nosotros, la "
+            "clase la tendremos que crear nosotros."
+        ),
+    )
+    foot_description = HTMLField(
+        _("foot description"),
+        default="",
+        blank=True,
+        help_text=("Igual que la descripción"),
+    )
+
     capacity = models.IntegerField(_("capacity"), default=100)
     numbered = models.BooleanField(_("numbered"), default=False)
     seat_map = models.ForeignKey(
@@ -467,6 +493,15 @@ class Space(models.Model):
     )
 
     order = models.IntegerField(_("order"), default=0)
+    is_folding = models.BooleanField(
+        _("is folding"),
+        default=False,
+        help_text=(
+            "El espacio será mostrado utilizando un details summary en html, por "
+            "defecto estará desplegado, si queremos que por defecto aparezca plegado, "
+            "tendremos que activar esta opción."
+        ),
+    )
 
     def get_next_sessions(self):
         now = timezone.now()
@@ -479,6 +514,12 @@ class Space(models.Model):
 
     def __str__(self):
         return "%s - %s" % (self.event, self.name)
+
+    def calc_grid_style(self):
+        return (
+            f"grid-row: {(self.order - 1) // 2 + 1};"
+            f"grid-column: {(self.order - 1) % 2 + 1}"
+        )
 
 
 class Session(models.Model):
