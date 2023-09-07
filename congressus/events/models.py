@@ -11,7 +11,6 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from tinymce.models import HTMLField
 
 from invs.utils import get_sold_invs
 from .widgets import HTMLWidget
@@ -264,8 +263,12 @@ class Discount(models.Model):
 class Event(models.Model):
     name = models.CharField(_("name"), max_length=200, unique=True)
     slug = models.SlugField()
-
-    info = models.TextField(_("info"), blank=True, null=True)
+    info = models.TextField(
+        _("info"),
+        blank=True,
+        default="",
+        help_text="Campo en html que se mostrará en la página de inicio",
+    )
     active = models.BooleanField(_("active"), default=False)
     admin = models.EmailField(_("admin email"), blank=True, null=True)
     discounts = models.ManyToManyField(
@@ -456,7 +459,7 @@ class Space(models.Model):
     name = models.CharField(_("name"), max_length=300)
     slug = models.SlugField()
 
-    title = HTMLField(
+    title = models.TextField(
         _("title"),
         default="",
         help_text=(
@@ -465,7 +468,7 @@ class Space(models.Model):
             "en theme --> theme config --> custom css, usando la class 'title'"
         ),
     )
-    description = HTMLField(
+    description = models.TextField(
         _("description"),
         default="",
         blank=True,
@@ -474,7 +477,7 @@ class Space(models.Model):
             "clase la tendremos que crear nosotros."
         ),
     )
-    foot_description = HTMLField(
+    foot_description = models.TextField(
         _("foot description"),
         default="",
         blank=True,
