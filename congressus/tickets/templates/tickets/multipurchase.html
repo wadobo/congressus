@@ -32,7 +32,7 @@
     {% endblock %}
 
     {% block info %}
-    <p> {{ ev.info }} </p>
+    <p> {{ ev.info|safe }} </p>
     {% endblock %}
 
     {% if not ev.ticket_sale_enabled and not user.is_superuser %}
