@@ -364,7 +364,7 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
         else:
             confirm = True
 
-        if confirm:
+        if self.pk and confirm:
             for t in self.tickets.all():
                 t.confirmed = self.confirmed
                 t.save()
