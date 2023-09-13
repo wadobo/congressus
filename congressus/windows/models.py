@@ -1,21 +1,20 @@
 from typing import Optional
+from datetime import datetime
 
 import websocket
-from datetime import datetime
-from django.db import models
-from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
-from django.contrib.auth.models import User
 from django.conf import settings
-
-from events.models import Event, TicketTemplate
-from tickets.models import MultiPurchase
-
+from django.contrib.auth.models import User
+from django.db import models
+from django.db.models import Sum
 from django.db.models.signals import post_delete
 from django.db.models.signals import post_save
 from django.db.models.signals import pre_save
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
-from django.db.models import Sum
+from events.models import Event, TicketTemplate
+from tickets.models import MultiPurchase
+from windows.managers import WriteTicketWindowSaleManager
 
 
 PAYMENT_TYPES = (
@@ -122,9 +121,6 @@ class TicketWindow(models.Model):
     def get_price(self, session):
         return session.window_price + self.supplement
 
-    def get_available_templates(self) -> dict[int, str]:
-        return {tpl.id: tpl.name for tpl in self.templates.all()}
-
     def __str__(self):
         return "{0} - {1}".format(self.event.name, self.name)
 
@@ -159,13 +155,11 @@ class TicketWindowSale(models.Model):
     )
 
     date = models.DateTimeField(auto_now_add=True)
+    objects = WriteTicketWindowSaleManager()
 
     class Meta:
         verbose_name = _("ticket window sale")
         verbose_name_plural = _("ticket window sales")
-
-    def get_first_template(self) -> Optional[TicketTemplate]:
-        return self.window.templates.first()
 
     def __str__(self):
         return "%s - %s - %s" % (self.user, self.window, self.purchase)

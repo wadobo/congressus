@@ -12,23 +12,28 @@ from django.conf import settings
 from django.core.mail import EmailMessage
 from django.db import models
 from django.db.models.signals import post_save
-from django.template import Context
-from django.template import Template
+from django.http.response import HttpResponse
+from django.template import Context, Template, loader
 from django.template.loader import get_template
 from django.urls import reverse
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
+from weasyprint import HTML
 
+from events.choices import SessionTemplate
 from events.models import Event, InvCode
 from events.models import Session
 from events.models import Discount
 from events.models import SeatLayout
-from events.ticket_pdf import TicketPDF
-from events.ticket_html import TicketHTML
-from tickets.utils import concat_pdf
+from tickets.managers import (
+    ReadMultiPurchaseManager,
+    ReadTicketManager,
+    WriteMultiPurchaseManager,
+    WriteTicketManager,
+)
 
 if TYPE_CHECKING:
-    from windows.models import TicketWindowSale
+    from events.models import TicketTemplate
 
 
 WARNING_TYPES = (("req", _("Required")),)
@@ -178,7 +183,11 @@ class BaseTicketMixing:
                 email.attach_file(att.attach.path)
 
         filename = "ticket_%s.pdf" % self.order
-        email.attach(filename, self.generate_pdf(), "application/pdf")
+        email.attach(
+            filename,
+            self.pdf_format(session_template=SessionTemplate.ONLINE),
+            "application/pdf",
+        )
         email.send(fail_silently=False)
 
     def get_absolute_url(self):
@@ -245,6 +254,28 @@ class BaseTicketMixing:
         self.tpv_error = error
         self.tpv_error_info = info
         self.save()
+
+    def get_html(self, session_template: SessionTemplate, preview_pdf: bool = False):
+        return HttpResponse(
+            self.html_format(session_template=session_template, preview_pdf=preview_pdf)
+        )
+
+    def get_pdf(self, session_template: SessionTemplate, request):
+        pdf = self.pdf_format(session_template=session_template, request=request)
+        response = HttpResponse(content_type="application/pdf")
+        fname = 'attachment; filename="tickets.pdf"'
+        response["Content-Disposition"] = fname
+        response.write(pdf)
+        return response
+
+    def pdf_format(self, session_template: SessionTemplate, request=None):
+        # TODO: dividir entre sessiones diferentes para ver los diferentes tipos de
+        # templates que tenemos que usar para generar el html
+        html = self.html_format(session_template=session_template)
+        kwargs = {"string": html}
+        if request:
+            kwargs["base_url"] = request.build_absolute_uri()
+        return HTML(**kwargs).write_pdf()
 
 
 class BaseExtraData:
@@ -357,6 +388,9 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
 
     extra_data = models.TextField(_("extra data"), blank=True, null=True)
 
+    read_objects = ReadMultiPurchaseManager()
+    objects = WriteMultiPurchaseManager()
+
     def save(self, *args, **kw):
         if self.pk is not None:
             orig = MultiPurchase.objects.get(pk=self.pk)
@@ -421,9 +455,6 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
             total = self.discount.apply_to(total)
         return total
 
-    def get_first_ticket_window_sale(self) -> TicketWindowSale:
-        return self.sales.first()
-
     def get_window_price(self):
         total = sum(i.get_window_price() for i in self.all_tickets())
         if self.discount and not self.discount.unit:
@@ -446,22 +477,13 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
     def is_mp(self):
         return True
 
-    def generate_pdf(self, template=None):
-        if not template:
-            sale = self.get_first_ticket_window_sale()
-            if sale:
-                template = sale.get_first_template()
-
-        files = []
-        for ticket in self.all_tickets():
-            pdf = TicketPDF(
-                ticket, template=template or ticket.session.template
-            ).generate(asbuf=True)
-            files.append(pdf)
-        return concat_pdf(files)
-
-    def generate_html(self, template=None):
-        return TicketHTML(self.all_tickets(), template=template).generate()
+    def html_format(self, session_template: SessionTemplate, preview_pdf: bool = False):
+        html = ""
+        for ticket in self.tickets.all():
+            html += ticket.html_format(
+                session_template=session_template, preview_pdf=preview_pdf
+            )
+        return html
 
     def all_tickets(self):
         return self.tickets.select_related("session", "session__template").order_by(
@@ -639,6 +661,9 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
     used = models.BooleanField(_("used"), default=False)
     used_date = models.DateTimeField(_("ticket used date"), blank=True, null=True)
 
+    objects = WriteTicketManager()
+    read_objects = ReadTicketManager()
+
     class Meta:
         ordering = ["-created"]
         verbose_name = _("ticket")
@@ -706,9 +731,6 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
             f'<font class="price">{price}</font>   '
             f'<font class="tax">{tax}% {taxtext}</font>'
         )
-
-    def get_first_ticket_window_sale(self) -> TicketWindowSale:
-        return self.mp.sales.first()
 
     def get_gate_name(self):
         return self.gate_name
@@ -782,11 +804,29 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
         self.update_mp_extra_data()
         self.save_extra_sessions()
 
-    def generate_pdf(self, template=None):
-        return TicketPDF(self, template=template).generate()
+    def get_template(self, session_template: SessionTemplate) -> TicketTemplate:
+        if session_template == SessionTemplate.ONLINE:
+            return self.session.template
 
-    def generate_html(self, template=None):
-        return TicketHTML([self], template=template).generate()
+        if session_template == SessionTemplate.WINDOW:
+            return self.session.window_template
+
+        raise Exception(_("Not found ticket template"))
+
+    def html_format(self, session_template: SessionTemplate, preview_pdf: bool = False):
+        ticket_template = self.get_template(session_template)
+        tpl_child = Template(ticket_template.extra_html)
+        ctx = Context({"ticket": self, "template": ticket_template})
+        preview_data = tpl_child.render(ctx)
+
+        template = loader.get_template("tickets/preview.html")
+        return template.render(
+            {
+                "template": ticket_template,
+                "preview": preview_data,
+                "preview_pdf": preview_pdf,
+            }
+        )
 
     def window_code(self):
         """

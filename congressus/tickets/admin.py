@@ -16,7 +16,8 @@ from django.utils.translation import gettext_lazy as _
 from extended_filters.filters import DateRangeFilter
 from tinymce.widgets import TinyMCE
 
-from congressus.admin import register
+from events.admin import GlobalEventFilter
+from events.admin import CustomSpaceFilter
 from events.models import TicketField
 from tickets.filters import TicketWindowFilter, SessionFilter, SingleTicketWindowFilter
 from tickets.models import (
@@ -33,9 +34,6 @@ CACHE_TICKET_FIELDS = {
     tf.id: tf.label
     for tf in TicketField.objects.filter(pk__in=settings.CSV_TICKET_FIELDS)
 }
-
-
-CACHE_TICKET_FIELDS = {tf.id: tf.label for tf in TicketField.objects.filter(pk__in=settings.CSV_TICKET_FIELDS)}
 
 
 def confirm(modeladmin, request, queryset):
@@ -130,6 +128,23 @@ def get_csv_tickets(modeladmin, request, queryset):
 get_csv_tickets.short_description = _("Download csv")
 
 
+class GlobalMPEventFilter(GlobalEventFilter):
+    parameter_name = "mp__ev"
+
+
+class CustomSessionSpaceFilter(CustomSpaceFilter):
+    title = _("space")
+    parameter_name = "space"
+
+    def queryset(self, request, queryset):
+        qs = queryset.select_related("session__space", "session__space__event")
+        if not self.value():
+            return qs
+
+        return qs.filter(session__space=self.value())
+
+
+@admin.register(Ticket)
 class TicketAdmin(admin.ModelAdmin):
     list_per_page = 20
     list_max_show_all = 800
@@ -149,15 +164,15 @@ class TicketAdmin(admin.ModelAdmin):
         "event",
     )
     list_filter = (
+        GlobalMPEventFilter,
         ("created", DateRangeFilter),
         "confirmed",
         "payment_method",
         "used",
         SingleTicketWindowFilter,
-        "event_name",
         "seat_layout",
         SessionFilter,
-        ("session__space", admin.RelatedOnlyFieldListFilter),
+        CustomSessionSpaceFilter,
     )
     search_fields = (
         "order",
@@ -327,7 +342,7 @@ class TicketAdmin(admin.ModelAdmin):
 
     used_at.short_description = _("used at")
 
-    def event_filter(self, request, slug):
+    def get_queryset(self, request):
         return (
             super()
             .get_queryset(request)
@@ -346,7 +361,6 @@ class TicketAdmin(admin.ModelAdmin):
                     queryset=TicketWindowSale.objects.select_related("window"),
                 ),
             )
-            .filter(session__space__event__slug=slug)
         )
 
     def mark_used(self, request, queryset):
@@ -395,6 +409,11 @@ def link_online_sale(modeladmin, request, queryset):
 link_online_sale.short_description = _("Link online sale")
 
 
+class GlobalEvFilter(GlobalEventFilter):
+    parameter_name = "ev"
+
+
+@admin.register(MultiPurchase)
 class MPAdmin(admin.ModelAdmin):
     list_per_page = 20
     list_max_show_all = 800
@@ -410,11 +429,11 @@ class MPAdmin(admin.ModelAdmin):
         "event",
     )
     list_filter = (
+        GlobalEvFilter,
         ("created", DateRangeFilter),
         "confirmed",
         "payment_method",
         TicketWindowFilter,
-        ("ev", admin.RelatedOnlyFieldListFilter),
         "tpv_error",
     )
 
@@ -424,25 +443,6 @@ class MPAdmin(admin.ModelAdmin):
     inlines = [
         TicketInline,
     ]
-
-    def get_queryset(self, request):
-        return (
-            super()
-            .get_queryset(request)
-            .select_related("ev", "discount")
-            .prefetch_related(
-                Prefetch(
-                    "sales", queryset=TicketWindowSale.objects.select_related("window")
-                ),
-                Prefetch(
-                    "tickets",
-                    queryset=Ticket.objects.select_related(
-                        "session", "session__template", "session__space"
-                    ).order_by("session__start"),
-                ),
-            )
-            .all()
-        )
 
     def __getattr__(self, value):
         if value.startswith("ticket_field_"):
@@ -535,11 +535,10 @@ class MPAdmin(admin.ModelAdmin):
 
     formated_extra_data.short_description = _("extra data")
 
-    def event_filter(self, request, slug):
+    def get_queryset(self, request):
         return (
             super()
             .get_queryset(request)
-            .filter(ev__slug=slug)
             .select_related("ev", "discount")
             .prefetch_related(
                 Prefetch(
@@ -552,10 +551,10 @@ class MPAdmin(admin.ModelAdmin):
                     ).order_by("session__start"),
                 ),
             )
-            .all()
         )
 
 
+@admin.register(TicketWarning)
 class TicketWarningAdmin(admin.ModelAdmin):
     list_display = ("name", "ev", "csessions1", "csessions2", "message")
     list_filter = ("name",)
@@ -567,11 +566,8 @@ class TicketWarningAdmin(admin.ModelAdmin):
     def csessions2(self, obj):
         return ", ".join(str(s) for s in obj.sessions2.all())
 
-    def event_filter(self, request, slug):
-        qs = super().get_queryset(request)
-        return qs.filter(ev__slug=slug)
 
-
+@admin.register(TicketSeatHold)
 class TicketSeatHoldAdmin(admin.ModelAdmin):
     search_fields = ("client",)
     date_hierarchy = "date"
@@ -581,16 +577,6 @@ class TicketSeatHoldAdmin(admin.ModelAdmin):
         "type",
         ("layout", admin.RelatedOnlyFieldListFilter),
     )
-
-    def event_filter(self, request, slug):
-        qs = super().get_queryset(request)
-        return qs.filter(session__space__event__slug=slug)
-
-
-register(Ticket, TicketAdmin)
-register(TicketWarning, TicketWarningAdmin)
-register(MultiPurchase, MPAdmin)
-register(TicketSeatHold, TicketSeatHoldAdmin)
 
 
 # tinymce for flatpages

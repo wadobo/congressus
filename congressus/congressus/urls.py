@@ -17,32 +17,15 @@ from django.urls import include, path
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.generic.base import RedirectView
 
-from congressus.admin import SITES
-
-ADMINS = [
-    path('admin/{}/'.format(site.name),
-         site.urls)
-        for site in SITES
-]
-
-class AdminView(RedirectView):
-    def get_redirect_url(*args, **kwargs):
-        if SITES:
-            defsite = SITES[-1]
-            return '/admin/{}'.format(defsite.name)
-        else:
-            return '/admin/all/'
 
 THEME = []
 if 'theme' in settings.INSTALLED_APPS:
     THEME = [path('custom/', include('theme.urls'))]
 
 
-urlpatterns = ADMINS + THEME + [
-    path('admin/', AdminView.as_view()),
-    path('admin/all/', admin.site.urls),
+urlpatterns = THEME + [
+    path('admin/', admin.site.urls),
     path('pages/', include('django.contrib.flatpages.urls')),
     path('tinymce/', include('tinymce.urls')),
     path('window/', include('windows.urls')),

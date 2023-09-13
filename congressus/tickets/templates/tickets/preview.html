@@ -29,6 +29,17 @@
     page-break-after: always;
   }
 
+  .btn-float {
+    position: fixed;
+    top: 2rem;
+    right: 25%;
+    border: none;
+    background-color: #417690;
+    color: white;
+    padding: 8px 16px;
+    text-decoration: none;
+  }
+
   {{ template.extra_style|safe }}
 </style>
 
@@ -37,6 +48,11 @@
     <title>Ticket preview</title>
   </head>
   <body>
+    {% if preview_pdf %}
+      <a class="btn-float" href="pdf/">
+        PDF
+      </a>
+    {% endif %}
     {{ preview|safe }}
     <script>
         {{ template.extra_js|safe }}

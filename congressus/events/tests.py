@@ -1,6 +1,6 @@
 import pytest
 
-from events.ticket_pdf import TicketPDF
+from events.choices import SessionTemplate
 from events.factories import TicketTemplateFactory
 from tickets.factories import TicketFactory
 
@@ -18,7 +18,7 @@ def test_preview_horizontal():
     )
 
     ticket = TicketFactory(session__template=ticket_template)
-    TicketPDF(ticket).generate(asbuf=True)
+    ticket.pdf_format(session_template=SessionTemplate.ONLINE)
 
 
 @pytest.mark.django_db
@@ -34,4 +34,4 @@ def test_preview_vertical():
     )
 
     ticket = TicketFactory(session__template=ticket_template)
-    TicketPDF(ticket).generate(asbuf=True)
+    ticket.pdf_format(session_template=SessionTemplate.ONLINE)

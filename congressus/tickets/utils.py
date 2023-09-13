@@ -2,16 +2,9 @@ from __future__ import annotations
 
 import random
 from io import BytesIO
-from typing import TYPE_CHECKING, Union
 
 from django.conf import settings
-from django.http import HttpResponse
 from PyPDF2 import PdfFileMerger
-from weasyprint import HTML
-
-if TYPE_CHECKING:
-    from events.models import TicketTemplate
-    from tickets.models import MultiPurchase, Ticket
 
 
 def concat_pdf(files):
@@ -25,56 +18,6 @@ def concat_pdf(files):
     pdf = _buffer.getvalue()
     _buffer.close()
     return pdf
-
-
-def get_ticket_template(pf) -> TicketTemplate:
-    from events.models import TicketTemplate
-
-    if pf is None:
-        return TicketTemplate.objects.first()
-
-    return TicketTemplate.objects.filter(pk=pf).first()
-
-
-def get_ticket_format(
-    mp: Union["MultiPurchase", "Ticket"],
-    pf,
-    attachment=True,
-    force_pdf: bool = False,
-    request=None,
-):
-    """With a list of invitations or invitations,generate ticket output"""
-    if pf == "csv":
-        csv = []
-        if hasattr(mp, "all_tickets"):  # is MultiPurchase
-            for i, ticket in enumerate(mp.all_tickets()):
-                csv.append("%s, %s, %s" % (i + 1, ticket.order, ticket.session_name))
-        else:  # is Ticket
-            csv.append("%s, %s, %s" % (i + 1, mp.order, mp.session_name))
-        response = HttpResponse(content_type="application/csv")
-        response["Content-Disposition"] = 'filename="invs.csv"'
-        response.write("\n".join(csv))
-        return response
-
-    template = get_ticket_template(pf)
-
-    if template.is_html_format and not force_pdf:
-        return HttpResponse(mp.generate_html(template))
-
-    if template.is_html_format and force_pdf:
-        html_code = mp.generate_html(template)
-        pdf = HTML(string=html_code, base_url=request.build_absolute_uri()).write_pdf()
-    else:
-        pdf = mp.generate_pdf(template)
-
-    response = HttpResponse(content_type="application/pdf")
-    fname = 'filename="tickets.pdf"'
-    if attachment:
-        fname = "attachment; " + fname
-    response["Content-Disposition"] = fname
-    response.write(pdf)
-
-    return response
 
 
 def check_free_seats(sessions, res):
@@ -98,7 +41,7 @@ def check_free_seats(sessions, res):
     return res
 
 
-def get_seats_by_str(sessions, string):
+def get_seats_by_str(string):
     """String format: 'C1[1-1,1-3]; C1[2-1:2-10]; C1[]'"""
     res = {}  # {'C1': ['1-1', '1-2']}, ...
     string = string.replace(" ", "")

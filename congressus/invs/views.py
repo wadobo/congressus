@@ -1,68 +1,77 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
+from django.core.exceptions import ValidationError
+from django.http.response import HttpResponse
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 
-from events.models import Event, TicketTemplate
+from events.models import Event
 from invs.models import InvitationType, InvitationGenerator
-from invs.utils import get_ticket_format
 
 
 class GenInvitationsView(UserPassesTestMixin, TemplateView):
-    template_name = 'invs/generator.html'
-    DEFAULT_PF = 'csv'
+    template_name = "invs/generator.html"
+    PRINT_FORMATS = ["CSV", "HTML", "PDF"]
 
     def test_func(self):
         u = self.request.user
         return u.is_authenticated and u.is_superuser
 
     def get_discounts(self):
-        ev = self.kwargs['ev']
+        ev = self.kwargs["ev"]
         ev = get_object_or_404(Event, slug=ev)
         return ev.discounts.all()
 
     def get_context_data(self, *args, **kwargs):
         ctx = super(GenInvitationsView, self).get_context_data(*args, **kwargs)
-        ev = get_object_or_404(Event, slug=self.kwargs['ev'])
-        ctx['ev'] = ev
-        ctx['invs'] = InvitationType.objects.filter(is_pass=False, event=ev)
-        ctx['passes'] = InvitationType.objects.filter(is_pass=True, event=ev)
-        ctx['menuitem'] = 'inv'
-        ctx['print_formats'] = self._get_print_formats()
-        ctx['default_pf'] = self.DEFAULT_PF
-        ctx['discounts'] = self.get_discounts()
+        ev = get_object_or_404(Event, slug=self.kwargs["ev"])
+        ctx["ev"] = ev
+        ctx["invs"] = InvitationType.objects.filter(is_pass=False, event=ev)
+        ctx["passes"] = InvitationType.objects.filter(is_pass=True, event=ev)
+        ctx["menuitem"] = "inv"
+        ctx["print_formats"] = self.PRINT_FORMATS
+        ctx["discounts"] = self.get_discounts()
         return ctx
 
     def post(self, request, ev):
-        ids = [(i[len('number_'):], request.POST[i]) for i in request.POST if i.startswith('number_')]
-        print_format = request.POST.get('print-format', self.DEFAULT_PF)
-        seats = request.POST.get('seats', '')
+        ids = [
+            (i[len("number_"):], request.POST[i])
+            for i in request.POST
+            if i.startswith("number_") and request.POST[i] != "0"
+        ]
+        if len(ids) != 1:
+            messages.error(request, _("Please select onlye one invitation or pass"))
+            return redirect(request.path)
 
-        igs = []
-        for i, v in ids:
-            itype = InvitationType.objects.get(pk=i)
-            amount = int(v)
+        print_format = request.POST.get("print-format", self.PRINT_FORMATS[0])
+        seats = request.POST.get("seats", "")
+        price = float(request.POST.get("price", "0"))
+        comment = request.POST.get("comment", "")
 
-            if not amount:
-                continue
+        inv_type_id = int(ids[0][0])
+        amount = int(ids[0][1])
+        if not amount:
+            messages.error(request, _("Invalid amount"))
+            return redirect(request.path)
 
-            price = request.POST.get('price', '0')
-            comment = request.POST.get('comment', '')
+        generator = InvitationGenerator(
+            type_id=inv_type_id,
+            amount=amount,
+            price=price,
+            concept=comment,
+            seats=seats,
+        )
 
-            ig = InvitationGenerator(type=itype, amount=amount,
-                                     price=price, concept=comment)
-            if seats:
-                ig.seats = seats
-            ig.clean()
-            ig.save()
-            igs.append(ig)
+        try:
+            generator.clean()
+        except ValidationError as err:
+            messages.error(request, err.message)
+            return redirect(request.path)
 
-        response = get_ticket_format(igs, pf=print_format, request=request)
-        return response
+        generator.save()
 
-    def _get_print_formats(self):
-        print_formats = TicketTemplate.get_all_templates_dict()
-        print_formats.update({'csv': 'csv'})
-        return print_formats
+        return generator.get_from_print_format(print_format)
 
 
 gen_invitations = GenInvitationsView.as_view()

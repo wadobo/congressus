@@ -1,38 +1,55 @@
 @startuml
 
-class Event
-class Discount
-class SeatMap
-class Gate
-class SeatLayout
-class Space
-class Session
-class ExtraSession
-class ConfirmEmail
-class EmailAttachment
-class InvCode
-class TicketField
-class TicketTemplate
+class Congressus
 
-class TicketWindow
-class TicketWindowSale
-class TicketWindowCashMovement
+package events {
+    class ConfirmEmail
+    class Discount
+    class EmailAttachment
+    class Event
+    class ExtraSession
+    class Gate
+    class InvCode
+    class SeatLayout
+    class SeatMap
+    class Session
+    class Space
+    class TicketField
+    class TicketTemplate
+}
 
-class MultiPurchase
-class Ticket
-class TicketWarning
-class TicketSeatHold
+package windows {
+    class TicketWindow
+    class TicketWindowSale
+    class TicketWindowCashMovement
+}
 
-class SingleRowConfig
-class SingleRowTail
+package tickets {
+    class MultiPurchase
+    class Ticket
+    class TicketWarning
+    class TicketSeatHold
+}
 
-class InvitationType
+package access {
+    class AccessControl
+}
 
-class Dashboard
+package invs {
+    class InvitationType
+}
 
-class AccessControl
+package singlerow {
+    class SingleRowConfig
+    class SingleRowTail
+}
+
+package dashboard {
+    class Dashboard
+}
 
 
+Congressus *--> "0..n" Event
 Event *--> "0..n" MultiPurchase
 Event *--> "0..n" TicketWindow
 Event *--> "1..n" Discount
@@ -51,6 +68,8 @@ Event *--> "0..n" TicketField
 MultiPurchase *--> "0..n" Ticket
 MultiPurchase *--> "0..n" TicketWindowSale
 TicketWindow *--> "0..n" TicketWindowSale
+TicketWindowSale *--> User
+TicketWindowSale *--> Window
 TicketWindow *--> "0..n" TicketWindowCashMovement
 TicketWindow *--> "0..n" SingleRowTail
 TicketWindow *--> "0..n" SingleRowConfig

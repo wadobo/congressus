@@ -5,15 +5,6 @@ from events.factories import EventFactory, SessionFactory
 from tickets.models import MultiPurchase, Ticket
 
 
-class TicketFactory(DjangoModelFactory):
-    class Meta:
-        model = Ticket
-
-    session = SubFactory(SessionFactory)
-    email = Faker('email')
-    order_tpv = Faker('pystr', min_chars=15, max_chars=15)
-
-
 class MultiPurchaseFactory(DjangoModelFactory):
     class Meta:
         model = MultiPurchase
@@ -21,4 +12,14 @@ class MultiPurchaseFactory(DjangoModelFactory):
     ev = SubFactory(EventFactory)
 
     order = Faker('pystr', max_chars=20)
-    order_tpv = Faker('pystr', max_chars=18)
+    order_tpv = Faker('pystr', max_chars=12)
+
+
+class TicketFactory(DjangoModelFactory):
+    class Meta:
+        model = Ticket
+
+    mp = SubFactory(MultiPurchaseFactory)
+    session = SubFactory(SessionFactory)
+    email = Faker('email')
+    order_tpv = Faker('pystr', min_chars=12, max_chars=12)

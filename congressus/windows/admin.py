@@ -12,11 +12,11 @@ from django.utils.safestring import mark_safe
 
 from extended_filters.filters import DateRangeFilter
 
-from congressus.admin import register
-from events.admin import EventMixin, EVFilter
+from events.admin import GlobalEventFilter
 
 
-class TicketWindowAdmin(EventMixin, admin.ModelAdmin):
+@admin.register(TicketWindow)
+class TicketWindowAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "code",
@@ -28,41 +28,57 @@ class TicketWindowAdmin(EventMixin, admin.ModelAdmin):
         "singlerow_pos",
         "user",
     )
-    list_filter = (EVFilter, "location")
+    list_filter = (GlobalEventFilter, "location")
     prepopulated_fields = {"slug": ["name"]}
     search_fields = ("name", "slug", "event__name")
     filter_horizontal = ("templates",)
 
 
+class GlobalWindowEventFilter(GlobalEventFilter):
+    title = _("Event")
+    parameter_name = "window__event"
+
+
+class CustomWindowFilter(admin.SimpleListFilter):
+    title = _("ticket window")
+    parameter_name = "window"
+
+    def lookups(self, request, model_admin):
+        windows = TicketWindow.objects.select_related("event")
+        if current_event := request.session.get("current_event", None):
+            windows = windows.filter(event=current_event)
+        return [(str(win.id), str(win)) for win in windows]
+
+    def queryset(self, request, queryset):
+        qs = queryset.select_related("window", "window__event")
+        if not self.value():
+            return qs
+
+        return qs.filter(window__event=self.value())
+
+
+@admin.register(TicketWindowSale)
 class TicketWindowSaleAdmin(admin.ModelAdmin):
     list_display = ("window", "user", "purchase", "price", "payment")
     list_filter = (
+        GlobalWindowEventFilter,
         ("user", admin.RelatedOnlyFieldListFilter),
         "payment",
-        ("window", admin.RelatedOnlyFieldListFilter),
-        ("window__event", admin.RelatedOnlyFieldListFilter),
+        CustomWindowFilter,
     )
     search_fields = ("window__name", "user__username", "window__event__name")
     date_hierarchy = "date"
     autocomplete_fields = ("purchase",)
     readonly_fields = ["purchase"]
 
-    def event_filter(self, request, slug):
-        qs = super().get_queryset(request)
-        return qs.filter(window__event__slug=slug)
 
-    def event_filter_fields(self, slug):
-        return {
-            "window": Q(event__slug=slug),
-            "purchase": Q(ev__slug=slug),
-        }
-
-
+@admin.register(TicketWindowCashMovement)
 class TicketWindowCashMovementAdmin(admin.ModelAdmin):
     list_display = ("id", "day", "window", "famount", "type", "date", "note")
     list_filter = (
+        GlobalWindowEventFilter,
         "type",
-        ("window", admin.RelatedOnlyFieldListFilter),
+        CustomWindowFilter,
         ("date", DateRangeFilter),
     )
     search_fields = ("window__name",)
@@ -93,17 +109,3 @@ class TicketWindowCashMovementAdmin(admin.ModelAdmin):
         return mark_safe(html)
 
     famount.short_description = _("amount")
-
-    def event_filter(self, request, slug):
-        qs = super().get_queryset(request)
-        return qs.filter(window__event__slug=slug)
-
-    def event_filter_fields(self, slug):
-        return {
-            "window": Q(event__slug=slug),
-        }
-
-
-register(TicketWindow, TicketWindowAdmin)
-register(TicketWindowSale, TicketWindowSaleAdmin)
-register(TicketWindowCashMovement, TicketWindowCashMovementAdmin)

@@ -54,8 +54,7 @@ ALLOWED_HOSTS = env_list('ALLOWED_HOSTS', [])
 # Application definition
 
 INSTALLED_APPS = [
-    'custom_admin_templates',
-    'django.contrib.admin',
+    'custom_admin.apps.CustomAdminConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -116,7 +115,6 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'congressus.admin.context_processor',
             ],
             'loaders': [
                 'django.template.loaders.app_directories.Loader',
@@ -279,12 +277,12 @@ if os.path.exists(os.path.join(BASE_DIR, 'theme')):
     INSTALLED_APPS = ['theme'] + INSTALLED_APPS
     try:
         from theme.settings import *
-        REAL_EXTRA_APPS += [i for i in EXTRA_APPS if not i in REAL_EXTRA_APPS]
+        REAL_EXTRA_APPS += [i for i in EXTRA_APPS if i not in REAL_EXTRA_APPS]
     except Exception:
         pass
 
 if REAL_EXTRA_APPS:
-    INSTALLED_APPS += [i for i in REAL_EXTRA_APPS if not i in INSTALLED_APPS]
+    INSTALLED_APPS += [i for i in REAL_EXTRA_APPS if i not in INSTALLED_APPS]
 
 CACHES = {
     'default': {

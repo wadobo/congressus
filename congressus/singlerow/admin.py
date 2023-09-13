@@ -1,28 +1,18 @@
 from django.contrib import admin
 
+from events.admin import GlobalEventFilter
 from .models import SingleRowTail, SingleRowConfig
-from congressus.admin import register
 
 
+@admin.register(SingleRowTail)
 class SingleRowTailAdmin(admin.ModelAdmin):
     list_display = ('event', 'window', 'date')
-    list_filter = ('event', 'window')
+    list_filter = (GlobalEventFilter, 'window')
     search_fields = ('window',)
 
-    def event_filter(self, request, slug):
-        qs = super().get_queryset(request)
-        return qs.filter(event__slug=slug)
 
-
+@admin.register(SingleRowConfig)
 class SingleRowConfigAdmin(admin.ModelAdmin):
     list_display = ('event', 'last_window')
-    list_filter = ('event', )
+    list_filter = (GlobalEventFilter, )
     filter_horizontal = ('waiting', )
-
-    def event_filter(self, request, slug):
-        qs = super().get_queryset(request)
-        return qs.filter(event__slug=slug)
-
-
-register(SingleRowTail, SingleRowTailAdmin)
-register(SingleRowConfig, SingleRowConfigAdmin)

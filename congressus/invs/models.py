@@ -2,24 +2,30 @@ import base64
 import string
 import random
 from io import BytesIO
+from typing import TYPE_CHECKING
 
 import qrcode
 from django.db import models
+from django.db.models.signals import post_delete
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.http.response import HttpResponse
+from django.template import Context, Template, loader
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
+from weasyprint import HTML
 
 from events.models import Event
 from events.models import Session
 from events.models import Gate
 from events.models import SeatLayout
-from events.ticket_pdf import TicketPDF
 from tickets.models import BaseExtraData
 from tickets.models import TicketSeatHold
 from tickets.utils import get_seats_by_str
 
-from django.db.models.signals import post_delete
+
+if TYPE_CHECKING:
+    from events.models import TicketTemplate
 
 
 def short_hour(date_time):
@@ -113,7 +119,7 @@ class Invitation(models.Model, BaseExtraData):
     def used_date(self):
         try:
             return self.usedin.all()[0].date
-        except:
+        except Exception:
             return None
 
     @property
@@ -164,7 +170,45 @@ class Invitation(models.Model, BaseExtraData):
         tax = self.get_tax()
 
         taxtext = _("TAX INC.")
-        return f'<font class="price">{price}</font>   <font class="tax">{tax}% {taxtext}</font>'
+        return (
+            f'<font class="price">{price}</font>   '
+            f'<font class="tax">{tax}% {taxtext}</font>'
+        )
+
+    def get_template(self) -> "TicketTemplate":
+        return self.type.template
+
+    def html_format(self):
+        ticket_template = self.get_template()
+        tpl_child = Template(ticket_template.extra_html)
+        ctx = Context({"ticket": self, "template": ticket_template})
+        preview_data = tpl_child.render(ctx)
+
+        template = loader.get_template("tickets/preview.html")
+        return template.render(
+            {
+                "template": ticket_template,
+                "preview": preview_data,
+            }
+        )
+
+    def get_html(self):
+        return HttpResponse(self.html_format())
+
+    def pdf_format(self, request=None):
+        html = self.html_format()
+        kwargs = {"string": html}
+        if request:
+            kwargs["base_url"] = request.build_absolute_uri()
+        return HTML(**kwargs).write_pdf()
+
+    def get_pdf(self, request):
+        pdf = self.pdf_format(request=request)
+        response = HttpResponse(content_type="application/pdf")
+        fname = 'attachment; filename="tickets.pdf"'
+        response["Content-Disposition"] = fname
+        response.write(pdf)
+        return response
 
     def is_used(self, session):
         return self.usedin.filter(session=session).exists()
@@ -172,7 +216,7 @@ class Invitation(models.Model, BaseExtraData):
     def get_used_date(self, session):
         try:
             return self.usedin.get(session=session).date
-        except:
+        except Exception:
             return None
 
     def set_used(self, session):
@@ -252,12 +296,6 @@ class Invitation(models.Model, BaseExtraData):
         if self.generator:
             return self.generator.tax
         return 0
-
-    def gen_pdf(self):
-        return TicketPDF(self).generate()
-
-    def gen_thermal(self):
-        return TicketPDF(self).generate()
 
     def cseat(self):
         if not self.seat:
@@ -364,7 +402,7 @@ class InvitationGenerator(models.Model):
         return prefix + postfix
 
     def get_seats(self):
-        return get_seats_by_str(self.type.sessions.all(), self.seats)
+        return get_seats_by_str(self.seats)
 
     def clean(self):
         super().clean()
@@ -382,6 +420,58 @@ class InvitationGenerator(models.Model):
         if should_generate:
             self.generate()
 
+    def get_from_print_format(self, print_format):
+        if print_format == "CSV":
+            csv = []
+            name = self.type.name
+            for i, inv in enumerate(self.invitations.all()):
+                line = "%s,%s" % (inv.order, name)
+                if inv.seat_layout and inv.seat:
+                    row, col = inv.seat.split("-")
+                    col = int(col) + inv.seat_layout.column_start_number - 1
+                    line += ",%s,%s,%s" % (inv.seat_layout.gate, row, col)
+                csv.append(line)
+
+            csv_out = []
+            for i, line in enumerate(csv):
+                csv_out.append(("%d," % (i + 1)) + line)
+
+            response = HttpResponse(content_type="application/csv")
+            response["Content-Disposition"] = 'filename="invs.csv"'
+            response.write("\n".join(csv_out))
+            return response
+
+        if print_format == "HTML":
+            return self.get_html()
+
+        if print_format == "PDF":
+            return self.get_pdf()
+
+    def html_format(self):
+        html = ""
+        for inv in self.invitations.select_related(
+            "seat_layout", "seat_layout__gate", "generator", "type", "type__template"
+        ).all():
+            html += inv.html_format()
+        return html
+
+    def pdf_format(self, request=None):
+        html = self.html_format()
+        kwargs = {"string": html}
+        if request:
+            kwargs["base_url"] = request.build_absolute_uri()
+        return HTML(**kwargs).write_pdf()
+
+    def get_html(self):
+        return HttpResponse(self.html_format())
+
+    def get_pdf(self):
+        response = HttpResponse(content_type="application/pdf")
+        fname = 'attachment; filename="tickets.pdf"'
+        response["Content-Disposition"] = fname
+        response.write(self.pdf_format())
+        return response
+
     def generate(self):
         # SEAT LAYOUTS
         seat_list = []
@@ -397,7 +487,7 @@ class InvitationGenerator(models.Model):
             "order", flat=True
         )
 
-        ## Extra sessions
+        # Extra sessions
         data = []
         session_first = self.type.sessions.first()
         for session in self.type.sessions.all():

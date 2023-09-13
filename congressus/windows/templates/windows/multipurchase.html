@@ -124,7 +124,7 @@
         <div class="col-sm-2">
             <label id="print-format">{% trans "Print format" %}</label>
             <select id="print-format" name="print-format">
-                {% for pf, name in print_formats.items %}
+                {% for pf, name in print_formats %}
                     <option value="{{ pf }}" {% if forloop.first %} selected{% endif %}>{{ name }}</option>
                 {% endfor %}
             </select>

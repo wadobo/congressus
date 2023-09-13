@@ -12,6 +12,7 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
+from events.managers import ReadEventManager, WriteEventManager
 from invs.utils import get_sold_invs
 from .widgets import HTMLWidget
 
@@ -284,6 +285,9 @@ class Event(models.Model):
         null=True,
     )
 
+    read_objects = ReadEventManager()
+    objects = WriteEventManager()
+
     class Meta:
         verbose_name = _("event")
         verbose_name_plural = _("events")
@@ -545,7 +549,13 @@ class Session(models.Model):
     tax = models.IntegerField(_("ticket tax percentage"), default=21)
 
     template = models.ForeignKey(
-        "TicketTemplate", verbose_name=_("template"), on_delete=models.CASCADE
+        "TicketTemplate", verbose_name=_("template"), on_delete=models.PROTECT
+    )
+    window_template = models.ForeignKey(
+        "TicketTemplate",
+        verbose_name=_("window template"),
+        on_delete=models.PROTECT,
+        related_name="window_templates",
     )
     autoseat_mode = models.CharField(
         _("autoseat mode"),
@@ -769,7 +779,6 @@ def gencode(sender, instance, created, raw, using, update_fields, **kwargs):
 
 class TicketTemplate(models.Model):
     name = models.CharField(_("name"), max_length=200, unique=True)
-    is_html_format = models.BooleanField(_("is html format"), default=False)
     header = models.ImageField(
         _("header"), upload_to="templheader", blank=True, null=True
     )

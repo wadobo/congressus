@@ -1,8 +1,6 @@
-from django.db.models import Q
-from django.db.models.query import Prefetch
 from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
 
-from congressus.admin import register
 from events.models import (
     ConfirmEmail,
     Discount,
@@ -18,41 +16,34 @@ from events.models import (
     TicketField,
     TicketTemplate,
 )
-from tickets.models import Ticket
 
 
-EVFilter = ("event", admin.RelatedOnlyFieldListFilter)
+class GlobalEventFilter(admin.SimpleListFilter):
+    title = _("Event")
+    parameter_name = "event"
+
+    def lookups(self, request, model_admin):
+        return Event.read_objects.choices()
+
+    def queryset(self, request, queryset):
+        current_event = self.value() or request.session.get("current_event", None)
+        if current_event:
+            return queryset.filter(**{self.parameter_name: current_event})
+        return queryset
 
 
-class EventMixin:
-    def event_filter(self, request, slug):
-        qs = super().get_queryset(request)
-        return qs.filter(event__slug=slug)
-
-    def event_filter_fields(self, slug):
-        return {
-            "event": Q(slug=slug),
-        }
-
-
-class SpaceMixin:
-    def event_filter(self, request, slug):
-        qs = super().get_queryset(request)
-        return qs.filter(space__event__slug=slug)
-
-    def event_filter_fields(self, slug):
-        return {
-            "space": Q(event__slug=slug),
-        }
+class GlobalSpaceEventFilter(GlobalEventFilter):
+    parameter_name = "space__event"
 
 
 class InvCodeInline(admin.TabularInline):
     model = InvCode
 
 
-class InvCodeAdmin(EventMixin, admin.ModelAdmin):
+@admin.register(InvCode)
+class InvCodeAdmin(admin.ModelAdmin):
     list_display = ("event", "person", "code", "type", "used")
-    list_filter = (EVFilter, "used", "type")
+    list_filter = (GlobalEventFilter, "used", "type")
     search_fields = ("event", "person", "code")
 
 
@@ -60,9 +51,10 @@ class SpaceInline(admin.TabularInline):
     model = Space
 
 
-class SpaceAdmin(EventMixin, admin.ModelAdmin):
+@admin.register(Space)
+class SpaceAdmin(admin.ModelAdmin):
     list_display = ("event", "order", "name", "capacity", "numbered")
-    list_filter = (EVFilter, "capacity", "numbered")
+    list_filter = (GlobalEventFilter, "capacity", "numbered")
     search_fields = ("event__name", "name")
     prepopulated_fields = {"slug": ["name"]}
 
@@ -71,6 +63,7 @@ class TicketFieldInline(admin.TabularInline):
     model = TicketField
 
 
+@admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
     inlines = [SpaceInline, TicketFieldInline, InvCodeInline]
     list_display = ("name", "active", "ticket_sale_enabled", "sold")
@@ -86,10 +79,11 @@ class Attachments(admin.TabularInline):
     model = EmailAttachment
 
 
-class ConfirmEmailAdmin(EventMixin, admin.ModelAdmin):
+@admin.register(ConfirmEmail)
+class ConfirmEmailAdmin(admin.ModelAdmin):
     inlines = [Attachments]
     list_display = ("event", "subject")
-    list_filter = (EVFilter,)
+    list_filter = (GlobalEventFilter,)
     search_fields = ("event", "subject", "body")
 
 
@@ -97,72 +91,71 @@ class ExtraSessionInline(admin.TabularInline):
     model = ExtraSession
     fk_name = "orig"
 
-    def event_filter_fields(self, slug):
-        return {
-            "extra": Q(space__event__slug=slug),
-        }
+
+class GlobalOrigSpaceEventFilter(GlobalEventFilter):
+    parameter_name = "orig__space__event"
 
 
+@admin.register(ExtraSession)
 class ExtraSessionAdmin(admin.ModelAdmin):
     list_display = ("orig", "extra", "start", "end", "used")
-
-    def event_filter(self, request, slug):
-        qs = super().get_queryset(request)
-        return qs.filter(orig__space__event__slug=slug)
-
-    def event_filter_fields(self, slug):
-        return {
-            "orig": Q(space__event__slug=slug),
-            "extra": Q(space__event__slug=slug),
-        }
+    list_filter = (GlobalOrigSpaceEventFilter,)
 
 
-class SessionAdmin(SpaceMixin, admin.ModelAdmin):
+class CustomSpaceFilter(admin.SimpleListFilter):
+    title = _("space")
+    parameter_name = "space"
+
+    def lookups(self, request, model_admin):
+        spaces = Space.objects.select_related("event")
+        if current_event := request.session.get("current_event", None):
+            spaces = spaces.filter(event=current_event)
+        return [(str(sp.id), str(sp)) for sp in spaces]
+
+    def queryset(self, request, queryset):
+        qs = queryset.select_related("space", "space__event")
+        if not self.value():
+            return qs
+
+        return qs.filter(space=self.value())
+
+
+@admin.register(Session)
+class SessionAdmin(admin.ModelAdmin):
     inlines = [ExtraSessionInline]
     list_display = ("space", "name", "start", "end", "price", "tax")
-    list_filter = (("space", admin.RelatedOnlyFieldListFilter),)
+    list_filter = (GlobalSpaceEventFilter, CustomSpaceFilter)
     search_fields = ("space__name", "name", "space__event__name")
     prepopulated_fields = {"slug": ["name"]}
 
     date_hierarchy = "start"
 
 
+@admin.register(SeatMap)
 class SeatMapAdmin(admin.ModelAdmin):
     list_display = ("name",)
     list_filter = ("name",)
     search_fields = ("name",)
 
 
+@admin.register(SeatLayout)
 class SeatLayoutAdmin(admin.ModelAdmin):
     list_display = ("name", "map", "top", "left", "direction")
     list_filter = ("map",)
     search_fields = ("map__name", "name")
 
 
-class GateAdmin(EventMixin, admin.ModelAdmin):
+@admin.register(Gate)
+class GateAdmin(admin.ModelAdmin):
     list_display = ("event", "name")
-    list_filter = (EVFilter,)
+    list_filter = (GlobalEventFilter,)
 
 
+@admin.register(TicketTemplate)
 class TicketTemplateAdmin(admin.ModelAdmin):
-    list_display = ("name", "is_html_format")
-    list_filter = ("is_html_format",)
+    list_display = ("name",)
 
 
+@admin.register(Discount)
 class DiscountAdmin(admin.ModelAdmin):
     list_display = ("name", "type", "value")
-
-
-register(Event, EventAdmin)
-register(InvCode, InvCodeAdmin)
-register(ConfirmEmail, ConfirmEmailAdmin)
-register(Space, SpaceAdmin)
-register(ExtraSession, ExtraSessionAdmin)
-register(Session, SessionAdmin)
-
-register(SeatMap, SeatMapAdmin)
-register(SeatLayout, SeatLayoutAdmin)
-register(Gate, GateAdmin)
-
-register(TicketTemplate, TicketTemplateAdmin)
-register(Discount, DiscountAdmin)

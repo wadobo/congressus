@@ -16,11 +16,11 @@ from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, View
 
+from events.choices import SessionTemplate
 from events.models import Discount, Event, Session
 from tickets.forms import MPRegisterForm
 from tickets.models import Ticket
 from tickets.models import MultiPurchase
-from tickets.utils import get_ticket_format
 from tickets.views import MultiPurchaseView
 from windows.models import TicketWindow
 from windows.models import TicketWindowSale
@@ -108,14 +108,7 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
         ctx["window"] = ticket_window
         ctx["subsum"] = True
 
-        templates = ticket_window.get_available_templates()
-        if not templates:
-            messages.warning(
-                self.request,
-                _("Templates not found, is necessary selected any template"),
-            )
-        pf = tuple(templates.keys())[0]
-        ctx["print_formats"] = templates
+        ctx["print_formats"] = SessionTemplate.choices
 
         ctx["discounts"] = self.get_discounts()
         ctx["window_status"] = _("Opened") if ticket_window.singlerow else _("Closed")
@@ -137,7 +130,8 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
                     kwargs={
                         "ev": ticket_window.event.slug,
                         "w": ticket_window.slug,
-                        "pf": pf,
+                        # TODO: El pf de la última entrada no se cual es
+                        "pf": SessionTemplate.WINDOW,
                         "order": str(last_sale.purchase),
                     },
                 ),
@@ -148,12 +142,12 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
         w = self.get_window()
 
         ids = [
-            (i[len("number_") :], request.POST[i])
+            (i[len("number_"):], request.POST[i])
             for i in request.POST
             if i.startswith("number_")
         ]
         seats = [
-            (i[len("seats_") :], request.POST[i].split(","))
+            (i[len("seats_"):], request.POST[i].split(","))
             for i in request.POST
             if i.startswith("seats_")
         ]
@@ -252,8 +246,7 @@ class WindowTicket(WindowMultiPurchase):
 
     def get(self, request, ev=None, pf=None, order=None, w=None):
         mp = self.get_mp(order)
-        response = get_ticket_format(mp, pf=pf, attachment=False, request=request)
-        return response
+        return mp.get_html(session_template=SessionTemplate(pf))
 
 
 window_ticket = WindowTicket.as_view()

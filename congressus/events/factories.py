@@ -82,6 +82,7 @@ class SessionFactory(DjangoModelFactory):
     end = Faker('date_time', tzinfo=settings.TZINFO)
 
     template = SubFactory(TicketTemplateFactory)
+    window_template = SubFactory(TicketTemplateFactory)
 
 
 class ExtraSessionFactory(DjangoModelFactory):

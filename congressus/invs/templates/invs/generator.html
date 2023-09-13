@@ -12,6 +12,10 @@
         {% endblock %}
     </div>
 
+    <div>
+        {% trans "WARNING: Only can create one invitation or pass at same time" %}
+    </div>
+
     <form id="form-gen" class="form" method="POST" action="">
         {% csrf_token %}
 
@@ -24,8 +28,9 @@
                     </div>
                 </div>
                 <input type="text" id="seats" name="seats" class="form-control"
-                        placeholder="{% trans "Show Thursday seats" %}. Example: C1[1-1,1-3]; C2[2-1:2-4]" />
+                        placeholder="{% trans "Define seats if necessary" %}. Example: C1[1-1,1-3]; C2[2-1:2-4]" />
                 <span id="span-seats"></span>
+                </br>
             </div>
             <div class="col-sm-6">
                 <div class="panel panel-info">
@@ -73,8 +78,8 @@
             <div class="col-sm-2">
                 <label id="print-format">{% trans "Print format" %}</label>
                 <select id="print-format" name="print-format">
-                    {% for pf, name in print_formats.items %}
-                        <option value="{{ pf }}" {% if pf == default_pf %} selected{% endif %}>{{ name }}</option>
+                    {% for pf in print_formats %}
+                        <option value="{{ pf }}">{{ pf }}</option>
                     {% endfor %}
                 </select>
                 <button id="finish" class="btn btn-success btn-block btn-lg">
@@ -91,7 +96,6 @@
             $("#clean").click(function() {
                 $(".invinput").val("0");
                 $("#seats").val("");
-                $("#seats").hide();
                 $("[value=none]").click();
                 $("#price").val("0");
                 $("#comment").val("");
@@ -107,6 +111,7 @@
                 if (next > max) {
                     next = max;
                 }
+                $(".invinput").val("0");
                 $(id).val(next);
                 $(id).change();
             });
@@ -119,51 +124,34 @@
                 if (next < min) {
                     next = min;
                 }
+                $(".invinput").val("0");
                 $(id).val(next);
                 $(id).change();
             });
 
-            show_thu = 3;
-            var total_seats = 0;
-            show_thursday = $("#" + show_thu);
-            input_seat = $("#seats");
-            input_seat.hide();
-
-            function check_validity() {
-                if (show_thursday.val() != total_seats) {
-                    $("#finish").attr("disabled", true);
-                } else {
-                    $("#finish").attr("disabled", false);
-                }
-            }
-
-            show_thursday.on('keyup change', function() {
-                if (show_thursday.val() > 0) {
-                    input_seat.show();
-                    check_validity(total_seats);
-                } else {
-                    input_seat.hide();
-                    input_seat.val("");
-                    $("#finish").attr("disabled", false);
-                }
+            $(".invinput").keyup(function() {
+                var value = $(this).val();
+                $(".invinput").val("0");
+                $(this).val(value);
             });
+
+            var total_seats = 0;
+            input_seat = $("#seats");
 
             input_seat.keyup(function() {
                 value = input_seat.val();
                 $.ajax({
                     type: "POST",
-                    data: {'invi_type': show_thu, 'string': value},
+                    data: {'string': value},
                     dataType: 'JSON',
                     url: "/seats/bystr/",
                     success: function(msg) {
                         if (msg.error) {
                             m = msg.error;
                             total_seats = 0;
-                            check_validity();
                         } else {
                             m = "Total:" + msg.total + "-->" + msg.values;
                             total_seats = msg.total;
-                            check_validity();
                         }
                         $("#span-seats").text(m);
                     }

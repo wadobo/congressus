@@ -25,7 +25,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, View
 from django.views.generic.edit import CreateView
 from pyDes import triple_des, CBC
-from weasyprint import HTML
 
 from tickets.models import (
     MultiPurchase,
@@ -40,12 +39,12 @@ from events.models import (
     Session,
     Space,
 )
+from events.choices import SessionTemplate
 
 
 from events.factories import SeatLayoutFactory, SessionFactory
-from invs.models import InvitationType
 from tickets.forms import MPRegisterForm, RegisterForm
-from tickets.utils import get_ticket_format, get_seats_by_str, search_seats
+from tickets.utils import get_seats_by_str, search_seats
 from windows.utils import online_sale
 
 logger = logging.getLogger(__name__)
@@ -250,11 +249,11 @@ def tpv_parse_data(mdata, sig):
 
 def get_ticket_or_404(**kwargs):
     try:
-        tk = MultiPurchase.objects.get(**kwargs)
+        tk = MultiPurchase.read_objects.filter(**kwargs).with_ticket_templates().get()
     except ObjectDoesNotExist:
         logger.warning("MultiPurchase not found %s", kwargs)
         try:
-            tk = Ticket.objects.get(**kwargs)
+            tk = Ticket.read_objects.filter(**kwargs).with_templates().get()
         except ObjectDoesNotExist:
             logger.warning("Ticket not found %s", kwargs)
             raise Http404
@@ -404,15 +403,7 @@ class Thanks(TemplateView):
 
     def post(self, request, order):
         ticket = get_ticket_or_404(order=request.POST.get("ticket"), confirmed=True)
-        pf = None
-        sale = ticket.get_first_ticket_window_sale()
-        if sale:
-            template = sale.get_first_template()
-            if template and hasattr(template, "id"):
-                pf = template.id
-
-        response = get_ticket_format(ticket, pf=pf, force_pdf=True, request=request)
-        return response
+        return ticket.get_pdf(session_template=SessionTemplate.ONLINE, request=request)
 
     def get_context_data(self, *args, **kwargs):
         ctx = super(Thanks, self).get_context_data(*args, **kwargs)
@@ -604,10 +595,10 @@ class TicketTemplatePreview(UserPassesTestMixin, View):
         u = self.request.user
         return u.is_authenticated and u.is_superuser
 
-    def _fake_ticket(self) -> Ticket:
+    def _fake_ticket(self, ticket_template) -> Ticket:
         session = SessionFactory.build(
             name=formats.date_format(timezone.now(), "l"),
-            template=self.template,
+            template=ticket_template,
         )
         seat_layout = SeatLayoutFactory.build(
             map=session.space.seat_map,
@@ -623,34 +614,20 @@ class TicketTemplatePreview(UserPassesTestMixin, View):
     def get(self, request, id):
         from events.models import TicketTemplate
 
-        self.template = get_object_or_404(TicketTemplate, pk=id)
-        ticket = self._fake_ticket()
-
-        if self.template.is_html_format:
-            response = HttpResponse(ticket.generate_html(self.template))
-        else:
-            response = get_ticket_format(ticket, pf=id, attachment=False, request=request)
-        return response
+        ticket_template = get_object_or_404(TicketTemplate, pk=id)
+        ticket = self._fake_ticket(ticket_template)
+        return ticket.get_html(
+            session_template=SessionTemplate.ONLINE, preview_pdf=True
+        )
 
 
 class TicketTemplatePreviewPDF(TicketTemplatePreview):
     def get(self, request, id):
         from events.models import TicketTemplate
 
-        self.template = get_object_or_404(TicketTemplate, pk=id)
-        ticket = self._fake_ticket()
-
-        if not self.template.is_html_format:
-            return HttpResponse("No tenemos un HTML en que basarnos")
-
-        html_code = ticket.generate_html(self.template)
-
-        pdf = HTML(string=html_code, base_url=request.build_absolute_uri()).write_pdf()
-
-        # Devolver el PDF generado para su descarga
-        response = HttpResponse(pdf, content_type="application/pdf")
-        response["Content-Disposition"] = 'attachment; filename="converted_pdf.pdf"'
-        return response
+        ticket_template = get_object_or_404(TicketTemplate, pk=id)
+        ticket = self._fake_ticket(ticket_template)
+        return ticket.get_pdf(session_template=SessionTemplate.ONLINE, request=request)
 
 
 class EmailConfirmPreview(UserPassesTestMixin, View):
@@ -701,22 +678,16 @@ email_confirm_preview = EmailConfirmPreview.as_view()
 class SeatsByStr(View):
     def post(self, request):
         ctx = {}
-        invi_type_id = request.POST.get("invi_type")
-        if invi_type_id:
-            invi_type = get_object_or_404(InvitationType, id=invi_type_id)
-            sessions = invi_type.sessions.all()
-            string = request.POST.get("string", "")
-            try:
-                dic = get_seats_by_str(sessions, string)
-                total = 0
-                for val in dic.values():
-                    total += len(val)
-                ctx["total"] = total
-                ctx["values"] = dic.__str__()
-            except Exception:
-                ctx["error"] = "invalid"
-        else:
-            ctx["error"] = _("neccessary select invitation type")
+        string = request.POST.get("string", "")
+        try:
+            dic = get_seats_by_str(string)
+            total = 0
+            for val in dic.values():
+                total += len(val)
+            ctx["total"] = total
+            ctx["values"] = dic.__str__()
+        except Exception:
+            ctx["error"] = "invalid"
         return JsonResponse(ctx)
 
 

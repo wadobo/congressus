@@ -1,0 +1,22 @@
+{% extends "admin/index.html" %}
+{% load i18n %}
+
+{% block content %}
+  <div class="dashboard">
+    <div class="dashboard-module">
+        <h2>
+            <form method="post">
+                {% csrf_token %}
+                {% trans 'Event filter by ' %}
+                <select name="event_name" onchange="this.form.submit()">
+                    <option value="" {% if not current_event %}selected{% endif %}>{% trans 'All' %}</option>
+                    {% for id, name in event_names %}
+                    <option value="{{ id }}" {% if current_event == id %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+        </h2>
+    </div>
+  </div>
+  {{block.super}}
+{% endblock %}
