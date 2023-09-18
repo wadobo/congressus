@@ -70,7 +70,8 @@ CHILD_TEMPLATE = """
   </div>
 
   <div class="codeimg">
-    <img src="data:image/png;base64,{{ ticket.gen_qr }}" />
+    <img src="data:image/png;base64,{{ qr_group }}" />
+    <img src="data:image/png;base64,{{ qr }}" />
   </div>
 
   <div class="order">

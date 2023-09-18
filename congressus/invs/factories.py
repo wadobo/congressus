@@ -1,5 +1,5 @@
 from django.conf import settings
-from factory import Faker, SubFactory
+from factory import Faker, SubFactory, post_generation
 from factory.django import DjangoModelFactory
 from events.factories import EventFactory, TicketTemplateFactory
 
@@ -38,3 +38,13 @@ class InvitationFactory(DjangoModelFactory):
 
     type = SubFactory(InvitationTypeFactory)
     generator = SubFactory(InvitationGeneratorFactory)
+
+    @post_generation
+    def sessions(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+        if extracted:
+            # A list of groups were passed in, use them
+            for session in extracted:
+                self.sessions.add(session)

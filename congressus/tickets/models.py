@@ -18,13 +18,18 @@ from django.template.loader import get_template
 from django.urls import reverse
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
+from PIL import ImageDraw, ImageFont
 from weasyprint import HTML
 
 from events.choices import SessionTemplate
-from events.models import Event, InvCode
-from events.models import Session
-from events.models import Discount
-from events.models import SeatLayout
+from events.models import (
+    Discount,
+    Event,
+    ExtraSession,
+    InvCode,
+    SeatLayout,
+    Session,
+)
 from tickets.managers import (
     ReadMultiPurchaseManager,
     ReadTicketManager,
@@ -60,6 +65,57 @@ def short_hour(date_time):
     return formats.date_format(date_time, "H:i")
 
 
+class BaseTicketModel:
+    @classmethod
+    def prefix(cls) -> str:
+        raise NotImplementedError
+
+    def gen_order(
+        self, *, length: int = settings.ORDER_SIZE, save: bool = True
+    ) -> None:
+        prefix = self.prefix()
+        chars = string.ascii_uppercase + string.digits
+        _length = length - len(prefix)
+        while 1:
+            order = prefix + "".join(random.choice(chars) for _ in range(_length))
+            if not self.is_order_used(order):
+                break
+
+        self.order = order
+        if save:
+            self.save()
+
+    @classmethod
+    def gen_orders(cls, *, length: int = settings.ORDER_SIZE, amount: int = 1) -> None:
+        prefix = cls.prefix()
+        chars = string.ascii_uppercase + string.digits
+        _length = length - len(prefix)
+
+        chars = string.ascii_uppercase + string.digits
+        orders = set()
+        while len(orders) < amount:
+            orders.add(prefix + "".join(random.choice(chars) for _ in range(_length)))
+        return tuple(orders)
+
+    def is_order_used(self, order):
+        return self.__class__.objects.filter(order=order).exists()
+
+    def gen_qr(self, qr_size: float = 10, border: int = 4):
+        """
+        border: default is 4, which is the minimum according to the specs
+        """
+        stream = BytesIO()
+        img = qrcode.make(
+            self.order,
+            error_correction=qrcode.constants.ERROR_CORRECT_H,
+            box_size=qr_size + 2 * border,
+            border=border,
+        )
+
+        img.save(stream, format="png")
+        return base64.b64encode(stream.getvalue()).decode("utf8")
+
+
 class BaseTicketMixing:
     """
     Common base class for ticket and MultiPurchase to avoid django model
@@ -71,29 +127,6 @@ class BaseTicketMixing:
 
     def event(self):
         return self.space().event
-
-    def is_order_used(self, order):
-        tk = Ticket.objects.filter(order=order).exists()
-        mp = MultiPurchase.objects.filter(order=order).exists()
-        return mp or tk
-
-    def gen_order(self, save=True):
-        chars = string.ascii_uppercase + string.digits
-        lenght = 8
-        if hasattr(settings, "ORDER_SIZE"):
-            lenght = settings.ORDER_SIZE
-
-        order = ""
-        used = True
-        reserved = True
-        while used or reserved:
-            order = "".join(random.choice(chars) for _ in range(lenght))
-            used = self.is_order_used(order)
-            reserved = order.startswith(settings.INVITATION_ORDER_START)
-
-        self.order = order
-        if save:
-            self.save()
 
     def gen_order_tpv(self):
         chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -315,8 +348,7 @@ class BaseExtraData:
         return extras
 
     def get_extra_sessions(self):
-        d = self.get_extra_data("extra_sessions")
-        return d or []
+        return self.get_extra_data("extra_sessions") or []
 
     def get_extra_session(self, pk):
         for extra in self.get_extra_sessions():
@@ -353,7 +385,7 @@ class BaseExtraData:
         self.set_extra_data("extra_sessions", data)
 
 
-class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
+class MultiPurchase(models.Model, BaseTicketModel, BaseTicketMixing, BaseExtraData):
     ev = models.ForeignKey(
         Event, related_name="mps", verbose_name=_("event"), on_delete=models.CASCADE
     )
@@ -407,6 +439,10 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
 
         super().save(*args, **kw)
 
+    @classmethod
+    def prefix(cls) -> str:
+        return "M"
+
     @property
     def price(self):
         total = sum([i.get_price(mp=self) for i in self.tickets.all()])
@@ -441,6 +477,49 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
         if not tws:
             return "-"
         return tws[0]
+
+    def gen_qr(self, qr_size: float = 10, border: int = 4):
+        """Override gen_qr for put ticket number in the middle of QR"""
+        stream = BytesIO()
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_H,
+            box_size=qr_size + 2 * border,
+            border=border,
+        )
+        qr.add_data(self.order)
+        qr.make(fit=True)
+
+        qr_img = qr.make_image()
+
+        draw = ImageDraw.Draw(qr_img)
+        circle_size = qr_img.pixel_size / 4
+        draw.ellipse(
+            (
+                int((qr_img.size[0] - circle_size) / 2),
+                int((qr_img.size[1] - circle_size) / 2),
+                int((qr_img.size[0] + circle_size) / 2),
+                int((qr_img.size[1] + circle_size) / 2),
+            ),
+            fill="white",
+            outline="black",
+            width=4,
+        )
+
+        number = len(self.all_tickets())
+        font = ImageFont.truetype("static/fonts/Aileron-Bold.otf", size=96)
+        text_w, text_h = draw.textsize(str(number), font=font)
+        draw.text(
+            (
+                int((qr_img.size[0] - text_w) / 2),
+                int((qr_img.size[1] - text_h) / 2.1),  # 2.1 for correct height
+            ),
+            str(number),
+            font=font,
+            align="center",
+        )
+        qr_img.save(stream, format="png")
+        return base64.b64encode(stream.getvalue()).decode("utf8")
 
     def space(self):
         """Multiple spaces"""
@@ -479,11 +558,35 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
 
     def html_format(self, session_template: SessionTemplate, preview_pdf: bool = False):
         html = ""
+        qr_group = None
+        if self.check_valid_group():
+            qr_group = self.gen_qr()
+
         for ticket in self.tickets.all():
             html += ticket.html_format(
-                session_template=session_template, preview_pdf=preview_pdf
+                session_template=session_template,
+                preview_pdf=preview_pdf,
+                qr_group=qr_group,
             )
         return html
+
+    def check_valid_group(self) -> bool:
+        tickets = self.tickets.all()
+        if len(tickets) < 2 or len(tickets) > 20:
+            return False
+
+        sessions = [t.session for t in tickets]
+        distinct_sessions = set(sessions)
+        if len(distinct_sessions) == 1:
+            return True
+
+        is_conflict_extra_sessions = ExtraSession.objects.filter(
+            orig__in=sessions, extra__in=sessions
+        ).exists()
+        if is_conflict_extra_sessions:
+            return False
+
+        return True
 
     def all_tickets(self):
         return self.tickets.select_related("session", "session__template").order_by(
@@ -581,7 +684,7 @@ class MultiPurchase(models.Model, BaseTicketMixing, BaseExtraData):
         return self.order
 
 
-class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
+class Ticket(models.Model, BaseTicketModel, BaseTicketMixing, BaseExtraData):
     session = models.ForeignKey(
         Session,
         related_name="tickets",
@@ -671,6 +774,10 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
 
     def __str__(self):
         return self.order
+
+    @classmethod
+    def prefix(cls) -> str:
+        return "T"
 
     @property
     def wcode(self) -> str:
@@ -813,10 +920,25 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
 
         raise Exception(_("Not found ticket template"))
 
-    def html_format(self, session_template: SessionTemplate, preview_pdf: bool = False):
+    def html_format(
+        self,
+        session_template: SessionTemplate,
+        preview_pdf: bool = False,
+        qr_group=None,
+    ):
         ticket_template = self.get_template(session_template)
         tpl_child = Template(ticket_template.extra_html)
-        ctx = Context({"ticket": self, "template": ticket_template})
+        qr = self.gen_qr()
+        if qr_group is None:
+            qr_group = qr
+        ctx = Context(
+            {
+                "ticket": self,
+                "qr": qr,
+                "qr_group": qr_group,
+                "template": ticket_template,
+            }
+        )
         preview_data = tpl_child.render(ctx)
 
         template = loader.get_template("tickets/preview.html")
@@ -849,19 +971,6 @@ class Ticket(models.Model, BaseTicketMixing, BaseExtraData):
             return self.get_window_price()
         else:
             return self.get_price()
-
-    def gen_qr(self, qr_size: float = 10, border: int = 4):
-        """
-        border: default is 4, which is the minimum according to the specs
-        """
-        stream = BytesIO()
-        img = qrcode.make(
-            self.order,
-            box_size=qr_size + 2 * border,
-            border=border,
-        )
-        img.save(stream, format="png")
-        return base64.b64encode(stream.getvalue()).decode("utf8")
 
 
 class TicketWarning(models.Model):

@@ -241,8 +241,6 @@ WS_SERVER = f'ws.{DOMAIN}'
 TIMESTEP_CHART = 'daily'
 MAX_STEP_CHART = 10
 
-INVITATION_ORDER_START = '01'
-
 MAX_SEAT_BY_SESSION = 50
 EXPIRED_SEAT_H = 5*60 # 5 minutes
 EXPIRED_SEAT_C = 15*60 # 15 minutes
@@ -313,7 +311,6 @@ if DEBUG and DEBUG_TOOLS:
         'debug_toolbar.panels.templates.TemplatesPanel',
         'debug_toolbar.panels.cache.CachePanel',
         'debug_toolbar.panels.signals.SignalsPanel',
-        'debug_toolbar.panels.logging.LoggingPanel',
         'debug_toolbar.panels.redirects.RedirectsPanel',
     ]
 

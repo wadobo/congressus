@@ -1,6 +1,4 @@
 import base64
-import string
-import random
 from io import BytesIO
 from typing import TYPE_CHECKING
 
@@ -19,7 +17,7 @@ from events.models import Event
 from events.models import Session
 from events.models import Gate
 from events.models import SeatLayout
-from tickets.models import BaseExtraData
+from tickets.models import BaseExtraData, BaseTicketModel
 from tickets.models import TicketSeatHold
 from tickets.utils import get_seats_by_str
 
@@ -74,7 +72,7 @@ class InvitationType(models.Model):
         return self.name
 
 
-class Invitation(models.Model, BaseExtraData):
+class Invitation(models.Model, BaseTicketModel, BaseExtraData):
     type = models.ForeignKey(
         InvitationType,
         related_name="invitations",
@@ -110,6 +108,10 @@ class Invitation(models.Model, BaseExtraData):
     class Meta:
         verbose_name = _("invitation")
         verbose_name_plural = _("invitations")
+
+    @classmethod
+    def prefix(cls) -> str:
+        return "I"
 
     @property
     def used(self):
@@ -210,6 +212,9 @@ class Invitation(models.Model, BaseExtraData):
         response.write(pdf)
         return response
 
+    def event(self):
+        return self.type.event
+
     def is_used(self, session):
         return self.usedin.filter(session=session).exists()
 
@@ -225,43 +230,6 @@ class Invitation(models.Model, BaseExtraData):
 
     def get_gate_name(self):
         return ", ".join(i.name for i in self.type.gates.all())
-
-    def gen_order(self, starts=""):
-        """Generate order for passes and invitations"""
-        starts = starts or settings.INVITATION_ORDER_START
-        chars = string.ascii_uppercase + string.digits
-        l = 8
-        if hasattr(settings, "ORDER_SIZE"):
-            l = settings.ORDER_SIZE
-
-        l -= len(starts)
-
-        order = ""
-        used = True
-        while used:
-            order = "".join(random.choice(chars) for _ in range(l))
-            order = starts + order
-            used = self.is_order_used(order)
-        self.order = order
-        self.save()
-
-    @staticmethod
-    def gen_orders(starts="", amount=10) -> tuple[str]:
-        starts = starts or settings.INVITATION_ORDER_START
-
-        length = 8
-        if hasattr(settings, "ORDER_SIZE"):
-            length = settings.ORDER_SIZE
-        length -= len(starts)
-
-        orders = set()
-        chars = string.ascii_uppercase + string.digits
-        while len(orders) < amount:
-            orders.add(starts + "".join(random.choice(chars) for _ in range(length)))
-        return tuple(orders)
-
-    def is_order_used(self, order):
-        return Invitation.objects.filter(order=order).exists()
 
     def save_extra_sessions(self):
         data = []
@@ -337,6 +305,7 @@ class Invitation(models.Model, BaseExtraData):
         stream = BytesIO()
         img = qrcode.make(
             self.order,
+            error_correction=qrcode.constants.ERROR_CORRECT_H,
             box_size=qr_size + 2 * border,
             border=border,
         )

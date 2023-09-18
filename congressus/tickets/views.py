@@ -12,8 +12,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Count
-from django.db.models import Q
+from django.db import transaction
+from django.db.models import Count, Q
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import Context
@@ -32,6 +32,7 @@ from tickets.models import (
     TicketSeatHold,
 )
 from tickets.factories import TicketFactory
+from tickets.factories import MultiPurchaseFactory
 from events.models import (
     Event,
     SeatLayout,
@@ -595,39 +596,59 @@ class TicketTemplatePreview(UserPassesTestMixin, View):
         u = self.request.user
         return u.is_authenticated and u.is_superuser
 
-    def _fake_ticket(self, ticket_template) -> Ticket:
-        session = SessionFactory.build(
+    def _fake_mp(self, ticket_template) -> Ticket:
+        session = SessionFactory.create(
             name=formats.date_format(timezone.now(), "l"),
             template=ticket_template,
         )
-        seat_layout = SeatLayoutFactory.build(
-            map=session.space.seat_map,
-            name="C10",
-            gate__event=session.space.event,
+        mp = MultiPurchaseFactory.create(ev=session.space.event)
+        seat_layout = SeatLayoutFactory.create(
+            name="C10", gate__event=session.space.event
         )
-        ticket = TicketFactory.build(seat_layout=seat_layout, seat="150-100")
-        ticket.gen_order(save=False)
-        ticket.created = timezone.now()
-        ticket.session = session
-        return ticket
+        ticket1 = TicketFactory.create(
+            session=session,
+            seat_layout=seat_layout,
+            seat="150-100",
+        )
+        ticket1.gen_order(save=False)
+        ticket1.created = timezone.now()
+        ticket1.save()
+        mp.tickets.add(ticket1)
 
-    def get(self, request, id):
-        from events.models import TicketTemplate
+        ticket2 = TicketFactory.create(
+            session=session,
+            seat_layout=seat_layout,
+            seat="150-101",
+        )
+        ticket2.gen_order(save=False)
+        ticket2.created = timezone.now()
+        ticket2.save()
+        mp.tickets.add(ticket2)
+        return mp
 
-        ticket_template = get_object_or_404(TicketTemplate, pk=id)
-        ticket = self._fake_ticket(ticket_template)
-        return ticket.get_html(
+    def get_response(self, mp):
+        return mp.get_html(
             session_template=SessionTemplate.ONLINE, preview_pdf=True
         )
 
-
-class TicketTemplatePreviewPDF(TicketTemplatePreview):
     def get(self, request, id):
         from events.models import TicketTemplate
 
         ticket_template = get_object_or_404(TicketTemplate, pk=id)
-        ticket = self._fake_ticket(ticket_template)
-        return ticket.get_pdf(session_template=SessionTemplate.ONLINE, request=request)
+        response = None
+        try:
+            with transaction.atomic():
+                mp = self._fake_mp(ticket_template)
+                response = self.get_response(mp)
+                raise Exception("For remove fake data")
+        except Exception:
+            pass
+        return response
+
+
+class TicketTemplatePreviewPDF(TicketTemplatePreview):
+    def get_response(self, mp):
+        return mp.get_pdf(session_template=SessionTemplate.ONLINE, request=None)
 
 
 class EmailConfirmPreview(UserPassesTestMixin, View):
