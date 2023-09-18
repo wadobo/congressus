@@ -508,11 +508,11 @@ class MultiPurchase(models.Model, BaseTicketModel, BaseTicketMixing, BaseExtraDa
 
         number = len(self.all_tickets())
         font = ImageFont.truetype("static/fonts/Aileron-Bold.otf", size=96)
-        text_w, text_h = draw.textsize(str(number), font=font)
+        text_length = draw.textlength(str(number), font=font)
         draw.text(
             (
-                int((qr_img.size[0] - text_w) / 2),
-                int((qr_img.size[1] - text_h) / 2.1),  # 2.1 for correct height
+                int((qr_img.size[0] - text_length) / 2),
+                int((qr_img.size[1] - circle_size * 2 / 3) / 2),
             ),
             str(number),
             font=font,

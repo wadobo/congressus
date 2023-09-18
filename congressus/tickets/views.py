@@ -51,6 +51,10 @@ from windows.utils import online_sale
 logger = logging.getLogger(__name__)
 
 
+class FakeException(Exception):
+    pass
+
+
 class EventView(TemplateView):
     template_name = "tickets/event.html"
 
@@ -640,9 +644,11 @@ class TicketTemplatePreview(UserPassesTestMixin, View):
             with transaction.atomic():
                 mp = self._fake_mp(ticket_template)
                 response = self.get_response(mp)
-                raise Exception("For remove fake data")
-        except Exception:
+                raise FakeException("For remove fake data")
+        except FakeException:
             pass
+        except Exception as e:
+            raise e
         return response
 
 
