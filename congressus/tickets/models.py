@@ -100,19 +100,43 @@ class BaseTicketModel:
     def is_order_used(self, order):
         return self.__class__.objects.filter(order=order).exists()
 
-    def gen_qr(self, qr_size: float = 10, border: int = 4):
-        """
-        border: default is 4, which is the minimum according to the specs
-        """
+    def gen_qr(self, qr_size: float = 10, border: int = 4, number: int = 0):
         stream = BytesIO()
-        img = qrcode.make(
-            self.order,
+        qr = qrcode.QRCode(
+            version=1,
             error_correction=qrcode.constants.ERROR_CORRECT_H,
             box_size=qr_size + 2 * border,
             border=border,
         )
+        qr.add_data(self.order)
+        qr.make(fit=True)
 
-        img.save(stream, format="png")
+        qr_img = qr.make_image()
+
+        if number:
+            draw = ImageDraw.Draw(qr_img)
+            circle_size = qr_img.pixel_size / 4
+            draw.ellipse(
+                (
+                    int((qr_img.size[0] - circle_size) / 2),
+                    int((qr_img.size[1] - circle_size) / 2),
+                    int((qr_img.size[0] + circle_size) / 2),
+                    int((qr_img.size[1] + circle_size) / 2),
+                ),
+                fill="white",
+                outline="black",
+                width=4,
+            )
+
+            font = ImageFont.truetype("static/fonts/Aileron-Bold.otf", size=96)
+            draw.text(
+                xy=(int(qr_img.size[0] / 2), int(qr_img.size[1] / 2)),
+                text=str(number),
+                anchor="mm",
+                font=font,
+            )
+
+        qr_img.save(stream, format="png")
         return base64.b64encode(stream.getvalue()).decode("utf8")
 
 
@@ -478,49 +502,6 @@ class MultiPurchase(models.Model, BaseTicketModel, BaseTicketMixing, BaseExtraDa
             return "-"
         return tws[0]
 
-    def gen_qr(self, qr_size: float = 10, border: int = 4):
-        """Override gen_qr for put ticket number in the middle of QR"""
-        stream = BytesIO()
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_H,
-            box_size=qr_size + 2 * border,
-            border=border,
-        )
-        qr.add_data(self.order)
-        qr.make(fit=True)
-
-        qr_img = qr.make_image()
-
-        draw = ImageDraw.Draw(qr_img)
-        circle_size = qr_img.pixel_size / 4
-        draw.ellipse(
-            (
-                int((qr_img.size[0] - circle_size) / 2),
-                int((qr_img.size[1] - circle_size) / 2),
-                int((qr_img.size[0] + circle_size) / 2),
-                int((qr_img.size[1] + circle_size) / 2),
-            ),
-            fill="white",
-            outline="black",
-            width=4,
-        )
-
-        number = len(self.all_tickets())
-        font = ImageFont.truetype("static/fonts/Aileron-Bold.otf", size=96)
-        text_length = draw.textlength(str(number), font=font)
-        draw.text(
-            (
-                int((qr_img.size[0] - text_length) / 2),
-                int((qr_img.size[1] - circle_size * 2 / 3) / 2),
-            ),
-            str(number),
-            font=font,
-            align="center",
-        )
-        qr_img.save(stream, format="png")
-        return base64.b64encode(stream.getvalue()).decode("utf8")
-
     def space(self):
         """Multiple spaces"""
         return None
@@ -558,16 +539,26 @@ class MultiPurchase(models.Model, BaseTicketModel, BaseTicketMixing, BaseExtraDa
 
     def html_format(self, session_template: SessionTemplate, preview_pdf: bool = False):
         html = ""
-        qr_group = None
-        if self.check_valid_group():
-            qr_group = self.gen_qr()
+        should_gen_group = self.check_valid_group()
 
-        for ticket in self.tickets.all():
-            html += ticket.html_format(
-                session_template=session_template,
-                preview_pdf=preview_pdf,
-                qr_group=qr_group,
-            )
+        ticket_group_by_session = {}
+        for ticket in self.tickets.all().order_by("session_id"):
+            if ticket.session_id not in ticket_group_by_session:
+                ticket_group_by_session[ticket.session_id] = [ticket]
+            else:
+                ticket_group_by_session[ticket.session_id].append(ticket)
+
+        for session_id, tickets in ticket_group_by_session.items():
+            qr_group = None
+            if should_gen_group:
+                qr_group = self.gen_qr(number=len(tickets))
+
+            for ticket in tickets:
+                html += ticket.html_format(
+                    session_template=session_template,
+                    preview_pdf=preview_pdf,
+                    qr_group=qr_group,
+                )
         return html
 
     def check_valid_group(self) -> bool:
