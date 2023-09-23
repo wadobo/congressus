@@ -149,6 +149,17 @@ class InvitationAdmin(admin.ModelAdmin):
     actions = [get_csv, get_pdf, get_html]
     inlines = [InvUsedInSessionInline]
 
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if event := request.session.get("current_event", None):
+            form.base_fields["type"].queryset = InvitationType.objects.filter(
+                event=event
+            )
+            form.base_fields["generator"].queryset = InvitationGenerator.objects.filter(
+                type__event=event
+            )
+        return form
+
     def get_queryset(self, request):
         from events.models import Session
 
@@ -221,6 +232,14 @@ class InvitationGeneratorAdmin(admin.ModelAdmin):
     list_display = ("type", "amount", "price", "concept", "created")
     actions = [get_csv, get_pdf, get_html]
     list_filter = (GlobalTypeEventFilter,)
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if event := request.session.get("current_event", None):
+            form.base_fields["type"].queryset = InvitationType.objects.filter(
+                event=event
+            )
+        return form
 
     class Media:
         js = [
