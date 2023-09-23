@@ -102,6 +102,23 @@ class TicketQuerySet(models.QuerySet):
             "seat_layout",
         )
 
+    def group_by_sessions(self):
+        group_by_session = {}
+        for ticket in self.all():
+            if ticket.session_id not in group_by_session:
+                group_by_session[ticket.session_id] = [ticket]
+            else:
+                group_by_session[ticket.session_id].append(ticket)
+        return group_by_session
+
+    def has_session_conflict(self):
+        from events.models import ExtraSession
+
+        distinct_sessions = list(set(self.values_list("session_id", flat=True)))
+        return ExtraSession.objects.filter(
+            orig__in=distinct_sessions, extra__in=distinct_sessions
+        ).exists()
+
 
 class ReadTicketManager(models.Manager):
     def get_queryset(self):

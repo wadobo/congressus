@@ -202,30 +202,17 @@ def test_access_multipurchase_same_session(
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    ("tickets", "is_valid_group"),
+    ("tickets", "has_conflict"),
     [
-        # INVALID
-        # Only one Ticket
-        ([{"session": "S1"}], False),
-        # More than 20 tickets
-        (21 * [{"session": "S1"}], False),
-        # Different sessions with extra session and conflict
-        ([{"session": "S1"}, {"session": "S3"}], False),
-        ([{"session": "S2"}, {"session": "S4"}], False),
-
-        # VALID
-        # All tickets same sessions, lte=20
-        (3 * [{"session": "S1"}], True),
-        (20 * [{"session": "S1"}], True),
-        # Different sessions without extra sessions
-        ([{"session": "S1"}, {"session": "S2"}], True),
-        # Different sessions with extra session without conflict
-        ([{"session": "S3"}, {"session": "S4"}], True),
-        ([{"session": "S1"}, {"session": "S4"}], True),
-        ([{"session": "S2"}, {"session": "S3"}], True),
+        ([{"session": "S1"}, {"session": "S1"}, {"session": "S3"}], True),
+        ([{"session": "S2"}, {"session": "S2"}, {"session": "S4"}], True),
+        ([{"session": "S1"}, {"session": "S2"}], False),
+        ([{"session": "S3"}, {"session": "S3"}, {"session": "S4"}], False),
+        ([{"session": "S1"}, {"session": "S1"}, {"session": "S4"}], False),
+        ([{"session": "S2"}, {"session": "S2"}, {"session": "S3"}], False),
     ],
 )
-def test_mp_check_valid_group(tickets, is_valid_group):
+def test_mp_check_conflict(tickets, has_conflict):
     event = EventFactory()
     spaces = {
         "SP1": SpaceFactory(event=event, name="SP1", numbered=False, seat_map=None),
@@ -249,4 +236,4 @@ def test_mp_check_valid_group(tickets, is_valid_group):
 
     mp = MultiPurchaseFactory(ev=event)
     mp.tickets.set(ticket_objs)
-    assert mp.check_valid_group() is is_valid_group
+    assert mp.tickets.all().has_session_conflict() is has_conflict

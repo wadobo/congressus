@@ -65,27 +65,6 @@ CHILD_TEMPLATE = """
     {{ template.previous_note }}
   </div>
 
-  <div class="total_price">
-    {{ ticket.total_price|safe }}
-  </div>
-
-  <div class="codeimg">
-    <img src="data:image/png;base64,{{ qr_group }}" />
-    <img src="data:image/png;base64,{{ qr }}" />
-  </div>
-
-  <div class="order">
-    {{ ticket.order }}
-  </div>
-
-  <div class="wcode">
-    {{ ticket.wcode }}
-  </div>
-
-  <div class="initials">
-    {{ ticket.initials }}
-  </div>
-
   <div class="text">
     {{ ticket.text }}
   </div>
@@ -94,28 +73,65 @@ CHILD_TEMPLATE = """
     {{ ticket.date }}
   </div>
 
+  <div class="total_price">
+    {{ ticket.total_price|safe }}
+  </div>
+
+  <div class="initials">
+    {{ ticket.initials }}
+  </div>
+
   <div class="seatinfo">
     {{ ticket.seatinfo }}
   </div>
 
-  <div class="seatinfo2">
-    {% if ticket.seat_layout and ticket.seat_layout.name %}
-      <div class="seatinfo_sector">
-        {{ ticket.seat_layout.name }}
-      </div>
-    {% endif %}
+  {% if ticket.seat_layout %}
+  <table class="seatinfo2">
+    <thead>
+      <tr>
+        {% if ticket.seat_layout.name %}
+          <th>SECTOR</th>
+        {% endif %}
+        {% if ticket.seat_row %}
+          <th>ROW</th>
+        {% endif %}
+        {% if ticket.seat_column %}
+          <th>SEAT</th>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        {% if ticket.seat_layout.name %}
+          <td>{{ ticket.seat_layout.name }}</td>
+        {% endif %}
+        {% if ticket.seat_row %}
+          <td>{{ ticket.seat_row }}</td>
+        {% endif %}
+        {% if ticket.seat_column %}
+          <td>{{ ticket.seat_column }}</td>
+        {% endif %}
+      </tr>
+    </tbody>
+  </table>
+  {% endif %}
 
-    {% if ticket.seat_row %}
-      <div class="seatinfo_row">
-        {{ ticket.seat_row }}
-      </div>
-    {% endif %}
+  <div class="codeimg">
+    <img src="data:image/png;base64,{{ qr_group }}" />
+    <div class="order">
+      {{ ticket.mp.order }}
+    </div>
+  </div>
 
-    {% if ticket.seat_column %}
-      <div class="seatinfo_seat">
-        {{ ticket.seat_column }}
-      </div>
-    {% endif %}
+  <div class="codeimg">
+    <img src="data:image/png;base64,{{ qr }}" />
+    <div class="order">
+      {{ ticket.order }}
+    </div>
+  </div>
+
+  <div class="wcode">
+    {{ ticket.wcode }}
   </div>
 
   <div class="next_note">
@@ -131,25 +147,17 @@ CHILD_TEMPLATE = """
 """
 
 DEFAULT_STYLE = """
-.header {
-  grid-area: header;
-  width: 100%;
-}
-
 img {
   width: 100%;
 }
 
-.sponsors {
-  grid-area: sponsors;
+.header, .sponsors, .footer {
+  display: block;
+  width: 100%;
 }
 
-.note {
-  grid-area: note;
-}
-
-.total_price {
-  grid-area: total_price;
+.note, .text, .date, .next_note {
+  display: block;
 }
 
 .price {
@@ -157,76 +165,46 @@ img {
 }
 
 .tax {
+  display: block;
   font-size: small;
 }
 
-.codeimg {
-  margin: auto;
-  grid-area: codeimg;
-}
-
-.order {
-  grid-area: order;
-}
-
-.wcode {
-  grid-area: wcode;
-  text-align: end;
-}
-
 .initials {
-  grid-area: initials;
+  display: block;
   text-align: center;
   font-size: xxx-large;
 }
 
-.text {
-  grid-area: text;
-  text-align: center;
+.codeimg {
+  margin: auto;
+  display: block;
+  width: 75%;
 }
 
-.date {
-  grid-area: date;
+.order {
   text-align: center;
+  margin-top: -2rem;
 }
 
 .seatinfo {
   height: 100%;
-  grid-area: seatinfo;
+  display: none;
   text-align: end;
 }
 
-.seatinfo2 {
+table .seatinfo2 {
   height: 100%;
-  grid-area: seatinfo2;
-  display: none;
+  display: block;
 }
 
-.seatinfo_sector {
-  height: 100%;
-  grid-area: seatinfo_sector;
-  display: none;
+table td {
+  text-align: center;
 }
 
-.seatinfo_row {
-  height: 100%;
-  grid-area: seatinfo_row;
-  display: none;
-}
-
-.seatinfo_seat {
-  height: 100%;
-  grid-area: seatinfo_seat;
-  display: none;
-}
-
-.next_note {
-  grid-area: next_note;
-}
-
-.footer {
-  grid-area: footer;
-  width: 100%;
+.wcode {
+  display: block;
+  text-align: end;
+  font-size: small;
 }
 """
 

@@ -25,7 +25,6 @@ from events.choices import SessionTemplate
 from events.models import (
     Discount,
     Event,
-    ExtraSession,
     InvCode,
     SeatLayout,
     Session,
@@ -326,8 +325,6 @@ class BaseTicketMixing:
         return response
 
     def pdf_format(self, session_template: SessionTemplate, request=None):
-        # TODO: dividir entre sessiones diferentes para ver los diferentes tipos de
-        # templates que tenemos que usar para generar el html
         html = self.html_format(session_template=session_template)
         kwargs = {"string": html}
         if request:
@@ -539,18 +536,13 @@ class MultiPurchase(models.Model, BaseTicketModel, BaseTicketMixing, BaseExtraDa
 
     def html_format(self, session_template: SessionTemplate, preview_pdf: bool = False):
         html = ""
-        should_gen_group = self.check_valid_group()
+        tickets = self.tickets.all().order_by("session_id")
+        has_conflict = tickets.has_session_conflict()
 
-        ticket_group_by_session = {}
-        for ticket in self.tickets.all().order_by("session_id"):
-            if ticket.session_id not in ticket_group_by_session:
-                ticket_group_by_session[ticket.session_id] = [ticket]
-            else:
-                ticket_group_by_session[ticket.session_id].append(ticket)
-
+        ticket_group_by_session = tickets.group_by_sessions()
         for session_id, tickets in ticket_group_by_session.items():
             qr_group = None
-            if should_gen_group:
+            if not has_conflict and (1 < len(tickets) <= 20):
                 qr_group = self.gen_qr(number=len(tickets))
 
             for ticket in tickets:
@@ -560,24 +552,6 @@ class MultiPurchase(models.Model, BaseTicketModel, BaseTicketMixing, BaseExtraDa
                     qr_group=qr_group,
                 )
         return html
-
-    def check_valid_group(self) -> bool:
-        tickets = self.tickets.all()
-        if len(tickets) < 2 or len(tickets) > 20:
-            return False
-
-        sessions = [t.session for t in tickets]
-        distinct_sessions = set(sessions)
-        if len(distinct_sessions) == 1:
-            return True
-
-        is_conflict_extra_sessions = ExtraSession.objects.filter(
-            orig__in=sessions, extra__in=sessions
-        ).exists()
-        if is_conflict_extra_sessions:
-            return False
-
-        return True
 
     def all_tickets(self):
         return self.tickets.select_related("session", "session__template").order_by(

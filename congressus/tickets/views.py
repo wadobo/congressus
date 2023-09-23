@@ -606,6 +606,7 @@ class TicketTemplatePreview(UserPassesTestMixin, View):
             template=ticket_template,
         )
         mp = MultiPurchaseFactory.create(ev=session.space.event)
+        mp.gen_order()
         seat_layout = SeatLayoutFactory.create(
             name="C10", gate__event=session.space.event
         )
@@ -654,7 +655,7 @@ class TicketTemplatePreview(UserPassesTestMixin, View):
 
 class TicketTemplatePreviewPDF(TicketTemplatePreview):
     def get_response(self, mp):
-        return mp.get_pdf(session_template=SessionTemplate.ONLINE, request=None)
+        return mp.get_pdf(session_template=SessionTemplate.ONLINE, request=self.request)
 
 
 class EmailConfirmPreview(UserPassesTestMixin, View):

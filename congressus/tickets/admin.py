@@ -418,6 +418,7 @@ class MPAdmin(admin.ModelAdmin):
     list_per_page = 20
     list_max_show_all = 800
     list_display = (
+        "order",
         "order_tpv",
         "ticket_window_code",
         "created",
