@@ -77,7 +77,6 @@ class TicketWindow(models.Model):
         help_text=_("Number of calls created to singlerow when open ticket windows"),
         default=1,
     )
-    templates = models.ManyToManyField(TicketTemplate)
 
     class Meta:
         verbose_name = _("ticket window")

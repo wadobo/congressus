@@ -1,4 +1,3 @@
-from django.db.models import Q
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
@@ -31,7 +30,6 @@ class TicketWindowAdmin(admin.ModelAdmin):
     list_filter = (GlobalEventFilter, "location")
     prepopulated_fields = {"slug": ["name"]}
     search_fields = ("name", "slug", "event__name")
-    filter_horizontal = ("templates",)
 
 
 class GlobalWindowEventFilter(GlobalEventFilter):
