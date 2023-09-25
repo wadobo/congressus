@@ -40,9 +40,6 @@
             <li {% if menuitem == 'access' %}class="active"{% endif %}>
                 <a href="{% url 'access_list' ev.slug %}">{% trans "access points" %}</a>
             </li>
-            <li {% if menuitem == 'inv' %}class="active"{% endif %}>
-                <a href="{% url 'gen_invitations' ev.slug %}">{% trans "invitations and passes" %}</a>
-            </li>
             {% block extramenu %}{% endblock %}
         {% endif %}
       </ul>

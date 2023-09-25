@@ -32,7 +32,6 @@ urlpatterns = THEME + [
     path('access/', include('access.urls')),
     path('dashboard/', include('dashboard.urls')),
     path('report/', include('dashboard.urls_report')),
-    path('invs/', include('invs.urls')),
     path('singlerow/', include('singlerow.urls')),
     path('', include('tickets.urls')),
 ]
