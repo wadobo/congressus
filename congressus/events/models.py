@@ -135,7 +135,11 @@ CHILD_TEMPLATE = """
   </div>
 
   <div class="next_note">
-    {{ ticket.next_note }}
+    {{ template.next_note }}
+  </div>
+
+  <div class="links">
+    {{ template.links }}
   </div>
 
   {% if template.footer %}
@@ -156,7 +160,7 @@ img {
   width: 100%;
 }
 
-.note, .text, .date, .next_note {
+.note, .text, .date, .next_note, .links {
   display: block;
 }
 
@@ -178,7 +182,7 @@ img {
 .codeimg {
   margin: auto;
   display: block;
-  width: 75%;
+  width: 70%;
 }
 
 .order {
