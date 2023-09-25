@@ -236,7 +236,9 @@ STRIPE_BITCOIN = env.get('STRIPE_BITCOIN', False)
 
 QRCODE = True
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
-DOMAIN = env.get('DOMAIN', 'congressus.local')
+SCHEMA = env.get('SCHEMA', 'http')
+DOMAIN = env.get('DOMAIN', 'localhost:8000')
+FULL_DOMAIN = f'{SCHEMA}://{DOMAIN}'
 WS_SERVER = f'ws.{DOMAIN}'
 TIMESTEP_CHART = 'daily'
 MAX_STEP_CHART = 10

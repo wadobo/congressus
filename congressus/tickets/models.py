@@ -329,6 +329,8 @@ class BaseTicketMixing:
         kwargs = {"string": html}
         if request:
             kwargs["base_url"] = request.build_absolute_uri()
+        else:
+            kwargs["base_url"] = settings.FULL_DOMAIN
         return HTML(**kwargs).write_pdf()
 
 
