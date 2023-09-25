@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
+from events.forms import TicketTemplateForm
 from events.models import (
     ConfirmEmail,
     Discount,
@@ -153,6 +154,7 @@ class GateAdmin(admin.ModelAdmin):
 
 @admin.register(TicketTemplate)
 class TicketTemplateAdmin(admin.ModelAdmin):
+    form = TicketTemplateForm
     list_display = ("name",)
 
 
