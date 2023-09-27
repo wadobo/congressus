@@ -183,6 +183,7 @@ class Invitation(models.Model, BaseTicketModel, BaseExtraData):
     def html_format(self):
         ticket_template = self.get_template()
         tpl_child = Template(ticket_template.extra_html)
+        qr = self.gen_qr()
         ctx = Context({"ticket": self, "template": ticket_template})
         preview_data = tpl_child.render(ctx)
 
@@ -190,6 +191,8 @@ class Invitation(models.Model, BaseTicketModel, BaseExtraData):
         return template.render(
             {
                 "template": ticket_template,
+                "qr": qr,
+                "qr_group": qr,
                 "preview": preview_data,
             }
         )
@@ -202,6 +205,8 @@ class Invitation(models.Model, BaseTicketModel, BaseExtraData):
         kwargs = {"string": html}
         if request:
             kwargs["base_url"] = request.build_absolute_uri()
+        else:
+            kwargs["base_url"] = settings.FULL_DOMAIN
         return HTML(**kwargs).write_pdf()
 
     def get_pdf(self, request):
