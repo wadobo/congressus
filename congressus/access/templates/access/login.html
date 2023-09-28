@@ -28,7 +28,7 @@
     <label for="inputSession" class="sr-only">{% trans "session" %}</label>
     <select name="session" class="form-control" id="inputSession">
         {% for s in sessions %}
-            <option value="{{ s.id }}">{{ s.space.name }} / {{ s.name }}</option>
+            <option value="{{ s.id|safe }}">{{ s.space.name }} / {{ s.name }}</option>
         {% endfor %}
     </select>
 

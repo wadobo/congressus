@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from access.managers import ReadAccessControlManager, WriteAccessControlManager
 
 from events.models import Event
 
@@ -15,6 +16,9 @@ class AccessControl(models.Model):
 
     location = models.CharField(_("location"), max_length=500, blank=True, null=True)
     mark_used = models.BooleanField(_("mark used"), default=True)
+
+    read_objects = ReadAccessControlManager()
+    objects = WriteAccessControlManager()
 
     class Meta:
         verbose_name = _("access control point")

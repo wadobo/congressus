@@ -2,14 +2,13 @@ from django.db import models
 
 
 class EventQuerySet(models.QuerySet):
-    def with_templates(self):
-        return self.select_related(
-            "session",
-            "session__template",
-            "session__window_template",
-            "session__space",
-            "session__space__event",
-            "seat_layout",
+
+    def with_amount_sold_tickets(self):
+        return self.annotate(
+            amount_sold_tickets=models.Count(
+                "spaces__sessions__tickets",
+                filter=models.Q(spaces__sessions__tickets__confirmed=True),
+            )
         )
 
 
@@ -27,3 +26,19 @@ class ReadEventManager(models.Manager):
 class WriteEventManager(models.Manager):
     def get_queryset(self):
         return EventQuerySet(self.model, using="default")
+
+
+class SessionQuerySet(models.QuerySet):
+
+    def with_space(self):
+        return self.select_related("space")
+
+
+class ReadSessionManager(models.Manager):
+    def get_queryset(self):
+        return SessionQuerySet(self.model, using="default")
+
+
+class WriteSessionManager(models.Manager):
+    def get_queryset(self):
+        return SessionQuerySet(self.model, using="default")

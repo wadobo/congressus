@@ -72,8 +72,15 @@ class EventAdmin(admin.ModelAdmin):
     filter_horizontal = ("discounts",)
     prepopulated_fields = {"slug": ["name"]}
 
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .with_amount_sold_tickets()
+        )
+
     def sold(self, obj):
-        return obj.sold()
+        return obj.amount_sold_tickets
 
 
 class Attachments(admin.TabularInline):

@@ -41,11 +41,14 @@ class AccessLogin(TemplateView):
     def get_context_data(self, *args, **kwargs):
         ev = self.kwargs.get("ev")
         ac = self.kwargs.get("ac")
-        ac = get_object_or_404(AccessControl, event__slug=ev, slug=ac)
-        ctx = super(AccessLogin, self).get_context_data(*args, **kwargs)
+        ac = get_object_or_404(
+            AccessControl.read_objects.all().with_event().with_gates(), event__slug=ev, slug=ac
+        )
+        sessions = Session.objects.filter(space__event=ac.event).with_space()
+        ctx = super().get_context_data(*args, **kwargs)
         ctx["ev"] = ac.event
         ctx["ac"] = ac
-        ctx["sessions"] = ac.event.get_sessions()
+        ctx["sessions"] = sessions
         ctx["gates"] = ac.event.gates.all()
         return ctx
 

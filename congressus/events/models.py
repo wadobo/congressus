@@ -12,7 +12,12 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
-from events.managers import ReadEventManager, WriteEventManager
+from events.managers import (
+    ReadEventManager,
+    WriteEventManager,
+    ReadSessionManager,
+    WriteSessionManager,
+)
 from invs.utils import get_sold_invs
 from .widgets import HTMLWidget
 
@@ -551,6 +556,9 @@ class Session(models.Model):
         _("date format"), max_length=50, default="start", choices=TICKET_DATE_FORMATS
     )
     active = models.BooleanField(default=True)
+
+    read_objects = ReadSessionManager()
+    objects = WriteSessionManager()
 
     class Meta:
         ordering = ["start"]
