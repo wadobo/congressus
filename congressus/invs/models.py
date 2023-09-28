@@ -1,8 +1,5 @@
-import base64
-from io import BytesIO
 from typing import TYPE_CHECKING
 
-import qrcode
 from django.db import models
 from django.db.models.signals import post_delete
 from django.conf import settings
@@ -184,7 +181,9 @@ class Invitation(models.Model, BaseTicketModel, BaseExtraData):
         ticket_template = self.get_template()
         tpl_child = Template(ticket_template.extra_html)
         qr = self.gen_qr()
-        ctx = Context({"ticket": self, "template": ticket_template})
+        ctx = Context(
+            {"ticket": self, "template": ticket_template, "qr": qr, "qr_group": qr}
+        )
         preview_data = tpl_child.render(ctx)
 
         template = loader.get_template("tickets/preview.html")
@@ -302,20 +301,6 @@ class Invitation(models.Model, BaseTicketModel, BaseExtraData):
                 )
                 if tsh:
                     tsh.delete()
-
-    def gen_qr(self, qr_size: float = 10, border: int = 4):
-        """
-        border: default is 4, which is the minimum according to the specs
-        """
-        stream = BytesIO()
-        img = qrcode.make(
-            self.order,
-            error_correction=qrcode.constants.ERROR_CORRECT_H,
-            box_size=qr_size + 2 * border,
-            border=border,
-        )
-        img.save(stream, format="png")
-        return base64.b64encode(stream.getvalue()).decode("utf8")
 
     def __str__(self):
         return self.order
