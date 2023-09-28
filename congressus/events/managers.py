@@ -31,7 +31,7 @@ class WriteEventManager(models.Manager):
 class SessionQuerySet(models.QuerySet):
 
     def with_space(self):
-        return self.select_related("space")
+        return self.select_related("space", "space__event")
 
 
 class ReadSessionManager(models.Manager):

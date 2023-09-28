@@ -17,7 +17,7 @@ from invs.models import (
     InvitationType,
 )
 from events.admin import GlobalEventFilter
-from events.models import TicketTemplate
+from events.models import Gate, Session, TicketTemplate
 from weasyprint import HTML
 
 
@@ -98,7 +98,23 @@ class InvitationTypeAdmin(admin.ModelAdmin):
         field = super().formfield_for_dbfield(db_field, **kwargs)
         if db_field.name == "template":
             field.queryset = TicketTemplate.objects.all().order_by("name")
+
         return field
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        current_event = request.session.get("current_event", None)
+        if db_field.name == "gates" and current_event:
+            kwargs["queryset"] = Gate.objects.filter(event=current_event).order_by(
+                "name"
+            )
+
+        if db_field.name == "sessions" and current_event:
+            kwargs["queryset"] = (
+                Session.objects.filter(space__event=current_event)
+                .with_space()
+                .order_by("name")
+            )
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
 
 
 class InvUsedInSessionInline(admin.TabularInline):
