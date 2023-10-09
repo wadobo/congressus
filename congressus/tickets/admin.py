@@ -108,14 +108,13 @@ def get_csv_tickets(modeladmin, request, queryset):
     ]
     # ] + ['ticket_field_' + i for i in settings.CSV_TICKET_FIELDS]
 
-    qs = modeladmin.get_queryset(request)
     header = [_(field) for field in csv_fields]
 
     content = StringIO()
     writer = csv.writer(content, delimiter=",")
     writer.writerow(header)
 
-    for ticket in qs:
+    for ticket in queryset:
         row = [str(getattr(ticket, field)) for field in csv_fields]
         writer.writerow(row)
 
