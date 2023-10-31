@@ -11,10 +11,12 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.urls import reverse
 
-from .models import AccessControl
+from access.enums import AccessPriority
+from access.models import AccessControl
 from events.models import Event
 from events.models import Session
 from events.models import Gate
+from tickets.entities import AccessData
 from tickets.models import Ticket, MultiPurchase
 from invs.models import Invitation
 
@@ -42,7 +44,9 @@ class AccessLogin(TemplateView):
         ev = self.kwargs.get("ev")
         ac = self.kwargs.get("ac")
         ac = get_object_or_404(
-            AccessControl.read_objects.all().with_event().with_gates(), event__slug=ev, slug=ac
+            AccessControl.read_objects.all().with_event().with_gates(),
+            event__slug=ev,
+            slug=ac,
         )
         sessions = Session.objects.filter(space__event=ac.event).with_space()
         ctx = super().get_context_data(*args, **kwargs)
@@ -61,11 +65,13 @@ class AccessLogin(TemplateView):
         if user is not None:
             have_access = user.groups.filter(name="access").count()
             if user.is_active and have_access:
-                # session
-                session = get_object_or_404(
-                    Session, space__event__slug=ev, id=request.POST.get("session", None)
+                # sessions
+                sessions_data = request.POST.getlist("sessions", [])
+                sessions = Session.objects.filter(
+                    space__event__slug=ev, id__in=sessions_data
                 )
-                request.session["session"] = session.id
+                request.session["sessions"] = [session.id for session in sessions]
+
                 # gate
                 gate = request.POST.get("gate", "")
                 if gate:
@@ -96,26 +102,35 @@ class AccessView(UserPassesTestMixin, TemplateView):
     def get_ac(self):
         ev = self.kwargs["ev"]
         ac = self.kwargs["ac"]
-        ac = get_object_or_404(AccessControl, event__slug=ev, slug=ac)
+        ac = get_object_or_404(
+            AccessControl.objects.all().with_event(),
+            event__slug=ev,
+            slug=ac,
+        )
         return ac
 
     def test_func(self):
-        u = self.request.user
-        have_access = u.groups.filter(name="access").count()
-        have_access = have_access and "session" in self.request.session
-        have_access = have_access and "gate" in self.request.session
+        user = self.request.user
+        if not user.is_authenticated:
+            return False
 
-        return u.is_authenticated and have_access
+        return (
+            user.groups.filter(name="access").exists()
+            and "sessions" in self.request.session
+            and "gate" in self.request.session
+        )
 
     def get_login_url(self):
         return reverse("access_login", kwargs=self.kwargs)
 
     def get_context_data(self, *args, **kwargs):
-        ctx = super(AccessView, self).get_context_data(*args, **kwargs)
+        ctx = super().get_context_data(*args, **kwargs)
         ac = self.get_ac()
         ctx["ac"] = ac
-        s = Session.objects.get(id=self.request.session.get("session", ""))
-        ctx["session"] = s
+        sessions = Session.objects.filter(
+            id__in=self.request.session.get("sessions", [])
+        ).with_space()
+        ctx["sessions"] = sessions
         ctx["ws_server"] = settings.WS_SERVER
         ctx["gate"] = self.request.session.get("gate", "")
         return ctx
@@ -133,205 +148,52 @@ class AccessView(UserPassesTestMixin, TemplateView):
         data["extra2"] = msg2
         return JsonResponse(data)
 
-    def get_ticket(self, order):
-        return Ticket.objects.get(order=order, confirmed=True)
-
-    def check_extra_session(self, ticket, s):
-        extra = ticket.get_extra_session(s)
-
-        if not extra:
-            if self.is_inv(ticket.order):
-                return "wrong", ticket.type.name
-            else:
-                return "wrong", ticket.session.short()
-
-        if extra.get("used"):
-            used_date = datetime.strptime(extra["used_date"], settings.DATETIME_FORMAT)
-            msg = _("Used: %(date)s") % {"date": short_date(used_date)}
-            return "wrong", msg
-
-        start = datetime.strptime(extra["start"], settings.DATETIME_FORMAT)
-        end = datetime.strptime(extra["end"], settings.DATETIME_FORMAT)
-        session = Session.objects.get(pk=extra["session"])
-
-        start_formatted = short_date(start)
-        end_formatted = short_date(end)
-
-        if make_aware(end) < timezone.now():
-            msg = _("Expired, ended at %(date)s") % {"date": end_formatted}
-            return "wrong", msg
-        elif make_aware(start) > timezone.now():
-            msg = _("Too soon, wait until %(date)s") % {"date": start_formatted}
-            return "wrong", msg
-
-        if not hasattr(ticket, "is_pass") or not ticket.is_pass:
-            if self.get_ac().mark_used:
-                ticket.set_extra_session_to_used(s)
-            ticket.save()
-
-        return "right", _("Extra session: %(session)s") % {"session": session.short()}
-
-    def check_inv(self, order, s, g):
-        try:
-            inv = Invitation.objects.get(order=order)
-        except Exception:
-            return self.response_json(_("Not exists"), st="wrong")
-
-        session = Session.objects.get(pk=s)
-        valid_session = inv.type.sessions.filter(pk=s).exists()
-        invalid_gate = g and not inv.type.gates.filter(name=g).exists()
-
-        ret = self.check_all(inv, s, valid_session, invalid_gate, session=session)
-        if ret:
-            return ret
-
-        if settings.ACCESS_VALIDATE_INV_HOURS:
-            now = timezone.now()
-            # Checking if there's start or end date and if it's valid
-            if inv.type.end and now > inv.type.end:
-                msg = _("Expired, ended at %(date)s") % {
-                    "date": short_date(inv.type.end)
-                }
-                return self.response_json(msg, st="wrong")
-            if inv.type.start and now < inv.type.start:
-                msg = _("Too soon, wait until %(date)s") % {
-                    "date": short_date(inv.type.start)
-                }
-                return self.response_json(msg, st="wrong")
-
-        # if we're here, everything is ok
-        #  * If is a valid inv and it's not a pass, mark as used
-        #  * If it's a pass with one_time_for_session we mark as used
-        if not inv.is_pass or inv.type.one_time_for_session:
-            if self.get_ac().mark_used:
-                inv.set_used(session)
-                inv.save()
-
-        msg = _("Ok: %(session)s") % {"session": session.short()}
-        return self.response_json(msg, msg2=inv.order)
-
-    def check_ticket(self, order, s, g):
-        try:
-            ticket = self.get_ticket(order)
-        except Exception:
-            return self.response_json(msg=_("Not exists"), msg2="TESTING", st="wrong")
-
-        valid_session = ticket.session_id == s
-        invalid_gate = g and ticket.gate_name and ticket.gate_name != g
-
-        ret = self.check_all(ticket, s, valid_session, invalid_gate)
-        if ret:
-            return ret
-
-        # if we're here, everything is ok
-        if self.get_ac().mark_used:
-            ticket.used = True
-            ticket.used_date = timezone.now()
-        ticket.save()
-        msg = _("Ok: %(session)s") % {"session": ticket.session.short()}
-        return self.response_json(msg)
-
-    def check_multipurchase(self, order, s, g):
-        try:
-            multipurchase = MultiPurchase.objects.get(order=order, confirmed=True)
-            tickets = multipurchase.tickets.filter(confirmed=True).select_related(
-                "session"
-            )
-        except Exception:
-            return self.response_json(_("Not exists"), st="wrong")
-
-        valids: list[Ticket] = []
-        invalids: set[Session] = []
-        useds: list[Ticket] = []
-        invalid_gate: list = []
-
-        extra_valids: list[Ticket] = []
-        extra_useds: list[datetime] = []
-
-        for ticket in tickets:
-            if ticket.session_id == s and ticket.gate_name == g:
-                valids.append(ticket)
-                if ticket.used:
-                    useds.append(ticket)
-            else:
-                invalids.append(ticket.session)
-
-            if extra_ticket := ticket.get_extra_session(s):
-                print(extra_ticket)
-                extra_valids.append(ticket)
-                if extra_ticket["used"]:
-                    extra_useds.append(extra_ticket["used_date"])
-
-        if len(valids) >= 1:
-            if len(useds) == 0:
-                if self.get_ac().mark_used:
-                    for ticket in valids:
-                        ticket.used = True
-                        ticket.used_date = timezone.now()
-                        ticket.save()
-                msg = _("Ok: %(session)s") % {"session": ticket.session.short()}
-                msg2 = f"G {len(valids)}"
-                return self.response_json(msg, msg2=msg2)
-
-            if len(valids) > len(useds):
-                return self.response_json(_("Some used: read individually"), st="wrong")
-
-            msg = _("Used: %(date)s") % {"date": short_date(useds[0].used_date)}
-            msg2 = useds[0].session.short()
-            return self.response_json(msg=msg, msg2=msg2, st="wrong")
-
-
-    def check_all(self, ticket, s, valid_session, invalid_gate, session=None):
-        # Checking order:
-        #  * Check if the ticket exists
-        #  * Check if it's used
-        #  * Check if it's a valid session
-        #    * check if there's extra session in this ticket
-        #  * Check if it's a valid gate
-
-        if self.is_inv(ticket.order) and ticket.is_pass:
-            used = ticket.is_used(session)
-            used_date = ticket.get_used_date(session)
-        else:
-            used = ticket.used
-            used_date = ticket.used_date
-
-        msg2 = (session or ticket.session).short()
-        if used:
-            msg = _("Used: %(date)s") % {"date": short_date(used_date)}
-            return self.response_json(msg, msg2=msg2, st="wrong")
-
-        if not valid_session:
-            # check if this has an extra session
-            st, msg = self.check_extra_session(ticket, s)
-            return self.response_json(msg, msg2=msg2, st=st)
-
-        if invalid_gate:
-            data = {
-                "session": (session or ticket.session).short(),
-                "gate": ticket.get_gate_name(),
-            }
-            msg = _("%(session)s - Gate: %(gate)s") % data
-            return self.response_json(msg, st="maybe")
-
-        return None
-
     def post(self, request, *args, **kwargs):
         order = request.POST.get("order", "")
         order = order.strip()
         if len(order) != settings.ORDER_SIZE:
             msg = _("Incorrect readind")
             return self.response_json(msg, st="wrong")
-        s = self.request.session.get("session", "")
-        g = self.request.session.get("gate", "")
+
+        sessions = self.request.session.get("sessions", [])
+        gate = self.request.session.get("gate", "")
+        self.sessions_obj = Session.objects.filter(id__in=sessions).get_sessions_dict()
 
         if self.is_inv(order):
-            return self.check_inv(order, s, g)
+            baseticket = (
+                Invitation.read_objects.filter(order=order).with_sessions().get()
+            )
+        elif self.is_multipurchase(order):
+            baseticket = (
+                MultiPurchase.objects.filter(order=order, confirmed=True)
+                .with_tickets()
+                .get()
+            )
+        else:
+            baseticket = (
+                Ticket.objects.filter(order=order, confirmed=True)
+                .with_templates()
+                .get()
+            )
 
-        if self.is_multipurchase(order):
-            return self.check_multipurchase(order, s, g)
+        if not baseticket:
+            return self.response_json(_("Not exists"), st="wrong")
 
-        return self.check_ticket(order, s, g)
+        best = AccessData("wrong", AccessPriority.UNKNOWN, session_id=-1)
+        for session_id in sessions:
+            access_data = baseticket.can_access(session_id, gate)
+            if access_data < best:
+                best = access_data
+
+            if access_data.is_best():
+                break
+
+        best.set_session(self.sessions_obj)
+
+        if self.get_ac().mark_used:
+            baseticket.mark_as_used(best.session_id, best.priority)
+
+        return self.response_json(**best.get_response_data())
 
 
 access = csrf_exempt(AccessView.as_view())

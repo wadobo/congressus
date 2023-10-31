@@ -25,14 +25,14 @@
     <label for="inputPassword" class="sr-only">{% trans "password" %}</label>
     <input type="password" name="password" id="inputPassword" class="form-control" placeholder="{% trans "password" %}" required>
 
-    <label for="inputSession" class="sr-only">{% trans "session" %}</label>
-    <select name="session" class="form-control" id="inputSession">
+    <label for="inputSession">{% trans "sessions" %}</label>
+    <select name="sessions" class="form-control" id="inputSession" size="10" multiple>
         {% for s in sessions %}
             <option value="{{ s.id|safe }}">{{ s.space.name }} / {{ s.name }}</option>
         {% endfor %}
     </select>
 
-    <label for="inputGate" class="sr-only">{% trans "gate" %}</label>
+    <label for="inputGate">{% trans "gate" %}</label>
     <select name="gate" class="form-control" id="inputGate">
         <option value="">{% trans "None" %}</option>
         {% for g in gates %}

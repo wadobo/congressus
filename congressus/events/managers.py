@@ -2,7 +2,6 @@ from django.db import models
 
 
 class EventQuerySet(models.QuerySet):
-
     def with_amount_sold_tickets(self):
         return self.annotate(
             amount_sold_tickets=models.Count(
@@ -29,9 +28,15 @@ class WriteEventManager(models.Manager):
 
 
 class SessionQuerySet(models.QuerySet):
-
     def with_space(self):
         return self.select_related("space", "space__event")
+
+    def get_sessions_dict(self) -> dict[int, str]:
+        sessions = self.select_related("space").values("id", "name", "space__name")
+        return {
+            session["id"]: f"{session['space__name']} - {session['name']}"
+            for session in sessions
+        }
 
 
 class ReadSessionManager(models.Manager):

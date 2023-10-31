@@ -21,7 +21,11 @@
         {% if gate %}
         <small> {% trans "Gate" %}: {{ gate }} </small> /
         {% endif %}
-        <small> {{ session }} </small>
+        <small>
+            {% for session in sessions %}
+               {{ session }}, 
+            {% endfor %}
+        </small>
         <small class="text-info pull-right">
             <a href="{% url 'access_logout' ac.event.slug ac.slug %}">
             {% trans "logout" %}
@@ -31,7 +35,7 @@
         {% endblock %}
     </div>
 
-    <form id="access" action="{% url 'access' ac.event.slug ac.slug %}" data-session="{{ session.id }}">
+    <form id="access" action="{% url 'access' ac.event.slug ac.slug %}" data-session="{{ sessions.0.id }}">
         <div class="input-group input-group-lg">
             <input type="text" class="form-control" id="order" placeholder="{% trans "ticket order" %}" value="" autofocus/>
             <span class="input-group-btn">

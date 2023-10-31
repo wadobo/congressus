@@ -87,7 +87,7 @@ INSTALLED_APPS = [
 
 SITE_ID = 1
 
-MIDDLEWARE = (
+MIDDLEWARE = [
     'congressus.suspicious_middleware.SuspiciousMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -100,7 +100,7 @@ MIDDLEWARE = (
     'middlewares.FixMaintenanceDup',
     'maintenancemode.middleware.MaintenanceModeMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
-)
+]
 
 ROOT_URLCONF = 'congressus.urls'
 
@@ -298,7 +298,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 DEBUG_TOOLS = env.get('DEBUG_TOOLS', 'True') == 'True'
 if DEBUG and DEBUG_TOOLS:
     DEBUG_TOOLBAR_CONFIG = {
-        "SHOW_TOOLBAR_CALLBACK": lambda request: True,
+        "SHOW_TOOLBAR_CALLBACK": (
+            lambda req: req.environ.get("SERVER_NAME", None) != "testserver"
+        ),
         "SHOW_COLLAPSED": True,
     }
 
@@ -317,12 +319,14 @@ if DEBUG and DEBUG_TOOLS:
     ]
 
     INSTALLED_APPS += [
-        'debug_toolbar',
+        "debug_toolbar",
+        "silk",
     ]
 
-    MIDDLEWARE = (
-        'debug_toolbar.middleware.DebugToolbarMiddleware',
-    ) + MIDDLEWARE
+    MIDDLEWARE = [
+        "debug_toolbar.middleware.DebugToolbarMiddleware",
+        "silk.middleware.SilkyMiddleware",
+    ] + MIDDLEWARE
 
     for tmpl in TEMPLATES:
         tmpl['OPTIONS']['context_processors'] = ['django.template.context_processors.debug'] + tmpl['OPTIONS']['context_processors']
