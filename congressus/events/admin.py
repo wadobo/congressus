@@ -117,7 +117,7 @@ class CustomSpaceFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         spaces = Space.objects.select_related("event")
         if current_event := request.session.get("current_event", None):
-            spaces = spaces.filter(event=current_event)
+            spaces = [space for space in spaces if space.event == current_event]
         return [(str(sp.id), str(sp)) for sp in spaces]
 
     def queryset(self, request, queryset):

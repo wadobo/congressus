@@ -93,18 +93,21 @@ def get_csv_tickets(modeladmin, request, queryset):
     csv_fields = [
         "email",
         "order",
-        "order_tpv",
         "confirmed",
         "confirmed_date",
         "get_real_price",
         "cseat",
         "mp",
-        "event_name",
-        "space_name",
+        # "window_ticket"
         "session_name",
+        "space_name",
         "created",
         "used",
-        "extra_data",
+        "used_date",
+
+        # "mp",
+        # "event_name",
+        # "extra_data",
     ]
     # ] + ['ticket_field_' + i for i in settings.CSV_TICKET_FIELDS]
 
@@ -115,7 +118,12 @@ def get_csv_tickets(modeladmin, request, queryset):
     writer.writerow(header)
 
     for ticket in queryset:
-        row = [str(getattr(ticket, field)) for field in csv_fields]
+        row = []
+        for field in csv_fields:
+            attr = getattr(ticket, field)
+            if callable(attr):
+                attr = attr()
+            row.append(str(attr))
         writer.writerow(row)
 
     response = HttpResponse(content_type="application/csv")

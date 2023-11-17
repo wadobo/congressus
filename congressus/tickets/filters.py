@@ -12,7 +12,7 @@ class TicketWindowFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         ticket_windows = TicketWindow.objects.select_related("event")
         if current_event := request.session.get("current_event", None):
-            ticket_windows = ticket_windows.filter(event=current_event)
+            ticket_windows = [tw for tw in ticket_windows if tw.event == current_event]
         ws = [(tw.id, "%s - %s" % (tw.event, tw.name)) for tw in ticket_windows]
         ws = [("--", _("without ticket window"))] + ws
         return ws
