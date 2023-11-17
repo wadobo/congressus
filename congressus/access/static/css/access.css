@@ -58,3 +58,17 @@ body.incorrect {
 #qr-canvas {
     display: none;
 }
+
+.readable-options {
+  padding: 1rem;
+}
+
+.readable {
+  font-weight: bold;
+  color: green;
+}
+
+.unreadable {
+  font-weight: bold;
+  color: red;
+}

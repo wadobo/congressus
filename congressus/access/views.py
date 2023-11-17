@@ -165,7 +165,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
             return "wrong", msg
 
         if not hasattr(ticket, "is_pass") or not ticket.is_pass:
-            if self.get_ac().mark_used:
+            if self.access_control.mark_used:
                 ticket.set_extra_session_to_used(s)
             ticket.save()
 
@@ -203,7 +203,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
         #  * If is a valid inv and it's not a pass, mark as used
         #  * If it's a pass with one_time_for_session we mark as used
         if not inv.is_pass or inv.type.one_time_for_session:
-            if self.get_ac().mark_used:
+            if self.access_control.mark_used:
                 inv.set_used(session)
                 inv.save()
 
@@ -224,7 +224,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
             return ret
 
         # if we're here, everything is ok
-        if self.get_ac().mark_used:
+        if self.access_control.mark_used:
             ticket.used = True
             ticket.used_date = timezone.now()
         ticket.save()
@@ -264,7 +264,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
 
         if len(valids) >= 1:
             if len(useds) == 0:
-                if self.get_ac().mark_used:
+                if self.access_control.mark_used:
                     for ticket in valids:
                         ticket.used = True
                         ticket.used_date = timezone.now()
@@ -317,6 +317,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
         return None
 
     def post(self, request, *args, **kwargs):
+        self.access_control = self.get_ac()
         order = request.POST.get("order", "")
         order = order.strip()
         if len(order) != settings.ORDER_SIZE:
@@ -326,11 +327,17 @@ class AccessView(UserPassesTestMixin, TemplateView):
         g = self.request.session.get("gate", "")
 
         if self.is_inv(order):
+            if not self.access_control.read_inv:
+                return self.response_json(_("Can't read invitations"), st="wrong")
             return self.check_inv(order, s, g)
 
         if self.is_multipurchase(order):
+            if not self.access_control.read_mp:
+                return self.response_json(_("Can't read multipurchase"), st="wrong")
             return self.check_multipurchase(order, s, g)
 
+        if not self.access_control.read_tickets:
+            return self.response_json(_("Can't read individual tickets"), st="wrong")
         return self.check_ticket(order, s, g)
 
 

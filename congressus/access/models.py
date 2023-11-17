@@ -16,6 +16,9 @@ class AccessControl(models.Model):
 
     location = models.CharField(_("location"), max_length=500, blank=True, null=True)
     mark_used = models.BooleanField(_("mark used"), default=True)
+    read_tickets = models.BooleanField(_("read tickets"), default=True)
+    read_mp = models.BooleanField(_("read multipurchases"), default=True)
+    read_inv = models.BooleanField(_("read invitations"), default=True)
 
     read_objects = ReadAccessControlManager()
     objects = WriteAccessControlManager()
