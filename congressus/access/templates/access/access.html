@@ -30,6 +30,18 @@
             <a href="{% url 'access_logout' ac.event.slug ac.slug %}">
             {% trans "logout" %}
             </a>
+            </br>
+            <div class="readable-options">
+                <span class="{% if ac.read_tickets %}readable{% else %}unreadable{% endif %}">
+                    T
+                </span>
+                <span class={% if ac.read_mp %}"readable"{% else %}"unreadable"{% endif %}>
+                    M
+                </span>
+                <span class={% if ac.read_inv %}"readable"{% else %}"unreadable"{% endif %}>
+                    I
+                </span>
+            </div>
         </small>
         </h1>
         {% endblock %}

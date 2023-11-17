@@ -1,4 +1,5 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
+
 from tickets.models import MultiPurchase
 from windows.utils import online_sale
 

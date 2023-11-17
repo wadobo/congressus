@@ -149,6 +149,7 @@ class AccessView(UserPassesTestMixin, TemplateView):
         return JsonResponse(data)
 
     def post(self, request, *args, **kwargs):
+        self.access_control = self.get_ac()
         order = request.POST.get("order", "")
         order = order.strip()
         if len(order) != settings.ORDER_SIZE:
@@ -160,16 +161,24 @@ class AccessView(UserPassesTestMixin, TemplateView):
         self.sessions_obj = Session.objects.filter(id__in=sessions).get_sessions_dict()
 
         if self.is_inv(order):
+            if not self.access_control.read_inv:
+                return self.response_json(_("Can't read invitations"), st="wrong")
             baseticket = (
                 Invitation.read_objects.filter(order=order).with_sessions().get()
             )
         elif self.is_multipurchase(order):
+            if not self.access_control.read_mp:
+                return self.response_json(_("Can't read multipurchase"), st="wrong")
             baseticket = (
                 MultiPurchase.objects.filter(order=order, confirmed=True)
                 .with_tickets()
                 .get()
             )
         else:
+            if not self.access_control.read_tickets:
+                return self.response_json(
+                    _("Can't read individual tickets"), st="wrong"
+                )
             baseticket = (
                 Ticket.objects.filter(order=order, confirmed=True)
                 .with_templates()
