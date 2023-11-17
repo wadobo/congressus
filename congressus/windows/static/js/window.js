@@ -165,14 +165,13 @@ $(document).ready(function() {
 
     // Define tabindex: only for window sale
     if (window.location.pathname.startsWith("/window/")) {
-        $('.sessioninput').each(function(i) {
+        $("a, summary, select[name=print-format], .minus, .plus, input#clean, input#total, input[name=discount]").attr("tabindex", -1);
+        $("details[open] input.sessioninput").each(function(i) {
             $(this).attr('tabindex', i + 1);
         });
-        index = $('.sessioninput').length + 1;
-        //$("input[name=discount]").attr('tabindex', index++);
-        $("input[name=payment]").attr('tabindex', index++);
-        $("input[name=payed]").attr('tabindex', index++);
-        $("#finish").attr('tabindex', index++);
+        $("label input[name=payment]").attr('tabindex', 0);
+        $("input[name=payed]").attr('tabindex', 0);
+        $("#finish").attr('tabindex', 0);
     }
 
     function preConfirmMsg() {
