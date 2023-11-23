@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Prefetch
 
 
 class EventQuerySet(models.QuerySet):
@@ -9,6 +10,9 @@ class EventQuerySet(models.QuerySet):
                 filter=models.Q(spaces__sessions__tickets__confirmed=True),
             )
         )
+
+    def with_sessions(self):
+        return self.prefetch_related("spaces__sessions")
 
 
 class ReadEventManager(models.Manager):
@@ -37,6 +41,41 @@ class SessionQuerySet(models.QuerySet):
             session["id"]: f"{session['space__name']} - {session['name']}"
             for session in sessions
         }
+
+    def with_seat_layouts(self):
+        return self.prefetch_related("space__seat_map__layouts")
+
+    def with_seat_holds(self):
+        from tickets.models import TicketSeatHold
+
+        return self.prefetch_related(
+            Prefetch("seat_holds", TicketSeatHold.objects.select_related("layout"))
+        )
+
+    def with_tickets(self):
+        return self.prefetch_related("tickets")
+
+    def with_invitations(self):
+        from invs.models import InvitationType, Invitation, InvUsedInSession
+
+        return self.prefetch_related(
+            Prefetch(
+                "invitation_types",
+                InvitationType.objects.prefetch_related(
+                    Prefetch(
+                        "invitations",
+                        Invitation.objects.select_related(
+                            "seat_layout"
+                        ).prefetch_related(
+                            Prefetch(
+                                "usedin",
+                                InvUsedInSession.objects.select_related("session"),
+                            )
+                        ),
+                    ),
+                ),
+            ),
+        )
 
 
 class ReadSessionManager(models.Manager):
