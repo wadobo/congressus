@@ -3,7 +3,6 @@ import random
 
 from django import forms
 from django.urls import reverse
-from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import Q
 from django.db.models.signals import post_save
@@ -18,6 +17,7 @@ from events.managers import (
     ReadSessionManager,
     WriteSessionManager,
 )
+from events.validators import not_contains_spaces, validate_phone
 from invs.utils import get_sold_invs
 from .widgets import HTMLWidget
 
@@ -356,7 +356,7 @@ class SeatLayout(models.Model):
     map = models.ForeignKey(
         SeatMap, related_name="layouts", verbose_name=_("map"), on_delete=models.CASCADE
     )
-    name = models.CharField(_("name"), max_length=300)
+    name = models.CharField(_("name"), max_length=300, validators=[not_contains_spaces])
     top = models.IntegerField(_("top"), default=0)
     left = models.IntegerField(_("left"), default=0)
     direction = models.CharField(
@@ -736,7 +736,7 @@ class TicketField(models.Model):
             "email": forms.EmailField(),
             "url": forms.URLField(),
             "tel": forms.CharField(
-                validators=[RegexValidator(r"^\+?[0-9]+$", _("Enter a valid phone"))],
+                validators=[validate_phone],
             ),
         }
 
