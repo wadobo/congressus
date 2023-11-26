@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -10,12 +11,14 @@ from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
 from weasyprint import HTML
 
+from access.enums import AccessPriority
 from events.models import Event
 from events.models import Session
 from events.models import Gate
 from events.models import SeatLayout
-from tickets.models import BaseExtraData, BaseTicketModel
-from tickets.models import TicketSeatHold
+from invs.managers import ReadInvitationManager, WriteInvitationManager
+from tickets.entities import AccessData
+from tickets.models import BaseExtraData, BaseTicketModel, TicketSeatHold
 from tickets.utils import get_seats_by_str
 
 
@@ -27,6 +30,21 @@ def short_hour(date_time):
     if timezone.is_aware(date_time):
         date_time = timezone.localtime(date_time)
     return formats.date_format(date_time, "H:i")
+
+
+def assert_if_not_prefetch_usedin(func):
+    def wrapper(self, *args, **kwargs):
+        if (
+            not hasattr(self, "_prefetched_objects_cache")
+            or "usedin" not in self._prefetched_objects_cache
+        ):
+            raise AssertionError(
+                "Invalid use of invitation, you need load InvUsedInSession with "
+                "prefetch_related('usedin')"
+            )
+        return func(self, *args, **kwargs)
+
+    return wrapper
 
 
 class InvitationType(models.Model):
@@ -101,6 +119,9 @@ class Invitation(models.Model, BaseTicketModel, BaseExtraData):
     )
     seat = models.CharField(_("seat"), max_length=20, null=True, blank=True)
     name = models.CharField(_("name"), max_length=200, null=True, blank=True)
+
+    objects = WriteInvitationManager()
+    read_objects = ReadInvitationManager()
 
     class Meta:
         verbose_name = _("invitation")
@@ -219,17 +240,24 @@ class Invitation(models.Model, BaseTicketModel, BaseExtraData):
     def event(self):
         return self.type.event
 
-    def is_used(self, session):
-        return self.usedin.filter(session=session).exists()
+    @assert_if_not_prefetch_usedin
+    def is_used(self, session_id):
+        return session_id in [session.id for session in self.usedin.all()]
 
-    def get_used_date(self, session):
-        try:
-            return self.usedin.get(session=session).date
-        except Exception:
-            return None
+    @assert_if_not_prefetch_usedin
+    def get_used_date(self, session_id):
+        used_date = None
+        for session in self.usedin.all():
+            if session.id == session_id:
+                used_date = session.date
+                break
 
-    def set_used(self, session):
-        i, created = InvUsedInSession.objects.get_or_create(session=session, inv=self)
+        return used_date
+
+    def set_used(self, session_id):
+        i, created = InvUsedInSession.objects.get_or_create(
+            session_id=session_id, inv=self
+        )
         i.save()
 
     def get_gate_name(self):
@@ -301,6 +329,139 @@ class Invitation(models.Model, BaseTicketModel, BaseExtraData):
                 )
                 if tsh:
                     tsh.delete()
+
+    def can_access_extra(self, session_id, gate_name) -> AccessData:
+        from access.views import make_aware
+
+        extra = self.get_extra_session(session_id)
+        if not extra:
+            return AccessData(
+                st="wrong",
+                priority=AccessPriority.INVALID_SESSION,
+                session_id=session_id,
+            )
+
+        if extra.get("used"):
+            return AccessData(
+                st="wrong",
+                priority=AccessPriority.USED,
+                session_id=session_id,
+                date=datetime.strptime(extra["used_date"], settings.DATETIME_FORMAT),
+            )
+
+        end = datetime.strptime(extra["end"], settings.DATETIME_FORMAT)
+        if make_aware(end) < timezone.now():
+            return AccessData(
+                st="wrong",
+                priority=AccessPriority.HOUR_EXPIRED,
+                session_id=session_id,
+                date=end,
+            )
+
+        start = datetime.strptime(extra["start"], settings.DATETIME_FORMAT)
+        if make_aware(start) > timezone.now():
+            return AccessData(
+                st="wrong",
+                priority=AccessPriority.HOUR_TOO_SOON,
+                session_id=session_id,
+                date=start,
+            )
+
+        return AccessData(
+            st="right", priority=AccessPriority.VALID_EXTRA, session_id=session_id
+        )
+
+    def can_access(self, session_id, gate_name) -> AccessData:
+        extra_access_data = self.can_access_extra(session_id, gate_name)
+        if extra_access_data.is_valid():
+            return extra_access_data
+
+        if session_id not in [session.id for session in self.type.sessions.all()]:
+            priority = AccessPriority.INVALID_SESSION
+
+            if extra_access_data.priority < priority:
+                return extra_access_data
+
+            return AccessData(
+                st="wrong",
+                priority=priority,
+                session_id=session_id,
+            )
+
+        if self.is_pass:
+            used = self.is_used(session_id)
+            used_date = self.get_used_date(session_id)
+        else:
+            used = self.used
+            used_date = self.used_date
+
+        if used:
+            priority = AccessPriority.USED
+
+            if extra_access_data.priority < priority:
+                return extra_access_data
+
+            return AccessData(
+                st="wrong",
+                priority=priority,
+                session_id=session_id,
+                date=used_date,
+            )
+
+        if settings.ACCESS_VALIDATE_INV_HOURS:
+            now = timezone.now()
+            if self.type.end and now > self.type.end:
+                priority = AccessPriority.HOUR_EXPIRED
+
+                if extra_access_data.priority < priority:
+                    return extra_access_data
+
+                return AccessData(
+                    st="wrong",
+                    priority=priority,
+                    session_id=session_id,
+                    date=self.type.end,
+                )
+
+            if self.type.start and now < self.type.start:
+                priority = AccessPriority.HOUR_TOO_SOON
+
+                if extra_access_data.priority < priority:
+                    return extra_access_data
+
+                return AccessData(
+                    st="wrong",
+                    priority=priority,
+                    session_id=session_id,
+                    date=self.type.start,
+                )
+
+        if gate_name and gate_name not in [gate.name for gate in self.type.gates.all()]:
+            priority = AccessPriority.INVALID_GATE
+
+            if extra_access_data.priority < priority:
+                return extra_access_data
+
+            return AccessData(
+                st="maybe",
+                priority=AccessPriority.INVALID_GATE,
+                session_id=session_id,
+                gate_name=gate_name,
+            )
+
+        return AccessData(
+            st="right", priority=AccessPriority.VALID_NORMAL, session_id=session_id
+        )
+
+    def mark_as_used(self, session_id, priority):
+        if self.is_pass and not self.type.one_time_for_session:
+            return
+
+        if priority == AccessPriority.VALID_NORMAL:
+            self.set_used(session_id)
+        elif priority == AccessPriority.VALID_EXTRA:
+            self.set_extra_session_to_used(session_id)
+            self.save()
 
     def __str__(self):
         return self.order

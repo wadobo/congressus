@@ -4,6 +4,7 @@ import base64
 import json
 import random
 import string
+from datetime import datetime
 from io import BytesIO
 from typing import TYPE_CHECKING
 
@@ -21,6 +22,7 @@ from django.utils.translation import gettext_lazy as _
 from PIL import ImageDraw, ImageFont
 from weasyprint import HTML
 
+from access.enums import AccessPriority
 from events.choices import SessionTemplate
 from events.models import (
     Discount,
@@ -29,6 +31,7 @@ from events.models import (
     SeatLayout,
     Session,
 )
+from tickets.entities import AccessData
 from tickets.managers import (
     ReadMultiPurchaseManager,
     ReadTicketManager,
@@ -62,6 +65,21 @@ def short_hour(date_time):
     if timezone.is_aware(date_time):
         date_time = timezone.localtime(date_time)
     return formats.date_format(date_time, "H:i")
+
+
+def assert_if_not_prefetch_tickets(func):
+    def wrapper(self, *args, **kwargs):
+        if (
+            not hasattr(self, "_prefetched_objects_cache")
+            or "tickets" not in self._prefetched_objects_cache
+        ):
+            raise AssertionError(
+                "Invalid use of has_valid_tickets_with_extra_session, you need "
+                "load MultiPurchase with prefetch_related('tickets')"
+            )
+        return func(self, *args, **kwargs)
+
+    return wrapper
 
 
 class BaseTicketModel:
@@ -137,6 +155,12 @@ class BaseTicketModel:
 
         qr_img.save(stream, format="png")
         return base64.b64encode(stream.getvalue()).decode("utf8")
+
+    def can_access(self, session_id, gate_name) -> AccessData:
+        raise NotImplementedError
+
+    def mark_as_used(self, session_id, priority):
+        raise NotImplementedError
 
 
 class BaseTicketMixing:
@@ -642,6 +666,85 @@ class MultiPurchase(models.Model, BaseTicketModel, BaseTicketMixing, BaseExtraDa
             f'<font class="tax">{tax}% {taxtext}</font>'
         )
 
+    def get_extra_session(self, pk):
+        for extra in self.get_extra_sessions():
+            if extra["session"] == pk:
+                return extra
+        return None
+
+    def can_access(self, session_id, gate_name) -> AccessData:
+        best_access = AccessData("wrong", AccessPriority.UNKNOWN, session_id=-1)
+
+        group_tickets = self.tickets_group_by_sessions()
+        for group_session_id, tickets in group_tickets.items():
+            access_datas = [
+                ticket.can_access(session_id, gate_name) for ticket in tickets
+            ]
+            if len(access_datas) == 1:
+                if access_datas[0].priority < best_access.priority:
+                    best_access = access_datas[0]
+                continue
+
+            priorities = set([x.priority for x in access_datas])
+
+            if len(priorities) == 1:
+                current_priority = priorities.pop()
+                if current_priority == AccessPriority.VALID_EXTRA:
+                    return AccessData(
+                        st="right",
+                        priority=AccessPriority.VALID_EXTRA,
+                        session_id=session_id,
+                        group=len(access_datas),
+                    )
+
+                if current_priority < best_access.priority:
+                    best_access = access_datas[0]
+                    if best_access.priority == AccessPriority.VALID_NORMAL:
+                        best_access.group = len(access_datas)
+                continue
+
+            priority = AccessPriority.INDIVIDUAL
+            if priority < best_access.priority and any(
+                [x.is_valid() for x in access_datas]
+            ):
+                best_access = AccessData(
+                    st="maybe",
+                    priority=priority,
+                    session_id=session_id,
+                )
+                continue
+
+            best_priority = sorted(priorities)[0]
+            if best_priority < best_access.priority:
+                for access_data in access_datas:
+                    if access_data.priority == best_priority:
+                        best_access = access_data
+                        break
+
+        return best_access
+
+    def mark_as_used(self, session_id, priority):
+        if priority == AccessPriority.VALID_NORMAL:
+            self.tickets.filter(session_id=session_id).update(
+                used=True, used_date=timezone.now()
+            )
+        elif priority == AccessPriority.VALID_EXTRA:
+            update_tickets = []
+            for ticket in self.tickets.all():
+                ticket.set_extra_session_to_used(session_id)
+                update_tickets.append(ticket)
+            self.tickets.bulk_update(update_tickets, ["extra_data"])
+
+    @assert_if_not_prefetch_tickets
+    def tickets_group_by_sessions(self):
+        group_by_session = {}
+        for ticket in self.tickets.all():
+            if ticket.session_id not in group_by_session:
+                group_by_session[ticket.session_id] = [ticket]
+            else:
+                group_by_session[ticket.session_id].append(ticket)
+        return group_by_session
+
     class Meta:
         ordering = ["-created"]
         verbose_name = _("multipurchase")
@@ -938,6 +1041,103 @@ class Ticket(models.Model, BaseTicketModel, BaseTicketMixing, BaseExtraData):
             return self.get_window_price()
         else:
             return self.get_price()
+
+    def can_access_extra(self, session_id, gate_name) -> AccessData:
+        from access.views import make_aware
+
+        extra = self.get_extra_session(session_id)
+        if not extra:
+            return AccessData(
+                st="wrong",
+                priority=AccessPriority.INVALID_SESSION,
+                session_id=session_id,
+            )
+
+        if extra.get("used"):
+            return AccessData(
+                st="wrong",
+                priority=AccessPriority.USED,
+                session_id=session_id,
+                date=datetime.strptime(extra["used_date"], settings.DATETIME_FORMAT),
+            )
+
+        end = datetime.strptime(extra["end"], settings.DATETIME_FORMAT)
+        if make_aware(end) < timezone.now():
+            return AccessData(
+                st="wrong",
+                priority=AccessPriority.HOUR_EXPIRED,
+                session_id=session_id,
+                date=end,
+            )
+
+        start = datetime.strptime(extra["start"], settings.DATETIME_FORMAT)
+        if make_aware(start) > timezone.now():
+            return AccessData(
+                st="wrong",
+                priority=AccessPriority.HOUR_TOO_SOON,
+                session_id=session_id,
+                date=start,
+            )
+
+        return AccessData(
+            st="right", priority=AccessPriority.VALID_EXTRA, session_id=session_id
+        )
+
+    def can_access(self, session_id, gate_name) -> AccessData:
+        extra_access_data = self.can_access_extra(session_id, gate_name)
+        if extra_access_data.is_valid():
+            return extra_access_data
+
+        if self.session_id != session_id:
+            priority = AccessPriority.INVALID_SESSION
+
+            if extra_access_data.priority < priority:
+                return extra_access_data
+
+            return AccessData(
+                st="wrong",
+                priority=priority,
+                session_id=session_id,
+            )
+
+        if self.used:
+            priority = AccessPriority.USED
+
+            if extra_access_data.priority < priority:
+                return extra_access_data
+
+            return AccessData(
+                st="wrong",
+                priority=priority,
+                session_id=session_id,
+                date=self.used_date,
+            )
+
+        if gate_name and self.gate_name and self.gate_name != gate_name:
+            priority = AccessPriority.INVALID_GATE
+
+            if extra_access_data.priority < priority:
+                return extra_access_data
+
+            return AccessData(
+                st="maybe",
+                priority=AccessPriority.INVALID_GATE,
+                session_id=session_id,
+                gate_name=gate_name,
+            )
+
+        return AccessData(
+            st="right", priority=AccessPriority.VALID_NORMAL, session_id=session_id
+        )
+
+    def mark_as_used(self, session_id, priority):
+        if priority == AccessPriority.VALID_NORMAL:
+            self.used = True
+            self.used_date = timezone.now()
+            self.save()
+        elif priority == AccessPriority.VALID_EXTRA:
+            self.set_extra_session_to_used(session_id)
+            self.save()
 
 
 class TicketWarning(models.Model):

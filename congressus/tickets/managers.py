@@ -3,7 +3,19 @@ from django.db import models
 
 class MultiPurchaseQuerySet(models.QuerySet):
     def with_tickets(self):
-        return self.prefetch_related("tickets")
+        from tickets.models import Ticket
+
+        return self.prefetch_related(
+            models.Prefetch(
+                "tickets",
+                queryset=Ticket.objects.select_related(
+                    "session",
+                    "session__space",
+                    "session__space__event",
+                    "seat_layout",
+                ),
+            ),
+        )
 
     def with_ticket_templates(self):
         from tickets.models import Ticket

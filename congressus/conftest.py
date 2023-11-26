@@ -1,6 +1,11 @@
 import pytest
+from django.conf import settings
 
 from django.contrib.auth.models import Group
+
+
+def pytest_configure():
+    settings.MIDDLEWARE.remove("silk.middleware.SilkyMiddleware")
 
 
 @pytest.fixture

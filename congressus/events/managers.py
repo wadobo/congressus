@@ -70,6 +70,13 @@ class SessionQuerySet(models.QuerySet):
             ),
         )
 
+    def get_sessions_dict(self) -> dict[int, str]:
+        sessions = self.select_related("space").values("id", "name", "space__name")
+        return {
+            session["id"]: f"{session['space__name']} - {session['name']}"
+            for session in sessions
+        }
+
 
 class ReadSessionManager(models.Manager):
     def get_queryset(self):

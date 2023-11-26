@@ -1,5 +1,6 @@
 -r requirements.txt
 django-debug-toolbar
+django-silk
 factory-boy
 ipdb
 mypy
