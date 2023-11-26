@@ -118,7 +118,7 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
         last_sale = ticket_window.sales.last()
         if last_sale:
             name = "{0} - {1} - {2} - {3}".format(
-                last_sale.purchase.tickets.count(),
+                len(last_sale.purchase.tickets.all()),
                 last_sale.purchase.window_code(),
                 last_sale.purchase.order_tpv,
                 last_sale.price,
