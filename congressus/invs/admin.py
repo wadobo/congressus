@@ -228,7 +228,7 @@ class InvitationAdmin(admin.ModelAdmin):
         return obj.generator.concept or "-"
 
     def iused(self, obj):
-        return obj.used or obj.extra_used
+        return obj.used or bool(obj.extra_used)
 
     iused.short_description = _("used")
     iused.boolean = True
