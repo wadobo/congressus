@@ -87,19 +87,17 @@ class TicketWindow(models.Model):
         if not date:
             date = timezone.now()
 
-        sales = TicketWindowSale.objects.filter(
+        return TicketWindowSale.objects.filter(
             window=self,
             date__year=date.year,
             date__month=date.month,
             date__day=date.day,
             **kwargs
-        )
-
-        return sales
+        ).with_mp()
 
     def tickets_today(self, date=None):
         sales = self.get_sales(date)
-        sales = sum(i.purchase.tickets.count() for i in sales)
+        sales = sum(len(i.purchase.tickets.all()) for i in sales)
         return sales
 
     def sold_today(self, date=None):

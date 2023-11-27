@@ -15,16 +15,9 @@
     </div>
 
     <div class="text-center">
-        <div class="btn-group" role="group" aria-label="...">
-            {% for d in days %}
-                <a href="?date={{ d|date:"Y-m-d" }}" type="button"
-                   class="btn
-                   {% if d|date:"Y-m-d" == date|date:"Y-m-d" %}btn-success{% else %}btn-default{% endif %}
-                   {% if d|date:"Y-m-d" == today|date:"Y-m-d" %}btn-primary{% endif %}
-                   ">
-                   {{ d.day }}</a>
-            {% endfor %}
-        </div>
+        <form method="GET">
+            <input type="date" name="date" id="currentDate" value="{{ date|date:"Y-m-d" }}" onChange="this.form.submit()" />
+        </form>
     </div>
 
     <hr/>
@@ -33,10 +26,8 @@
         <tr>
             <th class="text-center">{% trans "name" %}</th>
             <th class="text-center">{% trans "movement" %}</th>
-            <th class="text-center">{% trans "today tickets" %}</th>
-            <th class="text-center">{% trans "sold today" %}</th>
-            <th class="text-center">{% trans "today cash" %}</th>
-            <th class="text-center">{% trans "today card" %}</th>
+            <th class="text-center">{% trans "tickets" %}</th>
+            <th class="text-center">{% trans "sold" %} ({% trans "cash" %} + {% trans "card" %})</th>
             <th class="text-center">{% trans "cash" %}</th>
         </tr>
         {% for w in windows %}
@@ -52,12 +43,9 @@
                 </td>
                 <td>
                     <span id="sold-{{ w.id }}">{% sold_today w date %}</span> €
-                </td>
-                <td>
-                    <span id="cash-{{ w.id }}">{% sold_today_cash w date %}</span> €
-                </td>
-                <td>
-                    <span id="card-{{ w.id }}">{% sold_today_card w date %}</span> €
+                    (<span id="cash-{{ w.id }}">{% sold_today_cash w date %}</span> €
+                    +
+                    <span id="card-{{ w.id }}">{% sold_today_card w date %}</span> €)
                 </td>
                 <td>
                     <span id="money-{{ w.id }}">{{ w.cash }}</span> €
