@@ -442,7 +442,6 @@ class MPAdmin(admin.ModelAdmin):
         "confirmed",
         "payment_method",
         TicketWindowFilter,
-        "tpv_error",
     )
 
     search_fields = ("order", "order_tpv", "email", "extra_data")
@@ -451,6 +450,7 @@ class MPAdmin(admin.ModelAdmin):
     inlines = [
         TicketInline,
     ]
+    show_full_result_count = False
 
     def __getattr__(self, value):
         if value.startswith("ticket_field_"):
