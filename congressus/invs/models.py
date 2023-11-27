@@ -143,6 +143,38 @@ class Invitation(models.Model, BaseTicketModel, BaseExtraData):
             return None
 
     @property
+    def extra_used(self):
+        extra_sessions = self.get_extra_data("extra_sessions")
+        if extra_sessions is None:
+            return False
+
+        sessions_used = [
+            session.get("session", None)
+            for session in extra_sessions
+            if session.get("used") is True
+        ]
+        if sessions_used:
+            return sessions_used[0]
+
+        return False
+
+    @property
+    def extra_used_date(self):
+        extra_sessions = self.get_extra_data("extra_sessions")
+        if extra_sessions is None:
+            return None
+
+        sessions_used_date = [
+            session.get("used_date", None)
+            for session in extra_sessions
+            if session.get("used") is True
+        ]
+        if sessions_used_date:
+            return sessions_used_date[0]
+
+        return None
+
+    @property
     def wcode(self) -> str:
         if self.generator:
             return "GEN" + str(self.generator.id)
@@ -372,11 +404,40 @@ class Invitation(models.Model, BaseTicketModel, BaseExtraData):
         )
 
     def can_access(self, session_id, gate_name) -> AccessData:
-        extra_access_data = self.can_access_extra(session_id, gate_name)
-        if extra_access_data.is_valid():
-            return extra_access_data
+        if self.is_pass and self.is_used(session_id):
+            return AccessData(
+                st="wrong",
+                priority=AccessPriority.USED,
+                session_id=session_id,
+                date=self.get_used_date(session_id),
+            )
 
-        if session_id not in [session.id for session in self.type.sessions.all()]:
+        if not self.is_pass and self.used:
+            return AccessData(
+                st="wrong",
+                priority=AccessPriority.USED,
+                session_id=session_id,
+                date=self.used_date,
+            )
+
+        if not self.is_pass and self.extra_used:
+            extra_used_date = datetime.strptime(
+                self.extra_used_date, settings.DATETIME_FORMAT
+            )
+            if extra_used_date.date() != datetime.now().date():
+                # TODO: comprobar que la sesión extra usada es una sesión extra de la sesión
+                # actual, sino devolver usado. Ahora está por fecha y es funcional
+                return AccessData(
+                    st="wrong",
+                    priority=AccessPriority.USED,
+                    session_id=session_id,
+                    date=extra_used_date,
+                )
+
+        extra_access_data = self.can_access_extra(session_id, gate_name)
+        if not extra_access_data.is_valid() and session_id not in [
+            session.id for session in self.type.sessions.all()
+        ]:
             priority = AccessPriority.INVALID_SESSION
 
             if extra_access_data.priority < priority:
@@ -388,25 +449,8 @@ class Invitation(models.Model, BaseTicketModel, BaseExtraData):
                 session_id=session_id,
             )
 
-        if self.is_pass:
-            used = self.is_used(session_id)
-            used_date = self.get_used_date(session_id)
-        else:
-            used = self.used
-            used_date = self.used_date
-
-        if used:
-            priority = AccessPriority.USED
-
-            if extra_access_data.priority < priority:
-                return extra_access_data
-
-            return AccessData(
-                st="wrong",
-                priority=priority,
-                session_id=session_id,
-                date=used_date,
-            )
+        if extra_access_data.is_valid():
+            return extra_access_data
 
         if settings.ACCESS_VALIDATE_INV_HOURS:
             now = timezone.now()
