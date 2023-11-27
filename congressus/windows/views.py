@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib import messages
@@ -17,9 +17,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, View
 
 from events.choices import SessionTemplate
-from events.models import Discount, Event, Session
+from events.models import Discount, Event
 from tickets.forms import MPRegisterForm
-from tickets.models import Ticket
 from tickets.models import MultiPurchase
 from tickets.views import MultiPurchaseView
 from windows.models import TicketWindow
@@ -269,31 +268,18 @@ class WindowList(UserPassesTestMixin, TemplateView):
         return u.is_authenticated and u.is_superuser
 
     def get_context_data(self, *args, **kwargs):
-        ev = self.kwargs.get("ev")
-        ev = get_object_or_404(Event, slug=ev)
-        ctx = super(WindowList, self).get_context_data(*args, **kwargs)
+        ev = get_object_or_404(Event.objects.filter(slug=self.kwargs.get("ev")))
+        ctx = super().get_context_data(*args, **kwargs)
         ctx["windows"] = ev.windows.all()
         ctx["ev"] = ev
 
-        ctx["date"] = timezone.now()
-
-        d = self.request.GET.get("date", "")
-        if d:
-            date = datetime.datetime(*map(int, d.split("-")))
-            ctx["date"] = date
-
-        q = Ticket.objects.extra({"created_date": "date(created)"}).filter(
-            event_name=ev.name
-        )
-        days_online = (
-            q.values_list("created_date", flat=True).distinct().order_by("created_date")
+        date = self.request.GET.get("date", "")
+        ctx["date"] = (
+            datetime.strptime(date, "%Y-%m-%d")
+            if date
+            else timezone.now()
         )
 
-        q = Session.objects.extra({"start_date": "date(start)"}).filter(space__event=ev)
-        days_sessions = (
-            q.values_list("start_date", flat=True).distinct().order_by("start_date")
-        )
-        ctx["days"] = sorted(set(days_online) | set(days_sessions))
         ctx["today"] = timezone.now()
         ctx["menuitem"] = "windows"
 

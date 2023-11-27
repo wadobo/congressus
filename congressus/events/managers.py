@@ -14,6 +14,9 @@ class EventQuerySet(models.QuerySet):
     def with_sessions(self):
         return self.prefetch_related("spaces__sessions")
 
+    def with_access(self):
+        return self.prefetch_related("access")
+
 
 class ReadEventManager(models.Manager):
     def get_queryset(self):

@@ -42,11 +42,10 @@ class AccessLogin(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         ev = self.kwargs.get("ev")
-        ac = self.kwargs.get("ac")
         ac = get_object_or_404(
             AccessControl.read_objects.all().with_event().with_gates(),
             event__slug=ev,
-            slug=ac,
+            slug=self.kwargs.get("ac"),
         )
         sessions = Session.objects.filter(space__event=ac.event).with_space()
         ctx = super().get_context_data(*args, **kwargs)
@@ -54,6 +53,8 @@ class AccessLogin(TemplateView):
         ctx["ac"] = ac
         ctx["sessions"] = sessions
         ctx["gates"] = ac.event.gates.all()
+        ctx["selected_sessions"] = self.request.GET.get("sessions", "").split(",")
+        ctx["selected_gate"] = self.request.GET.get("gate", "")
         return ctx
 
     def post(self, request, ev=None, ac=None):
@@ -228,22 +229,16 @@ class AccessList(UserPassesTestMixin, TemplateView):
         return u.is_authenticated and u.is_superuser
 
     def get_context_data(self, *args, **kwargs):
-        ev = self.kwargs.get("ev")
-        ev = get_object_or_404(Event, slug=ev)
-        ctx = super(AccessList, self).get_context_data(*args, **kwargs)
+        ev = get_object_or_404(
+            Event.objects.filter(slug=self.kwargs.get("ev")).with_access()
+        )
+        ctx = super().get_context_data(*args, **kwargs)
         ctx["access"] = ev.access.all()
         ctx["ev"] = ev
 
-        ctx["date"] = timezone.now()
+        date = self.request.GET.get("date", "")
+        ctx["date"] = datetime.strptime(date, "%Y-%m-%d") if date else timezone.now()
 
-        d = self.request.GET.get("date", "")
-        if d:
-            date = datetime(*map(int, d.split("-")))
-            ctx["date"] = date
-
-        q = Session.objects.extra({"start_date": "date(start)"}).filter(space__event=ev)
-        days = q.values_list("start_date", flat=True).distinct().order_by("start_date")
-        ctx["days"] = days
         ctx["today"] = timezone.now()
         ctx["menuitem"] = "access"
 

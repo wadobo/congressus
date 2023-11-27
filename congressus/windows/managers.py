@@ -7,7 +7,8 @@ if TYPE_CHECKING:
 
 
 class TicketWindowSaleQuerySet(models.QuerySet):
-    pass
+    def with_mp(self):
+        return self.select_related("purchase").prefetch_related("purchase__tickets")
 
 
 class WriteTicketWindowSaleManager(models.Manager):
