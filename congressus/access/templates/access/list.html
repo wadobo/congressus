@@ -15,16 +15,9 @@
     </div>
 
     <div class="text-center">
-        <div class="btn-group" role="group" aria-label="...">
-            {% for d in days %}
-                <a href="?date={{ d|date:"Y-m-d" }}" type="button"
-                   class="btn
-                   {% if d|date:"Y-m-d" == date|date:"Y-m-d" %}btn-success{% else %}btn-default{% endif %}
-                   {% if d|date:"Y-m-d" == today|date:"Y-m-d" %}btn-primary{% endif %}
-                   ">
-                   {{ d.day }}</a>
-            {% endfor %}
-        </div>
+        <form method="GET">
+            <input type="date" name="date" id="currentDate" value="{{ date|date:"Y-m-d" }}" onChange="this.form.submit()" />
+        </form>
     </div>
     <hr/>
 

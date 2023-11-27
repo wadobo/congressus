@@ -17,6 +17,7 @@
 
 <form class="form-signin" method="POST">
     {% csrf_token %}
+
     <h2 class="form-signin-heading">{% trans "Please sign in" %}</h2>
 
     <label for="username" class="sr-only">{% trans "username" %}</label>
@@ -28,7 +29,9 @@
     <label for="inputSession">{% trans "sessions" %}</label>
     <select name="sessions" class="form-control" id="inputSession" size="10" multiple>
         {% for s in sessions %}
-            <option value="{{ s.id|safe }}">{{ s.space.name }} / {{ s.name }}</option>
+            <option value="{{ s.id|safe }}" {% if s.id|safe in selected_sessions %}selected{% endif %}>
+                {{ s.space.name }} / {{ s.name }}
+            </option>
         {% endfor %}
     </select>
 
@@ -36,7 +39,7 @@
     <select name="gate" class="form-control" id="inputGate">
         <option value="">{% trans "None" %}</option>
         {% for g in gates %}
-            <option value="{{ g.id }}">{{ g.name }}</option>
+            <option value="{{ g.id }}" {% if g.id|safe == selected_gate %}selected{% endif %}>{{ g.name }}</option>
         {% endfor %}
     </select>
 
