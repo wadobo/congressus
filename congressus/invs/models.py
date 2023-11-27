@@ -652,6 +652,35 @@ class InvitationGenerator(models.Model):
 
         Invitation.objects.bulk_create(invis)
 
+    def regenerate(self):
+        """This functionality has been created to regenerate extra_sessions when we
+        already create invitations and the sessions are incorrect."""
+
+        extra_sessions = []
+        for session in self.type.sessions.all():
+            for extra in session.orig_sessions.all():
+                extra_sessions.append(
+                    {
+                        "session": extra.extra.id,
+                        "start": timezone.make_naive(extra.start).strftime(
+                            settings.DATETIME_FORMAT
+                        ),
+                        "end": timezone.make_naive(extra.end).strftime(
+                            settings.DATETIME_FORMAT
+                        ),
+                        "used": extra.used,
+                    }
+                )
+
+        all_invis = []
+        for invi in self.invitations.all():
+            invi.set_extra_data("extra_sessions", extra_sessions)
+            invi.is_pass = self.type.is_pass
+            invi.type = self.type
+            all_invis.append(invi)
+
+        Invitation.objects.bulk_update(all_invis, ["is_pass", "type", "extra_data"])
+
 
 def remove_seatholds(sender, instance, using, **kwargs):
     instance.remove_hold_seats()
