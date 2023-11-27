@@ -242,13 +242,13 @@ class Invitation(models.Model, BaseTicketModel, BaseExtraData):
 
     @assert_if_not_prefetch_usedin
     def is_used(self, session_id):
-        return session_id in [session.id for session in self.usedin.all()]
+        return session_id in [session.session.id for session in self.usedin.all()]
 
     @assert_if_not_prefetch_usedin
     def get_used_date(self, session_id):
         used_date = None
         for session in self.usedin.all():
-            if session.id == session_id:
+            if session.session.id == session_id:
                 used_date = session.date
                 break
 
