@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-17 12:10+0100\n"
+"POT-Creation-Date: 2023-11-27 17:57+0100\n"
 "PO-Revision-Date: 2018-11-08 12:47+0100\n"
 "Last-Translator: danigm <danigm@gnome.org>\n"
 "Language-Team: Spanish; Castilian <es@gnome.org>\n"
@@ -43,7 +43,7 @@ msgstr "Expirado, finalizó {date}"
 msgid "Used: {date}"
 msgstr "Usado: {date}"
 
-#: access/enums.py:15 access/views.py:189
+#: access/enums.py:15 access/views.py:193
 msgid "Not exists"
 msgstr "No existe"
 
@@ -55,16 +55,16 @@ msgstr "No existe"
 msgid "event"
 msgstr "evento"
 
-#: access/models.py:14 access/templates/access/list.html:33
+#: access/models.py:14 access/templates/access/list.html:26
 #: dashboard/models.py:37 events/models.py:227 events/models.py:253
 #: events/models.py:306 events/models.py:345 events/models.py:359
 #: events/models.py:451 events/models.py:527 events/models.py:772
 #: invs/models.py:51 invs/models.py:121 windows/models.py:44
-#: windows/templates/windows/list.html:34
+#: windows/templates/windows/list.html:27
 msgid "name"
 msgstr "nombre"
 
-#: access/models.py:17 access/templates/access/list.html:34
+#: access/models.py:17 access/templates/access/list.html:27
 #: windows/models.py:55
 msgid "location"
 msgstr "localización"
@@ -147,85 +147,85 @@ msgstr "código de entrada"
 msgid "Access control admin"
 msgstr "Administración de control de acceso"
 
-#: access/templates/access/list.html:35
+#: access/templates/access/list.html:28
 msgid "today"
 msgstr "hoy"
 
-#: access/templates/access/list.html:36
+#: access/templates/access/list.html:29
 msgid "today ok"
 msgstr "válido hoy"
 
-#: access/templates/access/list.html:37
+#: access/templates/access/list.html:30
 msgid "today wrong"
 msgstr "no válido hoy"
 
-#: access/templates/access/list.html:38
+#: access/templates/access/list.html:31
 msgid "today used"
 msgstr "usado hoy"
 
-#: access/templates/access/list.html:39
+#: access/templates/access/list.html:32
 msgid "today maybe"
 msgstr "quizás hoy"
 
-#: access/templates/access/login.html:20
+#: access/templates/access/login.html:21
 #: windows/templates/windows/login.html:27
 msgid "Please sign in"
 msgstr "Por favor, accede"
 
-#: access/templates/access/login.html:22 access/templates/access/login.html:23
+#: access/templates/access/login.html:23 access/templates/access/login.html:24
 #: windows/templates/windows/login.html:29
 #: windows/templates/windows/login.html:30
 msgid "username"
 msgstr "nombre de usuario"
 
-#: access/templates/access/login.html:25 access/templates/access/login.html:26
+#: access/templates/access/login.html:26 access/templates/access/login.html:27
 #: windows/templates/windows/login.html:32
 #: windows/templates/windows/login.html:33
 msgid "password"
 msgstr "contraseña"
 
-#: access/templates/access/login.html:28
+#: access/templates/access/login.html:29
 #: dashboard/templates/dashboard/count_report.html:37 events/models.py:566
 #: invs/models.py:71
 msgid "sessions"
 msgstr "sesiones"
 
-#: access/templates/access/login.html:35 events/models.py:348
+#: access/templates/access/login.html:38 events/models.py:348
 #: events/models.py:376
 msgid "gate"
 msgstr "puerta"
 
-#: access/templates/access/login.html:37
+#: access/templates/access/login.html:40
 #: windows/templates/windows/multipurchase.html:78
 msgid "None"
 msgstr "Nada"
 
-#: access/templates/access/login.html:43
+#: access/templates/access/login.html:46
 #: windows/templates/windows/login.html:35
 msgid "sign in"
 msgstr "entrar"
 
-#: access/views.py:86
+#: access/views.py:87
 msgid "This user can't access in this access control"
 msgstr "Este usuario no puede acceder a este punto de control de acceso"
 
-#: access/views.py:89 windows/views.py:72
+#: access/views.py:90 windows/views.py:71
 msgid "Invalid username or password"
 msgstr "Nombre de usuario o contraseña incorrectos"
 
-#: access/views.py:156
+#: access/views.py:157
 msgid "Incorrect readind"
 msgstr "Lectura incorrecta"
 
-#: access/views.py:165
+#: access/views.py:166
 msgid "Can't read invitations"
 msgstr "No podemos leer invitaciones"
 
-#: access/views.py:171
+#: access/views.py:173
 msgid "Can't read multipurchase"
 msgstr "No podemos leer compras múltiples"
 
-#: access/views.py:180
+#: access/views.py:183
 msgid "Can't read individual tickets"
 msgstr "No podemos leer entradas individuales"
 
@@ -307,7 +307,7 @@ msgstr "cada minuto"
 
 #: dashboard/models.py:25 events/models.py:229 events/models.py:686
 #: events/models.py:703 invs/models.py:492 tickets/models.py:1160
-#: tickets/models.py:1191 windows/models.py:178
+#: tickets/models.py:1191 windows/models.py:176
 msgid "type"
 msgstr "tipo"
 
@@ -855,10 +855,6 @@ msgstr "campo de entrada"
 msgid "ticket fields"
 msgstr "campos de entrada"
 
-#: events/models.py:739
-msgid "Enter a valid phone"
-msgstr "Introduce un teléfono válido"
-
 #: events/models.py:774
 msgid "header"
 msgstr "cabecera"
@@ -958,6 +954,14 @@ msgstr "plantilla de entrada"
 #: events/models.py:833
 msgid "ticket templates"
 msgstr "plantillas de entrada"
+
+#: events/validators.py:8
+msgid "Spaces are not allowed"
+msgstr "Los espacios no están permitidos"
+
+#: events/validators.py:12
+msgid "Enter a valid phone"
+msgstr "Introduce un teléfono válido"
 
 #: invs/admin.py:28
 msgid "Download CSV"
@@ -1078,12 +1082,12 @@ msgstr "invitación usada en"
 msgid "invitations used in"
 msgstr "invitaciones usadas en"
 
-#: invs/models.py:494 windows/admin.py:109 windows/models.py:180
+#: invs/models.py:494 windows/admin.py:109 windows/models.py:178
 msgid "amount"
 msgstr "cantidad"
 
 #: invs/models.py:495 tickets/admin.py:300 tickets/models.py:824
-#: windows/models.py:149
+#: windows/models.py:147
 msgid "price"
 msgstr "precio"
 
@@ -1150,7 +1154,7 @@ msgstr "vídeo"
 msgid "Single Row Config"
 msgstr "Configuración de fila única"
 
-#: singlerow/models.py:31 windows/models.py:131 windows/models.py:174
+#: singlerow/models.py:31 windows/models.py:129 windows/models.py:172
 msgid "window"
 msgstr "taquilla"
 
@@ -1170,12 +1174,12 @@ msgstr "Vaya a la Taquilla nº"
 msgid "wait"
 msgstr "espere"
 
-#: singlerow/views.py:79 windows/views.py:114
+#: singlerow/views.py:79 windows/views.py:113
 msgid "Opened"
 msgstr "Abierto"
 
 #: singlerow/views.py:86 windows/templates/windows/multipurchase.html:50
-#: windows/views.py:114
+#: windows/views.py:113
 msgid "Closed"
 msgstr "Cerrado"
 
@@ -1231,7 +1235,7 @@ msgstr "código TPV"
 msgid "ticket window"
 msgstr "taquilla"
 
-#: tickets/admin.py:334 tickets/admin.py:528 windows/models.py:153
+#: tickets/admin.py:334 tickets/admin.py:528 windows/models.py:151
 msgid "payment"
 msgstr "forma de pago"
 
@@ -1416,7 +1420,7 @@ msgstr "%(date)s (%(start)s a %(end)s)"
 msgid "%(date)s"
 msgstr "%(date)s"
 
-#: tickets/models.py:750 tickets/models.py:810 windows/models.py:145
+#: tickets/models.py:750 tickets/models.py:810 windows/models.py:143
 msgid "multipurchase"
 msgstr "compra multiple"
 
@@ -1456,7 +1460,7 @@ msgstr "fecha de uso de entrada"
 msgid "ticket"
 msgstr "entrada"
 
-#: tickets/models.py:843
+#: tickets/models.py:843 windows/templates/windows/list.html:29
 msgid "tickets"
 msgstr "entrada"
 
@@ -1806,7 +1810,7 @@ msgstr "código a mostrar en la entrada"
 msgid "cash in the ticket window"
 msgstr "dinero en taquilla"
 
-#: windows/models.py:52 windows/models.py:137
+#: windows/models.py:52 windows/models.py:135
 msgid "user"
 msgstr "usuario"
 
@@ -1844,31 +1848,31 @@ msgstr "numero de llamadas"
 msgid "Number of calls created to singlerow when open ticket windows"
 msgstr "Numero de llamadas creadas para fila única al abrir taquilla"
 
-#: windows/models.py:150
+#: windows/models.py:148
 msgid "payed"
 msgstr "pagado"
 
-#: windows/models.py:151
+#: windows/models.py:149
 msgid "change"
 msgstr "cambio"
 
-#: windows/models.py:160
+#: windows/models.py:158
 msgid "ticket window sale"
 msgstr "venta en taquilla"
 
-#: windows/models.py:161
+#: windows/models.py:159
 msgid "ticket window sales"
 msgstr "ventas en taquilla"
 
-#: windows/models.py:182
+#: windows/models.py:180
 msgid "Note"
 msgstr "Nota"
 
-#: windows/models.py:187
+#: windows/models.py:185
 msgid "ticket window cash movement"
 msgstr "movimiento en taquilla"
 
-#: windows/models.py:188
+#: windows/models.py:186
 msgid "ticket window cash movements"
 msgstr "movimientos en taquilla"
 
@@ -1876,32 +1880,25 @@ msgstr "movimientos en taquilla"
 msgid "Window ticket admin"
 msgstr "Administración de taquillas"
 
-#: windows/templates/windows/list.html:35
+#: windows/templates/windows/list.html:28
 msgid "movement"
 msgstr "movimiento"
 
-#: windows/templates/windows/list.html:36
-msgid "today tickets"
-msgstr "entradas hoy"
+#: windows/templates/windows/list.html:30
+msgid "sold"
+msgstr "vendido"
 
-#: windows/templates/windows/list.html:37
-msgid "sold today"
-msgstr "vendido hoy"
-
-#: windows/templates/windows/list.html:38
-msgid "today cash"
-msgstr "efectivo hoy"
-
-#: windows/templates/windows/list.html:39
-msgid "today card"
-msgstr "tarjeta hoy"
-
-#: windows/templates/windows/list.html:40
+#: windows/templates/windows/list.html:30
+#: windows/templates/windows/list.html:31
 #: windows/templates/windows/multipurchase.html:109
 msgid "cash"
 msgstr "efectivo"
 
-#: windows/templates/windows/list.html:48
+#: windows/templates/windows/list.html:30
+msgid "card"
+msgstr "tarjeta"
+
+#: windows/templates/windows/list.html:39
 msgid "add / remove"
 msgstr "añadir / eliminar"
 
@@ -1949,11 +1946,11 @@ msgstr "entrada/s serán compradas, ¿estás seguro?"
 msgid "Finish"
 msgstr "Terminar"
 
-#: windows/views.py:69
+#: windows/views.py:68
 msgid "This user can't access in this ticket window"
 msgstr "Este usuario no puede acceder a esta taquilla"
 
-#: windows/views.py:233
+#: windows/views.py:232
 msgid "There was an error, please try again"
 msgstr "Ha ocurrido un error, por favor, inténtalo de nuevo"
 
@@ -1964,6 +1961,18 @@ msgstr "Ha ocurrido un error, por favor, inténtalo de nuevo"
 #, python-format
 #~ msgid "Ok: %(session)s"
 #~ msgstr "Ok: %(session)s"
+
+#~ msgid "today tickets"
+#~ msgstr "entradas hoy"
+
+#~ msgid "sold today"
+#~ msgstr "vendido hoy"
+
+#~ msgid "today cash"
+#~ msgstr "efectivo hoy"
+
+#~ msgid "today card"
+#~ msgstr "tarjeta hoy"
 
 #, fuzzy
 #~| msgid "Incorrect readind"
