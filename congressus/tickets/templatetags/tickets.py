@@ -18,11 +18,11 @@ def ticket_seat_class(session, layout, seat, row, col):
     elif seat == '_':
         return 'seat-_'
 
-    holded_type = session.is_seat_holded(layout, row, col)
+    holded_type = session.is_seat_holded_new(layout, row, col)
     if holded_type:
         return 'seat-' + re.sub('[CP]', 'H', holded_type)
 
-    if session.is_seat_available(layout, row, col):
+    if session.is_seat_available_new(layout, row, col):
         return 'seat-L'
 
     return 'seat-R'

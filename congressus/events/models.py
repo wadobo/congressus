@@ -593,12 +593,32 @@ class Session(models.Model):
         holded = self.is_seat_holded(layout, row, column, client)
         return not holded
 
+    def is_seat_available_new(self, layout, row, column, client=None):
+        holded = self.is_seat_holded_new(layout, row, column, client)
+        return not holded
+
     def is_seat_holded(self, layout, row: str, column: str, client=None):
         seat = row + "-" + column
         holds = self.seat_holds.filter(layout=layout, seat=seat)
         if client:
             holds = holds.exclude(client=client, type="H")
         if holds.exists():
+            return holds[0].type
+        else:
+            return ""
+
+    def is_seat_holded_new(self, layout, row: str, column: str, client=None):
+        seat = row + "-" + column
+        holds = [
+            seat_hold
+            for seat_hold in self.seat_holds.all()
+            if seat_hold.layout == layout and seat_hold.seat == seat
+        ]
+        if client:
+            holds = [
+                hold for hold in holds if hold.client == client and hold.type == "H"
+            ]
+        if len(holds) >= 1:
             return holds[0].type
         else:
             return ""

@@ -541,7 +541,7 @@ class SeatView(TemplateView):
     template_name = "tickets/seats.html"
 
     def get_context_data(self, *args, **kwargs):
-        ctx = super(SeatView, self).get_context_data(*args, **kwargs)
+        ctx = super().get_context_data(*args, **kwargs)
         ctx["map"] = get_object_or_404(SeatMap, id=kwargs["map"])
         ctx["q"] = self.request.GET.get("q", "")
         return ctx
@@ -584,9 +584,11 @@ class AjaxLayout(TemplateView):
     template_name = "tickets/layout.html"
 
     def get_context_data(self, session, layout, **kwargs):
-        ctx = super(AjaxLayout, self).get_context_data(**kwargs)
+        ctx = super().get_context_data(**kwargs)
         layout = get_object_or_404(SeatLayout, id=layout)
-        session = get_object_or_404(Session, id=session)
+        session = get_object_or_404(
+            Session.objects.filter(id=session).with_seat_holds()
+        )
         ctx["layout"] = layout
         ctx["session"] = session
         return ctx
@@ -632,9 +634,7 @@ class TicketTemplatePreview(UserPassesTestMixin, View):
         return mp
 
     def get_response(self, mp):
-        return mp.get_html(
-            session_template=SessionTemplate.ONLINE, preview_pdf=True
-        )
+        return mp.get_html(session_template=SessionTemplate.ONLINE, preview_pdf=True)
 
     def get(self, request, id):
         from events.models import TicketTemplate
