@@ -1,4 +1,6 @@
 from datetime import datetime
+
+from django.core.exceptions import ObjectDoesNotExist
 from django.views.generic import TemplateView, View
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
@@ -165,31 +167,27 @@ class AccessView(UserPassesTestMixin, TemplateView):
             if not self.access_control.read_inv:
                 return self.response_json(_("Can't read invitations"), st="wrong")
 
-            baseticket = (
-                Invitation.read_objects.filter(order=order).with_sessions().get()
-            )
+            baseticket = Invitation.read_objects.filter(order=order).with_sessions()
         elif self.is_multipurchase(order):
             if not self.access_control.read_mp:
                 return self.response_json(_("Can't read multipurchase"), st="wrong")
 
-            baseticket = (
-                MultiPurchase.objects.filter(order=order, confirmed=True)
-                .with_tickets()
-                .get()
-            )
+            baseticket = MultiPurchase.objects.filter(
+                order=order, confirmed=True
+            ).with_tickets()
         else:
             if not self.access_control.read_tickets:
                 return self.response_json(
                     _("Can't read individual tickets"), st="wrong"
                 )
 
-            baseticket = (
-                Ticket.objects.filter(order=order, confirmed=True)
-                .with_templates()
-                .get()
-            )
+            baseticket = Ticket.objects.filter(
+                order=order, confirmed=True
+            ).with_templates()
 
-        if not baseticket:
+        try:
+            baseticket = baseticket.get()
+        except ObjectDoesNotExist:
             return self.response_json(_("Not exists"), st="wrong")
 
         best = AccessData("wrong", AccessPriority.UNKNOWN, session_id=-1)
