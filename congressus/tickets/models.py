@@ -909,6 +909,10 @@ class Ticket(models.Model, BaseTicketModel, BaseTicketMixing, BaseExtraData):
             f'<font class="tax">{tax}% {taxtext}</font>'
         )
 
+    @property
+    def ticket_window_code(self) -> str:
+        return self.mp.ticket_window_code
+
     def get_gate_name(self):
         return self.gate_name
 
