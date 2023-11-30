@@ -98,7 +98,7 @@ def get_csv_tickets(modeladmin, request, queryset):
         "get_real_price",
         "cseat",
         "mp",
-        # "window_ticket"
+        "ticket_window_code",
         "session_name",
         "space_name",
         "created",

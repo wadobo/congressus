@@ -7,12 +7,14 @@ from windows.models import TicketWindow
 
 class TicketWindowFilter(admin.SimpleListFilter):
     title = _("Window ticket")
-    parameter_name = "twin"
+    parameter_name = "ticket_window_code"
 
     def lookups(self, request, model_admin):
         ticket_windows = TicketWindow.objects.select_related("event")
         if current_event := request.session.get("current_event", None):
-            ticket_windows = [tw for tw in ticket_windows if tw.event == current_event]
+            ticket_windows = [
+                tw for tw in ticket_windows if str(tw.event.id) == str(current_event)
+            ]
         ws = [(tw.id, "%s - %s" % (tw.event, tw.name)) for tw in ticket_windows]
         ws = [("--", _("without ticket window"))] + ws
         return ws
