@@ -35,7 +35,7 @@
     <p> {{ ev.info|safe }} </p>
     {% endblock %}
 
-    {% if not ev.ticket_sale_enabled and not user.is_superuser %}
+    {% if not ev.ticket_sale_enabled and not user.is_superuser and not is_my_ticket_window %}
       {% block ticket_sale_message %}
         <div class="alert alert-info text-center">
           <p>{{ ev.ticket_sale_message }}</p>
@@ -43,6 +43,11 @@
       {% endblock %}
 
     {% else %}
+        {% if not ev.ticket_sale_enabled and user.is_superuser %}
+            <div class="alert alert-info text-center">
+              <p>You are seeing this because you are superuser</p>
+            </div>
+        {% endif %}
 
       {% block form %}
       <form method="POST" action="" {% block extraform %}{% endblock %}>

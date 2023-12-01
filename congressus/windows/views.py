@@ -106,6 +106,7 @@ class WindowMultiPurchase(UserPassesTestMixin, MultiPurchaseView):
         ticket_window = self.get_window()
         ctx["window"] = ticket_window
         ctx["subsum"] = True
+        ctx["is_my_ticket_window"] = ticket_window.user == self.request.user
 
         ctx["print_formats"] = SessionTemplate.choices
 
