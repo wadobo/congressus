@@ -16,3 +16,4 @@ stripe==1.82.1
 weasyprint==59.0
 websocket-client==0.48.0
 websocket-server==0.4
+pillow>=10.2.0 # not directly required, pinned by Snyk to avoid a vulnerability
